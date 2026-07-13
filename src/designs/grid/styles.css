@@ -24,7 +24,7 @@
 .gr-wrap {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding-inline: 40px;
 }
 .gr-mono {
   font-family: var(--font-mono), monospace;
@@ -46,7 +46,7 @@
   grid-template-columns: repeat(12, 1fr);
   align-items: center;
   gap: 20px;
-  padding: 16px 0;
+  padding-block: 16px;
 }
 .gr-logo {
   grid-column: span 3;
@@ -128,7 +128,7 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 20px;
-  padding: 76px 0 0;
+  padding-block: 76px 0;
 }
 .gr-hero-copy {
   grid-column: 1 / span 6;
@@ -239,7 +239,7 @@
 /* vendor row */
 .gr-wall {
   border-bottom: 1px solid var(--rule);
-  padding: 20px 0;
+  padding-block: 20px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -438,7 +438,7 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 20px;
-  padding: 56px 0;
+  padding-block: 56px;
 }
 .gr-st {
   grid-column: span 3;
@@ -516,7 +516,7 @@
   grid-template-columns: repeat(12, 1fr);
   gap: 20px;
   align-items: center;
-  padding: 52px 0;
+  padding-block: 52px;
 }
 .gr-news-c {
   grid-column: span 6;
@@ -651,5 +651,50 @@
   .gr-form .gr-btn {
     border-left: 0;
     border-top: 1px solid var(--ink);
+  }
+}
+
+/* ---- phones ----
+   The 12-column system cannot survive here: at 320px a 20px gap spends 220px
+   of the row on gaps alone, leaving ~8px columns — enough to crop the logo
+   inside its 3-column span. Drop the nav out of the grid entirely and tighten
+   the gap for the remaining (now full-width) grid children. */
+@media (max-width: 640px) {
+  .gr-wrap {
+    padding-inline: 20px;
+  }
+  .gr-nav-in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .gr-logo {
+    grid-column: auto;
+    white-space: nowrap;
+  }
+  .gr-nav-in .gr-btn {
+    margin-left: auto;
+  }
+  .gr-sec-h,
+  .gr-tools,
+  .gr-adv,
+  .gr-trust,
+  .gr-stats,
+  .gr-cases,
+  .gr-news,
+  .gr-fgrid,
+  .gr-hero-in {
+    gap: 12px;
+  }
+  .gr-hero-in {
+    padding-block: 44px 0;
+  }
+  .gr-h1,
+  .gr-h2 {
+    overflow-wrap: break-word;
+  }
+  .gr-input {
+    min-width: 0;
   }
 }

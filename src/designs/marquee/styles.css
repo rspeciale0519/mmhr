@@ -26,7 +26,7 @@
 .mq-wrap {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 36px;
+  padding-inline: 36px;
 }
 .mq-disp {
   font-family: var(--font-display), sans-serif;
@@ -45,7 +45,7 @@
   display: flex;
   align-items: center;
   gap: 36px;
-  padding: 16px 0;
+  padding-block: 16px;
 }
 .mq-logo {
   font-family: var(--font-display), sans-serif;
@@ -679,5 +679,81 @@
   }
   .mq-form {
     flex-direction: column;
+  }
+}
+
+/* ---- phones ----
+   The nav row (logo + two buttons at a 36px gap) was widening the document. */
+@media (max-width: 640px) {
+  .mq-wrap {
+    padding-inline: 20px;
+  }
+  .mq-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .mq-ghost {
+    display: none;
+  }
+  .mq-solid {
+    margin-left: auto;
+  }
+  .mq-input {
+    min-width: 0;
+  }
+  .mq-form .mq-btn {
+    width: 100%;
+  }
+  .mq-receipt {
+    padding: 16px;
+  }
+  .mq-hero {
+    padding-block: 44px 0;
+  }
+  .mq-under {
+    padding-bottom: 40px;
+  }
+  .mq-sec {
+    padding: 56px 0;
+  }
+  .mq-news {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+}
+
+/* ---- small phones (320px) ----
+   Syne is a wide display face, so the clamp() floors above (46px / 32px) are
+   still too large at 320px: a word like "Download" is then wider than its
+   column and spills out of the box, widening the page. Lower the floors here
+   and keep break-word as a backstop for any word we did not anticipate. */
+@media (max-width: 640px) {
+  .mq-under > *,
+  .mq-adv > *,
+  .mq-news > * {
+    min-width: 0;
+  }
+  .mq-h1 {
+    max-width: none;
+    font-size: clamp(34px, 10vw, 46px);
+  }
+  .mq-h2 {
+    font-size: clamp(25px, 7.6vw, 32px);
+  }
+  .mq-news h2 {
+    font-size: clamp(24px, 7.4vw, 32px);
+  }
+  .mq-adv h3 {
+    font-size: clamp(23px, 7vw, 34px);
+  }
+  .mq-h1,
+  .mq-h2,
+  .mq-adv h3,
+  .mq-news h2 {
+    overflow-wrap: break-word;
+  }
+  .mq-eyebrow {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 }

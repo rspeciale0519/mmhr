@@ -23,7 +23,7 @@
 .d4-wrap {
   max-width: 1020px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 
 .d4-nav {
@@ -269,5 +269,41 @@
   }
   .d4-nav-links {
     display: none;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .d4-wrap {
+    padding-inline: 20px;
+  }
+  .d4-hero {
+    padding: 40px 0 44px;
+  }
+  .d4-h1 {
+    font-size: 32px;
+  }
+  .d4-form {
+    flex-direction: column;
+  }
+  .d4-input {
+    min-width: 0;
+  }
+  .d4-btn {
+    width: 100%;
+  }
+  /* the ledger is a 3-column table: scroll it rather than widen the page */
+  .d4-ledger {
+    overflow-x: auto;
+  }
+  .d4-tbl {
+    min-width: 340px;
+  }
+  .d4-notes,
+  .d4-stats {
+    grid-template-columns: 1fr;
+  }
+  .d4-band {
+    padding: 44px 0;
   }
 }

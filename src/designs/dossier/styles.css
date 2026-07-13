@@ -27,7 +27,7 @@
 .do-wrap {
   max-width: 1140px;
   margin: 0 auto;
-  padding: 0 34px;
+  padding-inline: 34px;
 }
 .do-serif {
   font-family: var(--font-display), Georgia, serif;
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 34px;
-  padding: 16px 0;
+  padding-block: 16px;
 }
 .do-logo {
   font-family: var(--font-display), Georgia, serif;
@@ -694,4 +694,53 @@
   .do-tabs {
     overflow-x: auto;
   }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .do-wrap {
+    padding-inline: 20px;
+  }
+  .do-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .do-line {
+    display: none;
+  }
+  .do-solid {
+    margin-left: auto;
+  }
+  .do-input {
+    min-width: 0;
+  }
+  .do-form .do-btn {
+    width: 100%;
+  }
+  /* the folder holds a 3-column table: scroll it instead of blowing the page */
+  .do-folder {
+    overflow-x: auto;
+  }
+  .do-line-item {
+    min-width: 300px;
+  }
+  .do-hero {
+    padding-block: 44px 52px;
+  }
+  .do-sec {
+    padding: 52px 0;
+  }
+  .do-news {
+    padding: 28px 22px;
+  }
+}
+
+/* Grid items default to min-width:auto, so a column refuses to shrink below its
+   content's min-content width — which is what was pushing the hero to 447px in a
+   350px viewport. min-width:0 lets the column shrink; the folder scrolls its own
+   table instead of widening the page. */
+.do-hero > *,
+.do-adv > *,
+.do-news > * {
+  min-width: 0;
 }

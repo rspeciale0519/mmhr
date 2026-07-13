@@ -34,7 +34,7 @@
 .h-wrap {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 
 /* ---------- nav ---------- */
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 40px;
-  padding: 15px 0;
+  padding-block: 15px;
 }
 .h-logo {
   font-weight: 800;
@@ -139,7 +139,7 @@
   grid-template-columns: 1fr 1.02fr;
   gap: 72px;
   align-items: center;
-  padding: 92px 0 100px;
+  padding-block: 92px 100px;
 }
 .h-pill {
   display: inline-flex;
@@ -834,5 +834,48 @@
   }
   .h-form {
     flex-direction: column;
+  }
+}
+
+/* ---- small phones (320px) ----
+   The nav CTA pair (sign-in + get started) was 206px on its own and would not
+   wrap, widening the document. */
+@media (max-width: 640px) {
+  .h-wrap {
+    padding-inline: 18px;
+  }
+  .h-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .h-btn-ghost {
+    display: none;
+  }
+  .h-nav-cta {
+    margin-left: auto;
+  }
+  .h-input {
+    min-width: 0;
+  }
+  .h-form .h-btn {
+    width: 100%;
+  }
+  .h-hero-in > *,
+  .h-adv > *,
+  .h-news > * {
+    min-width: 0;
+  }
+  .h-card {
+    overflow-x: auto;
+  }
+  .h-hero-in {
+    padding-block: 48px 56px;
+  }
+  .h-sec {
+    padding: 56px 0;
+  }
+  .h-stats,
+  .h-news {
+    padding: 28px 22px;
   }
 }

@@ -27,7 +27,7 @@
 .re-wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 36px;
+  padding-inline: 36px;
 }
 .re-mono {
   font-family: var(--font-mono), monospace;
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 34px;
-  padding: 16px 0;
+  padding-block: 16px;
 }
 .re-logo {
   font-size: 17px;
@@ -721,5 +721,45 @@
   }
   .re-form {
     flex-direction: column;
+  }
+}
+
+/* ---- small phones (320px) ---- */
+@media (max-width: 640px) {
+  .re-wrap {
+    padding-inline: 18px;
+  }
+  .re-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .re-line {
+    display: none;
+  }
+  .re-solid {
+    margin-left: auto;
+  }
+  .re-input {
+    min-width: 0;
+  }
+  .re-form {
+    flex-direction: column;
+  }
+  .re-form .re-btn {
+    width: 100%;
+  }
+  .re-hero > *,
+  .re-adv > *,
+  .re-news > * {
+    min-width: 0;
+  }
+  .re-hero {
+    padding-block: 44px 52px;
+  }
+  .re-sec {
+    padding: 52px 0;
+  }
+  .re-chart {
+    padding: 18px 16px 16px;
   }
 }

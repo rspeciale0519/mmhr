@@ -23,7 +23,7 @@
 .d1-wrap {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 
 /* Nav */
@@ -305,5 +305,45 @@
   }
   .d1-nav-links {
     display: none;
+  }
+}
+
+/* ---- phones ----
+   This study predates the responsive pass and had no small breakpoint: the
+   lead form stayed side-by-side (an <input> has an intrinsic min-width of
+   ~20ch, so it will not shrink on its own) and the match table forced the
+   page wider than the viewport. */
+@media (max-width: 640px) {
+  .d1-wrap {
+    padding-inline: 20px;
+  }
+  .d1-hero {
+    padding: 40px 0;
+  }
+  .d1-h1 {
+    font-size: 32px;
+  }
+  .d1-form {
+    flex-direction: column;
+  }
+  .d1-input {
+    min-width: 0;
+  }
+  .d1-btn {
+    width: 100%;
+  }
+  .d1-card {
+    overflow-x: auto;
+  }
+  .d1-table {
+    min-width: 320px;
+  }
+  .d1-band,
+  .d1-stats {
+    padding: 44px 0;
+  }
+  .d1-grid,
+  .d1-stats {
+    grid-template-columns: 1fr;
   }
 }

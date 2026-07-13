@@ -32,7 +32,7 @@
 .t-wrap {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 .t-mono {
   font-family: var(--font-mono);
@@ -52,7 +52,7 @@
   display: flex;
   align-items: center;
   gap: 36px;
-  padding: 13px 0;
+  padding-block: 13px;
 }
 .t-logo {
   display: flex;
@@ -124,7 +124,7 @@
   grid-template-columns: 0.86fr 1.14fr;
   gap: 64px;
   align-items: center;
-  padding: 84px 0 92px;
+  padding-block: 84px 92px;
 }
 .t-eyebrow {
   display: inline-flex;
@@ -791,5 +791,50 @@
   }
   .t-form {
     flex-direction: column;
+  }
+}
+
+/* ---- small phones (320px) ----
+   The hero table has a 409px min-content width: give it its own scroll
+   container rather than letting it widen the page. */
+@media (max-width: 640px) {
+  .t-wrap {
+    padding-inline: 18px;
+  }
+  .t-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .t-ghost {
+    display: none;
+  }
+  .t-primary {
+    margin-left: auto;
+  }
+  .t-input {
+    min-width: 0;
+  }
+  .t-form {
+    flex-direction: column;
+  }
+  .t-form .t-btn {
+    width: 100%;
+  }
+  .t-hero-in > *,
+  .t-adv > *,
+  .t-news > * {
+    min-width: 0;
+  }
+  .t-tbl-card {
+    overflow-x: auto;
+  }
+  .t-tbl {
+    min-width: 380px;
+  }
+  .t-hero-in {
+    padding-block: 44px 52px;
+  }
+  .t-sec {
+    padding: 52px 0;
   }
 }

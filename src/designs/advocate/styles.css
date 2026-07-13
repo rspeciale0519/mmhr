@@ -24,7 +24,7 @@
 .d2-wrap {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 
 .d2-nav {
@@ -229,5 +229,34 @@
   }
   .d2-nav-links {
     display: none;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .d2-wrap {
+    padding-inline: 20px;
+  }
+  .d2-hero {
+    padding: 40px 0 48px;
+  }
+  .d2-h1 {
+    font-size: 36px;
+  }
+  .d2-form {
+    flex-direction: column;
+  }
+  .d2-input {
+    min-width: 0;
+  }
+  .d2-btn {
+    width: 100%;
+  }
+  .d2-advisor {
+    padding: 24px;
+    gap: 20px;
+  }
+  .d2-stats {
+    gap: 28px;
   }
 }

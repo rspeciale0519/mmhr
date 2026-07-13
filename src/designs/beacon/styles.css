@@ -29,7 +29,7 @@
 .b-wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding-inline: 32px;
 }
 
 /* nav */
@@ -45,7 +45,7 @@
   display: flex;
   align-items: center;
   gap: 40px;
-  padding: 16px 0;
+  padding-block: 16px;
 }
 .b-logo {
   display: flex;
@@ -119,7 +119,7 @@
   grid-template-columns: 1.05fr 1fr;
   gap: 72px;
   align-items: center;
-  padding: 96px 0 104px;
+  padding-block: 96px 104px;
 }
 .b-kick {
   display: inline-flex;
@@ -147,19 +147,24 @@
   font-style: normal;
   color: var(--teal);
   position: relative;
-  white-space: nowrap;
+  /* Deliberately NOT white-space:nowrap — "someone on your side" is 446px at
+     this size and would blow past a 390px viewport. It may wrap; the underline
+     below follows it. */
 }
-/* the single flourish: a hand-drawn underline under the promise */
-.b-h1 em::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.08em;
-  height: 0.14em;
-  border-radius: 999px;
-  background: var(--teal);
-  opacity: 0.28;
+/* The single flourish: an underline under the promise. Drawn as a background
+   swipe rather than an absolutely-positioned ::after, so that when the phrase
+   wraps onto two lines on a phone each line keeps its own underline instead of
+   one bar stretching across the whole block. */
+.b-h1 em {
+  background-image: linear-gradient(
+    to top,
+    rgba(18, 133, 122, 0.28) 0,
+    rgba(18, 133, 122, 0.28) 0.1em,
+    transparent 0.1em
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-bottom: 0.06em;
 }
 .b-lede {
   font-size: 18.5px;
@@ -793,4 +798,54 @@
   .b-form {
     flex-direction: column;
   }
+}
+
+/* ---- phones ----
+   The nav row (logo + two pill buttons at a 40px gap) exceeded 390px. */
+@media (max-width: 640px) {
+  .b-wrap {
+    padding-inline: 20px;
+  }
+  .b-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .b-ghost {
+    display: none;
+  }
+  .b-primary {
+    margin-left: auto;
+  }
+  .b-input {
+    min-width: 0;
+  }
+  .b-form .b-btn {
+    width: 100%;
+  }
+  .b-hero-in {
+    padding-block: 48px 56px;
+  }
+  .b-sec {
+    padding: 56px 0;
+  }
+  .b-thread,
+  .b-panel {
+    padding: 16px;
+  }
+  .b-news {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+  .b-stats {
+    padding: 28px 22px;
+    border-radius: 16px;
+  }
+}
+
+/* Same grid blowout as dossier: min-width:auto on grid items refuses to shrink
+   below min-content, widening the whole page on phones. */
+.b-hero-in > *,
+.b-adv > *,
+.b-news > * {
+  min-width: 0;
 }

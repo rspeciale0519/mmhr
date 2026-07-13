@@ -26,7 +26,7 @@
 .bu-wrap {
   max-width: 1160px;
   margin: 0 auto;
-  padding: 0 34px;
+  padding-inline: 34px;
 }
 .bu-serif {
   font-family: var(--font-display), Georgia, serif;
@@ -673,5 +673,55 @@
   }
   .bu-form {
     flex-direction: column;
+  }
+}
+
+/* ---- phones ----
+   The masthead was the culprit: logo + two buttons at a 36px gap don't fit in
+   390px, which widened the document and dragged every other section with it. */
+@media (max-width: 640px) {
+  .bu-wrap {
+    padding-inline: 20px;
+  }
+  .bu-mast-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 10px;
+  }
+  .bu-mast-main {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .bu-logo {
+    font-size: 22px;
+  }
+  .bu-outline {
+    display: none; /* keep the primary CTA; sign-in lives in the footer */
+  }
+  .bu-solid {
+    margin-left: auto;
+  }
+  .bu-input {
+    min-width: 0;
+  }
+  .bu-form .bu-btn {
+    width: 100%;
+  }
+  /* the figure is a table: let it scroll rather than blow out the page */
+  .bu-fig {
+    overflow-x: auto;
+  }
+  .bu-tbl {
+    min-width: 320px;
+  }
+  .bu-hero {
+    padding-block: 44px 48px;
+  }
+  .bu-sec {
+    padding: 52px 0;
+  }
+  .bu-sec-h {
+    flex-wrap: wrap;
   }
 }

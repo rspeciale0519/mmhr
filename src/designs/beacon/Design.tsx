@@ -79,9 +79,10 @@ export default function Beacon() {
                 Paycom quoted us $161k/yr for 240 people. Is that normal?
               </div>
               <div className="b-msg b-msg-adv">
-                It&rsquo;s about <b>22% above</b> what companies your size paid
-                last quarter. Two of the modules in there almost nobody turns on.
-                Send me the PDF and I&rsquo;ll mark it up.
+                It&rsquo;s about <b>30% above</b>{" "}
+                what companies your size paid last quarter. Two of the modules in
+                there almost nobody turns on. Send me the PDF and I&rsquo;ll mark
+                it up.
               </div>
               <div className="b-msg b-msg-you">Just sent it 🙏</div>
             </div>
