@@ -15,11 +15,25 @@ gate, re-issue the same phase goal to continue.
 verification + decide GitHub repo name/visibility) BEFORE the first goal issuance, so the
 Phase 0 goal runs uninterrupted from scaffold to the G3 design-approval stop.
 
-## Current state (do not rediscover)
-- Docs-only repo; not yet git-initialized. Pre-flight (below) runs inside the Phase 0 goal.
+## Current state (do not rediscover, do not redo)
+- **Git is fully set up** (2026-07-12): repo initialized, `main` + `develop` both pushed to
+  `git@github.com:rspeciale0519/mmhr.git` (private; `develop` is the default branch).
+  Initial commit holds the planning docs + `.env.example` + `.gitignore`.
+- **All third-party accounts are provisioned and `.env.local` is fully populated**
+  (never commit it; `.gitignore` covers it): local Supabase (active) + cloud Supabase
+  (commented out — copy to Vercel env vars for staging, never uncomment locally),
+  Payload, Anthropic, Firecrawl, Trigger.dev (project ref `proj_mmmffglqprpzbymxcwqe`,
+  DEV secret key), Resend (sender domain `directmailmarketinghq.net` — verify it's a
+  verified domain in Resend before relying on sends), Beehiiv (key + publication id),
+  Cal.com (`miodiollc/30min`), PostHog (`phc_` project token verified correct),
+  Sentry (org `miodio-llc`, project `mmhr`, DSN + auth token), generated
+  PAYLOAD_SECRET/CRON_SECRET. **Do not run any service signup flows.**
+- **Sentry and Trigger.dev wizard/init steps were intentionally deferred** — they
+  require a package.json; run their init/instrumentation as part of the scaffold
+  (`npx trigger.dev init -p proj_mmmffglqprpzbymxcwqe`; Sentry via manual Next.js
+  instrumentation or wizard), consuming the existing `.env.local` values.
 - No design assets exist or should be sought — design is created fresh (development-plan §4.2).
 - Stack decisions D1–D7 + D14: **ratified 2026-07-12** (development-plan §3). D8–D13 open, due at their listed phases.
-- GitHub repo exists: `git@github.com:rspeciale0519/mmhr.git` (private) — add as remote during pre-flight; do not create one.
 
 ## OWNER GATES (work pauses; only the owner clears them)
 G1. ~~Ratification of D1–D14~~ **CLEARED 2026-07-12**: stack + service matrix ratified
@@ -49,9 +63,9 @@ Hitting a gate: announce it plainly, log it in `docs/temp/BLOCKERS.md`, stop new
 ## PHASES — exit criteria as runnable checks
 
 ### Phase 0 — Foundations & design system
-0.1 Pre-flight done: `git init` (main+develop); remote `git@github.com:rspeciale0519/mmhr.git`
-    added (already created by owner) and both branches pushed — `git branch -a` +
-    `git remote -v` shown. (G1 already cleared 2026-07-12.)
+0.1 ~~Pre-flight~~ **DONE 2026-07-12** (git init, remote, both branches pushed, accounts
+    provisioned, `.env.local` populated — see Current state). Verification only:
+    `git branch -a` + `git remote -v` output shown once at phase start.
 0.2 Design explorations rendered and G3 approval given in-conversation.
 0.3 Approved direction codified: sample page built from theme tokens + component library,
     screenshot shown via chrome-devtools against local dev server.

@@ -4,9 +4,9 @@
 > phases complete (Rule 7). PRD requirement IDs in parentheses.
 
 ## Pre-flight (upon build authorization)
-- [ ] git init with `main` + `develop` branches; add existing remote `git@github.com:rspeciale0519/mmhr.git` and push both
+- [x] git init with `main` + `develop`; remote `git@github.com:rspeciale0519/mmhr.git` (private, develop default) — both pushed 2026-07-12
 - [x] Ratify decision log D1–D7 + service matrix D14 — ratified 2026-07-12 after live pricing verification
-- [ ] Provision third-party accounts per ratified matrix; wire credentials into local/staging env
+- [x] Provision third-party accounts + populate `.env.local` — done 2026-07-12 (Vercel staging env-var wiring remains a Phase 0 task)
 
 ## Phase 0 — Foundations & design system
 - [ ] Next.js + TypeScript + Tailwind + shadcn scaffold with (marketing)/(auth)/(app)/(admin) route groups

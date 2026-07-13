@@ -39,13 +39,10 @@ authored at phase start and approved before code.
 | Visual design | None — created fresh in Phase 0 (frontend-design + shadcn skills), owner-approved before codifying |
 | Vendor seed data (50+ profiles) | Not started — the effort's long pole; research/authoring work, not code (see §8 Risks) |
 
-**Pre-flight actions upon authorization (before any feature code):**
-1. `git init` with `main` + `develop` branches (Rule 8 workflow requires `develop`);
-   add the existing remote `git@github.com:rspeciale0519/mmhr.git` (owner-created,
-   private) and push both branches.
-2. ~~Ratify D1–D7 + D14~~ — **done 2026-07-12** (see §3).
-3. Provision the ratified third-party accounts (all free tiers at this stage) and wire
-   credentials into local/staging env.
+**Pre-flight: COMPLETE (2026-07-12).** Git initialized with `main` + `develop`, both
+pushed to `git@github.com:rspeciale0519/mmhr.git` (private, `develop` default); D1–D7 +
+D14 ratified (§3); all third-party accounts provisioned and `.env.local` fully populated
+(cloud Supabase keys held for Vercel staging env vars — a Phase 0 task).
 
 ---
 
