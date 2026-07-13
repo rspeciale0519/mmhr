@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
+import { CookieConsent } from "@/components/cookie-consent";
 import { brand } from "@/lib/brand";
 import { TRPCReactProvider } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <CookieConsent />
       </body>
     </html>
   );
