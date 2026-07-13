@@ -13,10 +13,11 @@
 - [ ] Fresh design direction via frontend-design skill → owner approval of rendered explorations
 - [ ] Approved direction codified via shadcn skill: theme tokens + core component library
 - [x] Local Supabase + Drizzle + first migration (identity, leads) — 5 tables, RLS enabled default-deny
-- [ ] Supabase Auth skeleton (sign-up/sign-in round-trip)
-- [ ] tRPC wiring; brand config module
-- [ ] CI (type-check, lint, tests, Lighthouse budget) + Vercel/Supabase staging deploy
-- [ ] PostHog project + consent-gated client
+- [x] Supabase Auth skeleton (sign-up/sign-in round-trip) — verified in-browser + integration tests
+- [x] tRPC wiring; brand config module
+- [x] CI (type-check, lint, unit tests, build) — green on GitHub Actions
+- [ ] Vercel staging deploy
+- [x] PostHog project + consent-gated client — 0 tracking requests before consent (browser-verified)
 
 ## Phase 1 — Marketing site + lead gate
 - [ ] All public pages (FR-M1): Home (FR-M2), Platform, Broker Model, Services, Case Studies, FAQ, About, Contact, Partners ×3, Resources, Transparency, Privacy/Terms
