@@ -9,10 +9,10 @@
 - [x] Provision third-party accounts + populate `.env.local` — done 2026-07-12 (Vercel staging env-var wiring remains a Phase 0 task)
 
 ## Phase 0 — Foundations & design system
-- [ ] Next.js + TypeScript + Tailwind + shadcn scaffold with (marketing)/(auth)/(app)/(admin) route groups
+- [x] Next.js + TypeScript + Tailwind + shadcn scaffold with (marketing)/(auth)/(app)/(admin) route groups
 - [ ] Fresh design direction via frontend-design skill → owner approval of rendered explorations
 - [ ] Approved direction codified via shadcn skill: theme tokens + core component library
-- [ ] Local Supabase + Drizzle + first migration (identity, leads)
+- [x] Local Supabase + Drizzle + first migration (identity, leads) — 5 tables, RLS enabled default-deny
 - [ ] Supabase Auth skeleton (sign-up/sign-in round-trip)
 - [ ] tRPC wiring; brand config module
 - [ ] CI (type-check, lint, tests, Lighthouse budget) + Vercel/Supabase staging deploy
