@@ -1,8 +1,16 @@
-// Placeholder. Real sign-in form + server action land in Task 5.
+import Link from "next/link";
+
+import { signIn } from "../actions";
+import { AuthForm } from "../auth-form";
+
 export default function SignInPage() {
   return (
-    <main>
-      <h1>Sign in</h1>
+    <main className="mx-auto flex w-full max-w-md flex-col gap-6 p-8">
+      <h1 className="text-2xl font-semibold">Sign in</h1>
+      <AuthForm action={signIn} submitLabel="Sign in" />
+      <p className="text-sm">
+        No account yet? <Link href="/sign-up">Sign up</Link>
+      </p>
     </main>
   );
 }
