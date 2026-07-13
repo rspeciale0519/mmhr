@@ -7,10 +7,15 @@ import Bureau from "./bureau/Design";
 import Dossier from "./dossier/Design";
 import Grid from "./grid/Design";
 import Harbor from "./harbor/Design";
+import Itinerary from "./itinerary/Design";
 import Ledger from "./ledger/Design";
 import Marquee from "./marquee/Design";
+import Memo from "./memo/Design";
+import Redline from "./redline/Design";
 import Report from "./report/Design";
 import Scorecard from "./scorecard/Design";
+import Specimen from "./specimen/Design";
+import Sticker from "./sticker/Design";
 import Terminal from "./terminal/Design";
 
 export type DesignOption = {
@@ -41,6 +46,66 @@ export type DesignOption = {
  * own URL automatically — nothing else to wire up.
  */
 export const DESIGNS: DesignOption[] = [
+  {
+    slug: "redline",
+    name: "Redline",
+    round: 4,
+    line: "The buyer's own legal markup",
+    hero: "A contract, actually redlined",
+    note: "The hero is a real contract clause shown with tracked-changes markup — vendor language struck in red, buyer-favorable language inserted in green, with an advisor's margin note explaining why. Source Serif 4 for the document, Courier Prime for every annotation.",
+    swatch: ["#1B1B18", "#B3261E", "#FBFAF7", "#2F6B3A"],
+    type: "Source Serif 4 + Courier Prime",
+    scope: "full homepage",
+    Component: Redline,
+  },
+  {
+    slug: "specimen",
+    name: "Specimen",
+    round: 4,
+    line: "A field guide to HR software",
+    hero: "Plate No. 014 — Rippling",
+    note: "Fifty-two systems catalogued like species: habitat, distinguishing marks, field notes. A thin scale-bar rule recurs as the page's only structural device. Fraunces carries the naturalist-book warmth; Work Sans stays out of the way.",
+    swatch: ["#232019", "#8A5A34", "#F7F4EC", "#ffffff"],
+    type: "Fraunces + Work Sans",
+    scope: "full homepage",
+    Component: Specimen,
+  },
+  {
+    slug: "itinerary",
+    name: "Itinerary",
+    round: 4,
+    line: "The buyer's journey, boarded",
+    hero: "An actual boarding pass",
+    note: "RFP to signed contract is a real five-stop sequence, so a literal boarding pass and departure board earn their place — perforated stub, gate and seat fields, a split-flap status board with 'Negotiation' lit up as 'you are here.' Space Grotesk for the cities, Space Mono for every code.",
+    swatch: ["#14151A", "#C97A1D", "#FAFAF8", "#FFFDF6"],
+    type: "Space Grotesk + Space Mono + DM Sans",
+    scope: "full homepage",
+    Component: Itinerary,
+  },
+  {
+    slug: "memo",
+    name: "Memo",
+    round: 4,
+    line: "The declassified internal memo",
+    hero: "A redaction bar, peeled back",
+    note: "The broker's whole pitch is reversed information asymmetry, so the hero shows it happening: a memo with black bars over the numbers, one bar peeled at the corner to reveal $161,400 underneath. Special Elite's typewriter roughness against clean Inter figures is the whole tension.",
+    swatch: ["#1A1A1A", "#A1281F", "#F1EEE6", "#17181C"],
+    type: "Special Elite + Inter",
+    scope: "full homepage",
+    Component: Memo,
+  },
+  {
+    slug: "sticker",
+    name: "Sticker",
+    round: 4,
+    line: "The window sticker, for HRIS",
+    hero: "MSRP vs. invoice price",
+    note: "Everyone knows to distrust a car's window sticker. The hero applies the same instinct to an HRIS quote: an itemized label, a struck-through sticker price, a barcode, and the real negotiated number sitting right below it. Barlow Condensed reads like a government form; Roboto Mono carries every figure.",
+    swatch: ["#101114", "#B23A2E", "#FFFFFF", "#C7A600"],
+    type: "Barlow Condensed + Roboto Mono",
+    scope: "full homepage",
+    Component: Sticker,
+  },
   {
     slug: "report",
     name: "Report",
@@ -192,6 +257,12 @@ export function getDesign(slug: string) {
 }
 
 export const ROUNDS = [
+  {
+    n: 4,
+    title: "Round 4 — five more angles, same brief",
+    blurb:
+      "Round 3's neutral-canvas rule carries over — ink and paper, no color backgrounds — but each of these five takes a completely different real-world artifact as its signature: a redlined contract, a field-guide specimen plate, a boarding pass, a declassified memo, a car's window sticker. Five more arguments for what this page could be.",
+  },
   {
     n: 3,
     title: "Round 3 — neutral canvases, five type systems",

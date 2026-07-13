@@ -1,0 +1,745 @@
+/* STICKER — the window sticker / Monroney label.
+   Everyone knows a car's window sticker is a starting point, not the real
+   price. HRIS quotes work the same way. The signature moment is a literal
+   label: itemized rows with dotted-leader pricing, a barcode, and the
+   sticker price (struck through) next to the negotiated invoice price.
+   The dotted-leader itemization motif repeats in the "included" panels
+   below so the concept isn't confined to the hero. */
+
+.sk {
+  --paper: #FFFFFF;
+  --ink: #101114;
+  --body: #494B52;
+  --rule: #D9DBE0;
+  --caution: #C7A600;
+  --flag: #B23A2E;
+
+  /* local extras, kept out of the required token block */
+  --off: #F6F6F3;
+  --card: #FEFEFC;
+  --rule-strong: #C3C6CD;
+  --shadow: rgba(16, 17, 20, 0.14);
+
+  background: var(--paper);
+  color: var(--ink);
+}
+.sk *,
+.sk *::before,
+.sk *::after {
+  box-sizing: border-box;
+}
+
+.sk-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 32px;
+}
+
+.sk-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+.sk-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--caution);
+  border-radius: 1px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* nav */
+.sk-nav {
+  border-bottom: 1px solid var(--rule);
+}
+.sk-nav-in {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-block: 18px;
+}
+.sk-logo {
+  font-family: var(--font-display), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.sk-links {
+  display: flex;
+  gap: 22px;
+  margin-right: auto;
+  font-size: 14px;
+  color: var(--body);
+}
+.sk-btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+.sk-btn-solid {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 10px 18px;
+  font-size: 14px;
+}
+.sk-btn-solid:hover {
+  background: var(--flag);
+  border-color: var(--flag);
+}
+.sk-btn-line {
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 15px;
+  font-size: 14px;
+}
+.sk-btn-line:hover {
+  background: rgba(16, 17, 20, 0.05);
+}
+.sk-btn-lg {
+  padding: 13px 22px;
+  font-size: 15px;
+}
+
+/* hero */
+.sk-hero-band {
+  background: linear-gradient(180deg, var(--off) 0%, var(--paper) 100%);
+  border-bottom: 1px solid var(--rule);
+}
+.sk-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  padding-block: 72px 76px;
+  align-items: center;
+}
+.sk-h1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(34px, 4.4vw, 54px);
+  line-height: 1.08;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 18px 0 20px;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.sk-lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--body);
+  margin: 0 0 30px;
+  max-width: 46ch;
+}
+.sk-form {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+}
+.sk-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  font: inherit;
+  font-size: 15px;
+  background: var(--card);
+  color: var(--ink);
+}
+.sk-input:focus-visible {
+  outline: 3px solid rgba(178, 58, 46, 0.16);
+  border-color: var(--flag);
+}
+.sk-fine {
+  margin-top: 13px;
+  font-size: 13.5px;
+  color: var(--body);
+}
+
+/* SIGNATURE: the window sticker label */
+.sk-label {
+  background: var(--card);
+  border: 2px dashed var(--rule-strong);
+  border-radius: 10px;
+  padding: 22px 24px 20px;
+  box-shadow: 0 26px 50px -32px var(--shadow);
+}
+.sk-label-head {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--body);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+}
+
+.sk-items {
+  display: flex;
+  flex-direction: column;
+}
+.sk-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+}
+.sk-item-name {
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+.sk-item-leader {
+  flex: 1 1 auto;
+  border-bottom: 1px dotted var(--rule-strong);
+  margin-bottom: 4px;
+  min-width: 12px;
+}
+.sk-item-price {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.sk-rule-dbl {
+  border-top: 3px double var(--ink);
+  margin: 10px 0 2px;
+}
+
+.sk-sticker-row .sk-item-name,
+.sk-sticker-row .sk-item-price {
+  color: var(--body);
+}
+.sk-sticker-row .sk-item-price {
+  text-decoration: line-through;
+  text-decoration-color: var(--body);
+}
+
+.sk-mm-row {
+  padding-top: 10px;
+}
+.sk-mm-row .sk-item-name {
+  font-weight: 700;
+  color: var(--flag);
+  font-size: 13.5px;
+}
+.sk-mm-row .sk-item-price {
+  font-weight: 700;
+  color: var(--flag);
+  font-size: 19px;
+}
+.sk-mm-row .sk-item-leader {
+  border-bottom-color: var(--flag);
+  opacity: 0.35;
+}
+
+.sk-label-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--body);
+  font-style: italic;
+  margin: 10px 0 16px;
+}
+
+.sk-barcode-wrap {
+  border-top: 1px dashed var(--rule);
+  padding-top: 14px;
+}
+/* bar widths are flex-grow weights, not fixed pixels, so the barcode always
+   fills its container and can never force horizontal scroll at any width */
+.sk-barcode {
+  display: flex;
+  align-items: stretch;
+  height: 28px;
+  gap: 1px;
+}
+.sk-barcode i {
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 0;
+  background: var(--ink);
+  display: block;
+}
+.sk-upc {
+  margin-top: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--body);
+  text-align: center;
+}
+
+/* vendor wall */
+.sk-wall {
+  padding-block: 22px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.sk-wall-v {
+  font-size: 13.5px;
+  color: var(--body);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sk-wall-v::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 1px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* sections */
+.sk-sec {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.sk-off {
+  background: var(--off);
+}
+.sk-sec-h {
+  margin-bottom: 44px;
+  max-width: 64ch;
+}
+.sk-h2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(26px, 2.8vw, 34px);
+  line-height: 1.16;
+  font-weight: 700;
+  margin: 12px 0 0;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+/* tools */
+.sk-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.sk-tool {
+  background: var(--card);
+  padding: 26px;
+}
+.sk-tool-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--body);
+  margin-bottom: 14px;
+}
+.sk-tool h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  margin: 0 0 8px;
+}
+.sk-tool p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0 0 10px;
+}
+.sk-tool small {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--body);
+  opacity: 0.85;
+  display: block;
+}
+
+/* advantages */
+.sk-adv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  padding: 46px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.sk-adv:last-of-type {
+  border-bottom: 0;
+}
+.sk-adv.flip .sk-adv-copy {
+  order: 2;
+}
+.sk-adv-copy h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  margin: 0 0 12px;
+}
+.sk-adv-copy p {
+  font-size: 15.5px;
+  line-height: 1.68;
+  color: var(--body);
+  margin: 0;
+}
+.sk-adv-copy p b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* an "included" panel that borrows the label's dotted-leader itemization */
+.sk-adv-panel {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 20px 22px;
+}
+.sk-adv-panel-h {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--body);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+}
+.sk-adv-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+}
+.sk-adv-row-name {
+  font-size: 13.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+.sk-adv-row-leader {
+  flex: 1 1 auto;
+  border-bottom: 1px dotted var(--rule-strong);
+  margin-bottom: 3px;
+  min-width: 10px;
+}
+.sk-adv-row-tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--flag);
+  flex: 0 0 auto;
+}
+
+/* method / trust */
+.sk-trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+.sk-tc {
+  border-top: 2px solid var(--ink);
+  padding-top: 16px;
+}
+.sk-tc h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.sk-tc p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+
+/* stats */
+.sk-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+  padding: 56px 0;
+}
+.sk-st-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sk-st-l {
+  font-size: 13.5px;
+  color: var(--body);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* cases */
+.sk-cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.sk-case {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.sk-case:hover {
+  border-color: var(--rule-strong);
+  box-shadow: 0 14px 28px -20px var(--shadow);
+}
+.sk-case-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--flag);
+}
+.sk-case-nl {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--body);
+  margin-bottom: 8px;
+}
+.sk-case h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+}
+.sk-case p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+
+/* newsletter */
+.sk-news {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 44px;
+  align-items: center;
+  padding-block: 48px;
+}
+.sk-news h2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 29px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.sk-news p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--body);
+  line-height: 1.6;
+}
+.sk-news-form {
+  max-width: none;
+}
+
+/* footer */
+.sk-foot {
+  border-top: 1px solid var(--ink);
+  padding: 48px 0 36px;
+}
+.sk-fgrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.sk-foot p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 10px 0 0;
+  max-width: 32ch;
+}
+.sk-fc h4 {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--body);
+  margin: 0 0 14px;
+}
+.sk-fc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.sk-fc li {
+  font-size: 14px;
+  color: var(--body);
+}
+.sk-fbot {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--body);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---- tablet: collapse multi-column grids ---- */
+@media (max-width: 1000px) {
+  .sk-hero,
+  .sk-adv,
+  .sk-news {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .sk-adv.flip .sk-adv-copy {
+    order: 0;
+  }
+  .sk-tools,
+  .sk-stats,
+  .sk-cases,
+  .sk-trust,
+  .sk-fgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sk-links {
+    display: none;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .sk-wrap {
+    padding-inline: 18px;
+  }
+  .sk-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sk-btn-line {
+    display: none;
+  }
+  .sk-btn-solid {
+    margin-left: auto;
+  }
+  .sk-form {
+    flex-direction: column;
+  }
+  .sk-form .sk-btn {
+    width: 100%;
+  }
+  .sk-input {
+    min-width: 0;
+  }
+
+  .sk-h1 {
+    font-size: clamp(30px, 9vw, 38px);
+  }
+  .sk-h1,
+  .sk-h2 {
+    overflow-wrap: break-word;
+  }
+
+  .sk-hero {
+    padding-block: 44px 48px;
+  }
+  .sk-sec {
+    padding: 52px 0;
+  }
+
+  .sk-tools,
+  .sk-stats,
+  .sk-cases,
+  .sk-trust,
+  .sk-fgrid {
+    grid-template-columns: 1fr;
+  }
+  .sk-hero > *,
+  .sk-adv > *,
+  .sk-news > *,
+  .sk-tools > *,
+  .sk-stats > *,
+  .sk-cases > *,
+  .sk-trust > *,
+  .sk-fgrid > * {
+    min-width: 0;
+  }
+
+  .sk-label {
+    padding: 18px 16px 16px;
+  }
+
+  /* itemized rows: drop the dotted leader and stack label above price
+     rather than truncate or overflow at narrow widths */
+  .sk-item,
+  .sk-adv-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .sk-item-leader,
+  .sk-adv-row-leader {
+    display: none;
+  }
+  .sk-item-name,
+  .sk-item-leader,
+  .sk-item-price,
+  .sk-adv-row-name,
+  .sk-adv-row-leader,
+  .sk-adv-row-tag {
+    min-width: 0;
+  }
+
+  .sk-barcode {
+    height: 22px;
+  }
+  .sk-upc {
+    letter-spacing: 0.16em;
+    font-size: 11px;
+  }
+
+  .sk-wall {
+    gap: 14px;
+  }
+}
