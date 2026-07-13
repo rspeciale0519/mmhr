@@ -1,7 +1,7 @@
 import { Manrope, Sora } from "next/font/google";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
-import "./direction.css";
+import "./styles.css";
 
 const display = Sora({
   subsets: ["latin"],

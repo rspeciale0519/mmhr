@@ -1,7 +1,7 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
-import "./direction.css";
+import "./styles.css";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],

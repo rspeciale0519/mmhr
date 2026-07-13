@@ -1,0 +1,309 @@
+/* Direction 1 — Scorecard.
+   Cool, analytical, product-forward. The signature is the hero itself: a live
+   match table. Everything else stays quiet so the table carries the page. */
+
+.d1 {
+  --ink: #101828;
+  --paper: #f7f9fb;
+  --card: #ffffff;
+  --slate: #5c6b80;
+  --line: #dde3ea;
+  --signal: #b47b12; /* the recommendation — used exactly twice */
+  --fit: #0f766e;
+
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.d1 * {
+  box-sizing: border-box;
+}
+
+.d1-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Nav */
+.d1-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+.d1-logo {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.d1-nav-links {
+  display: flex;
+  gap: 28px;
+  font-size: 14px;
+  color: var(--slate);
+}
+
+/* Hero */
+.d1-hero {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 64px;
+  align-items: center;
+  padding: 88px 0;
+}
+.d1-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 20px;
+}
+.d1-h1 {
+  font-size: clamp(36px, 4.4vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+.d1-sub {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--slate);
+  margin: 0 0 32px;
+  max-width: 42ch;
+}
+.d1-form {
+  display: flex;
+  gap: 8px;
+  max-width: 420px;
+}
+.d1-input {
+  flex: 1;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 15px;
+  background: var(--card);
+}
+.d1-input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.d1-btn {
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.d1-fineprint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--slate);
+}
+
+/* THE SIGNATURE: the hero is the scorecard */
+.d1-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+.d1-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.d1-card-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.d1-card-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--slate);
+}
+.d1-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.d1-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate);
+  font-weight: 500;
+  text-align: left;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.d1-table th.num,
+.d1-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+.d1-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.d1-table tr:last-child td {
+  border-bottom: 0;
+}
+.d1-vendor {
+  font-weight: 600;
+}
+.d1-vendor-sub {
+  font-size: 12px;
+  color: var(--slate);
+  margin-top: 2px;
+}
+/* the match bar — how well each vendor fits YOU */
+.d1-bar {
+  position: relative;
+  height: 5px;
+  width: 84px;
+  border-radius: 999px;
+  background: #eef1f5;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.d1-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--fit);
+  display: block;
+}
+.d1-pct {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.d1-featured {
+  background: #fdfaf3;
+}
+.d1-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal);
+  border: 1px solid #e8d5ab;
+  background: #fdf6e7;
+  border-radius: 3px;
+  padding: 2px 5px;
+  margin-left: 8px;
+  vertical-align: 1px;
+}
+.d1-card-foot {
+  padding: 12px 20px;
+  font-size: 12px;
+  color: var(--slate);
+  background: #fbfcfd;
+  border-top: 1px solid var(--line);
+}
+
+/* Broker model */
+.d1-band {
+  border-top: 1px solid var(--line);
+  padding: 72px 0;
+}
+.d1-band-head {
+  max-width: 56ch;
+  margin-bottom: 40px;
+}
+.d1-h2 {
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+.d1-band p {
+  color: var(--slate);
+  line-height: 1.65;
+  margin: 0;
+  font-size: 16px;
+}
+.d1-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.d1-tile {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px;
+}
+.d1-tile h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.d1-tile p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--slate);
+  margin: 0;
+}
+.d1-tile-k {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--slate);
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* Stats */
+.d1-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  border-top: 1px solid var(--line);
+  padding: 56px 0 88px;
+}
+.d1-stat-n {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.d1-stat-l {
+  font-size: 13px;
+  color: var(--slate);
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .d1-hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 48px 0;
+  }
+  .d1-grid,
+  .d1-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .d1-nav-links {
+    display: none;
+  }
+}

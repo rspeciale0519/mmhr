@@ -1,7 +1,7 @@
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
-import "./direction.css";
+import "./styles.css";
 
 const sans = Archivo({
   subsets: ["latin"],

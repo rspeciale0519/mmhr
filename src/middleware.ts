@@ -10,6 +10,21 @@ import { NextResponse, type NextRequest } from "next/server";
  * work in Phase 2, where there is an actual authorization model to enforce.
  */
 export async function middleware(request: NextRequest) {
+  // GALLERY_ONLY builds (the public design-review deployment) serve nothing but
+  // /designs. The app and admin routes never render, and sign-up is unreachable
+  // — so a public URL can't be used to create accounts against a real Supabase
+  // project. Auth is skipped entirely here: there is nothing to authenticate.
+  if (process.env.GALLERY_ONLY === "1") {
+    const { pathname } = request.nextUrl;
+    if (pathname === "/designs" || pathname.startsWith("/designs/")) {
+      return NextResponse.next();
+    }
+    const url = request.nextUrl.clone();
+    url.pathname = "/designs";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   const response = NextResponse.next({ request });
 
   const supabase = createServerClient(
