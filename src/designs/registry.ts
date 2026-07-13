@@ -3,8 +3,13 @@ import type { ComponentType } from "react";
 import Advocate from "./advocate/Design";
 import Beacon from "./beacon/Design";
 import Blueprint from "./blueprint/Design";
+import Bureau from "./bureau/Design";
+import Dossier from "./dossier/Design";
+import Grid from "./grid/Design";
 import Harbor from "./harbor/Design";
 import Ledger from "./ledger/Design";
+import Marquee from "./marquee/Design";
+import Report from "./report/Design";
 import Scorecard from "./scorecard/Design";
 import Terminal from "./terminal/Design";
 
@@ -36,6 +41,66 @@ export type DesignOption = {
  * own URL automatically — nothing else to wire up.
  */
 export const DESIGNS: DesignOption[] = [
+  {
+    slug: "report",
+    name: "Report",
+    round: 3,
+    line: "Data journalism",
+    hero: "Where your quote lands",
+    note: "The hero is a real distribution chart: what 214 comparable companies actually paid, with your quote marked in ochre above the median. It turns the benchmarking service into the picture. Libre Franklin with a mono for every figure.",
+    swatch: ["#0f0f10", "#b45309", "#fafafa", "#ffffff"],
+    type: "Libre Franklin + Chivo Mono",
+    scope: "full homepage",
+    Component: Report,
+  },
+  {
+    slug: "bureau",
+    name: "Bureau",
+    round: 3,
+    line: "The published brief",
+    hero: "Fig. 1 — a typeset figure",
+    note: "Set like a research publication: a masthead with an edition line, a typeset thesis, and the match table presented as a numbered figure with a caption. Instrument Serif against Geist. Oxblood appears four times on the whole page.",
+    swatch: ["#14110f", "#8c2b22", "#f5f4f2", "#ffffff"],
+    type: "Instrument Serif + Geist",
+    scope: "full homepage",
+    Component: Bureau,
+  },
+  {
+    slug: "grid",
+    name: "Grid",
+    round: 3,
+    line: "International style",
+    hero: "The construction grid, left visible",
+    note: "A selection is a system, so the page is built as one and shows its work: a visible 12-column grid, everything snapped to it, numerals set enormous, and a single Swiss red used only where the eye must go.",
+    swatch: ["#0a0a0a", "#e4002b", "#fafafa", "#ffffff"],
+    type: "Schibsted Grotesk + JetBrains Mono",
+    scope: "full homepage",
+    Component: Grid,
+  },
+  {
+    slug: "marquee",
+    name: "Marquee",
+    round: 3,
+    line: "Type as the art",
+    hero: "A shout, then the receipts",
+    note: "Every site in this category whispers. This one says it at 108px — then puts a small, precise match table directly underneath to prove it isn't bluster. The whole design is that tension. Syne shouts; Epilogue stays calm.",
+    swatch: ["#121013", "#5b21b6", "#faf9f8", "#ffffff"],
+    type: "Syne + Epilogue",
+    scope: "full homepage",
+    Component: Marquee,
+  },
+  {
+    slug: "dossier",
+    name: "Dossier",
+    round: 3,
+    line: "The case file",
+    hero: "A tabbed folder",
+    note: "Your advisor keeps a file on your purchase — requirements, quotes, the marked-up proposal. This page is that file: tabbed dividers, typed clause labels, an advisor's note in the margin. Brass, not gold: an archive, not a luxury brand.",
+    swatch: ["#17181a", "#8a6e2f", "#f2f2f2", "#ffffff"],
+    type: "Literata + Public Sans",
+    scope: "full homepage",
+    Component: Dossier,
+  },
   {
     slug: "harbor",
     name: "Harbor",
@@ -127,6 +192,12 @@ export function getDesign(slug: string) {
 }
 
 export const ROUNDS = [
+  {
+    n: 3,
+    title: "Round 3 — neutral canvases, five type systems",
+    blurb:
+      "Same OutSail-derived skeleton, but the background stays neutral in every one — white, off-white, or paper-grey — so the typography and one accent carry the whole identity. Five genuinely different type systems, from a high-contrast serif to a Swiss grotesque to a display face doing the shouting.",
+  },
   {
     n: 2,
     title: "Round 2 — full homepages",

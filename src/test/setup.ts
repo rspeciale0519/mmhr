@@ -12,17 +12,26 @@ import { vi } from "vitest";
  */
 const FONT_LOADERS = [
   "Archivo",
+  "Chivo_Mono",
+  "Epilogue",
   "Geist",
   "IBM_Plex_Mono",
   "IBM_Plex_Sans",
   "Instrument_Sans",
+  "Instrument_Serif",
+  "JetBrains_Mono",
   "Karla",
+  "Libre_Franklin",
+  "Literata",
   "Manrope",
   "Newsreader",
   "Plus_Jakarta_Sans",
+  "Public_Sans",
   "Saira_Semi_Condensed",
+  "Schibsted_Grotesk",
   "Sora",
   "Spectral",
+  "Syne",
 ] as const;
 
 vi.mock("next/font/google", () => {

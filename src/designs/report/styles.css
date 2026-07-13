@@ -1,0 +1,725 @@
+/* REPORT — data journalism.
+   The product's sharpest moment is telling a buyer "your quote sits in the top
+   decile of what comparable companies paid." So that is the hero: an actual
+   distribution chart with the buyer's quote marked on it. Charts, not
+   screenshots. Ochre marks the reader's own position; everything else is ink. */
+
+.re {
+  --white: #ffffff;
+  --off: #fafafa;
+  --ink: #0f0f10;
+  --body: #3f4145;
+  --gray: #6e7076;
+  --faint: #9aa0a6;
+  --rule: #e6e7e9;
+  --bar: #d6d8dc;
+  --ochre: #b45309;
+  --ochre-l: #fdf3e7;
+
+  background: var(--white);
+  color: var(--ink);
+}
+.re *,
+.re *::before,
+.re *::after {
+  box-sizing: border-box;
+}
+.re-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 36px;
+}
+.re-mono {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+.re-lbl {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* nav */
+.re-nav {
+  border-bottom: 1px solid var(--rule);
+}
+.re-nav-in {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding: 16px 0;
+}
+.re-logo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.re-links {
+  display: flex;
+  gap: 24px;
+  margin-right: auto;
+  font-size: 14px;
+  color: var(--gray);
+}
+.re-btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease;
+}
+.re-solid {
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+.re-solid:hover {
+  background: var(--ochre);
+  border-color: var(--ochre);
+}
+.re-line {
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 15px;
+  font-size: 14px;
+}
+.re-line:hover {
+  background: var(--off);
+}
+.re-lg {
+  padding: 13px 22px;
+  font-size: 15px;
+}
+
+/* hero */
+.re-hero {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: 60px;
+  padding: 76px 0 80px;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+.re-h1 {
+  font-size: clamp(36px, 4.1vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  margin: 18px 0 20px;
+  text-wrap: balance;
+}
+.re-h1 em {
+  font-style: normal;
+  color: var(--ochre);
+}
+.re-lede {
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0 0 30px;
+  max-width: 44ch;
+}
+.re-form {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+}
+.re-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 15px;
+  background: #fff;
+}
+.re-input:focus-visible {
+  outline: 3px solid rgba(180, 83, 9, 0.16);
+  border-color: var(--ochre);
+}
+.re-fine {
+  margin-top: 13px;
+  font-size: 13.5px;
+  color: var(--gray);
+}
+
+/* SIGNATURE: the distribution chart */
+.re-chart {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 24px 26px 20px;
+  background: var(--white);
+  box-shadow: 0 1px 2px rgba(15, 15, 16, 0.04), 0 22px 44px -30px rgba(15, 15, 16, 0.3);
+}
+.re-chart-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 4px;
+}
+.re-chart-t {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.re-chart-s {
+  font-size: 13px;
+  color: var(--gray);
+  margin: 4px 0 24px;
+}
+.re-plot {
+  position: relative; /* the median line and the quote flag anchor to this */
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 168px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--ink);
+}
+.re-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  height: 100%;
+}
+.re-col > i {
+  display: block;
+  width: 100%;
+  background: var(--bar);
+  border-radius: 2px 2px 0 0;
+  transition: background 0.16s ease;
+}
+.re-col:hover > i {
+  background: #b9bcc2;
+}
+/* the reader's own quote */
+.re-col.you > i {
+  background: var(--ochre);
+}
+.re-you-flag {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--ochre);
+  color: #fff;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+.re-you-flag::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ochre);
+}
+/* The median is a price, so it is a VERTICAL line at that price on the x-axis.
+   (A horizontal line across a histogram would mean a frequency threshold —
+   a different, and here meaningless, claim.) */
+.re-median {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px dashed var(--ink);
+  pointer-events: none;
+  z-index: 2; /* above the bars, or the label gets swallowed by them */
+}
+.re-median-l {
+  position: absolute;
+  top: -1px;
+  left: 5px;
+  white-space: nowrap;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--white);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.re-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 9px;
+}
+.re-axis span {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  color: var(--faint);
+}
+.re-chart-f {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.re-key {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--gray);
+}
+.re-key i {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  display: block;
+}
+.re-key i.b {
+  background: var(--bar);
+}
+.re-key i.o {
+  background: var(--ochre);
+}
+
+/* vendor row */
+.re-wall {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.re-wall-v {
+  font-size: 13.5px;
+  color: #aeb2b8;
+}
+
+/* sections */
+.re-sec {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.re-off {
+  background: var(--off);
+}
+.re-sec-h {
+  margin-bottom: 44px;
+  max-width: 64ch;
+}
+.re-h2 {
+  font-size: clamp(26px, 2.9vw, 36px);
+  line-height: 1.13;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  margin: 12px 0 12px;
+  text-wrap: balance;
+}
+.re-sub {
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0;
+}
+
+/* tools */
+.re-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.re-tool {
+  background: var(--white);
+  padding: 26px;
+}
+.re-off .re-tool {
+  background: var(--off);
+}
+.re-tool-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--ochre);
+  margin-bottom: 14px;
+}
+.re-tool h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.re-tool p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0 0 10px;
+}
+.re-tool small {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--gray);
+  display: block;
+}
+
+/* advantages */
+.re-adv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  padding: 48px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.re-adv:last-of-type {
+  border-bottom: 0;
+}
+/* Explicit, so the alternation doesn't depend on how many divs precede it. */
+.re-adv.flip .re-adv-copy {
+  order: 2;
+}
+.re-adv h3 {
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 10px 0 12px;
+}
+.re-adv p {
+  font-size: 15.5px;
+  line-height: 1.66;
+  color: var(--body);
+  margin: 0 0 20px;
+}
+.re-adv p b {
+  color: var(--ink);
+  font-weight: 700;
+}
+.re-pts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px 18px;
+}
+.re-pts li {
+  font-size: 14px;
+  display: flex;
+  gap: 8px;
+  color: var(--body);
+}
+.re-pts li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--ochre);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* mini charts in the advantage panels */
+.re-panel {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fff;
+  padding: 20px;
+}
+.re-off .re-panel {
+  background: var(--off);
+}
+.re-panel-h {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: 4px;
+}
+.re-hrow {
+  display: grid;
+  grid-template-columns: 92px 1fr 56px;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13.5px;
+}
+.re-hrow:last-child {
+  border-bottom: 0;
+}
+.re-hbar {
+  height: 8px;
+  background: #eceef0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.re-hbar > i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+}
+.re-hbar.o > i {
+  background: var(--ochre);
+}
+.re-hval {
+  font-family: var(--font-mono), monospace;
+  text-align: right;
+  color: var(--gray);
+}
+.re-hval.neg {
+  color: var(--ochre);
+}
+.re-prow {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13.5px;
+}
+.re-prow:last-child {
+  border-bottom: 0;
+}
+.re-prow span:last-child {
+  font-family: var(--font-mono), monospace;
+  color: var(--gray);
+}
+.re-prow.tot {
+  border-top: 2px solid var(--ink);
+  border-bottom: 0;
+  font-weight: 700;
+}
+.re-prow.tot span:last-child {
+  color: var(--ochre);
+}
+
+/* trust */
+.re-trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+.re-tc {
+  border-top: 2px solid var(--ink);
+  padding-top: 16px;
+}
+.re-tc h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 10px 0 8px;
+}
+.re-tc p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+
+/* stats */
+.re-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+  padding: 56px 0;
+}
+.re-st-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 46px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.re-st-l {
+  font-size: 13.5px;
+  color: var(--gray);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* cases */
+.re-cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.re-case {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.re-off .re-case {
+  background: var(--off);
+}
+.re-case:hover {
+  border-color: #cfd2d6;
+  box-shadow: 0 14px 28px -20px rgba(15, 15, 16, 0.25);
+}
+.re-case-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--ochre);
+}
+.re-case-nl {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 8px;
+}
+.re-case h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.36;
+  margin: 0;
+}
+.re-case p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+.re-more {
+  margin-top: auto;
+  padding-top: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ochre);
+  font-weight: 500;
+}
+
+/* newsletter */
+.re-news {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 44px;
+  align-items: center;
+  padding: 48px 0;
+}
+.re-news h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 0 0 8px;
+}
+.re-news p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--body);
+  line-height: 1.6;
+}
+
+/* footer */
+.re-foot {
+  border-top: 1px solid var(--ink);
+  padding: 48px 0 36px;
+}
+.re-fgrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.re-foot p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gray);
+  margin: 10px 0 0;
+  max-width: 32ch;
+}
+.re-fc h4 {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 14px;
+}
+.re-fc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.re-fc li {
+  font-size: 14px;
+  color: var(--body);
+}
+.re-fbot {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 1020px) {
+  .re-hero,
+  .re-adv,
+  .re-news {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .re-adv.flip .re-adv-copy {
+    order: 0;
+  }
+  .re-tools,
+  .re-trust,
+  .re-cases,
+  .re-stats,
+  .re-fgrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .re-links {
+    display: none;
+  }
+}
+@media (max-width: 620px) {
+  .re-tools,
+  .re-trust,
+  .re-cases,
+  .re-stats,
+  .re-fgrid,
+  .re-pts {
+    grid-template-columns: 1fr;
+  }
+  .re-form {
+    flex-direction: column;
+  }
+}

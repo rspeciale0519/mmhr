@@ -1,0 +1,683 @@
+/* MARQUEE — type as the art.
+   Every vendor site in this category whispers. This one says the thing out loud
+   at 90px and then, immediately beneath, shows a small precise table to prove it
+   isn't bluster. The whole design is that tension: a shout, then the receipts.
+   Syne is doing the shouting; Epilogue keeps everything else calm. */
+
+.mq {
+  --paper: #faf9f8;
+  --white: #ffffff;
+  --ink: #121013;
+  --body: #46424a;
+  --gray: #7c7783;
+  --rule: #e6e3e8;
+  --violet: #5b21b6;
+  --violet-2: #4c1d95;
+  --lilac: #f1ecfb;
+
+  background: var(--paper);
+  color: var(--ink);
+}
+.mq *,
+.mq *::before,
+.mq *::after {
+  box-sizing: border-box;
+}
+.mq-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 36px;
+}
+.mq-disp {
+  font-family: var(--font-display), sans-serif;
+}
+
+/* nav */
+.mq-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(250, 249, 248, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.mq-nav-in {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  padding: 16px 0;
+}
+.mq-logo {
+  font-family: var(--font-display), sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.mq-links {
+  display: flex;
+  gap: 26px;
+  margin-right: auto;
+  font-size: 14.5px;
+  color: var(--gray);
+  font-weight: 500;
+}
+.mq-btn {
+  font: inherit;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+.mq-btn:active {
+  transform: translateY(1px);
+}
+.mq-solid {
+  background: var(--ink);
+  color: #fff;
+  padding: 11px 20px;
+  font-size: 14.5px;
+}
+.mq-solid:hover {
+  background: var(--violet);
+}
+.mq-ghost {
+  background: transparent;
+  color: var(--body);
+  padding: 11px 8px;
+  font-size: 14.5px;
+}
+.mq-lg {
+  padding: 15px 28px;
+  font-size: 16px;
+}
+
+/* SIGNATURE: the shout */
+.mq-hero {
+  padding: 76px 0 0;
+}
+.mq-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--violet);
+  background: var(--lilac);
+  border-radius: 999px;
+  padding: 7px 16px;
+  margin-bottom: 30px;
+}
+.mq-h1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(46px, 8.4vw, 108px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+  margin: 0 0 34px;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+.mq-h1 em {
+  font-style: normal;
+  color: var(--violet);
+  /* the one flourish: the promise gets a rule under it, drawn thick */
+  box-shadow: inset 0 -0.09em 0 rgba(91, 33, 182, 0.22);
+}
+.mq-under {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 56px;
+  align-items: end;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--rule);
+}
+.mq-lede {
+  font-size: 19px;
+  line-height: 1.58;
+  color: var(--body);
+  margin: 0 0 28px;
+  max-width: 44ch;
+}
+.mq-form {
+  display: flex;
+  gap: 10px;
+  max-width: 460px;
+}
+.mq-input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 1.5px solid var(--rule);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  background: #fff;
+  color: var(--ink);
+}
+.mq-input:focus-visible {
+  outline: 3px solid rgba(91, 33, 182, 0.18);
+  border-color: var(--violet);
+}
+.mq-fine {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--gray);
+}
+
+/* the receipts — small, precise, deliberately quiet next to the shout */
+.mq-receipt {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 18px 20px;
+  min-width: 336px;
+  box-shadow: 0 18px 36px -24px rgba(18, 16, 19, 0.28);
+}
+.mq-receipt-h {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+}
+.mq-rrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+}
+.mq-rrow:last-child {
+  border-bottom: 0;
+}
+.mq-rname {
+  font-weight: 600;
+}
+.mq-tag {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--violet);
+  background: var(--lilac);
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin-left: 6px;
+}
+.mq-fit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray);
+}
+.mq-bar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: #ece9f1;
+  overflow: hidden;
+}
+.mq-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--violet);
+}
+
+/* vendor marquee — literal, since the direction is named for it */
+.mq-band {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+  background: var(--white);
+}
+.mq-band-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.mq-band-row {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: max-content;
+  animation: mq-run 40s linear infinite;
+}
+@keyframes mq-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-band-row {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+}
+.mq-band-v {
+  font-family: var(--font-display), sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #cfcad6;
+  white-space: nowrap;
+}
+.mq-band-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--violet);
+  flex-shrink: 0;
+}
+
+/* sections */
+.mq-sec {
+  padding: 92px 0;
+}
+.mq-white {
+  background: var(--white);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.mq-h2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(32px, 4.4vw, 54px);
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  margin: 0 0 16px;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+.mq-sub {
+  font-size: 17.5px;
+  line-height: 1.6;
+  color: var(--gray);
+  margin: 0 0 52px;
+  max-width: 54ch;
+}
+
+/* tools */
+.mq-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.mq-tool {
+  background: var(--paper);
+  padding: 30px;
+  transition: background 0.16s ease;
+}
+.mq-white .mq-tool {
+  background: var(--white);
+}
+.mq-tool:hover {
+  background: var(--lilac);
+}
+.mq-tool-n {
+  font-family: var(--font-display), sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--violet);
+  margin-bottom: 14px;
+}
+.mq-tool h3 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.mq-tool p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0 0 10px;
+}
+.mq-tool small {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--gray);
+  display: block;
+}
+
+/* advantages */
+.mq-adv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  padding: 56px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.mq-adv:last-of-type {
+  border-bottom: 0;
+}
+.mq-adv:nth-of-type(even) .mq-adv-copy {
+  order: 2;
+}
+.mq-adv h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  margin: 0 0 14px;
+}
+.mq-adv p {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--body);
+  margin: 0 0 22px;
+}
+.mq-adv p b {
+  font-weight: 700;
+  color: var(--ink);
+}
+.mq-pts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+}
+.mq-pts li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+.mq-pts li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--violet);
+  flex-shrink: 0;
+}
+.mq-panel {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 20px 40px -28px rgba(18, 16, 19, 0.25);
+}
+.mq-white .mq-panel {
+  background: var(--paper);
+}
+.mq-panel-h {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.mq-prow {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+}
+.mq-prow:last-child {
+  border-bottom: 0;
+}
+.mq-prow span:first-child {
+  font-weight: 600;
+}
+.mq-prow span:last-child {
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+.mq-prow.tot span:last-child {
+  color: var(--violet);
+  font-weight: 700;
+}
+
+/* trust */
+.mq-trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.mq-tc {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 30px;
+}
+.mq-tc-n {
+  font-family: var(--font-display), sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--violet);
+  margin-bottom: 12px;
+}
+.mq-tc h3 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+.mq-tc p {
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0;
+}
+
+/* stats */
+.mq-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  padding: 64px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.mq-st-n {
+  font-family: var(--font-display), sans-serif;
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+.mq-st-l {
+  font-size: 14px;
+  color: var(--gray);
+  margin-top: 10px;
+}
+
+/* cases */
+.mq-cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.mq-case {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.mq-case:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 36px -24px rgba(18, 16, 19, 0.26);
+}
+.mq-case-n {
+  font-family: var(--font-display), sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--violet);
+}
+.mq-case-nl {
+  font-size: 13.5px;
+  color: var(--gray);
+  margin-bottom: 8px;
+}
+.mq-case h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  margin: 0;
+}
+.mq-case p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+.mq-more {
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--violet);
+}
+
+/* newsletter */
+.mq-news {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 24px;
+  padding: 56px;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.mq-news h2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin: 0 0 10px;
+  line-height: 1;
+}
+.mq-news p {
+  margin: 0;
+  font-size: 16px;
+  color: #a29ba8;
+  line-height: 1.6;
+}
+.mq-news .mq-input {
+  border-color: transparent;
+}
+.mq-news .mq-solid {
+  background: var(--violet);
+}
+.mq-news .mq-solid:hover {
+  background: var(--violet-2);
+}
+
+/* footer */
+.mq-foot {
+  padding: 64px 0 44px;
+}
+.mq-fgrid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 44px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--rule);
+}
+.mq-foot p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--gray);
+  margin: 12px 0 0;
+  max-width: 32ch;
+}
+.mq-fc h4 {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin: 0 0 15px;
+}
+.mq-fc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.mq-fc li {
+  font-size: 15px;
+  color: var(--body);
+}
+.mq-fbot {
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: var(--gray);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 1020px) {
+  .mq-under,
+  .mq-adv,
+  .mq-news {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .mq-adv:nth-of-type(even) .mq-adv-copy {
+    order: 0;
+  }
+  .mq-receipt {
+    min-width: 0;
+  }
+  .mq-tools,
+  .mq-trust,
+  .mq-cases,
+  .mq-stats,
+  .mq-fgrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mq-links {
+    display: none;
+  }
+  .mq-news {
+    padding: 36px;
+  }
+}
+@media (max-width: 620px) {
+  .mq-tools,
+  .mq-trust,
+  .mq-cases,
+  .mq-stats,
+  .mq-fgrid,
+  .mq-pts {
+    grid-template-columns: 1fr;
+  }
+  .mq-form {
+    flex-direction: column;
+  }
+}
