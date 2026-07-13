@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { brand } from "@/lib/brand";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
 
-// Typography is intentionally unset. Fonts are part of the design direction
-// awaiting owner approval (gate G3); the type system lands with the theme tokens.
+// Placeholder typography from the shadcn base preset. The real typeface is part
+// of the design direction awaiting owner approval (gate G3) and replaces this,
+// along with the theme tokens, in the codification task.
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+
 export const metadata: Metadata = {
   title: brand.name,
   description: `${brand.name} — buyer-side HRIS brokerage.`,
@@ -15,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={cn("h-full antialiased", "font-sans", geist.variable)}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
