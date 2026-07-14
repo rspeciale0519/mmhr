@@ -11,14 +11,21 @@ import { vi } from "vitest";
  * it here.
  */
 const FONT_LOADERS = [
+  "Albert_Sans",
   "Archivo",
+  "Azeret_Mono",
   "Barlow_Condensed",
+  "Bricolage_Grotesque",
   "Chivo_Mono",
   "Courier_Prime",
   "DM_Sans",
   "Epilogue",
+  "Figtree",
   "Fraunces",
   "Geist",
+  "Geist_Mono",
+  "Geologica",
+  "Hanken_Grotesk",
   "IBM_Plex_Mono",
   "IBM_Plex_Sans",
   "Inter",
@@ -29,9 +36,12 @@ const FONT_LOADERS = [
   "Libre_Franklin",
   "Literata",
   "Manrope",
+  "Martian_Mono",
   "Newsreader",
+  "Overpass_Mono",
   "Plus_Jakarta_Sans",
   "Public_Sans",
+  "Red_Hat_Mono",
   "Roboto_Mono",
   "Saira_Semi_Condensed",
   "Schibsted_Grotesk",
@@ -42,6 +52,7 @@ const FONT_LOADERS = [
   "Special_Elite",
   "Spectral",
   "Syne",
+  "Unbounded",
   "Work_Sans",
 ] as const;
 

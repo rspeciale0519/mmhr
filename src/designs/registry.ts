@@ -1,16 +1,21 @@
 import type { ComponentType } from "react";
 
 import Advocate from "./advocate/Design";
+import Aperture from "./aperture/Design";
 import Beacon from "./beacon/Design";
 import Blueprint from "./blueprint/Design";
 import Bureau from "./bureau/Design";
+import Calibrate from "./calibrate/Design";
+import Console from "./console/Design";
 import Dossier from "./dossier/Design";
 import Grid from "./grid/Design";
 import Harbor from "./harbor/Design";
 import Itinerary from "./itinerary/Design";
+import Lattice from "./lattice/Design";
 import Ledger from "./ledger/Design";
 import Marquee from "./marquee/Design";
 import Memo from "./memo/Design";
+import Pulse from "./pulse/Design";
 import Redline from "./redline/Design";
 import Report from "./report/Design";
 import Scorecard from "./scorecard/Design";
@@ -46,6 +51,66 @@ export type DesignOption = {
  * own URL automatically — nothing else to wire up.
  */
 export const DESIGNS: DesignOption[] = [
+  {
+    slug: "pulse",
+    name: "Pulse",
+    round: 5,
+    line: "Verification, live",
+    hero: "A signal that never flatlines",
+    note: "The hero is a literal live signal — an oscilloscope trace standing in for the automated research pipeline that re-checks vendor pricing on a schedule. Geologica for the interface, Martian Mono for every timestamp and figure.",
+    swatch: ["#0A0E13", "#2FE6C4", "#F3F6F8", "#1E2732"],
+    type: "Geologica + Martian Mono",
+    scope: "full homepage",
+    Component: Pulse,
+  },
+  {
+    slug: "console",
+    name: "Console",
+    round: 5,
+    line: "Your evaluation, as mission control",
+    hero: "Six live instrument tiles",
+    note: "Not vendor data — the buyer's own evaluation, shown as a mission-control tile wall: requirements locked, committee scored, shortlist size, advisor ETA. Unbounded carries the headline; Hanken Grotesk and Red Hat Mono do the rest.",
+    swatch: ["#0B0D12", "#5B79FF", "#EDEFF5", "#232838"],
+    type: "Unbounded + Hanken Grotesk + Red Hat Mono",
+    scope: "full homepage",
+    Component: Console,
+  },
+  {
+    slug: "lattice",
+    name: "Lattice",
+    round: 5,
+    line: "You, at the center of the market",
+    hero: "A node graph of 52 systems",
+    note: "A literal fit graph: a central 'you' node with thin lines to vendor nodes, sized and colored by score. Bricolage Grotesque throughout, Azeret Mono for every fit percentage.",
+    swatch: ["#16151B", "#8B5CF6", "#FAFAFC", "#E5E3EC"],
+    type: "Bricolage Grotesque + Azeret Mono",
+    scope: "full homepage",
+    Component: Lattice,
+  },
+  {
+    slug: "calibrate",
+    name: "Calibrate",
+    round: 5,
+    line: "A quote, calibrated",
+    hero: "A precision gauge, needle and all",
+    note: "The benchmark rendered as an actual instrument: a semicircular gauge with zone labels and a needle pointing to exactly where a $161,400 quote sits against a $124,100 verified median. Figtree and Overpass Mono keep it clinical.",
+    swatch: ["#12151C", "#2E90FA", "#F5F6F8", "#E2E5EA"],
+    type: "Figtree + Overpass Mono",
+    scope: "full homepage",
+    Component: Calibrate,
+  },
+  {
+    slug: "aperture",
+    name: "Aperture",
+    round: 5,
+    line: "The whole picture, in focus",
+    hero: "One glass card, three numbers",
+    note: "The most minimal page in the gallery: a single floating glass card over a soft magenta-violet gradient mesh, holding nothing but three huge verified numbers. Albert Sans and Geist Mono, and otherwise just restraint.",
+    swatch: ["#0A0A0F", "#C026D3", "#7C3AED", "#F7F6FA"],
+    type: "Albert Sans + Geist Mono",
+    scope: "full homepage",
+    Component: Aperture,
+  },
   {
     slug: "redline",
     name: "Redline",
@@ -257,6 +322,12 @@ export function getDesign(slug: string) {
 }
 
 export const ROUNDS = [
+  {
+    n: 5,
+    title: "Round 5 — professional, elegant, a touch of high-tech",
+    blurb:
+      "A different register from round 4's paper-and-ink artifacts: precision instrumentation instead. A live verification signal, a mission-control tile wall, a node graph of the whole market, a calibration gauge, one glass card and three numbers. Cool electric accents throughout — no brown or tan anywhere in this round.",
+  },
   {
     n: 4,
     title: "Round 4 — five more angles, same brief",
