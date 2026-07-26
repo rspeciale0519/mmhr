@@ -44,3 +44,9 @@ yarn-error.log*
 docs/temp/
 
 .vercel
+
+# >>> brain (managed) >>>
+mmhrbrain/.brainstate/
+mmhrbrain/.obsidian/
+# <<< brain (managed) <<<
+
