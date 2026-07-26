@@ -3,8 +3,11 @@
 import { Geologica, Martian_Mono } from "next/font/google";
 import { useState } from "react";
 
-import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
+import { Footer } from "@/app/(marketing)/_site/Footer";
+import { Nav } from "@/app/(marketing)/_site/Nav";
+import { PulseBody } from "./Body";
 import "./styles.css";
+import "@/app/(marketing)/_site/site.css";
 
 const body = Geologica({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const mono = Martian_Mono({
@@ -13,332 +16,27 @@ const mono = Martian_Mono({
   variable: "--font-mono",
 });
 
-/* A 600-unit heartbeat/oscilloscope trace, repeated once more (offset +600)
-   inside a 1200-wide viewBox so the shape is seamless end-to-start — the same
-   loop trick as marquee's logo band, just drawn instead of duplicated markup. */
-const WAVE_POINTS =
-  "0,60 30,60 45,40 55,80 65,20 75,60 150,60 165,45 175,75 185,60 260,60 275,38 285,82 295,15 305,60 380,60 395,45 405,75 415,60 490,60 505,40 515,80 525,20 535,60 600,60 " +
-  "630,60 645,40 655,80 665,20 675,60 750,60 765,45 775,75 785,60 860,60 875,38 885,82 895,15 905,60 980,60 995,45 1005,75 1015,60 1090,60 1105,40 1115,80 1125,20 1135,60 1200,60";
-
-const MINI_WAVE = "0,24 10,24 16,12 21,34 26,4 32,24 62,24 68,14 73,30 78,24 108,24 114,10 119,36 124,24 150,24";
-
+/**
+ * Pulse, complete and self-contained — nav, body, footer, and its own theme
+ * state. This is what the design gallery renders at /designs/pulse.
+ *
+ * The live site does NOT use this component: it composes the same Nav, Footer
+ * and PulseBody inside the shared site chrome, so the theme survives
+ * navigation. Both paths render identical markup.
+ */
 export default function Pulse() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const next = theme === "dark" ? "light" : "dark";
 
   return (
-    <div
-      className={`pu ${body.className} ${mono.variable}`}
-      data-theme={theme}
-    >
-      {/* nav */}
-      <header className="pu-nav">
-        <div className="pu-wrap pu-nav-in">
-          <div className="pu-logo">
-            <span className="pu-mark" aria-hidden="true" />
-            MatchMaker HR
-          </div>
-          <nav className="pu-links">
-            {NAV.map((n) => (
-              <span key={n}>{n}</span>
-            ))}
-          </nav>
-          <button
-            type="button"
-            className="pu-theme"
-            onClick={() => setTheme(next)}
-            aria-label={`Switch to ${next} theme`}
-            title={`Switch to ${next} theme`}
-          >
-            <span className="pu-theme-glyph" aria-hidden="true" />
-            <span className="pu-theme-label">{next.toUpperCase()}</span>
-          </button>
-          <button className="pu-btn pu-ghost">Sign in</button>
-          <button className="pu-btn pu-solid">Get started</button>
-        </div>
-      </header>
-
-      {/* hero */}
-      <section className="pu-hero">
-        <div className="pu-wrap pu-hero-in">
-          <div className="pu-hero-copy">
-            <div className="pu-eyebrow">AUTOMATED RESEARCH PIPELINE</div>
-            <h1 className="pu-h1">Pricing that&rsquo;s verified continuously, not once.</h1>
-            <p className="pu-lede">
-              Every vendor in the marketplace gets re-checked on a schedule — not
-              when someone remembers to. This is what that looks like: a live
-              signal, not a static list.
-            </p>
-            <form className="pu-form" action="#">
-              <input
-                className="pu-input"
-                type="email"
-                placeholder="Work email"
-                aria-label="Work email"
-              />
-              <button className="pu-btn pu-solid pu-lg" type="submit">
-                Get access
-              </button>
-            </form>
-            <p className="pu-fine">
-              Free. The vendor pays our commission — the same rate whichever one
-              you choose.
-            </p>
-          </div>
-
-          {/* SIGNATURE — the live verification signal */}
-          <div className="pu-signal">
-            <div className="pu-signal-head">
-              <span className="pu-signal-label">VERIFICATION SIGNAL — LAST 24H</span>
-              <span className="pu-live">
-                <i className="pu-live-dot" aria-hidden="true" />
-                LIVE
-              </span>
-            </div>
-
-            <div className="pu-signal-scope">
-              <svg
-                className="pu-signal-svg"
-                viewBox="0 0 1200 120"
-                width="1200"
-                height="120"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-              >
-                <polyline points={WAVE_POINTS} />
-              </svg>
-            </div>
-
-            <ul className="pu-legend">
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">Rippling</span>
-                <span className="pu-legend-meta">re-verified 14m ago</span>
-              </li>
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">BambooHR</span>
-                <span className="pu-legend-meta">re-verified 41m ago</span>
-              </li>
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">Paycor</span>
-                <span className="pu-legend-meta">re-verified 2h ago</span>
-              </li>
-            </ul>
-
-            <div className="pu-readout">
-              52 systems monitored · 1 check every 6h · 0 stale profiles
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* vendor wall */}
-      <section className="pu-vwall">
-        <div className="pu-wrap pu-vwall-in">
-          <span className="pu-vwall-label">Monitored</span>
-          <div className="pu-vwall-list">
-            {VENDORS.slice(0, 12).map((v) => (
-              <span className="pu-vchip" key={v}>
-                {v}
-              </span>
-            ))}
-            <span className="pu-vchip pu-vchip-more">+ 40 more</span>
-          </div>
-        </div>
-      </section>
-
-      {/* six tools */}
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-head">
-            <div className="pu-eye">The instrument panel</div>
-            <h2 className="pu-h2">Six gauges on one dashboard</h2>
-            <p className="pu-sub">
-              Everything a buying committee needs to run a real evaluation,
-              instrumented instead of improvised.
-            </p>
-          </div>
-          <div className="pu-tools">
-            {TOOLS.map((t, i) => (
-              <div className="pu-tool" key={t.key}>
-                <div className="pu-tool-n">{String(i + 1).padStart(2, "0")}</div>
-                <h3>{t.name}</h3>
-                <p>{t.blurb}</p>
-                <small>{t.detail}</small>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* broker advantage */}
-      <section className="pu-sec pu-sec-surface">
-        <div className="pu-wrap">
-          <div className="pu-head">
-            <div className="pu-eye">The broker advantage</div>
-            <h2 className="pu-h2">Why the signal never goes stale</h2>
-          </div>
-
-          {ADVANTAGES.map((a, i) => (
-            <div className="pu-adv" key={a.title}>
-              <div className="pu-adv-copy">
-                <h3>{a.title}</h3>
-                <p>
-                  <b>{a.lead}</b> {a.body}
-                </p>
-              </div>
-
-              <div className="pu-adv-panel">
-                <div className="pu-adv-panel-h">
-                  <span>CH.{String(i + 1).padStart(2, "0")}</span>
-                  <span className="pu-adv-status">ONLINE</span>
-                </div>
-                <svg
-                  className="pu-mini-wave"
-                  viewBox="0 0 150 48"
-                  width="150"
-                  height="48"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <polyline points={MINI_WAVE} />
-                </svg>
-                <ul className="pu-adv-points">
-                  {a.points.map((p) => (
-                    <li key={p}>
-                      <i aria-hidden="true" />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* method / trust */}
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-head">
-            <div className="pu-eye">Method</div>
-            <h2 className="pu-h2">How the commission works</h2>
-          </div>
-          <div className="pu-trust">
-            {TRUST.map((t, i) => (
-              <article className="pu-tcard" key={t.title}>
-                <div className="pu-tcard-k">M.{String(i + 1).padStart(2, "0")}</div>
-                <h3>{t.title}</h3>
-                <p>{t.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* stats */}
-      <section className="pu-wrap pu-stats-wrap">
-        <div className="pu-stats">
-          {STATS.map((s) => (
-            <div className="pu-stat" key={s.label}>
-              <div className="pu-stat-n">{s.n}</div>
-              <div className="pu-stat-l">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* case studies */}
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-head">
-            <div className="pu-eye">Signal history</div>
-            <h2 className="pu-h2">What continuous verification is worth</h2>
-          </div>
-          <div className="pu-cases">
-            {CASES.map((c) => (
-              <article className="pu-case" key={c.title}>
-                <div className="pu-case-n">{c.stat}</div>
-                <div className="pu-case-nl">{c.statLabel}</div>
-                <h3>{c.title}</h3>
-                <p>{c.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* newsletter */}
-      <section className="pu-wrap pu-news-wrap">
-        <div className="pu-news">
-          <div>
-            <h2>The Weekly Signal</h2>
-            <p>What moved in vendor pricing this week, in one email.</p>
-          </div>
-          <form className="pu-form" action="#">
-            <input
-              className="pu-input"
-              type="email"
-              placeholder="Work email"
-              aria-label="Work email for newsletter"
-            />
-            <button className="pu-btn pu-solid pu-lg" type="submit">
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
-
-      {/* footer */}
-      <footer className="pu-foot">
-        <div className="pu-wrap">
-          <div className="pu-fgrid">
-            <div>
-              <div className="pu-logo">
-                <span className="pu-mark" aria-hidden="true" />
-                MatchMaker HR
-              </div>
-              <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
-              </p>
-            </div>
-            <div className="pu-fcol">
-              <h4>For buyers</h4>
-              <ul>
-                <li>HRIS Marketplace</li>
-                <li>Requirements Builder</li>
-                <li>Advisory services</li>
-                <li>Case studies</li>
-              </ul>
-            </div>
-            <div className="pu-fcol">
-              <h4>Why us</h4>
-              <ul>
-                <li>Broker model</li>
-                <li>How we make money</li>
-                <li>Scoring methodology</li>
-                <li>FAQ</li>
-              </ul>
-            </div>
-            <div className="pu-fcol">
-              <h4>Resources</h4>
-              <ul>
-                <li>Blog</li>
-                <li>HRIS Landscape Report</li>
-                <li>Partner finder</li>
-                <li>Contact</li>
-              </ul>
-            </div>
-          </div>
-          <div className="pu-fbot">
-            <span>© 2026 MatchMaker HR</span>
-            <span>Privacy · Terms · Commission disclosure</span>
-          </div>
-        </div>
-      </footer>
+    <div className={`pu ${body.className} ${mono.variable}`} data-theme={theme}>
+      <Nav
+        theme={theme}
+        onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+      />
+      <main>
+        <PulseBody />
+      </main>
+      <Footer />
     </div>
   );
 }
