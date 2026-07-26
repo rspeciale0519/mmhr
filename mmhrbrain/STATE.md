@@ -1,32 +1,41 @@
 # mmhr brain — STATE
-Updated: 2026-07-25
+Updated: 2026-07-26
 
 ## Current focus
-Phase 0 (foundations) is mostly done. Owner gate **G3** is still formally
-open, but **Pulse** is now the front-runner and is being iterated on
-directly — the owner asked for changes to it rather than picking from the
-22 options cold.
+Phase 0 (foundations) is mostly done. **G3 is decided in practice: Pulse is
+the locked-in frontend**, rendering at `/`. The design gallery is deliberately
+**unchanged** — all 22 layouts stay in `src/designs/` and stay live at
+`/designs`. Next real work is Phase 1 marketing content (FR-M2) against
+Pulse's layout.
 
 ## Latest synopsis
-Modified Pulse per owner request: a bottom-left → top-right wash in the
-existing accent green, plus a full dark/light theme pair on a nav toggle.
-Wash is a viewport-fixed pseudo-element (a page-attached diagonal degrades
-to vertical on a ~4.9k px page). Light theme required two real inversions,
-not a colour flip — bands deepen instead of lifting, and separation comes
-from shadow instead of hairlines. See [[journal/2026-07-25]].
+One-line change in the end: `(marketing)/page.tsx` renders
+`@/designs/pulse/Design`. Pulse stays in the gallery, so `/` and
+`/designs/pulse` are the same component — one source, no drift. Gates green
+(type-check, 16/16 tests, build with all 22 design routes + `/` prerendered);
+browser-verified. Uncommitted. See [[journal/2026-07-26]].
 
 ## Open threads
-- G3 (design direction) is the actual next decision — see
-  [[knowledge/roadmap]]. Pulse is approved in substance, not yet ratified.
-- **Pending:** production deploy of `3f2288b`. The gallery has **no Vercel
-  git integration** — pushing to GitHub deploys nothing; deploys are
-  CLI-only (`npx vercel --prod`). See [[journal/2026-07-26]].
+- **Nothing from this task is committed**, and it sits on
+  `codex/competitor-analysis` — the wrong branch for a frontend lock-in
+  (Pulse's lineage is `feature/foundations`). Owner picks the branch first.
+- **Pending:** production deploy of `3f2288b`, now compounded because `/`
+  has changed too. The gallery has **no Vercel git integration** — pushing
+  to GitHub deploys nothing; deploys are CLI-only (`npx vercel --prod`).
+- Placeholder figures (NPS 74, 310 companies) now render at the **site
+  root**, not just behind a noindex gallery. Real FR-M2 copy is Phase 1.
+- Editing `src/designs/pulse/` now changes production, not just a gallery
+  entry. Anyone treating `src/designs/` as a scratch area needs to know.
+- `npm run lint` exits 1 on 52 pre-existing `no-require-imports` errors in
+  `.claude/hooks/**` + `.codex/hooks/**` (sync-managed, not hand-editable).
+  Unrelated to app code — don't mistake it for a regression.
+- Port 3007 runs a **stale** `next start` from the old GALLERY_ONLY build
+  (its `.next` was overwritten); it backs the owner's Tailscale review URL.
 - Brain-init / knowledge-build files, `CLAUDE.md` and the `.gitignore`
   addition are still uncommitted.
-- Vercel staging deploy of the app itself (distinct from the already-live
-  design gallery) is still open.
-- Route groups beyond `(auth)` and `/designs` are placeholders — real
-  marketing/app/admin pages are Phase 1+ work.
+- Vercel staging deploy of the app itself is still open.
+- Route groups beyond `(auth)`, `/` and `/designs` are placeholders — real
+  app/admin pages are Phase 1+ work.
 
 ## Active skills in play
 - (none yet)
