@@ -15,6 +15,10 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: brand.name,
   description: `${brand.name} — buyer-side HRIS brokerage.`,
+  // The homepage still ships placeholder figures (NPS 74, "310 selections
+  // guided", three invented case studies). Keep the whole site out of search
+  // until FR-M2 copy lands in Phase 1 — then delete this line.
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

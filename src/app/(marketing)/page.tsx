@@ -1,12 +1,11 @@
-import { brand } from "@/lib/brand";
+import Pulse from "@/designs/pulse/Design";
 
-// Placeholder. The real marketing home (FR-M2) is built in Phase 1, on top of
-// the design system approved at gate G3.
+// Pulse is the locked-in frontend (gate G3). It stays in src/designs/ so the
+// review gallery keeps rendering it alongside the other 21 explorations —
+// there is one copy, and /designs/pulse and / show the same component.
+//
+// The copy it renders is still the placeholder set in src/designs/_content.ts;
+// real FR-M2 marketing content is Phase 1.
 export default function MarketingHome() {
-  return (
-    <main>
-      <h1>{brand.name}</h1>
-      <p>Buyer-side HRIS brokerage. Marketing site lands in Phase 1.</p>
-    </main>
-  );
+  return <Pulse />;
 }
