@@ -1,22 +1,121 @@
 /* PULSE — verification never stops.
    The brokerage's real edge is an automated research pipeline that re-checks
    vendor pricing on a schedule, not a spreadsheet someone remembers to update.
-   The signature makes that literal: a live oscilloscope trace on a dark
-   instrument panel, a pulsing LIVE dot, and a legend of vendors just
-   re-verified. Geologica carries display + body; Martian Mono's stepped
-   letterforms are reserved for labels, timestamps and figures only. */
+   The signature makes that literal: a live oscilloscope trace on an instrument
+   panel, a pulsing LIVE dot, and a legend of vendors just re-verified.
+   Geologica carries display + body; Martian Mono's stepped letterforms are
+   reserved for labels, timestamps and figures only.
+
+   CANVAS — "phosphor bloom": signal light enters at the lower-left and decays
+   toward the upper-right. Viewport-fixed, so it behaves like ambient room
+   light the panels travel through rather than a page-height gradient that
+   flattens to a vertical wash on a long document.
+
+   SURFACES — three honest categories, and everything follows one of them:
+     · translucent bands  (nav, vendor wall, advantage strip) — light passes
+     · solid modules      (the 1px-gap grids)                 — hardware
+     · one glass panel    (the signal card)                   — the signature
+
+   THEMES — dark is the instrument room at night, light is the same instrument
+   on a bench in daylight. Not an inversion: the trace deepens so it still
+   reads as a live signal, and the accent darkens to hold contrast on paper. */
 
 .pu {
-  --bg: #0a0e13;
-  --surface: #10161d;
+  /* ---- dark (default) ---- */
+  --bg: #080c11;
   --ink: #f3f6f8;
   --muted: #8a96a3;
   --line: #1e2732;
-  --cyan: #2fe6c4;
 
+  --accent: #2fe6c4;
+  --accent-on: #04120e;
+  --accent-soft: rgba(47, 230, 196, 0.38);
+  --accent-tint: rgba(47, 230, 196, 0.06);
+
+  --trace: #2fe6c4;
+  --trace-glow: rgba(47, 230, 196, 0.7);
+  --mark-glow: rgba(47, 230, 196, 0.65);
+  --scope-tint: rgba(47, 230, 196, 0.05);
+
+  --veil: rgba(255, 255, 255, 0.03);
+  --panel: rgba(255, 255, 255, 0.045);
+  --glass: rgba(16, 23, 30, 0.62);
+  --module: #10161d;
+  --module-hover: #141d26;
+  --field: rgba(255, 255, 255, 0.05);
+  --nav: rgba(8, 12, 17, 0.78);
+
+  --shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.72);
+  --focus: rgba(47, 230, 196, 0.25);
+  /* dark separates surfaces with hairlines; light needs weight instead */
+  --lift: none;
+
+  /* the bloom, strongest at the entry corner */
+  --glow-1: rgba(47, 230, 196, 0.17);
+  --glow-2: rgba(47, 230, 196, 0.09);
+  --glow-3: rgba(47, 230, 196, 0.035);
+
+  position: relative;
+  isolation: isolate;
   background: var(--bg);
   color: var(--ink);
 }
+
+/* ---- light ---- */
+.pu[data-theme="light"] {
+  --bg: #eef3f2;
+  --ink: #0a161b;
+  /* darkened past the obvious #566871: body copy has to clear 4.5:1 even in
+     the most saturated corner of the bloom, not just on flat paper */
+  --muted: #4e616a;
+  --line: #cbd9d7;
+
+  --accent: #097061;
+  --accent-on: #ffffff;
+  --accent-soft: rgba(9, 112, 97, 0.34);
+  --accent-tint: rgba(47, 230, 196, 0.12);
+
+  --trace: #0a9b84;
+  --trace-glow: rgba(10, 155, 132, 0.28);
+  --mark-glow: rgba(10, 155, 132, 0.3);
+  --scope-tint: rgba(47, 230, 196, 0.16);
+
+  /* inverted logic: a band on paper reads as a deepening, not a lift */
+  --veil: rgba(10, 58, 54, 0.05);
+  --panel: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.8);
+  --module: #ffffff;
+  --module-hover: #f2fbf8;
+  --field: rgba(255, 255, 255, 0.9);
+  --nav: rgba(238, 243, 242, 0.8);
+
+  --shadow: 0 24px 50px -30px rgba(11, 46, 44, 0.35);
+  --focus: rgba(9, 112, 97, 0.22);
+  --lift: 0 1px 2px rgba(11, 46, 44, 0.05), 0 10px 26px -20px rgba(11, 46, 44, 0.4);
+
+  --glow-1: rgba(47, 230, 196, 0.34);
+  --glow-2: rgba(47, 230, 196, 0.17);
+  --glow-3: rgba(47, 230, 196, 0.06);
+}
+
+/* SIGNATURE CANVAS — fixed so the diagonal stays a diagonal at any scroll
+   depth. Sits behind content but above .pu's own flat base colour. */
+.pu::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(78% 62% at -6% 106%, var(--glow-1), transparent 68%),
+    linear-gradient(
+      to top right,
+      var(--glow-2) 0%,
+      var(--glow-3) 38%,
+      transparent 68%
+    );
+}
+
 .pu *,
 .pu *::before,
 .pu *::after {
@@ -31,20 +130,26 @@
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+.pu button:focus-visible,
+.pu a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* nav */
 .pu-nav {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(10, 14, 19, 0.85);
+  background: var(--nav);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
 .pu-nav-in {
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 20px;
   padding-block: 16px;
 }
 .pu-logo {
@@ -60,14 +165,14 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 10px 1px rgba(47, 230, 196, 0.65);
+  background: var(--accent);
+  box-shadow: 0 0 10px 1px var(--mark-glow);
   flex-shrink: 0;
 }
 .pu-links {
   display: flex;
   gap: 26px;
-  margin-right: auto;
+  margin-inline: 16px auto;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
@@ -82,8 +187,8 @@
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 .pu-solid {
-  background: var(--cyan);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--accent-on);
   padding: 10px 18px;
   font-size: 14px;
 }
@@ -105,15 +210,48 @@
   font-size: 15px;
 }
 
+/* theme control — an illumination switch, in the panel's own vernacular.
+   The glyph and label both name the theme you'll GET, not the one you're in. */
+.pu-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.pu-theme:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+.pu-theme-glyph {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: linear-gradient(90deg, currentColor 0 50%, transparent 50%);
+  flex-shrink: 0;
+}
+.pu[data-theme="light"] .pu-theme-glyph {
+  background: linear-gradient(270deg, currentColor 0 50%, transparent 50%);
+}
+.pu-theme-label {
+  min-width: 38px;
+  text-align: left;
+}
+
 /* hero */
 .pu-hero {
   border-bottom: 1px solid var(--line);
-  background: radial-gradient(
-      1100px 480px at 82% -10%,
-      rgba(47, 230, 196, 0.1),
-      transparent 60%
-    ),
-    var(--bg);
 }
 .pu-hero-in {
   display: grid;
@@ -133,7 +271,7 @@
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.12em;
-  color: var(--cyan);
+  color: var(--accent);
   margin-bottom: 22px;
 }
 .pu-h1 {
@@ -164,15 +302,15 @@
   border-radius: 7px;
   font: inherit;
   font-size: 14.5px;
-  background: var(--surface);
+  background: var(--field);
   color: var(--ink);
 }
 .pu-input::placeholder {
   color: var(--muted);
 }
 .pu-input:focus-visible {
-  outline: 3px solid rgba(47, 230, 196, 0.2);
-  border-color: var(--cyan);
+  outline: 3px solid var(--focus);
+  border-color: var(--accent);
 }
 .pu-fine {
   margin-top: 14px;
@@ -181,13 +319,17 @@
   line-height: 1.5;
 }
 
-/* SIGNATURE — the live verification signal */
+/* SIGNATURE — the live verification signal. The one glass surface on the
+   page: the ambient bloom reads through it, so the panel feels lit rather
+   than painted. */
 .pu-signal {
-  background: var(--surface);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 22px;
-  box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow);
 }
 .pu-signal-head {
   display: flex;
@@ -212,13 +354,13 @@
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--cyan);
+  color: var(--accent);
 }
 .pu-live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--cyan);
+  background: var(--accent);
   display: block;
   animation: pu-pulse 1.8s ease-in-out infinite;
 }
@@ -239,7 +381,7 @@
   height: 120px;
   overflow: hidden;
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(47, 230, 196, 0.04), transparent);
+  background: linear-gradient(180deg, var(--scope-tint), transparent);
 }
 .pu-signal-svg {
   display: block;
@@ -250,11 +392,11 @@
 }
 .pu-signal-svg polyline {
   fill: none;
-  stroke: var(--cyan);
+  stroke: var(--trace);
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px var(--cyan));
+  filter: drop-shadow(0 0 6px var(--trace-glow));
 }
 @keyframes pu-scroll {
   to {
@@ -289,7 +431,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--cyan);
+  background: var(--accent);
   flex-shrink: 0;
   align-self: center;
 }
@@ -313,7 +455,7 @@
 /* vendor wall */
 .pu-vwall {
   border-bottom: 1px solid var(--line);
-  background: var(--surface);
+  background: var(--veil);
 }
 .pu-vwall-in {
   display: flex;
@@ -344,8 +486,8 @@
   padding: 6px 13px;
 }
 .pu-vchip-more {
-  color: var(--cyan);
-  border-color: rgba(47, 230, 196, 0.35);
+  color: var(--accent);
+  border-color: var(--accent-soft);
 }
 
 /* sections */
@@ -353,7 +495,7 @@
   padding: 88px 0;
 }
 .pu-sec-surface {
-  background: var(--surface);
+  background: var(--veil);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -362,7 +504,7 @@
   font-size: 10.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--cyan);
+  color: var(--accent);
   margin-bottom: 12px;
 }
 .pu-h2 {
@@ -386,7 +528,7 @@
   max-width: 720px;
 }
 
-/* six tools */
+/* six tools — solid modules, hairlines drawn by the 1px grid gap */
 .pu-tools {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -395,22 +537,20 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--lift);
 }
 .pu-tool {
-  background: var(--bg);
+  background: var(--module);
   padding: 28px;
   transition: background 0.15s ease;
 }
-.pu-sec-surface .pu-tool {
-  background: var(--surface);
-}
 .pu-tool:hover {
-  background: rgba(47, 230, 196, 0.05);
+  background: var(--module-hover);
 }
 .pu-tool-n {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--cyan);
+  color: var(--accent);
   letter-spacing: 0.08em;
   margin-bottom: 14px;
 }
@@ -467,13 +607,11 @@
   font-weight: 700;
 }
 .pu-adv-panel {
-  background: var(--bg);
+  background: var(--module);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 20px;
-}
-.pu-sec-surface .pu-adv-panel {
-  background: var(--surface);
+  box-shadow: var(--lift);
 }
 .pu-adv-panel-h {
   display: flex;
@@ -486,7 +624,7 @@
   margin-bottom: 12px;
 }
 .pu-adv-status {
-  color: var(--cyan);
+  color: var(--accent);
 }
 .pu-mini-wave {
   display: block;
@@ -496,7 +634,7 @@
 }
 .pu-mini-wave polyline {
   fill: none;
-  stroke: var(--cyan);
+  stroke: var(--trace);
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -522,7 +660,7 @@
   width: 5px;
   height: 5px;
   border-radius: 1px;
-  background: var(--cyan);
+  background: var(--accent);
   flex-shrink: 0;
 }
 
@@ -535,9 +673,10 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--lift);
 }
 .pu-tcard {
-  background: var(--bg);
+  background: var(--module);
   padding: 28px;
 }
 .pu-tcard-k {
@@ -573,11 +712,12 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--lift);
 }
 .pu-stat {
-  background: var(--surface);
+  background: var(--module);
   padding: 30px 26px;
-  border-top: 2px solid var(--cyan);
+  border-top: 2px solid var(--accent);
 }
 .pu-stat-n {
   font-family: var(--font-mono);
@@ -593,24 +733,25 @@
   margin-top: 10px;
 }
 
-/* case studies */
+/* case studies — cards on open canvas, so the bloom reads through them */
 .pu-cases {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 .pu-case {
-  background: var(--surface);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 26px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: var(--lift);
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 .pu-case:hover {
-  border-color: rgba(47, 230, 196, 0.4);
+  border-color: var(--accent-soft);
   transform: translateY(-2px);
 }
 .pu-case-n {
@@ -618,7 +759,7 @@
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--cyan);
+  color: var(--accent);
   line-height: 1;
 }
 .pu-case-nl {
@@ -649,7 +790,7 @@
   padding-bottom: 92px;
 }
 .pu-news {
-  background: var(--surface);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 44px;
@@ -657,6 +798,7 @@
   grid-template-columns: 1.1fr 1fr;
   gap: 40px;
   align-items: center;
+  box-shadow: var(--lift);
 }
 .pu-news h2 {
   font-size: 27px;
@@ -670,9 +812,6 @@
   line-height: 1.6;
   color: var(--muted);
   margin: 0;
-}
-.pu-news .pu-input {
-  background: var(--bg);
 }
 
 /* footer */
@@ -746,6 +885,9 @@
   .pu-links {
     display: none;
   }
+  .pu-theme {
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 640px) {
@@ -770,8 +912,13 @@
   .pu-ghost {
     display: none;
   }
-  .pu-solid {
+  /* glyph only — the label is what pushes the nav onto a second row */
+  .pu-theme {
     margin-left: auto;
+    padding: 9px;
+  }
+  .pu-theme-label {
+    display: none;
   }
   .pu-form {
     flex-direction: column;

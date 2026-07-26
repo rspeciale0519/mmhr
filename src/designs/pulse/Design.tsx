@@ -1,4 +1,7 @@
+"use client";
+
 import { Geologica, Martian_Mono } from "next/font/google";
+import { useState } from "react";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
@@ -20,8 +23,14 @@ const WAVE_POINTS =
 const MINI_WAVE = "0,24 10,24 16,12 21,34 26,4 32,24 62,24 68,14 73,30 78,24 108,24 114,10 119,36 124,24 150,24";
 
 export default function Pulse() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const next = theme === "dark" ? "light" : "dark";
+
   return (
-    <div className={`pu ${body.className} ${mono.variable}`}>
+    <div
+      className={`pu ${body.className} ${mono.variable}`}
+      data-theme={theme}
+    >
       {/* nav */}
       <header className="pu-nav">
         <div className="pu-wrap pu-nav-in">
@@ -34,6 +43,16 @@ export default function Pulse() {
               <span key={n}>{n}</span>
             ))}
           </nav>
+          <button
+            type="button"
+            className="pu-theme"
+            onClick={() => setTheme(next)}
+            aria-label={`Switch to ${next} theme`}
+            title={`Switch to ${next} theme`}
+          >
+            <span className="pu-theme-glyph" aria-hidden="true" />
+            <span className="pu-theme-label">{next.toUpperCase()}</span>
+          </button>
           <button className="pu-btn pu-ghost">Sign in</button>
           <button className="pu-btn pu-solid">Get started</button>
         </div>
