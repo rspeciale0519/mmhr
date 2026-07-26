@@ -1,0 +1,45 @@
+name: CI
+
+# Integration tests (src/**/*.integration.test.ts) are NOT run here: they need a
+# live Supabase stack. They run locally before every checkpoint. Spinning up
+# Supabase in CI lands in Phase 2, alongside the RLS policy test matrix that
+# makes it worth the minutes.
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build-time only. Real values live in Vercel; these just satisfy the
+          # env reads so the build can compile.
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+          NEXT_PUBLIC_BRAND_NAME: MatchMaker HR
+          # Unset DSN keeps Sentry inert and skips source-map upload.
+          SENTRY_AUTH_TOKEN: ""

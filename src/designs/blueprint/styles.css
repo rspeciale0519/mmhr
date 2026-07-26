@@ -1,0 +1,370 @@
+/* Direction 3 — Blueprint.
+   An HRIS rollout IS an engineering project, so the page borrows the drafting
+   sheet: a visible grid, dimension lines, monospace annotations, and a red
+   markup pen used only where a human would actually mark up a drawing. */
+
+.d3 {
+  --sheet: #eef2f6;
+  --ink: #16222e;
+  --graphite: #5b6b7a;
+  --line: #cfd9e2;
+  --cyan: #0b6f9d;
+  --markup: #c8452f; /* the drafting pen — sparingly */
+
+  background: var(--sheet);
+  color: var(--ink);
+  min-height: 100vh;
+  /* the drafting grid */
+  background-image:
+    linear-gradient(rgba(11, 111, 157, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 111, 157, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.d3 * {
+  box-sizing: border-box;
+}
+
+.d3-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-inline: 32px;
+}
+
+.d3-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 2px solid var(--ink);
+}
+.d3-logo {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.d3-nav-links {
+  display: flex;
+  gap: 26px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--graphite);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* title block, like the corner of a drawing sheet */
+.d3-titleblock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--graphite);
+}
+.d3-titleblock > div {
+  padding: 10px 0;
+  border-right: 1px solid var(--line);
+}
+.d3-titleblock > div:last-child {
+  border-right: 0;
+}
+.d3-titleblock b {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+.d3-hero {
+  padding: 72px 0 64px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 72px;
+  align-items: start;
+}
+.d3-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 4.6vw, 56px);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 22px;
+  text-wrap: balance;
+}
+/* the one markup mark on the page */
+.d3-h1 u {
+  text-decoration: none;
+  /* the drafting pen: one marked-up phrase. box-decoration-break makes each
+     wrapped fragment get its own clean swipe instead of one stretched box. */
+  background-image: linear-gradient(
+    to top,
+    rgba(200, 69, 47, 0.2) 0.06em,
+    rgba(200, 69, 47, 0.2) 0.42em,
+    transparent 0.42em
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.06em;
+}
+.d3-sub {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--graphite);
+  margin: 0 0 32px;
+  max-width: 46ch;
+}
+.d3-form {
+  display: flex;
+  gap: 0;
+  max-width: 440px;
+  border: 2px solid var(--ink);
+}
+.d3-input {
+  flex: 1;
+  padding: 13px 14px;
+  border: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+}
+.d3-input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -2px;
+}
+.d3-btn {
+  padding: 13px 22px;
+  border: 0;
+  border-left: 2px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.d3-fine {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--graphite);
+}
+
+/* SIGNATURE: the schedule, drawn as a dimensioned timeline */
+.d3-plan {
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+.d3-plan-head {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+}
+.d3-phase {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.d3-phase:last-child {
+  border-bottom: 0;
+}
+.d3-phase-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cyan);
+  padding-top: 2px;
+}
+.d3-phase h3 {
+  font-size: 15px;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+.d3-phase p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--graphite);
+}
+/* dimension line: |<--- 6 wks --->| */
+.d3-dim {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyan);
+}
+.d3-dim span {
+  flex: 1;
+  height: 1px;
+  background: var(--cyan);
+  position: relative;
+}
+.d3-dim span::before,
+.d3-dim span::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: var(--cyan);
+}
+.d3-dim span::before {
+  left: 0;
+}
+.d3-dim span::after {
+  right: 0;
+}
+
+/* Spec band */
+.d3-band {
+  border-top: 2px solid var(--ink);
+  padding: 56px 0;
+}
+.d3-h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.d3-band > p {
+  color: var(--graphite);
+  margin: 0 0 36px;
+  max-width: 60ch;
+  line-height: 1.65;
+}
+.d3-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.d3-spec {
+  padding: 24px;
+  border-right: 1px solid var(--line);
+}
+.d3-spec:last-child {
+  border-right: 0;
+}
+.d3-spec-k {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+.d3-spec h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.d3-spec p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--graphite);
+}
+
+/* Stats as a schedule of quantities */
+.d3-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  background: #fff;
+  margin-bottom: 88px;
+}
+.d3-stat {
+  padding: 20px 24px;
+  border-right: 1px solid var(--line);
+}
+.d3-stat:last-child {
+  border-right: 0;
+}
+.d3-stat-n {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.d3-stat-l {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  margin-top: 4px;
+}
+
+@media (max-width: 940px) {
+  .d3-hero {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+  .d3-specs,
+  .d3-stats,
+  .d3-titleblock {
+    grid-template-columns: 1fr 1fr;
+  }
+  .d3-spec,
+  .d3-stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .d3-nav-links {
+    display: none;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .d3-wrap {
+    padding-inline: 20px;
+  }
+  .d3-hero {
+    padding: 40px 0 44px;
+  }
+  .d3-h1 {
+    font-size: 32px;
+  }
+  /* the form is a bordered unit: stack it and move the divider to the top */
+  .d3-form {
+    flex-direction: column;
+  }
+  .d3-input {
+    min-width: 0;
+  }
+  .d3-btn {
+    width: 100%;
+    border-left: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .d3-titleblock {
+    grid-template-columns: 1fr 1fr;
+  }
+  .d3-titleblock > div:nth-child(2n) {
+    border-right: 0;
+  }
+  .d3-specs,
+  .d3-stats {
+    grid-template-columns: 1fr;
+  }
+  .d3-band {
+    padding: 44px 0;
+  }
+}

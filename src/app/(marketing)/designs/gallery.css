@@ -1,0 +1,242 @@
+.g {
+  --ink: #101828;
+  --slate: #475467;
+  --faint: #98a2b3;
+  --line: #e4e7ec;
+  --paper: #f9fafb;
+  --blue: #2563eb;
+
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+.g *,
+.g *::before,
+.g *::after {
+  box-sizing: border-box;
+}
+.g-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.g-top {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 56px 0 44px;
+}
+.g-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.g-h1 {
+  font-size: clamp(30px, 3.6vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+.g-lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--slate);
+  margin: 0;
+  max-width: 68ch;
+}
+.g-note {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #713f12;
+  max-width: 72ch;
+}
+
+.g-round {
+  padding: 52px 0 12px;
+}
+.g-round-h {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+}
+.g-round-b {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--slate);
+  margin: 0 0 28px;
+  max-width: 70ch;
+}
+
+.g-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  padding-bottom: 28px;
+}
+.g-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.g-card:hover {
+  border-color: #cdd5df;
+  box-shadow: 0 12px 24px -14px rgba(16, 24, 40, 0.22);
+  transform: translateY(-2px);
+}
+.g-card:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+.g-swatch {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+.g-swatch span {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+}
+.g-name {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 4px;
+}
+.g-name h3 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.g-scope {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faint);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.g-line {
+  font-size: 14px;
+  color: var(--slate);
+  margin: 0 0 12px;
+}
+.g-hero {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.g-note-t {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--slate);
+  margin: 0 0 16px;
+}
+.g-meta {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.g-type {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.g-open {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.g-foot {
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding: 32px 0 56px;
+  font-size: 13.5px;
+  color: var(--faint);
+}
+
+/* the bar that sits on top of each design when viewed */
+.gv-bar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 18px;
+  background: #101828;
+  color: #fff;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 13.5px;
+}
+.gv-back {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+.gv-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.gv-name {
+  font-weight: 700;
+}
+.gv-round {
+  color: #98a2b3;
+}
+.gv-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.gv-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.gv-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 640px) {
+  .gv-round,
+  .gv-nav {
+    display: none;
+  }
+}

@@ -1,0 +1,746 @@
+/* DOSSIER — the case file.
+   Your advisor keeps a file on your purchase: the requirements, the quotes, the
+   marked-up proposal. This page is that file. Tabbed dividers, typed labels, a
+   sturdy bookish serif for anything considered and an institutional sans for
+   anything recorded. Brass, not gold — this is an archive, not a luxury brand. */
+
+.do {
+  --paper: #f2f2f2;
+  --card: #ffffff;
+  --manila: #ebe9e4;
+  --ink: #17181a;
+  --body: #43464b;
+  --gray: #74787f;
+  --rule: #d9dade;
+  --brass: #8a6e2f;
+  --brass-l: #f3eddd;
+  --crimson: #8f2f2a;
+
+  background: var(--paper);
+  color: var(--ink);
+}
+.do *,
+.do *::before,
+.do *::after {
+  box-sizing: border-box;
+}
+.do-wrap {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-inline: 34px;
+}
+.do-serif {
+  font-family: var(--font-display), Georgia, serif;
+}
+.do-stamp {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+/* nav */
+.do-nav {
+  background: var(--card);
+  border-bottom: 1px solid var(--rule);
+}
+.do-nav-in {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding-block: 16px;
+}
+.do-logo {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.do-links {
+  display: flex;
+  gap: 25px;
+  margin-right: auto;
+  font-size: 14px;
+  color: var(--gray);
+}
+.do-btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease;
+}
+.do-solid {
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+.do-solid:hover {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+.do-line {
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 15px;
+  font-size: 14px;
+}
+.do-line:hover {
+  background: var(--manila);
+}
+.do-lg {
+  padding: 13px 22px;
+  font-size: 15px;
+}
+
+/* hero */
+.do-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  padding: 72px 0 80px;
+  align-items: start;
+}
+.do-kick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.do-kick i {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.do-h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(38px, 4.4vw, 54px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 0 0 22px;
+  text-wrap: balance;
+}
+.do-lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--body);
+  margin: 0 0 30px;
+  max-width: 46ch;
+}
+.do-form {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+}
+.do-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--card);
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+}
+.do-input:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+  border-color: var(--brass);
+}
+.do-fine {
+  margin-top: 13px;
+  font-size: 13.5px;
+  color: var(--gray);
+}
+
+/* SIGNATURE: the file, with tabs */
+.do-file {
+  position: relative;
+}
+.do-tabs {
+  display: flex;
+  gap: 3px;
+  padding-left: 12px;
+}
+.do-tab {
+  background: var(--manila);
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  padding: 8px 14px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.do-tab.on {
+  background: var(--card);
+  color: var(--ink);
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -2px 0 var(--brass) inset;
+}
+.do-folder {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 0 4px 4px 4px;
+  padding: 22px;
+  box-shadow: 0 18px 40px -26px rgba(23, 24, 26, 0.35);
+  position: relative;
+  z-index: 1;
+}
+.do-file-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ink);
+}
+.do-file-t {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+.do-file-m {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.do-line-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+}
+.do-line-item:last-of-type {
+  border-bottom: 0;
+}
+.do-name {
+  font-weight: 600;
+}
+.do-name small {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--gray);
+  margin-top: 2px;
+}
+.do-ours {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--brass);
+  background: var(--brass-l);
+  border-radius: 2px;
+  padding: 2px 5px;
+  margin-left: 7px;
+}
+.do-fit {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--body);
+}
+.do-bar {
+  width: 56px;
+  height: 4px;
+  background: #e6e7ea;
+  overflow: hidden;
+}
+.do-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+}
+.do-price {
+  font-variant-numeric: tabular-nums;
+  color: var(--body);
+  min-width: 58px;
+  text-align: right;
+}
+.do-note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--brass-l);
+  border-left: 3px solid var(--brass);
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5c4a1f;
+}
+
+/* vendor line */
+.do-wall {
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.do-wall-v {
+  font-size: 14px;
+  color: #a8abb1;
+}
+
+/* sections */
+.do-sec {
+  padding: 80px 0;
+}
+.do-white {
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.do-sec-h {
+  margin-bottom: 44px;
+  max-width: 62ch;
+}
+.do-h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(27px, 2.9vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 10px 0 12px;
+}
+.do-sub {
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0;
+}
+
+/* tools: labelled dividers */
+.do-tools {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 44px;
+}
+.do-tool {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.do-tool-n {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+}
+.do-tool h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.do-tool p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0 0 6px;
+}
+.do-tool small {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--gray);
+  display: block;
+}
+
+/* advantages */
+.do-adv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  padding: 50px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.do-adv:last-of-type {
+  border-bottom: 0;
+}
+/* Explicit, so the alternation doesn't depend on how many divs precede it. */
+.do-adv.flip .do-adv-copy {
+  order: 2;
+}
+.do-adv h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 8px 0 12px;
+}
+.do-adv p {
+  font-size: 16px;
+  line-height: 1.67;
+  color: var(--body);
+  margin: 0 0 20px;
+}
+.do-adv p b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.do-pts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+.do-pts li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--body);
+}
+.do-pts li::after {
+  content: "✓";
+  color: var(--brass);
+  font-weight: 700;
+}
+.do-panel {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 20px;
+  box-shadow: 0 14px 30px -22px rgba(23, 24, 26, 0.3);
+}
+.do-white .do-panel {
+  background: var(--paper);
+}
+.do-panel-h {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--ink);
+}
+.do-prow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+}
+.do-prow:last-child {
+  border-bottom: 0;
+}
+.do-prow span:first-child {
+  font-weight: 600;
+}
+.do-prow span:last-child {
+  color: var(--body);
+  font-variant-numeric: tabular-nums;
+}
+.do-prow.tot {
+  border-top: 2px solid var(--ink);
+  border-bottom: 0;
+  font-weight: 700;
+}
+.do-neg {
+  color: var(--crimson) !important;
+}
+
+/* trust */
+.do-trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.do-tc {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--brass);
+  border-radius: 0 0 3px 3px;
+  padding: 26px;
+}
+.do-white .do-tc {
+  background: var(--paper);
+}
+.do-tc h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  margin: 10px 0 9px;
+}
+.do-tc p {
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0;
+}
+
+/* stats */
+.do-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--rule);
+  background: var(--card);
+}
+.do-st {
+  padding: 30px 26px;
+  border-right: 1px solid var(--rule);
+}
+.do-st:last-child {
+  border-right: 0;
+}
+.do-st-n {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.do-st-l {
+  font-size: 13px;
+  color: var(--gray);
+  margin-top: 8px;
+}
+
+/* cases */
+.do-cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.do-case {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.do-white .do-case {
+  background: var(--paper);
+}
+.do-case-n {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--brass);
+}
+.do-case-nl {
+  font-size: 13px;
+  color: var(--gray);
+  margin-bottom: 8px;
+}
+.do-case h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.34;
+  margin: 0;
+}
+.do-case p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+.do-more {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--brass);
+  align-self: flex-start;
+  padding-bottom: 1px;
+}
+
+/* newsletter */
+.do-news {
+  background: var(--ink);
+  color: #fff;
+  padding: 46px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 44px;
+  align-items: center;
+  border-radius: 3px;
+}
+.do-news h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+.do-news p {
+  margin: 0;
+  font-size: 15.5px;
+  color: #9ea2a9;
+  line-height: 1.6;
+}
+.do-news .do-input {
+  border-color: transparent;
+}
+.do-news .do-solid {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+
+/* footer */
+.do-foot {
+  padding: 56px 0 40px;
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+}
+.do-fgrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.do-foot p {
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--gray);
+  margin: 10px 0 0;
+  max-width: 32ch;
+}
+.do-fc h4 {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin: 0 0 14px;
+}
+.do-fc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.do-fc li {
+  font-size: 14.5px;
+  color: var(--body);
+}
+.do-fbot {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gray);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .do-hero,
+  .do-adv,
+  .do-news,
+  .do-tools {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .do-tools {
+    gap: 0;
+  }
+  .do-adv.flip .do-adv-copy {
+    order: 0;
+  }
+  .do-trust,
+  .do-cases,
+  .do-stats,
+  .do-fgrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .do-st {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .do-links {
+    display: none;
+  }
+}
+@media (max-width: 620px) {
+  .do-trust,
+  .do-cases,
+  .do-stats,
+  .do-fgrid {
+    grid-template-columns: 1fr;
+  }
+  .do-form {
+    flex-direction: column;
+  }
+  .do-tabs {
+    overflow-x: auto;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .do-wrap {
+    padding-inline: 20px;
+  }
+  .do-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .do-line {
+    display: none;
+  }
+  .do-solid {
+    margin-left: auto;
+  }
+  .do-input {
+    min-width: 0;
+  }
+  .do-form .do-btn {
+    width: 100%;
+  }
+  /* the folder holds a 3-column table: scroll it instead of blowing the page */
+  .do-folder {
+    overflow-x: auto;
+  }
+  .do-line-item {
+    min-width: 300px;
+  }
+  .do-hero {
+    padding-block: 44px 52px;
+  }
+  .do-sec {
+    padding: 52px 0;
+  }
+  .do-news {
+    padding: 28px 22px;
+  }
+}
+
+/* Grid items default to min-width:auto, so a column refuses to shrink below its
+   content's min-content width — which is what was pushing the hero to 447px in a
+   350px viewport. min-width:0 lets the column shrink; the folder scrolls its own
+   table instead of widening the page. */
+.do-hero > *,
+.do-adv > *,
+.do-news > * {
+  min-width: 0;
+}

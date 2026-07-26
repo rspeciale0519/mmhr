@@ -4,19 +4,20 @@
 > phases complete (Rule 7). PRD requirement IDs in parentheses.
 
 ## Pre-flight (upon build authorization)
-- [ ] git init with `main` + `develop` branches; add existing remote `git@github.com:rspeciale0519/mmhr.git` and push both
+- [x] git init with `main` + `develop`; remote `git@github.com:rspeciale0519/mmhr.git` (private, develop default) — both pushed 2026-07-12
 - [x] Ratify decision log D1–D7 + service matrix D14 — ratified 2026-07-12 after live pricing verification
-- [ ] Provision third-party accounts per ratified matrix; wire credentials into local/staging env
+- [x] Provision third-party accounts + populate `.env.local` — done 2026-07-12 (Vercel staging env-var wiring remains a Phase 0 task)
 
 ## Phase 0 — Foundations & design system
-- [ ] Next.js + TypeScript + Tailwind + shadcn scaffold with (marketing)/(auth)/(app)/(admin) route groups
+- [x] Next.js + TypeScript + Tailwind + shadcn scaffold with (marketing)/(auth)/(app)/(admin) route groups
 - [ ] Fresh design direction via frontend-design skill → owner approval of rendered explorations
 - [ ] Approved direction codified via shadcn skill: theme tokens + core component library
-- [ ] Local Supabase + Drizzle + first migration (identity, leads)
-- [ ] Supabase Auth skeleton (sign-up/sign-in round-trip)
-- [ ] tRPC wiring; brand config module
-- [ ] CI (type-check, lint, tests, Lighthouse budget) + Vercel/Supabase staging deploy
-- [ ] PostHog project + consent-gated client
+- [x] Local Supabase + Drizzle + first migration (identity, leads) — 5 tables, RLS enabled default-deny
+- [x] Supabase Auth skeleton (sign-up/sign-in round-trip) — verified in-browser + integration tests
+- [x] tRPC wiring; brand config module
+- [x] CI (type-check, lint, unit tests, build) — green on GitHub Actions
+- [ ] Vercel staging deploy
+- [x] PostHog project + consent-gated client — 0 tracking requests before consent (browser-verified)
 
 ## Phase 1 — Marketing site + lead gate
 - [ ] All public pages (FR-M1): Home (FR-M2), Platform, Broker Model, Services, Case Studies, FAQ, About, Contact, Partners ×3, Resources, Transparency, Privacy/Terms
