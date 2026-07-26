@@ -1,0 +1,40 @@
+# What NOT to upload to Vercel.
+#
+# IMPORTANT: once this file exists it supersedes .gitignore for deploys, so
+# anything that must stay out of the upload has to be listed here explicitly —
+# being gitignored is no longer enough.
+#
+# This file exists because docs/temp/ accumulated competitor walkthrough
+# captures (outsail-000.mp4 alone is 511 MB) and a deploy failed on Vercel's
+# 100 MB per-file limit after uploading 676 MB.
+
+node_modules
+.git
+
+# Local build output and caches. Vercel builds from source, and
+# .next/dev/cache/turbopack grows to hundreds of MB.
+.next
+out
+dist
+build
+coverage
+*.tsbuildinfo
+
+# Documentation and research captures — not part of the build.
+docs
+
+# Engineering-memory vault and agent tooling.
+mmhrbrain
+.claude
+.codex
+
+# Local env and editor state. Production env comes from Vercel project settings.
+.env
+.env.*
+.vscode
+.idea
+
+# Local service state.
+supabase/.branches
+supabase/.temp
+.trigger

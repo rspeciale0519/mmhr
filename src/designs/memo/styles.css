@@ -1,0 +1,716 @@
+/* MEMO — the declassified internal memo.
+   A buyer-side broker's whole value is reversing information asymmetry: the
+   vendor knows what's negotiable and you don't. So the page is staged as a
+   leaked internal document — redaction bars over the phrases a vendor would
+   rather keep quiet, one bar peeled back at the corner to prove there's a
+   real number underneath. Special Elite carries the typewriter/case-file
+   voice at large sizes only; Inter carries body copy and every revealed
+   figure, so the "truth" always reads clean against the "claim" reading
+   rough. */
+
+.me {
+  --paper: #f1eee6;
+  --ink: #1a1a1a;
+  --body: #45433d;
+  --rule: #d8d3c4;
+  --stamp: #a1281f;
+  --bar: #17181c;
+  --card: #ffffff;
+
+  background: var(--paper);
+  color: var(--ink);
+}
+.me *,
+.me *::before,
+.me *::after {
+  box-sizing: border-box;
+}
+.me-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-inline: 34px;
+}
+.me-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--stamp);
+}
+
+/* nav */
+.me-nav {
+  background: var(--card);
+  border-bottom: 1px solid var(--rule);
+}
+.me-nav-in {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-block: 16px;
+}
+.me-logo {
+  font-family: var(--font-display), monospace;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+}
+.me-links {
+  display: flex;
+  gap: 24px;
+  margin-right: auto;
+  font-size: 14px;
+  color: var(--body);
+}
+.me-btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.me-solid {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 10px 18px;
+  font-size: 14px;
+}
+.me-solid:hover {
+  background: var(--stamp);
+  border-color: var(--stamp);
+}
+.me-line {
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 15px;
+  font-size: 14px;
+}
+.me-line:hover {
+  background: var(--paper);
+}
+.me-lg {
+  padding: 13px 22px;
+  font-size: 15px;
+}
+
+/* hero */
+.me-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  padding-block: 68px 76px;
+  align-items: start;
+}
+
+/* memo header block: TO / FROM / RE, typed like a real memo */
+.me-memohead {
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 0;
+  margin-bottom: 26px;
+  display: grid;
+  gap: 6px;
+}
+.me-memohead-row {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.me-memohead-label {
+  font-family: var(--font-display), monospace;
+  color: var(--stamp);
+  letter-spacing: 0.03em;
+}
+.me-memohead-value {
+  color: var(--body);
+  font-weight: 500;
+}
+
+.me-h1 {
+  font-family: var(--font-display), monospace;
+  font-size: clamp(32px, 4.6vw, 54px);
+  line-height: 1.12;
+  font-weight: 400;
+  margin: 0 0 20px;
+  overflow-wrap: break-word;
+}
+.me-lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--body);
+  margin: 0 0 28px;
+  max-width: 46ch;
+}
+.me-form {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+}
+.me-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--card);
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+}
+.me-input:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 1px;
+  border-color: var(--stamp);
+}
+.me-fine {
+  margin-top: 13px;
+  font-size: 13.5px;
+  color: var(--body);
+}
+
+/* SIGNATURE: the redacted memo document, one bar peeled back */
+.me-doc-wrap {
+  position: relative;
+}
+.me-rubber-stamp {
+  position: absolute;
+  top: -16px;
+  right: 22px;
+  width: 148px;
+  padding: 9px 8px;
+  border: 3px solid var(--stamp);
+  border-radius: 6px;
+  color: var(--stamp);
+  font-family: var(--font-display), monospace;
+  font-size: 12.5px;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  z-index: 2;
+  pointer-events: none;
+}
+.me-doc {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 26px;
+  box-shadow: 0 18px 40px -26px rgba(23, 24, 26, 0.35);
+  position: relative;
+  z-index: 1;
+}
+.me-doc-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 13px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--ink);
+}
+.me-doc-tag {
+  font-family: var(--font-display), monospace;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+.me-doc-num {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--body);
+  white-space: nowrap;
+}
+.me-doc-body {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: var(--body);
+  margin: 0;
+}
+
+/* the redaction bar: real text stays in the DOM (announced by AT), just
+   painted over so it visually reads as blacked out. No fixed width — it
+   flows and wraps like any other inline span. */
+.me-bar {
+  display: inline;
+  background: var(--bar);
+  color: transparent;
+  border-radius: 2px;
+  padding: 0.06em 0.4em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* the one bar that's peeled: a small paper-coloured flap lifts off its
+   corner, and the true figure sits in clean Inter right after it — rough
+   claim, clean truth. */
+.me-bar--peel {
+  position: relative;
+}
+.me-bar--peel::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: -3px;
+  width: 13px;
+  height: 13px;
+  background: var(--paper);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  transform: rotate(6deg);
+  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.28);
+}
+.me-reveal {
+  font-family: var(--font-body), Inter, sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+  margin-left: 0.32em;
+}
+
+/* declassified facts: a redaction-bar motif above each revealed figure */
+.me-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+.me-stat-card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 16px;
+}
+.me-stat-bar {
+  display: block;
+  width: 30px;
+  height: 8px;
+  background: var(--bar);
+  border-radius: 1px;
+  margin-bottom: 12px;
+}
+.me-stat-figure {
+  font-family: var(--font-body), Inter, sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.me-stat-label {
+  font-size: 12px;
+  color: var(--body);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* vendor wall */
+.me-wall {
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.me-wall-in {
+  padding-block: 20px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.me-wall-v {
+  font-size: 14px;
+  color: #a39d8c;
+}
+
+/* sections */
+.me-sec {
+  padding: 80px 0;
+}
+.me-sec-alt {
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.me-sec-h {
+  margin-bottom: 42px;
+  max-width: 62ch;
+}
+.me-h2 {
+  font-family: var(--font-display), monospace;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.18;
+  font-weight: 400;
+  margin: 10px 0 12px;
+  overflow-wrap: break-word;
+}
+.me-sub {
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0;
+}
+
+/* tools */
+.me-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.me-tool {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 22px;
+}
+.me-tool-head {
+  margin-bottom: 10px;
+}
+.me-tool h3 {
+  font-family: var(--font-display), monospace;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+.me-tool p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0 0 8px;
+}
+.me-tool small {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--body);
+  display: block;
+  opacity: 0.85;
+}
+
+/* advantages */
+.me-adv {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.me-adv-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--stamp);
+  border-radius: 0 3px 3px 3px;
+  padding: 24px;
+}
+.me-sec-alt .me-adv-card {
+  background: var(--card);
+}
+.me-adv-card h3 {
+  font-family: var(--font-display), monospace;
+  font-size: 21px;
+  font-weight: 400;
+  margin: 10px 0 10px;
+}
+.me-adv-card p {
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 0 0 16px;
+}
+.me-adv-card p b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.me-pts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+.me-pts li {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--body);
+}
+.me-pts li::after {
+  content: "✓";
+  color: var(--stamp);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* method / trust */
+.me-trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.me-tc {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 24px;
+}
+.me-sec-alt .me-tc,
+.me-sec:not(.me-sec-alt) .me-tc {
+  background: var(--card);
+}
+.me-tc h3 {
+  font-family: var(--font-display), monospace;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 10px 0 9px;
+}
+.me-tc p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+
+/* case files */
+.me-cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.me-case {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.me-sec-alt .me-case {
+  background: var(--card);
+}
+.me-case-n {
+  font-family: var(--font-display), monospace;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--stamp);
+  line-height: 1;
+}
+.me-case-nl {
+  font-size: 12.5px;
+  color: var(--body);
+  margin-bottom: 6px;
+}
+.me-case h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.36;
+  margin: 0;
+  color: var(--ink);
+}
+.me-case p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+  margin: 0;
+}
+.me-more {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--stamp);
+  align-self: flex-start;
+  padding-bottom: 1px;
+}
+
+/* newsletter */
+.me-news-wrap {
+  padding-block: 80px;
+}
+.me-news {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 44px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  border-radius: 3px;
+}
+.me-news h2 {
+  font-family: var(--font-display), monospace;
+  font-size: 29px;
+  font-weight: 400;
+  margin: 0 0 10px;
+}
+.me-news p {
+  margin: 0;
+  font-size: 15.5px;
+  color: #b9b6ab;
+  line-height: 1.6;
+}
+.me-news .me-input {
+  border-color: transparent;
+}
+.me-news .me-solid {
+  background: var(--stamp);
+  border-color: var(--stamp);
+  color: #fff;
+}
+.me-news .me-solid:hover {
+  background: #c23127;
+}
+
+/* footer */
+.me-foot {
+  padding: 56px 0 40px;
+  background: var(--card);
+  border-top: 1px solid var(--rule);
+}
+.me-fgrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 38px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.me-foot p {
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--body);
+  margin: 10px 0 0;
+  max-width: 32ch;
+}
+.me-fc h4 {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--stamp);
+  margin: 0 0 14px;
+}
+.me-fc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.me-fc li {
+  font-size: 14.5px;
+  color: var(--body);
+}
+.me-fbot {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--body);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .me-hero,
+  .me-tools,
+  .me-adv,
+  .me-trust,
+  .me-cases,
+  .me-news,
+  .me-fgrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .me-tools,
+  .me-adv,
+  .me-trust,
+  .me-cases {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .me-stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .me-links {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .me-wrap {
+    padding-inline: 18px;
+  }
+  .me-nav-in {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .me-line {
+    display: none;
+  }
+  .me-solid {
+    margin-left: auto;
+  }
+  .me-form {
+    flex-direction: column;
+  }
+  .me-form .me-btn {
+    width: 100%;
+  }
+  .me-hero {
+    padding-block: 44px 48px;
+  }
+  .me-memohead-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .me-rubber-stamp {
+    top: -12px;
+    right: 8px;
+    width: 108px;
+    padding: 6px 6px;
+    font-size: 10px;
+    border-width: 2px;
+  }
+  .me-doc {
+    padding: 20px;
+    padding-top: 34px;
+  }
+  .me-doc-head {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .me-tools,
+  .me-adv,
+  .me-trust,
+  .me-cases {
+    grid-template-columns: 1fr;
+  }
+  .me-stats-row {
+    grid-template-columns: 1fr;
+  }
+  .me-sec {
+    padding: 52px 0;
+  }
+  .me-news-wrap {
+    padding-block: 52px;
+  }
+  .me-news {
+    padding: 26px 22px;
+  }
+
+  /* grid items refuse to shrink below their min-content width by default;
+     let every grid child and every input shrink with the viewport instead
+     of forcing the page wider than 320px. */
+  .me-hero > *,
+  .me-adv > *,
+  .me-trust > *,
+  .me-cases > *,
+  .me-tools > *,
+  .me-news > *,
+  .me-stats-row > * {
+    min-width: 0;
+  }
+  .me-input {
+    min-width: 0;
+  }
+}

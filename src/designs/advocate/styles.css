@@ -1,0 +1,262 @@
+/* Direction 2 — Advocate.
+   The differentiator is a human in your corner, so the page is written and set
+   like a letter from that person. Warm, but plum + teal rather than the
+   cream/serif/terracotta everyone reaches for. */
+
+.d2 {
+  --ivory: #faf6f3;
+  --plum: #3d2140;
+  --plum-soft: #5d3a60;
+  --teal: #17635e;
+  --teal-bright: #1e857e;
+  --warm: #8a7a84;
+  --rule: #e5dad e;
+  --rule: #e6dbe2;
+
+  background: var(--ivory);
+  color: var(--plum);
+  min-height: 100vh;
+}
+.d2 * {
+  box-sizing: border-box;
+}
+
+.d2-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-inline: 32px;
+}
+
+.d2-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0;
+}
+.d2-logo {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.d2-nav-links {
+  display: flex;
+  gap: 28px;
+  font-size: 14px;
+  color: var(--plum-soft);
+}
+
+/* Hero — set like an opening paragraph, not a slogan */
+.d2-hero {
+  padding: 64px 0 72px;
+  max-width: 34ch;
+}
+.d2-kicker {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.d2-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.2vw, 62px);
+  line-height: 1.08;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0 0 24px;
+}
+.d2-h1 em {
+  font-style: italic;
+  color: var(--teal);
+}
+.d2-lede {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--plum-soft);
+  max-width: 46ch;
+  margin: 0 0 36px;
+}
+
+.d2-form {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+}
+.d2-input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  color: var(--plum);
+}
+.d2-input:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+.d2-btn {
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--teal);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.d2-btn:hover {
+  background: var(--teal-bright);
+}
+.d2-note {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--warm);
+}
+
+/* SIGNATURE: the advisor card, set like a signed note */
+.d2-advisor {
+  background: var(--plum);
+  color: var(--ivory);
+  border-radius: 3px;
+  padding: 44px 48px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 88px;
+}
+.d2-portrait {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--teal-bright), var(--teal));
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: #fff;
+  flex-shrink: 0;
+}
+.d2-advisor-body p {
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.55;
+  margin: 0 0 20px;
+  font-weight: 300;
+}
+.d2-sig {
+  font-size: 14px;
+  color: #c7aec9;
+  line-height: 1.5;
+}
+.d2-sig strong {
+  color: var(--ivory);
+  font-weight: 600;
+  display: block;
+}
+
+/* Promises — plain, unadorned, one rule between each */
+.d2-promises {
+  border-top: 1px solid var(--rule);
+  padding: 56px 0 24px;
+}
+.d2-h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  margin: 0 0 40px;
+}
+.d2-promise {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 40px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.d2-promise h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+.d2-promise p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--plum-soft);
+}
+.d2-promise p strong {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* Stats — quiet, in the margin voice */
+.d2-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+  padding: 56px 0 88px;
+}
+.d2-stat-n {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--teal);
+  line-height: 1;
+}
+.d2-stat-l {
+  font-size: 14px;
+  color: var(--warm);
+  margin-top: 8px;
+  max-width: 18ch;
+  line-height: 1.4;
+}
+
+@media (max-width: 860px) {
+  .d2-advisor {
+    grid-template-columns: 1fr;
+    padding: 32px;
+  }
+  .d2-promise {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .d2-nav-links {
+    display: none;
+  }
+}
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  .d2-wrap {
+    padding-inline: 20px;
+  }
+  .d2-hero {
+    padding: 40px 0 48px;
+  }
+  .d2-h1 {
+    font-size: 36px;
+  }
+  .d2-form {
+    flex-direction: column;
+  }
+  .d2-input {
+    min-width: 0;
+  }
+  .d2-btn {
+    width: 100%;
+  }
+  .d2-advisor {
+    padding: 24px;
+    gap: 20px;
+  }
+  .d2-stats {
+    gap: 28px;
+  }
+}
