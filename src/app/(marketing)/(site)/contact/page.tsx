@@ -26,8 +26,8 @@ const REASONS = [
   },
 ];
 
-// The form is not wired to a handler yet — lead capture (FR-L1) and the
-// newsletter provider (FR-M3) land in Phase 1. Markup and validation are in
+// The form is not wired to a handler yet. FR-MKT-06 lead capture and
+// FR-MKT-11 newsletter registration remain unimplemented. Markup is in
 // place so the wiring is the only thing left to add.
 export default function ContactPage() {
   return (

@@ -27,7 +27,7 @@ export default function DesignDirectory() {
             <strong>Everything on these pages is placeholder content.</strong>{" "}
             The numbers (NPS 74, 310 companies, $84.5k saved), the case studies,
             and the advisor names are stand-ins so the layouts can be judged —
-            not claims. Real copy lands with Phase 1.
+            not claims. Real copy requires the canonical content review.
           </p>
         </div>
       </header>

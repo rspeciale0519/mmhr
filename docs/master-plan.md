@@ -1,3 +1,5 @@
+> **Legacy v1 plan:** [PRD.md](./PRD.md) and [TECH_STACK.md](./TECH_STACK.md) superseded this plan on 2026-08-24. Preserve it as history only.
+
 \# MatchMaker HR — Master Project Plan
 
 \*v1.0 — July 2026\*
@@ -174,7 +176,7 @@ Protected app area with a `superadmin` role at the top of the permission hierarc
 
 | Crawling | Firecrawl | Managed crawl + markdown extraction |
 
-| Extraction | LLM (Claude API) structured-output step | Unstructured page → validated JSON fields |
+| Extraction | Interchangeable AI service with structured output | Unstructured page → validated JSON fields |
 
 | CMS | Sanity or Payload | Blog, case studies; non-dev editing of vendor copy |
 

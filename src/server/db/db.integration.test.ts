@@ -35,7 +35,7 @@ describe("first migration", () => {
     expect(org.id).toBeTruthy();
   });
 
-  // The security model rides on RLS (dev-plan §4.3). Policies land in Phase 2,
+  // The security model rides on RLS (TECH_STACK section 10). Policies remain incomplete,
   // but every org-scoped table must be default-deny from the very first
   // migration — a table that ships with RLS off is a data leak waiting to be
   // forgotten about.

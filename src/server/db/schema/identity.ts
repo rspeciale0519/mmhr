@@ -8,9 +8,8 @@ import {
 } from "drizzle-orm/pg-core";
 
 /**
- * Buyer-side org roles (FR-A7). Internal roles (advisor, superadmin) are carried
- * as JWT claims rather than org membership, and arrive with the RLS policy work
- * in Phase 2.
+ * Organization roles are the current IAM foundation. Internal roles need a
+ * canonical authorization design before their RLS policy implementation.
  */
 export const orgRole = pgEnum("org_role", ["admin", "contributor", "viewer"]);
 

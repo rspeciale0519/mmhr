@@ -344,7 +344,7 @@ export const ROUNDS = [
     n: 2,
     title: "Round 2 — full homepages",
     blurb:
-      "Built on OutSail's proven section order (hero + capture → vendor wall → six tools → broker advantage → trust → stats → case studies → newsletter → footer), which also happens to match our own FR-M2 spec. Same skeleton, three very different arguments.",
+      "Built on OutSail's proven section order (hero + capture → vendor wall → six tools → broker advantage → trust → stats → case studies → newsletter → footer), which matches FR-MKT-02. Same skeleton, three very different arguments.",
   },
   {
     n: 1,

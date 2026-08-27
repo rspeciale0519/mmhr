@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { describe, expect, test } from "vitest";
 
 /**
- * BUILD_SPEC 0.4: prove the auth round-trip against the running local stack.
+ * Prove the authentication round-trip against the running local stack.
  * This exercises Supabase Auth directly (no Next.js), so a failure here means
  * the stack/env is wrong rather than our UI.
  */

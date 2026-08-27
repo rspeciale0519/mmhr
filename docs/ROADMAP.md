@@ -1,7 +1,9 @@
+> **Legacy v1 roadmap:** [PRD.md](./PRD.md) and [TECH_STACK.md](./TECH_STACK.md) superseded this roadmap on 2026-08-24. Preserve completion evidence as history only.
+
 # MatchMaker HR — Development Roadmap
 
-> Tracks phase/task completion per `docs/development-plan.md`. Items get checked off as
-> phases complete (Rule 7). PRD requirement IDs in parentheses.
+> Preserves former phase completion from `docs/development-plan.md`.
+> Do not update this file as the v2 roadmap.
 
 ## Pre-flight (upon build authorization)
 - [x] git init with `main` + `develop`; remote `git@github.com:rspeciale0519/mmhr.git` (private, develop default) — both pushed 2026-07-12
@@ -54,7 +56,7 @@
 
 ## Phase 5 — Automated research pipeline (parallel)
 - [ ] Source registry + cadence schedules (FR-P1/P2); registry populated (D12)
-- [ ] Trigger.dev crawl (Firecrawl) + Claude structured extraction → Zod schemas (FR-P3)
+- [ ] Trigger.dev crawl (Firecrawl) + configured AI structured extraction → Zod schemas (FR-P3)
 - [ ] Validation, anomaly detection, snapshot diffing, review queue (FR-P4)
 - [ ] Versioned snapshots + full traceability (FR-P5)
 - [ ] Publish flow: score recompute + "last verified" + freshness SLA metric (FR-P6)

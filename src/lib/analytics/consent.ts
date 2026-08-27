@@ -1,5 +1,5 @@
 /**
- * Cookie-consent state (FR-L4, GDPR/CCPA).
+ * Cookie-consent state for FR-MKT-09 and FR-ANL-01.
  *
  * Consent is opt-in: absence of the cookie means "no consent", never "assume
  * yes". Nothing may load a tracker before hasAnalyticsConsent() returns true.

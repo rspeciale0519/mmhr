@@ -42,7 +42,7 @@ describe("analytics consent", () => {
 
 /**
  * The load-bearing tests. A cookie banner that renders but does not actually
- * gate the tracker is a compliance failure (FR-L4), so assert on posthog.init
+ * gate the tracker is a compliance failure (FR-MKT-09), so assert on posthog.init
  * itself rather than on UI state.
  */
 describe("analytics initialisation is gated on consent", () => {
