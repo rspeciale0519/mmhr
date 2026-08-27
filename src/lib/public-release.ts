@@ -1,3 +1,5 @@
+import { brand } from "@/lib/brand";
+
 const ROBOTS_BLOCK = "noindex, nofollow, noarchive, nosnippet";
 
 // A future approved release must replace null with a versioned approval ID.
@@ -32,7 +34,29 @@ const commonHeaders = {
   "X-Robots-Tag": ROBOTS_BLOCK,
 };
 
-export function createPublicReleaseBlockResponse(pathname: string) {
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return character;
+    }
+  });
+}
+
+export function createPublicReleaseBlockResponse(
+  pathname: string,
+  brandName: string = brand.name,
+) {
   if (pathname === "/robots.txt") {
     return new Response("User-agent: *\nDisallow: /\n", {
       headers: {
@@ -55,8 +79,10 @@ export function createPublicReleaseBlockResponse(pathname: string) {
     );
   }
 
+  const safeBrandName = escapeHtml(brandName);
+
   return new Response(
-    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow,noarchive,nosnippet\"><title>MatchMaker HR</title></head><body><main><h1>This site is not available yet.</h1><p>MatchMaker HR is preparing a new release.</p></main></body></html>",
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><title>${safeBrandName}</title></head><body><main><h1>This site is not available yet.</h1><p>${safeBrandName} is preparing a new release.</p></main></body></html>`,
     {
       status: 503,
       headers: {

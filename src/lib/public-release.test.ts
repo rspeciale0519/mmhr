@@ -62,6 +62,22 @@ describe("public release control", () => {
     expect(await response.text()).toContain("This site is not available yet.");
   });
 
+  test("uses an escaped configured brand on the holding page", async () => {
+    const response = createPublicReleaseBlockResponse(
+      "/",
+      `Acme <People> & "Co's"`,
+    );
+    const html = await response.text();
+
+    expect(html).toContain(
+      "<title>Acme &lt;People&gt; &amp; &quot;Co&#39;s&quot;</title>",
+    );
+    expect(html).toContain(
+      "<p>Acme &lt;People&gt; &amp; &quot;Co&#39;s&quot; is preparing a new release.</p>",
+    );
+    expect(html).not.toContain("<People>");
+  });
+
   test("returns a machine-readable block for API routes", async () => {
     const response = createPublicReleaseBlockResponse("/api/trpc");
 
