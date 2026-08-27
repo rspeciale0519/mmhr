@@ -2,68 +2,79 @@
 kind: knowledge
 slug: roadmap
 status: current
-updated: 2026-07-15
+updated: 2026-08-27
 layer: roadmap
 sources:
-  - docs/ROADMAP.md
-  - docs/BUILD_SPEC.md
-  - docs/development-plan.md
-  - memory:project_design_gallery
+  - docs/README.md
+  - docs/PRD.md
+  - docs/TECH_STACK.md
+  - .codex/plans/roadmap-v2-implementation.md
+  - .codex/plans/module-r0-roadmap-and-public-release-control.md
+  - .codex/plans/module-r1-secure-platform-base.md
+  - memory:2026-08-27-r0-release-control
 ---
 
-# Roadmap — where the build actually stands
+# Roadmap
 
-Authoritative phase list: `docs/development-plan.md` (8 phases). Full
-machine-checkable exit criteria: `docs/BUILD_SPEC.md`. This doc is the
-brain's evidence-checked summary of `docs/ROADMAP.md`, not a replacement —
-on any future conflict between them, re-run the knowledge-build runbook
-rather than trusting this file blindly.
+The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
-## Phase 0 — Foundations & design system (in progress)
-Done (verified against code, see [[knowledge/features]]):
-scaffold + route groups · local Supabase + Drizzle + first migration ·
-Supabase Auth skeleton · tRPC wiring · CI · PostHog consent-gated client.
+It maps all 148 PRD identifiers to evidence status, release, owner role, and
+recovery controls. Version 1.4 links the R0 release-control record and records
+all required R1 owner approvals.
 
-Open:
-- **G3 owner gate — design direction.** 22 homepage options built across 5
-  rounds (report/bureau/grid/marquee/dossier; harbor/beacon/terminal;
-  scorecard/advocate/blueprint/ledger; redline/specimen/itinerary/memo/sticker;
-  pulse/console/lattice/calibrate/aperture), live at
-  `mmhr-designs.vercel.app/designs`. No direction has been picked yet — this
-  is the actual current blocker on Phase 0 completion.
-- Approved direction codified into theme tokens + component library (blocked
-  on G3).
-- Vercel staging deploy of the **app itself** (distinct from the gallery,
-  which is already deployed — see [[knowledge/orientation]]).
+## Baseline
 
-## Phase 1 — Marketing site + lead gate (not started)
-All FR-M1 public pages, Payload CMS embed, Beehiiv newsletter capture,
-registration gate (free-domain rejection, consent/TCPA), gated Landscape
-Report download, SEO/a11y pass. Blocked on Phase 0 design codification.
+- 5 requirements are Implemented.
+- 22 requirements are Partial.
+- 119 requirements are Missing.
+- FR-IAM-08 is Deferred.
+- FR-RFP-05 is Open.
 
-## Phase 2 — App core (not started)
-Orgs/roles/RLS enforcement, commission-disclosure onboarding, intake wizard,
-vendor catalog (≥15 seeded), match scoring engine v1, marketplace UI.
+See the roadmap traceability matrix for evidence paths and classifications.
 
-## Phase 3 — Evaluation suite (not started)
-Requirements Builder (~200-feature library), Scorecards (+ Realtime live
-mode), Project Plans, team invites/roles.
+## Release Order
 
-## Phase 4 — Advisor layer + reports (not started)
-Advisor console, chat (Realtime), Cal.com booking, proposal review (Storage
-upload), PDF export, Resend transactional email.
+1. R0 records approval, assigns decision ownership, and enforces the public-release block.
+2. R1 completes identity, permissions, RLS, and audit.
+3. R2A and R2B complete marketing, leads, CRM, and workflow foundations.
+4. R3 builds intake, matching, and evaluation.
+5. R4 builds RFP, communication, document, inbound, and job foundations.
+6. R5 adds provider-neutral AI assistance.
+7. R6 builds demos, proposals, and contract handoff.
+8. R7 builds commissions and financial closure.
+9. R8 completes customer success, operations, administration, and reporting.
+10. R9 completes production hardening and release gates.
 
-## Phase 5 — Research pipeline (not started, may run parallel to 3–4)
-Source registry, Trigger.dev + Firecrawl crawl, Claude structured extraction,
-validation/anomaly detection, versioned snapshots, publish flow. Wiring-only
-today: `trigger.config.ts` + one health-check task exist; no real pipeline
-task does. Anthropic/Firecrawl clients: zero code yet.
+R2A and R2B can run in parallel after R1. R3 depends on R2B.
 
-## Phase 6 — SuperAdmin console (not started)
-## Phase 7 — Hardening & launch (not started)
+## R0 Control
 
-## Owner gates (from `docs/BUILD_SPEC.md`)
-G1 ratification — CLEARED 2026-07-12. G2 (per-phase plan approval) — cleared
-for Phase 0's plan. **G3 (design direction) — OPEN, current blocker.**
-G4 (PR merge) / G5 (brand freeze) / G6 (production cutover) — not yet reached.
+The R0 record defines assigned owner roles, the policy quarantine, claim-source inventory, local
+fail-closed gate, recovery, and remaining exit evidence. The local gate is
+verified but is not active on the current production deployment.
 
+R0 remains open for exact claim review, deployment and alias controls, and
+live verification.
+
+The product owner chose to retain unverified statements as blocked placeholders
+for now. This decision does not approve public use.
+
+## R1 Detailed Plan
+
+The fully owner-approved R1 plan is
+.codex/plans/module-r1-secure-platform-base.md.
+
+It defines identity, permissions, RLS, audit, invitations, MFA, migration,
+CI, evidence, and recovery. Rob Speciale is the temporary operations owner.
+
+The approved amendment makes R1 the foundation for FR-IAM-10 and FR-IAM-11.
+Their final evidence belongs to R6 and R7.
+
+FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
+to real deal grants.
+
+## Authorization
+
+Roadmap approval does not authorize implementation. Each release needs an
+approved module plan from all required owners. Cloud migrations and
+deployments need separate approval.

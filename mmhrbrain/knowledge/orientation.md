@@ -2,71 +2,90 @@
 kind: knowledge
 slug: orientation
 status: current
-updated: 2026-07-15
+updated: 2026-08-27
 layer: orientation
 sources:
-  - docs/development-plan.md
-  - docs/BUILD_SPEC.md
+  - docs/README.md
   - docs/PRD.md
-  - src/middleware.ts
-  - .vercel/project.json
+  - docs/TECH_STACK.md
+  - .codex/plans/roadmap-v2-implementation.md
+  - .codex/plans/module-r0-roadmap-and-public-release-control.md
+  - .codex/plans/module-r1-secure-platform-base.md
+  - src/lib/public-release.ts
+  - package.json
+  - src/app/
+  - src/server/
+  - memory:2026-08-27-r0-release-control
 ---
 
 # Orientation
 
-**What this is:** MatchMaker HR — a buyer-side HRIS (HR software) brokerage.
-Buyers get free vendor matching, evaluation tools, and an advisor; vendors
-pay commission. Category reference: outsail.co. Full spec: `docs/PRD.md` +
-`docs/development-plan.md` (authoritative, 8 phases, no timelines).
+**What this is:** MMHR is a private operating platform for HR software
+selection, vendor management, CRM, deal flow, commissions, and customer
+success. MMHR staff use it with invited customer and vendor users. It is not a
+general SaaS product. See docs/PRD.md.
 
-**Where the build actually is:** Phase 0 (foundations), most items done —
-see [[knowledge/roadmap]] for the checklist and [[knowledge/features]] for
-evidence. The real current blocker is **owner gate G3**: 22 homepage design
-options exist, none chosen yet.
+**Document authority:** docs/README.md is the entry point. docs/PRD.md controls
+product behavior. docs/TECH_STACK.md controls architecture, security, and
+provider boundaries. The product owner approved the v2 roadmap on 2026-08-24.
+Roadmap v1.3 contains the approved amendment and the R0 control record.
+Security and engineering approved the R1 draft. Operations review remains pending.
+Former plans in docs/ are legacy records.
 
-## The two-deployments-one-repo split (easy to get confused by)
-This single Next.js codebase runs as **two separate Vercel projects**,
-switched by one env var:
-- `GALLERY_ONLY` unset → the real product app (marketing/app/auth/admin
-  route groups). **Not yet deployed to its own Vercel project.**
-- `GALLERY_ONLY=1` → `src/middleware.ts` serves nothing but `/designs`,
-  skips Supabase auth entirely. This is the `mmhr-designs` Vercel project,
-  already live at `mmhr-designs.vercel.app/designs`.
+**Where the build is:** Foundations and the public marketing shell exist.
+Pulse renders at the site root. The design gallery remains at /designs.
+Authentication, the first schema, tRPC, analytics consent, CI, Sentry, and
+Trigger.dev foundations exist. Customer and administration workflows remain
+mostly placeholders.
 
-Don't read the gallery's live deployment as evidence the *app* is deployed —
-it isn't yet.
+A fail-closed production release gate is implemented and verified locally.
+The current production deployment does not include it yet.
 
-## Stack (ratified D1–D7 + D14, 2026-07-12)
-Next.js 16 App Router + Turbopack, React 19, TypeScript, Tailwind v4 ·
-Supabase (Postgres + Auth + Storage + Realtime; `@supabase/ssr`, always
-`getClaims()` not `getSession()`) · Drizzle ORM, RLS default-deny · tRPC v11
-+ TanStack Query · Vitest (split unit/integration config) · shadcn/ui
-(unthemed pending G3) · PostHog (consent-gated) · Sentry (Next.js 16
-instrumentation pattern) · Trigger.dev (wiring only, real jobs Phase 5) ·
-Payload CMS self-hosted (planned, unbuilt) · Resend / Beehiiv / Cal.com
-(planned, zero code).
+The v2 product baseline replaced the former buyer-marketplace plan on
+2026-08-24. The approved roadmap maps all 148 requirements to releases.
 
-## Where things live
-- `docs/development-plan.md` — architecture, phases, stack decisions.
-- `docs/BUILD_SPEC.md` — machine-checkable exit criteria per phase, owner
-  gates, hard constraints (TDD, RLS matrix, file size, git workflow).
-- `docs/ROADMAP.md` — the checkbox tracker (kept current; see
-  [[knowledge/superseded]] for a granularity caveat on two checkmarks).
-- `src/designs/` — the 22-option design gallery; `registry.ts` is the single
-  wiring point, `_content.ts` the shared copy.
-- `src/server/db/schema/` — Drizzle schema (identity + leads, 5 tables).
-- `src/server/trpc/` — tRPC router tree (currently just `health`).
-- `src/lib/analytics/` — PostHog init + consent gate.
-- `.env.example` — the full env var inventory; **never read `.env.local`**.
+## Architecture Summary
 
-## Working conventions (from CLAUDE.md / BUILD_SPEC hard constraints)
-TDD (failing test → minimal code → pass → commit), work on `feature/*`
-branches via `/git-workflow-planning:start`, never merge to `main`,
-type-check/lint/full-suite must exit 0 at every checkpoint, files ≤~450 LOC,
-all UI through frontend-design + shadcn skills (standing instruction, see
-memory), local Supabase only until launch.
+The repository contains one Next.js application with marketing,
+authentication, customer/vendor, administration, and API route groups.
 
-## Next real step
-Pick (or synthesize) a direction from the 22 gallery options → clears G3 →
-unblocks theme-token codification and the rest of Phase 0.
+The installed foundation uses Supabase, Drizzle, tRPC, TanStack Query,
+Tailwind, shadcn, Trigger.dev, PostHog, Sentry, and Vitest.
 
+All AI work must use a provider-neutral AIService. Provider or model changes
+must not alter domain schemas, permissions, approvals, or workflows.
+
+Use package.json and package-lock.json for installed versions. Use
+docs/TECH_STACK.md for adopted and planned integration status.
+
+## Important Current Risks
+
+- RLS is enabled on the first application tables, but policies remain absent.
+- The direct server PostgreSQL pool bypasses RLS.
+- Customer and administration routes do not implement the v2 workflows.
+- Public placeholder claims remain a release risk. The product owner chose to retain them for now.
+- The current production deployment remains accessible until an approved gate deployment occurs.
+- Former roadmap phases and FR identifiers are not current sequencing.
+- Legacy FR identifiers remain temporary aliases in docs/PRD.md.
+
+## Where Things Live
+
+- docs/README.md — entry point and honest current status
+- docs/PRD.md — canonical v2 product requirements
+- docs/TECH_STACK.md — canonical architecture and stack
+- .codex/plans/roadmap-v2-implementation.md — approved v2 execution order and amendment
+- .codex/plans/module-r0-roadmap-and-public-release-control.md — release quarantine and claim-source inventory
+- .codex/plans/module-r1-secure-platform-base.md — fully owner-approved R1 security plan
+- src/lib/public-release.ts — local fail-closed production release gate
+- docs/outsail-competitive-operating-model.md — supporting research
+- src/app/ — route surfaces
+- src/server/ — domain, data, authorization, and tRPC foundations
+- src/designs/ — Pulse and retained design gallery
+- src/trigger/ — background-job entry points
+- src/server/db/schema/ — Drizzle schemas
+- drizzle/ — migrations
+- .env.example — variable-name inventory; never read .env.local values
+
+## Next Real Step
+
+Preserve the current work before new implementation. Claim review is deferred, and public release remains blocked.
