@@ -1,15 +1,23 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import {
+  createPublicReleaseBlockResponse,
+  isPublicReleaseBlocked,
+} from "@/lib/public-release";
+
 /**
- * Refreshes the Supabase session on every request and writes the rotated
- * cookies onto the response — Server Components can't do this themselves.
+ * Enforces the temporary public-release quarantine. Then it refreshes the
+ * Supabase session and writes rotated cookies onto the response.
  *
- * Route protection is deliberately NOT enforced here yet. The workspace and
- * admin areas are placeholders in Phase 0; gating them belongs with the org/RLS
- * work in Phase 2, where there is an actual authorization model to enforce.
+ * Route protection is deliberately NOT enforced here yet. Customer, vendor,
+ * and admin protection belongs with the canonical IAM and RLS implementation.
  */
 export async function middleware(request: NextRequest) {
+  if (isPublicReleaseBlocked()) {
+    return createPublicReleaseBlockResponse(request.nextUrl.pathname);
+  }
+
   // GALLERY_ONLY builds (the public design-review deployment) serve nothing but
   // /designs. The app and admin routes never render, and sign-up is unreachable
   // — so a public URL can't be used to create accounts against a real Supabase
@@ -53,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except static assets and image files.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Everything except Next's generated assets and the exact favicon path.
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
