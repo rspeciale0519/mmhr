@@ -4,8 +4,8 @@ import { signUp } from "../actions";
 import { AuthForm } from "../auth-form";
 
 /**
- * Phase 0 sign-up: email + password only, to prove the auth round-trip.
- * Phase 1 replaces this with the registration gate (FR-L1..L4): mandatory full
+ * Foundation sign-up uses email and password to prove the auth round-trip.
+ * FR-MKT-06 through FR-MKT-09 require the full registration gate: mandatory full
  * name, company, work email with free-domain rejection, direct phone, and an
  * explicit consent checkbox.
  */

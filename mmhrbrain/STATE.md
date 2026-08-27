@@ -1,48 +1,64 @@
 # mmhr brain — STATE
-Updated: 2026-07-26
+Updated: 2026-08-27
 
 ## Current focus
-Phase 0 (foundations) is mostly done. **G3 is decided in practice: Pulse is
-the locked-in frontend**, rendering at `/`. The design gallery is deliberately
-**unchanged** — all 22 layouts stay in `src/designs/` and stay live at
-`/designs`. Next real work is Phase 1 marketing content (FR-M2) against
-Pulse's layout.
+The canonical v2 product baseline lives in docs/README.md, docs/PRD.md, and
+docs/TECH_STACK.md. The approved implementation roadmap lives in
+.codex/plans/roadmap-v2-implementation.md.
+
+The roadmap maps 148 requirements to evidence status, releases, owner roles,
+tests, risks, and recovery. Version 1.4 links the R0 release-control record and
+records all required R1 owner approvals. Rob Speciale is the temporary
+operations owner. R1 implementation still needs separate authorization.
+
+The approved baseline is captured in four local commits on
+`feature/v2-baseline-stabilization`. No push, pull request, merge, or
+deployment is authorized yet.
+
+The R0 owner assignments, claim-source inventory, and fail-closed release gate live in
+.codex/plans/module-r0-roadmap-and-public-release-control.md and
+src/lib/public-release.ts. The gate passes local production checks but is not
+active on the current production deployment.
+
+Pulse remains the selected homepage direction at /. All 22 gallery layouts
+remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
-One-line change in the end: `(marketing)/page.tsx` renders
-`@/designs/pulse/Design`. Pulse stays in the gallery, so `/` and
-`/designs/pulse` are the same component — one source, no drift. Gates green
-(type-check, 16/16 tests, build with all 22 design routes + `/` prerendered);
-browser-verified. Uncommitted. See [[journal/2026-07-26]].
+Created four focused baseline commits after type checking, lint, 30 tests, and
+the production build passed. See [[journal/2026-08-27]].
 
 ## Open threads
-- **Nothing from this task is committed**, and it sits on
-  `codex/competitor-analysis` — the wrong branch for a frontend lock-in
-  (Pulse's lineage is `feature/foundations`). Owner picks the branch first.
-- **Pending:** production deploy of `3f2288b`, now compounded because `/`
-  has changed too. The gallery has **no Vercel git integration** — pushing
-  to GitHub deploys nothing; deploys are CLI-only (`npx vercel --prod`).
-- Placeholder figures (NPS 74, 310 companies) now render at the **site
-  root**, not just behind a noindex gallery. Real FR-M2 copy is Phase 1.
-- Editing `src/designs/pulse/` now changes production, not just a gallery
-  entry. Anyone treating `src/designs/` as a scratch area needs to know.
-- `npm run lint` exits 1 on 52 pre-existing `no-require-imports` errors in
-  `.claude/hooks/**` + `.codex/hooks/**` (sync-managed, not hand-editable).
-  Unrelated to app code — don't mistake it for a regression.
-- Port 3007 runs a **stale** `next start` from the old GALLERY_ONLY build
-  (its `.next` was overwritten); it backs the owner's Tailscale review URL.
-- Brain-init / knowledge-build files, `CLAUDE.md` and the `.gitignore`
-  addition are still uncommitted.
-- Vercel staging deploy of the app itself is still open.
-- Route groups beyond `(auth)`, `/` and `/designs` are placeholders — real
-  app/admin pages are Phase 1+ work.
+- R0 claim review is deferred while the statements remain blocked placeholders.
+- The current production deployment remains accessible. Activating the gate needs separate Git and production approval.
+- Old deployment URLs and aliases must be protected or retired before R0 closes.
+- R1 implementation, Git, dependency, cloud, bootstrap, and deployment actions remain separately gated.
+- The local baseline commits need separate push and integration approval.
+- Open product decisions remain in docs/PRD.md and must close before their
+  owning modules start.
+- RLS is enabled on the first application tables, but policies and the
+  organization-role integration matrix remain absent.
+- Customer, vendor, and administration workflows remain mostly placeholders.
+- Legacy FR identifiers remain temporary aliases in the canonical PRD.
+- Placeholder figures and claims remain in source and on the current production site.
+- Public commission and affiliation copy still reflects the legacy fixed-rate
+  product. Replace it before any public release.
+- No AI adapter, fixture suite, approval queue, or AI-run store exists yet.
+- The generic AI environment names replace the former provider-specific
+  placeholder. No current application code consumes them.
+- The project has a linked production deployment. Do not change or redeploy it without explicit approval.
+- The comprehensive OutSail questionnaire audit remains in gitignored
+  docs/temp/.
+- The public-site corpus remains in gitignored docs/temp/. Keep copied media
+  internal.
+- The durable operating-model brief remains untracked.
 
 ## Active skills in play
-- (none yet)
+- (none)
 
 ## Notes
-- Knowledge docs are now `current` — trust them over re-deriving from
-  scratch; re-run the knowledge-build runbook if they drift from a future
-  `git log` check (see the Consolidation protocol in `mmhrbrain/CLAUDE.md`).
-- dev docs are a baseline; on conflict prefer [[knowledge/superseded]].
-
+- Use docs/README.md as the entry point.
+- Use docs/PRD.md for product authority.
+- Use docs/TECH_STACK.md for architecture and security authority.
+- Use [[knowledge/superseded]] before consulting a legacy planning file.
+- Public release stays blocked until exact claim review and production gate activation are complete.
+- Product approval does not authorize feature implementation or external actions.

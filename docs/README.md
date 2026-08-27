@@ -1,134 +1,144 @@
-\# MatchMaker HR
+# MatchMaker HR (MMHR)
 
+MMHR is a private operating platform for HR software selection and related customer operations.
 
+MMHR staff use the platform with invited customer and vendor users. MMHR does not sell the platform as a commercial SaaS product.
 
-\*\*The easiest way to buy HR software — with an expert advisor in your corner, for free.\*\*
+## Current Status
 
+- Former Phase 0 foundations are mostly complete.
+- Pulse renders at the site root and remains the selected visual direction.
+- The public marketing routes and design gallery exist.
+- Existing public commission and affiliation copy still reflects the legacy product.
+- Authentication, database, analytics, tRPC, and background-job foundations exist.
+- Customer and internal administration routes remain placeholders.
+- The v2 product baseline now lives in the canonical documents below.
+- The approved v2 roadmap maps all 148 requirements to releases and owner roles.
+- Product, security, engineering, and operations approvals are recorded for R1.
+- Rob Speciale is the temporary operations owner.
+- The R0 claim-source inventory and fail-closed local release gate are recorded.
+- Public claims remain blocked placeholders by product decision.
+- The exact claim review register remains incomplete.
+- Production gate activation requires a separate approved deployment.
+- All roadmap owner roles now have named people.
+- The former v1 execution plan and roadmap remain historical records.
 
+Feature work requires owning-plan approval from every required owner.
 
-MatchMaker HR is a buyer-side HRIS software brokerage platform. It helps SMB-to-mid-market companies (\~50–5,000 employees) research, evaluate, and select the right HRIS at zero cost to the buyer. Revenue comes from vendor commissions on successful purchases — the same rate from every vendor, disclosed to every customer.
+## End-to-End Workflow
 
+1. Capture the customer organization, stakeholders, current systems, and timing.
+2. Complete discovery and create an initial masked evaluation.
+3. Select up to five initial vendor candidates.
+4. Build the RFP questionnaire and demo plan.
+5. Complete mandatory MMHR review and customer clarification.
+6. Issue approved RFP versions to vendors.
+7. Accept structured forms, email, and document responses.
+8. Normalize responses with AI assistance and human approval.
+9. Compare candidates without a forced shortlist funnel.
+10. Coordinate one or more demo rounds.
+11. Track proposals, pricing revisions, commitments, and evaluation changes.
+12. Record the final vendor selection.
+13. Hand direct contract negotiation to the customer and vendor.
+14. Track commission earning, invoicing, collection, and resolution.
+15. Support onboarding, issues, renewals, and later transactions.
 
+## Product Surfaces
 
-\---
+- Public marketing site
+- Customer portal
+- Vendor portal
+- Internal administration and CRM
+- Public endpoints and webhooks
+- Background jobs and operational integrations
 
+The external portals support MMHR operations. They do not make MMHR a general-purpose SaaS product.
 
+## Core Principles
 
-\## What it does
+- Preserve human approval at trust, judgment, relationship, and handoff points.
+- Keep vendor evaluation flexible.
+- Preserve complete commercial and decision history.
+- Enforce every protected action on the server.
+- Keep commission values outside recommendation calculations.
+- Treat AI output as draft material until the required approval occurs.
+- Keep each AI provider and model replaceable behind an internal interface.
+- Keep the design gallery unless the owner requests a change.
 
+## Quick Start
 
+Prerequisites:
 
-\- \*\*Vendor Marketplace\*\* — 50+ HRIS vendor profiles with verified pricing estimates, pros \& cons, module capability scores, and a personalized match % — kept fresh by an automated research pipeline
+- Node.js 22, matching the current CI runtime
+- npm
+- Docker Desktop
+- Supabase CLI
 
-\- \*\*Requirements Builder\*\* — \~200 common HRIS features, tagged must-have / nice-to-have
+Setup:
 
-\- \*\*Scorecards\*\* — weighted criteria, expert question banks, and team scoring, usable live during vendor demos
+1. Run `npm ci`.
+2. Create `.env.local` from `.env.example`.
+3. Add the required local values without committing secrets.
+4. Run `supabase start`.
+5. Run `npm run dev`.
+6. Open `http://localhost:3000`.
 
-\- \*\*Project Plans\*\* — milestone timelines and interactive checklists generated from your go-live date
+Use `supabase status` to inspect the local database services.
 
-\- \*\*Team Workspace\*\* — invites, roles \& permissions, shared progress and activity
+## Validation
 
-\- \*\*Advisor\*\* — a dedicated human expert for proposal review, price benchmarking, and negotiation guidance
+- `npm run type-check`
+- `npm run lint`
+- `npm test`
+- `npm run build`
+- `npm run test:integration` for database, authentication, RLS, migration, or query changes
 
+CI currently runs installation, type checking, linting, unit tests, and the production build.
 
+## Repository Guide
 
-\### The moat: automated research pipeline
-
-A scheduled (weekly / monthly / quarterly) crawl-and-extract pipeline (Firecrawl + LLM structured extraction) keeps vendor data, pricing, and scores continuously fresh — versioned, human-reviewed, and traceable to source. Incumbents maintain this data by hand; we automate it.
-
-
-
-\### Business model \& trust
-
-\- Free to buyers — no fees, no upsells, no passed-along costs, no commitment
-
-\- Same commission rate from every vendor; disclosed to every customer
-
-\- \*\*CBIZ Centrally HR\*\* (our white-labeled UKG Ready offering) appears in every recommendation list as a clearly labeled \*"Featured — our solution"\* placement; organic rankings are never manipulated
-
-\- Scoring methodology published; "last verified" dates on all vendor data
-
-
-
-\## Product surfaces
-
-
-
-1\. \*\*Marketing site\*\* (public) — home, platform, broker model, services, case studies, resources, transparency page
-
-2\. \*\*Buyer app\*\* (authenticated) — the six tools above, gated behind a required lead-capture sign-up (name, company, work email, direct phone)
-
-3\. \*\*SuperAdmin dashboard\*\* (internal) — pipeline control, vendor data management, scoring config, users \& orgs, advisor operations, deals \& commissions, leads \& analytics, content, system health
-
-
-
-\## Tech stack
-
-
-
-| Layer | Choice |
-
+| Path | Purpose |
 |---|---|
+| `src/app/` | Marketing, authentication, customer, administration, and API routes |
+| `src/server/` | Database access, domain services, and tRPC routers |
+| `src/lib/` | Shared clients, analytics, branding, and utilities |
+| `src/components/ui/` | Shared shadcn/ui components |
+| `src/designs/` | Retained design gallery and Pulse implementation |
+| `src/trigger/` | Trigger.dev tasks |
+| `drizzle/` | SQL migrations and generated metadata |
+| `supabase/` | Local Supabase configuration |
+| `docs/` | Product, architecture, research, and historical planning records |
+| `.codex/plans/` | Draft and approved implementation plans |
 
-| Framework | Next.js 15 (React + TypeScript) |
+## Documentation Authority
 
-| UI | Tailwind CSS + shadcn/ui |
-
-| Database / Auth | PostgreSQL via Supabase (RLS) + Drizzle/Prisma |
-
-| Background jobs | Trigger.dev / Inngest |
-
-| Crawling \& extraction | Firecrawl + Claude API (structured output) |
-
-| CMS | Sanity / Payload |
-
-| Email | Resend + Beehiiv |
-
-| Analytics | PostHog |
-
-| Hosting | Vercel + Supabase cloud |
-
-
-
-\## Repository guide
-
-
-
-| Path | Contents |
-
+| Document | Authority |
 |---|---|
+| [`README.md`](./README.md) | Project entry point and current status |
+| [`PRD.md`](./PRD.md) | Canonical product requirements and scope |
+| [`TECH_STACK.md`](./TECH_STACK.md) | Canonical architecture, stack, and security rules |
+| [`outsail-competitive-operating-model.md`](./outsail-competitive-operating-model.md) | Supporting operating-model research |
+| [`roadmap-v2-implementation.md`](../.codex/plans/roadmap-v2-implementation.md) | Approved v2 sequencing and traceability |
+| [`module-r0-roadmap-and-public-release-control.md`](../.codex/plans/module-r0-roadmap-and-public-release-control.md) | Active release quarantine, owner register, and public-claim inventory |
+| [`module-r1-secure-platform-base.md`](../.codex/plans/module-r1-secure-platform-base.md) | Approved R1 module plan; implementation remains separately gated |
 
-| `docs/PRD.md` | Product Requirements Document (v1.0) |
+When documents conflict, use `PRD.md` for product behavior and `TECH_STACK.md` for implementation constraints.
 
-| `MatchMaker HR — Master Plan.md` | Master project plan (primary planning source) |
+## Legacy Documents
 
-| `Homepage.dc.html` | Approved homepage design — "Bold Sage" direction |
+The following files are superseded drafts or v1 planning records:
 
-| `Homepage Options.dc.html` | Design exploration canvas (turns 1–3) |
+- `PRD-2.md` and `README-2.md`: superseded v2 drafting inputs
+- `development-plan.md`, `master-plan.md`, `BUILD_SPEC.md`, and `ROADMAP.md`: legacy v1 planning records
 
+Keep these files for history. Do not use them as current product scope or sequencing authority.
 
+## Branches and Deployment
 
-\## Design direction
+`develop` is the integration branch. `main` is the production release branch.
 
+A production deployment requires explicit approval.
 
+The active R0 policy blocks production access and search indexing.
 
-\*\*"Bold Sage"\*\* — near-white soft-gray canvas (`#F7F7F5`), bold forest-green accent, warm soft card shadows. Type: Bricolage Grotesque (display) + Manrope (body). All screens extend this system; see `Homepage.dc.html`.
-
-
-
-\## Status
-
-
-
-\*\*Phase 0 — Design\*\* (in progress): homepage approved; app screens and SuperAdmin views next. See `docs/PRD.md` §6 for the full release plan and §8 for open questions.
-
-
-
-\---
-
-
-
-© 2026 MatchMaker HR. Internal project — not for distribution.
-
-
-
+The local gate must reach production through a separately approved deployment.

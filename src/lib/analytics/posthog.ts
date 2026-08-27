@@ -3,7 +3,7 @@ import posthog from "posthog-js";
 import { hasAnalyticsConsent } from "./consent";
 
 /**
- * Initialises PostHog — but only behind explicit consent (FR-L4, FR-T1..T4).
+ * Initialises PostHog only behind explicit consent (FR-MKT-09, FR-ANL-01).
  *
  * This function is the single entry point for loading the tracker. Calling
  * posthog.init() anywhere else would bypass the consent gate, so don't.

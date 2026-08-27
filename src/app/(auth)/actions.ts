@@ -8,11 +8,10 @@ import { createClient } from "@/lib/supabase/server";
 export type AuthState = { error: string } | null;
 
 /**
- * Phase 0 auth actions: enough to prove the round-trip end to end.
+ * Foundation auth actions prove the round-trip end to end.
  *
- * The real registration gate (mandatory name/company/work-email/phone,
- * free-domain rejection, consent capture — FR-L1..L4) replaces this sign-up in
- * Phase 1, and org bootstrap on sign-up arrives in Phase 2.
+ * The registration gate in FR-MKT-06 through FR-MKT-09 and organization
+ * bootstrap remain unimplemented.
  */
 export async function signUp(
   _prev: AuthState,

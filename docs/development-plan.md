@@ -1,3 +1,5 @@
+> **Legacy v1 plan:** [PRD.md](./PRD.md) and [TECH_STACK.md](./TECH_STACK.md) superseded this plan on 2026-08-24. Preserve it as history, not current scope or sequencing.
+
 # MatchMaker HR — Full Development Plan
 
 > **Status:** Awaiting authorization to build. No code exists yet.
@@ -8,7 +10,7 @@
 > Phase 0 via the frontend-design and shadcn skills, gated on owner approval.
 > (2) The PRD §6 duration estimates are void — this plan tracks sequencing, dependencies,
 > and exit criteria only, not calendar time.
-> **Companion:** `docs/ROADMAP.md` (phase/task checklist, kept current per work session).
+> **Historical companion:** `docs/ROADMAP.md` preserves the former phase checklist.
 
 ---
 
@@ -79,8 +81,8 @@ D14 ratified (§3); all third-party accounts provisioned and `.env.local` fully 
 
 Selection principle: **best tool for the use-case at the lowest cost, free preferred**,
 as long as it does the job. **All free-tier figures below were verified against the
-live official pricing pages on 2026-07-12** (three parallel research passes; Claude API
-pricing from the current API reference). Re-check only if ratification is delayed
+live official pricing pages on 2026-07-12** (three parallel research passes; the
+configured AI service pricing came from its current API reference). Re-check only if ratification is delayed
 significantly.
 
 | Need | Candidates | Verified free-tier / cost reality (2026-07-12) | Recommendation |
@@ -89,7 +91,7 @@ significantly.
 | Database + Auth + Storage + Realtime | Supabase · Neon+Clerk+Pusher combo | Supabase free: 500 MB DB, 1 GB storage, 50k MAU, 200 Realtime connections, 2 active projects, **pauses after 1 wk inactivity** — fine for staging; local stack $0 for the entire build. Pro $25/mo at launch (8 GB disk, 100k MAU, 250 GB egress, daily backups, no pausing). | **Supabase** — one service covers four needs (DB, auth, file storage for proposal uploads, Realtime for chat/live scorecards). Develop 100% locally; pay only at launch. |
 | Background jobs/cron | Trigger.dev · Inngest · self-managed (pg-boss/pg_cron) | Trigger.dev: **DEV-environment runs are uncharged** + $5/mo free usage credits, 20 concurrent runs; first paid tier $10/mo. Inngest free (50k executions) **hard-pauses when exhausted**; first paid tier $99/mo — 10× Trigger.dev's. | **Trigger.dev** — $0 through the build, gentle $10/mo ramp if production volume outgrows free credits; pg-boss+pg_cron remains the $0 fallback. |
 | Crawling | Firecrawl managed · Firecrawl self-hosted (AGPL) · custom Playwright/Crawlee | Managed free tier is now **1,000 credits/mo recurring** (~1 credit/page) — covers dev AND likely a quarterly production cadence (50 vendors × ~20 pages ≈ 1,000 credits/quarter); Hobby $16–19/mo (5k credits), Standard $83–99/mo (100k). Self-hosted is $0 but **lacks Fire-engine** (cloud-only anti-bot/stealth layer) and the agent/browser endpoints — crawls of bot-protected vendor sites may fail. | **Managed free tier through Phase 5 dev and initial quarterly cadence; Phase 5-exit checkpoint** decides among free/Hobby/self-hosted using real per-run data. Tripwire for self-hosting: failures on Cloudflare-guarded vendor pages = Fire-engine absence. |
-| LLM extraction | Claude API (Haiku 4.5 ↔ Sonnet 5) | Usage-based: Haiku 4.5 $1/$5 per MTok (supports strict structured outputs — fits the Zod pipeline); Sonnet 5 $3/$15 ($2/$10 intro through 2026-08). | **Haiku 4.5 for routine extraction; escalate to Sonnet 5 only on low-confidence/complex pages.** Per-run budget caps + cost telemetry (FR-S9) from day 1. Costs start only when the pipeline goes live. |
+| AI extraction | Interchangeable provider and model through `AIService` | Use schema-validated structured output and versioned evaluation fixtures. | Select capability configurations by quality, latency, and cost. Provider changes must not alter domain workflows. |
 | CMS | Payload 3 (self-hosted) · Sanity | Payload: **MIT license confirmed** — self-hosted in our Next.js app + Postgres, $0 forever incl. admin UI. Watch item: Payload was **acquired by Figma**; its managed cloud is closed to new signups (irrelevant to self-hosting, but monitor project health). Sanity free: 20 seats/10k documents — viable fallback. | **Payload** (= D5). $0 permanently; Sanity is the documented fallback if the Figma acquisition ever degrades Payload maintenance. |
 | Transactional email | Resend · Amazon SES · Brevo | Resend free: 3,000/mo with a **100/day hard cap**, 1 domain; Pro $20/mo (50k). SES near-free but DX-poor. | **Resend free tier** — the 100/day cap comfortably covers invites/notifications pre-scale; Pro or SES when volume demands. |
 | Newsletter | Beehiiv · Listmonk (self-hosted) · Mailchimp | Beehiiv free ("Launch"): 2,500 subscribers, unlimited sends, **API access incl. programmatic subscribe** (Send API excluded — we don't need it); no automations/webhooks on free; Scale $43/mo (annual) at >2.5k subs or when automations needed. | **Beehiiv** (= D10). Free well past launch; the newsletter form posts via the subscriptions API. |
@@ -103,7 +105,7 @@ significantly.
 **Cost picture as verified:** **$0 for the entire build period** (local Supabase, Vercel
 Hobby, Trigger.dev DEV runs uncharged, all other free tiers confirmed). At commercial
 launch: **~$45/mo baseline** (Vercel Pro $20 + Supabase Pro $25) **plus usage-based
-pipeline costs** — Claude API (Haiku-first keeps this small) and Firecrawl $0–19/mo at
+pipeline costs** — configured AI usage and Firecrawl $0–19/mo at
 quarterly-to-light cadence (Standard $83–99/mo only if a mostly-weekly cadence proves
 necessary; the Phase 5 checkpoint decides). Everything else stays $0 past launch.
 
@@ -189,7 +191,7 @@ and an audit entry.
 ```
 source_schedules (cron) ─► Trigger.dev run per source
    1. Firecrawl fetch (vendor-owned/licensed URLs only — ToS guard is a registry rule)
-   2. Claude structured-output extraction → Zod-validated JSON (pricing, capabilities,
+   2. AI-service structured extraction → Zod-validated JSON (pricing, capabilities,
       service model, geography, facts, pros/cons)
    3. Validate: schema + anomaly rules (e.g., price swing > X%, capability drops)
    4. Diff vs last published snapshot → auto-approve trivial / queue significant changes
@@ -297,7 +299,7 @@ submits a proposal for review, and exports a branded PDF comparison.
 
 ### Phase 5 — Automated research pipeline (parallel track)
 **Scope:** source registry + schedules (FR-P1/P2, D12 registry filled as operational task);
-Trigger.dev crawl/extract tasks (Firecrawl + Claude structured output → Zod schemas — FR-P3);
+Trigger.dev crawl/extract tasks (Firecrawl + configured AI structured output → Zod schemas — FR-P3);
 validation + anomaly rules + snapshot diffing (FR-P4); review queue backend (UI in Phase 6,
 minimal approve/reject screen here); versioned snapshots + traceability (FR-P5); publish flow
 recomputing capability scores + freshness dates (FR-P6); scoring-config versioning + ranking
@@ -367,7 +369,7 @@ runs per vendor — recommend kicking those off as early as Phase 1.
 | Vendor seed data lags code | Marketplace launches hollow; match % meaningless | Data track starts Phase 1; admin-lite CRUD in Phase 2; ≥15-vendor gate on Phase 2 exit; deep-research assists per vendor |
 | Fresh design direction churns | Phase 0 rework if direction misses | Explorations presented for approval **before** codification; nothing themed until you sign off |
 | LLM extraction quality (FR-P3/P4) | Bad data published → trust KPI damage | Zod-validated structured output, anomaly thresholds, human review queue default-on for high-impact fields (pricing), golden-set eval fixtures per extractor |
-| Pipeline API costs (Firecrawl + Claude) | Cost overrun at 50 vendors × sources × cadence | Cost telemetry per run from day 1 (FR-S9); self-hosted-Firecrawl checkpoint at Phase 5 exit; quarterly default cadence, weekly only where it matters; per-run budget caps |
+| Pipeline API costs (content acquisition + AI processing) | Cost overrun at 50 vendors × sources × cadence | Cost telemetry per run from day 1 (FR-S9); acquisition checkpoint at Phase 5 exit; quarterly default cadence, weekly only where it matters; per-run budget caps |
 | Free-tier terms shift mid-build | Surprise costs or migration mid-build | All tiers verified against live pages 2026-07-12; Vercel spend cap set day 1; each service has a documented fallback in §3.3 (Cloudflare, Sanity, pg-boss, SES, Calendly, self-hosted Firecrawl) |
 | RLS complexity (org roles + advisor + impersonation) | Data-leak severity bugs | RLS test matrix (table × role) in CI from Phase 2; impersonation designed audited/time-boxed; security review in Phase 7 |
 | Scope creep in SuperAdmin (10 FR-S modules) | Phase 6 balloons | Admin-lite slices land early where operationally needed; Phase 6 is consolidation, not first contact |

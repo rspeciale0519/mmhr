@@ -5,8 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "../../(auth)/actions";
 
 /**
- * Placeholder workspace home. The real project hub (FR-A2) is built in Phase 2;
- * for now it exists to make the auth round-trip observable end to end.
+ * Placeholder workspace home. FR-EVL-05 is not implemented; this page only
+ * makes the authentication round-trip observable end to end.
  */
 export default async function WorkspaceHome() {
   const supabase = await createClient();

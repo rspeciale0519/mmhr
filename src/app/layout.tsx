@@ -7,9 +7,8 @@ import { TRPCReactProvider } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-// Placeholder typography from the shadcn base preset. The real typeface is part
-// of the design direction awaiting owner approval (gate G3) and replaces this,
-// along with the theme tokens, in the codification task.
+// Base typography from the shadcn preset. Pulse is selected, but its final
+// typography and theme tokens are not yet codified across every surface.
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
   description: `${brand.name} — buyer-side HRIS brokerage.`,
   // The homepage still ships placeholder figures (NPS 74, "310 selections
   // guided", three invented case studies). Keep the whole site out of search
-  // until FR-M2 copy lands in Phase 1 — then delete this line.
+  // until approved evidence replaces them under FR-MKT-03.
   robots: { index: false, follow: false },
 };
 

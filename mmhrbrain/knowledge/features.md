@@ -2,95 +2,78 @@
 kind: knowledge
 slug: features
 status: current
-updated: 2026-07-15
+updated: 2026-08-27
 layer: reference
 sources:
-  - docs/development-plan.md
-  - docs/ROADMAP.md
-  - docs/BUILD_SPEC.md
+  - docs/PRD.md
+  - docs/TECH_STACK.md
+  - src/app/
+  - src/server/
   - drizzle/0000_light_vanisher.sql
-  - src/server/db/schema/
-  - src/server/trpc/root.ts
-  - src/lib/analytics/posthog.ts
-  - src/lib/analytics/consent.ts
-  - src/middleware.ts
   - .github/workflows/ci.yml
   - trigger.config.ts
-  - src/trigger/health.ts
-  - src/designs/registry.ts
-  - .env.example
-  - .vercel/project.json
+  - package.json
+  - .codex/plans/roadmap-v2-implementation.md
+  - .codex/plans/module-r0-roadmap-and-public-release-control.md
+  - src/lib/public-release.ts
+  - src/lib/public-release.test.ts
+  - src/middleware.test.ts
 ---
 
-# Features — build status (Phase 0, 2026-07-15)
+# Features — Evidence-Gated Build Status
 
-Evidence-gated per the knowledge-build runbook. BUILT = entrypoint exists,
-non-stub, wired end-to-end. Every claim below was independently re-verified
-by re-opening the cited file, not just trusted from a first pass.
+The v2 roadmap audit classifies all 148 requirement identifiers. It found 5
+Implemented, 22 Partial, 119 Missing, 1 Deferred, and 1 Open.
 
-## BUILT
-- **Local Supabase + Drizzle schema** — `drizzle/0000_light_vanisher.sql` creates
-  5 tables (`orgs`, `org_members`, `invitations`, `leads`, `audit_log`); all 5
-  have RLS enabled, zero `CREATE POLICY` rows = confirmed default-deny.
-- **Supabase Auth** — `src/lib/supabase/{client,server}.ts` (`@supabase/ssr`
-  three-client pattern) + `src/middleware.ts` calls `getClaims()`, not
-  `getSession()` (explicit warning comment against the swap). Proven by
-  `src/server/auth/auth.integration.test.ts` (3 tests, live local stack).
-  Middleware does NOT gate routes yet — deferred to Phase 2 by design.
-- **CI** — `.github/workflows/ci.yml` runs type-check → lint → `vitest run` →
-  build in order. `*.integration.test.ts` excluded from CI (deferred to Phase 2).
-- **PostHog, consent-gated** — `initAnalytics()` (`src/lib/analytics/posthog.ts`)
-  returns before `posthog.init()` unless `hasAnalyticsConsent()`. Wired via
-  `<CookieConsent />` mounted in `src/app/layout.tsx`, not a dedicated
-  provider. No code path reaches `posthog.init` pre-consent.
-- **Design gallery** — 22 design folders (5 rounds), all registered 1:1 in
-  `src/designs/registry.ts`, served at `/designs` + `/designs/[slug]`, shared
-  copy in `src/designs/_content.ts`. Deployed as its own Vercel project
-  (`mmhr-designs`, `GALLERY_ONLY=1`) at `mmhr-designs.vercel.app` — see
-  Orientation for the two-deployments-one-repo split.
-- **Test suite** — 7 files, ~22 tests: `brand.test.ts`, `smoke.test.ts`,
-  `analytics/consent.test.ts` (7), `trpc/health.test.ts` (2),
-  `designs/registry.test.ts` (4), plus 2 integration files (auth, db). Split
-  config: `vitest.config.ts` (jsdom, unit) vs `vitest.integration.config.ts`
-  (node, loads `.env.local`, sequential).
+Use the roadmap traceability matrix for per-requirement evidence and ownership.
 
-## PARTIAL
-- **Route groups** — `(marketing)`, `(app)`, `(auth)`, `(admin)` all exist and
-  render, but only `(auth)` has real logic (`auth-form.tsx`, `actions.ts`).
-  `(marketing)` also hosts the fully-built design gallery, unrelated to the
-  marketing site itself, which is still a single placeholder `<h1>`.
-  `(app)/home` is a functional auth-gated stub; `(admin)` is a placeholder.
-- **tRPC** — wiring is complete end-to-end (`root.ts` → `api/trpc/[trpc]/route.ts`
-  → `TRPCReactProvider` in `layout.tsx`), but `appRouter` holds only the
-  `health` router (`ping`/`whoami`). No business router exists yet.
-- **Brand config** — `src/lib/brand.ts` is real and imported by the marketing
-  page + CI, but currently holds only `brand.name` (env-overridable) — no
-  colors or copy constants despite the name.
+## Built Foundations
 
-## CONFIGURED (client wired, not yet load-bearing)
-- **Sentry** — Next.js 16 instrumentation pattern (`src/instrumentation.ts`,
-  `src/instrumentation-client.ts`, `sentry.server.config.ts`,
-  `sentry.edge.config.ts`), not the legacy `sentry.client.config.ts` pattern.
-  Inert until `NEXT_PUBLIC_SENTRY_DSN` is set.
-- **Trigger.dev** — `trigger.config.ts` + one task, `src/trigger/health.ts`
-  (`health-check`, logs + returns `{ok:true}`) — explicitly a wiring check.
-  Real pipeline tasks (crawl/extract/validate/publish, FR-P1–P6) land Phase 5.
+- The Next.js application and marketing, authentication, customer,
+  administration, and API route groups exist.
+- Pulse renders at the site root.
+- The 22-design gallery remains available under /designs.
+- Local Supabase and Drizzle create organizations, memberships, invitations,
+  leads, and audit-log tables.
+- Supabase authentication uses verified claims.
+- tRPC is wired end to end with health-only procedures.
+- PostHog initialization remains consent-gated.
+- Sentry and Trigger.dev wiring exists.
+- GitHub Actions runs installation, type checking, linting, unit tests, and
+  the production build.
+- Unit and local integration test configurations exist.
+- A fail-closed production release gate blocks pages, APIs, and crawlers in local production checks.
 
-## PLANNED (env var placeholder or doc mention only — zero code)
-- **Payload CMS** — no `payload` dependency, no config, no collections. D5
-  ratified, unbuilt.
-- **Resend** — no package, no email-sending module. `RESEND_API_KEY` +
-  `EMAIL_FROM` in `.env.example` only.
-- **Beehiiv**, **Cal.com**, **Anthropic API** (app-facing), **Firecrawl** — same
-  pattern: env var name reserved in `.env.example`, zero code trace.
-- **Vercel staging deploy (the app itself)** — `vercel.json` exists (framework
-  config only). The only linked Vercel project in this checkout is
-  `mmhr-designs` (the gallery) — the product app has no staging deployment
-  yet. Roadmap's `[ ]` here is accurate.
+## Partial or Security-Incomplete
 
-## Not yet investigated (UNVERIFIED)
-- `src/components/ui/` (shadcn primitives) — presence confirmed, contents not
-  audited component-by-component.
-- `src/designs/_content.ts` exact shape — confirmed to exist and be imported
-  by all 22 designs; not read in full during this pass.
+- RLS is enabled on the first application tables, but policies are absent.
+- The direct Drizzle pool bypasses RLS and is suitable only for trusted paths.
+- Customer workspace and administration routes remain placeholders.
+- Public route structure exists, but product copy and claims need v2 review.
+- The release gate is not active on the current production deployment.
+- No complete v2 domain router or workflow exists.
+- Trigger.dev contains a health task only.
+- Document, communication, commission, and onboarding workflows are not built.
+- AI adapters, evaluation fixtures, review queues, and run records are not built.
 
+## Approved but Not Implemented
+
+- Transactional and inbound communication services
+- Private document storage and document scanning
+- Managed content
+- External content acquisition
+- Scheduling and newsletter integrations
+- PDF generation
+- Provider-neutral AI processing
+
+See docs/TECH_STACK.md for selected boundaries and implementation status.
+
+## V2 Product Domains
+
+The canonical PRD adds or expands customer CRM, vendor CRM, flexible
+evaluation, RFP review, vendor responses, demos, proposal versions, contract
+handoff, variable commissions, onboarding, customer success, and granular
+permissions.
+
+None of these domains is complete until source, policies, tests, and rendered
+workflows provide end-to-end evidence.

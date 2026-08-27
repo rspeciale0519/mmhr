@@ -3,8 +3,8 @@
  * case studies (index + detail), blog posts, FAQs.
  *
  * PLACEHOLDER. Company names, figures and outcomes below are illustrative so
- * the pages can be built and reviewed; they are not claims. FR-M4 moves this
- * into Payload CMS in Phase 1, at which point real content replaces it.
+ * the pages can be built and reviewed; they are not claims. FR-MKT-04 requires
+ * managed, approved content before public release.
  */
 
 export type CaseStudy = {

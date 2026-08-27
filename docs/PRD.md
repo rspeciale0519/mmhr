@@ -1,512 +1,548 @@
-\# MatchMaker HR — Product Requirements Document (PRD)
+# MMHR Product Requirements Document
 
+## Document Control
 
-
-| | |
-
+| Field | Value |
 |---|---|
+| Version | 2.1 |
+| Date | 2026-08-27 |
+| Status | Canonical product baseline |
+| Product owner | Rob Speciale |
+| Architecture authority | [TECH_STACK.md](./TECH_STACK.md) |
+| Supporting research | [outsail-competitive-operating-model.md](./outsail-competitive-operating-model.md) |
+| Supersedes | Prior PRD v1 content and [PRD-2.md](./PRD-2.md) |
 
-| \*\*Version\*\* | 1.0 |
+All requirements in this document are mandatory unless they are marked Deferred or Open.
 
-| \*\*Date\*\* | July 2026 |
+Technical providers and model selections belong in TECH_STACK.md. Product behavior must not depend on one AI provider or model.
 
-| \*\*Status\*\* | Draft for review |
+## 1. Product Definition
 
-| \*\*Primary source\*\* | `MatchMaker HR — Master Plan.md` |
+MMHR is a private operating platform for HR software selection, vendor management, CRM, deal flow, commissions, and customer success.
 
-| \*\*Design reference\*\* | `Homepage.dc.html` (approved direction: "Bold Sage") |
+MMHR staff use the platform with invited customer and vendor users. MMHR does not sell the platform as a general SaaS product.
 
+The initial category scope is HR and workforce software. Category expansion requires a separate product decision.
 
+### Operating Principle
 
-\---
+Automate administrative work while preserving human control at trust, judgment, approval, scheduling, relationship, and handoff points.
 
+### Product Principles
 
+1. Preserve a white-glove customer experience.
+2. Keep evaluation flexible instead of forcing a fixed funnel.
+3. Keep relationships and deals as first-class data.
+4. Preserve complete decision, communication, commercial, and approval history.
+5. Enforce every protected action on the server.
+6. Keep commission values outside recommendation calculations.
+7. Treat consequential AI output as draft material until a person approves it.
+8. Keep AI providers and models interchangeable behind an internal service interface.
+9. Support vendor processes when a safe structured workflow is not practical.
+10. Build the complete platform through controlled, production-safe phases.
 
-\## 1. Overview
+## 2. Goals and Success Measures
 
-
-
-\### 1.1 Product summary
-
-MatchMaker HR is a buyer-side HRIS software brokerage platform. It helps companies research, evaluate, and select the right HRIS at no cost to the buyer. Revenue comes from vendor commissions paid when a customer completes a purchase — the same rate from every vendor, disclosed to every customer.
-
-
-
-\### 1.2 Problem statement
-
-HR and finance leaders at SMB-to-mid-market companies (\~50–5,000 employees) face a rare, high-stakes HRIS/payroll purchase every 5–10 years. They lack the time, market knowledge, and tooling to run a rigorous vendor selection, and the traditional vendor-driven sales process works against them.
-
-
-
-\### 1.3 Solution
-
-A free, gated platform combining:
-
-1\. A continuously refreshed \*\*HRIS vendor marketplace\*\* (50+ vendors) with pricing, pros/cons, and personalized match scores
-
-2\. A \*\*structured evaluation toolkit\*\* (requirements, scorecards, project plans, team collaboration)
-
-3\. A \*\*human advisor layer\*\* (proposal review, price benchmarking, negotiation guidance)
-
-4\. An \*\*automated research pipeline\*\* that keeps all vendor data fresh — the core moat vs. incumbents whose datasets are manually maintained
-
-
-
-\### 1.4 Scope
-
-\- \*\*In scope:\*\* HRIS category only. A true HRIS includes payroll, benefits, time \& attendance, performance, etc. — these are treated as \*module capabilities\* scored within each vendor profile, not separate categories.
-
-\- \*\*Out of scope (v1):\*\* non-HRIS software categories, public/ungated vendor rankings, mobile native apps, self-serve vendor portals.
-
-
-
-\### 1.5 Goals \& success metrics
-
-| Goal | Metric | Target (12 mo post-launch) |
-
+| Goal | Measure | Target |
 |---|---|---|
+| Trustworthy RFP control | RFPs sent without required MMHR approval | 0 |
+| Financial completeness | Eligible signed contracts with one linked commission event | 100% |
+| Recommendation integrity | Comparisons using approved, versioned vendor data | 100% |
+| AI oversight | Consequential customer-facing AI outputs with recorded approval | 100% |
+| Audit coverage | Sensitive permission, approval, export, financial, and ranking changes with audit records | 100% |
+| Vendor-data freshness | Published vendor records inside their configured freshness window | At least 95% |
+| Customer trust | Net Promoter Score | At least 70 |
+| Workflow adoption | Completed intakes reaching an initial candidate set | At least 40% |
+| Operational visibility | Required marketing, product, workflow, and financial analytics | Available at launch |
 
-| Lead generation | Qualified leads captured (complete contact records) | Primary KPI — baseline in Q1, grow QoQ |
+The product owner can change business targets through a versioned PRD update.
 
-| Buyer engagement | Sign-up → shortlist creation rate | ≥ 40% |
+## 3. Scope
 
-| Deal flow | Demo requests per month; deals closed | Growth QoQ |
+### 3.1 In Scope
 
-| Data freshness | % vendor profiles verified within cadence window | ≥ 95% |
+- Public marketing, content, SEO, consent, lead capture, and gated resources
+- Internal administration and CRM
+- Customer and vendor portals
+- Customer, vendor, contact, relationship, product, and deal records
+- Discovery, requirements, matching, masked scorecards, and comparison
+- RFP creation, review, distribution, response, and clarification
+- Demo, proposal, pricing, selection, and contract-handoff workflows
+- Commission calculation, invoicing, collection, dispute, and closure tracking
+- Onboarding, customer success, renewals, and repeat deals
+- Tasks, reminders, communications, documents, search, analytics, and reporting
+- Versioned vendor evidence and provider-neutral AI assistance
+- Granular permissions, organization isolation, audit, and operational monitoring
 
-| Trust | NPS | ≥ 70 |
+The existing public marketing routes and design gallery remain in scope.
 
-| Traffic insight | Visit + page analytics operational | Day 1 |
+### 3.2 Out of Scope
 
+- A general-purpose SaaS product for other brokerage operators
+- Autonomous vendor selection
+- Autonomous consequential customer communications
+- Direct MMHR participation in legal contract negotiation
+- Contract execution, payment processing, or general accounting
+- Native mobile applications
+- Localization
+- Public unmasked vendor rankings without separate approval
+- Unlicensed sources or collection that violates source terms
+- Sponsored organic ranking
 
+## 4. Roles and Authorization
 
-\---
+### Roles
 
+- Visitor: public marketing access only.
+- Super Admin: full application control within audited product workflows.
+- Admin: delegated internal administration and operational control.
+- Sales Rep or Staff: scoped CRM and workflow access.
+- Customer Organization Admin: customer-organization membership and workspace control within granted permissions.
+- Customer User: scoped customer workspace access.
+- Vendor Organization Admin: vendor-organization membership and response control within granted permissions.
+- Vendor User: scoped vendor portal access.
 
+Super Admin access does not grant direct database credentials or unrestricted service credentials.
 
-\## 2. Users \& roles
+### Identity and Permission Requirements
 
+**FR-IAM-01 — Identity.** The system must authenticate internal and external users through the configured identity service.
 
+**FR-IAM-02 — Organization isolation.** The system must prevent access across customer and vendor organizations unless an audited internal permission permits it.
 
-| Role | Description | Access |
+**FR-IAM-03 — Server enforcement.** The server must authorize every protected read, write, action, approval, export, and sensitive field.
 
-|---|---|---|
+**FR-IAM-04 — Permission structure.** The system must support role defaults, feature permissions, action permissions, field permissions, and per-user overrides.
 
-| \*\*Visitor\*\* | Anonymous marketing-site visitor | Public pages only; tracked via analytics |
+**FR-IAM-05 — Delegation.** Super Admin must control which permissions each Admin can view, grant, revoke, or delegate.
 
-| \*\*Lead / Buyer user\*\* | Registered user (completed lead-capture form) | Full app: marketplace, tools, advisor |
+**FR-IAM-06 — External administration.** Organization Admins can manage their organization members only within platform-defined boundaries.
 
-| \*\*Org Admin\*\* | Buyer user managing their workspace | + invite team, assign roles, manage project |
+**FR-IAM-07 — Presentation.** Hidden, disabled, or read-only controls must never replace server authorization.
 
-| \*\*Contributor\*\* | Invited teammate | Scoped: score, comment, view (per permissions) |
+**FR-IAM-08 — Impersonation (Deferred).** If approved, impersonation must be scoped, time-limited, visible, and fully audited.
 
-| \*\*Viewer\*\* | Invited stakeholder | Read-only |
+**FR-IAM-09 — Audit.** The system must record sensitive permission changes with actor, time, reason, and before-and-after values.
 
-| \*\*Advisor\*\* (internal) | MatchMaker HR expert staff | Advisor console: assigned clients, chat, reviews |
+**FR-IAM-10 — Customer portal scope.** Customer users can access only approved records for their organization and granted deals.
 
-| \*\*SuperAdmin\*\* (internal) | Top of permission hierarchy | Everything, incl. pipeline, data, deals, impersonation |
+They can change only shared intake, requirements, availability, feedback, tasks, and documents allowed by their permissions.
 
+**FR-IAM-11 — Vendor portal scope.** Vendor users can access issued requests, their responses, scheduled events, proposals, and shared communications for their organization.
 
+They cannot access competitors, internal notes, customer-private records, or commission data without an explicit permission.
 
-\---
+**FR-IAM-12 — Sharing control.** Authorized MMHR users must grant and revoke portal access with an audit record.
 
+## 5. Functional Requirements
 
+### 5.1 Public Marketing and Lead Capture
 
-\## 3. Functional requirements
+**FR-MKT-01 — Public pages.** Maintain pages for home, platform, broker model, services, case studies, FAQ, company information, and contact.
 
+Also maintain partner, resource, transparency, privacy, and terms pages.
 
+**FR-MKT-02 — Homepage.** Pulse must remain the selected homepage direction until the product owner approves a replacement.
 
-\### 3.1 Marketing site (public)
+**FR-MKT-03 — Published claims.** Public claims, figures, evidence, and case studies must be approved and traceable. Placeholder claims must not ship.
 
+**FR-MKT-04 — Managed content.** Authorized staff must be able to manage designated marketing content without changing application code.
 
+**FR-MKT-05 — Discoverability.** Public pages must provide server rendering, canonical metadata, social metadata, sitemap coverage, and accessible semantic structure.
 
-\*\*FR-M1 — Pages.\*\* Home, Platform, Broker Model, Services, Case Studies (index + detail), FAQ, About, Contact, Partner pages (Software Vendors; Brokers \& Consultants; PE/VC), Resources (Blog, HRIS Landscape Report, Requirements Builder teaser, HR Service Partner Finder), and a \*\*Transparency page\*\* ("How we make money") disclosing the commission model and the CBIZ Centrally HR reseller affiliation.
+**FR-MKT-06 — Lead fields.** Public customer registration must collect full name, company, work email, and direct company phone.
 
+**FR-MKT-07 — Email validation.** Public registration must reject known personal email domains. Authorized staff can record a reviewed exception.
 
+**FR-MKT-08 — Gated resources.** Gated resources must use the same identity, consent, and lead-routing rules.
 
-\*\*FR-M2 — Homepage sections\*\* (per approved design `Homepage.dc.html`): nav; hero with headline + inline lead-capture form; vendor logo wall; six-tool platform tour; broker-model explainer; stats bar (companies served, NPS, HRIS profiled, annual purchases); case-study cards; FAQ teaser; newsletter block; footer.
+**FR-MKT-09 — Consent.** Outreach and analytics must honor recorded consent and applicable privacy requirements.
 
+**FR-MKT-10 — Lead routing.** Each completed lead must enter the internal CRM with source, consent, owner, and follow-up status.
 
+**FR-MKT-11 — Newsletter.** Approved public pages must support consent-aware newsletter registration through the internal newsletter service.
 
-\*\*FR-M3 — Newsletter.\*\* Email capture wired to newsletter provider; present on homepage and key pages.
+### 5.2 Customer and Vendor CRM
 
+**FR-CRM-01 — Customer records.** Store customer organizations, contacts, roles, stakeholders, current software, purchase history, requirements, contract dates, renewal windows, and related deals.
 
+**FR-CRM-02 — Vendor records.** Store vendor organizations, products, contacts, relationships, response history, deal history, commissions, payment terms, and performance measures.
 
-\*\*FR-M4 — CMS-driven content.\*\* Blog posts, case studies, and vendor marketing copy editable by non-developers.
+**FR-CRM-03 — Relationships.** Store relationship roles, decision influence, interaction history, preferences, and ownership.
 
+**FR-CRM-04 — Deals.** Treat each customer purchase effort as a first-class deal linked to customer, products, candidates, owner, stages, evidence, commissions, and onboarding.
 
+**FR-CRM-05 — Activity history.** Preserve notes, tasks, communications, documents, approvals, changes, and state transitions without destructive overwrites.
 
-\*\*FR-M5 — SEO.\*\* SSR/static rendering, canonical tags, OG metadata, sitemap.
+**FR-CRM-06 — Search.** Authorized users must search and filter customer, vendor, contact, deal, document, and activity records.
 
+**FR-CRM-07 — Exports.** Sensitive exports require explicit permission and an audit record.
 
+**FR-CRM-08 — Duplicate control.** The system must detect likely duplicate organizations, contacts, products, and deals without merging records automatically.
 
-\### 3.2 Registration gate \& lead capture
+**FR-CRM-09 — Renewals.** Track renewal and replacement windows with owners, reminders, and linked follow-on deals.
 
+### 5.3 Intake, Matching, and Evaluation
 
+**FR-INT-01 — Intake.** Capture company context, current systems, requirements, compliance needs, customizations, budget, timeline, stakeholders, and decision process.
 
-\*\*FR-L1 — Mandatory fields.\*\* Access to any vendor data requires: full name, company name, company email, direct company phone number.
+**FR-INT-02 — Saved progress.** Customers and authorized staff can save, resume, and revise intake information with change history.
 
+**FR-INT-03 — Initial evaluation.** The system must create an initial masked assessment using approved inputs and vendor data.
 
+**FR-INT-04 — Initial candidates.** The initial evaluation supports up to five candidates.
 
-\*\*FR-L2 — Work-email validation.\*\* Reject free/personal domains (gmail, yahoo, etc.) with inline guidance.
+After MMHR review, authorized staff or a permitted Customer Organization Admin can add candidates without a fixed funnel limit.
 
+**FR-EVL-01 — Candidate lifecycle.** Track each candidate independently from the deal stage.
 
+**FR-EVL-02 — Flexible comparison.** Customers can keep any number of current candidates active, pause them, eliminate them, or select one.
 
-\*\*FR-L3 — Gated lead magnets.\*\* The same gate applies to the HRIS Landscape Report download and any future gated assets.
+**FR-EVL-03 — Scorecards.** Support weighted criteria, questions, multiple scorers, comments, evidence, and aggregate and individual views.
 
+**FR-EVL-04 — Requirements.** Support structured and custom requirements with importance, ownership, evidence, and vendor response links.
 
+**FR-EVL-05 — Workspace.** Show current stage, candidates, open tasks, approvals, upcoming events, and recent activity.
 
-\*\*FR-L4 — Consent \& compliance.\*\* Sign-up form includes consent checkbox and links to privacy policy; phone outreach must be TCPA-compliant; cookie-consent banner governs analytics (GDPR/CCPA).
+**FR-EVL-06 — Collaboration.** Support invitations, scoped roles, assignments, comments, and customer team activity.
 
+**FR-EVL-07 — MMHR collaboration.** Support secure customer communication, meeting coordination, review requests, and assigned MMHR ownership.
 
+**FR-EVL-08 — Reactivation.** Authorized users can reactivate a paused or eliminated candidate without deleting prior history.
 
-\*\*FR-L5 — Lead routing.\*\* Every captured lead is stored in the `leads` table and surfaces in the SuperAdmin Leads \& Analytics module in near-real-time.
+**FR-EVL-09 — Comparison exports.** Authorized users can export approved comparisons and scorecards without exposing hidden or internal data.
 
+**FR-EVL-10 — Live scorecards.** Approved demo workflows can support concurrent score entry with conflict handling and complete history.
 
+### 5.4 Recommendation Integrity
 
-\### 3.3 App — buyer workspace (authenticated)
+**FR-MAT-01 — Eligibility.** Candidate eligibility must use approved requirements, vendor data, and configured business rules.
 
+**FR-MAT-02 — Scoring.** Eligibility and scoring must use versioned, deterministic rules.
 
+AI can draft explanations, but it cannot calculate or change eligibility or scores.
 
-\*\*FR-A1 — Matching intake wizard.\*\* Multi-step: company size, industry, geography, modules needed, budget, current systems. Output: personalized match scores across the vendor catalog. Progress is saved; wizard is re-editable.
+**FR-MAT-03 — Explanation.** Each recommendation must show approved fit reasons, limitations, confidence, and evidence freshness.
 
+**FR-MAT-04 — Commercial independence.** Commission rates, payout values, and payment status must not affect organic eligibility or scores.
 
+**FR-MAT-05 — Conflicts.** Disclose material commercial relationships and other recommendation conflicts to affected customers.
 
-\*\*FR-A2 — Workspace / Home.\*\* Project hub showing selection progress, open tasks, upcoming milestones, and team activity feed.
+**FR-MAT-06 — Configuration control.** Authorized users must preview, approve, and audit scoring changes before they affect active comparisons.
 
+**FR-MAT-07 — Duplicate products.** Avoid showing duplicate representations of the same underlying product unless the distinction is material and disclosed.
 
+**FR-MAT-08 — Masking.** The product must record when identities are masked, who can unmask them, and why disclosure occurred.
 
-\*\*FR-A3 — Vendor Marketplace.\*\*
+### 5.5 Vendor Knowledge and Evidence
 
-\- Browse/filter/sort 50+ HRIS vendor profiles
+**FR-VND-01 — Source registry.** Record permitted sources, owners, capture methods, cadence, licensing notes, and review requirements.
 
-\- Each profile: match %, verified pricing estimates, pros/cons, module capability scores, service model, geography, company facts, "last verified" date
+**FR-VND-02 — Acquisition.** Support manual and automated acquisition through replaceable provider adapters.
 
-\- Shortlisting (add/remove, shared with team)
+**FR-VND-03 — Extraction.** AI-assisted extraction must use the internal AI service and a versioned structured schema.
 
-\- PDF report export of comparisons/shortlists
+**FR-VND-04 — Validation.** Validate extracted data, detect material changes, and send low-confidence or high-impact changes to review.
 
-\- Demo request per vendor (creates a demo\_request record → deal pipeline)
+**FR-VND-05 — Approval.** Customer-visible vendor facts require the configured approval state.
 
+**FR-VND-06 — Versioning.** Preserve source artifacts, extracted values, capture dates, reviewer decisions, and published versions.
 
+**FR-VND-07 — Freshness.** Show freshness and confidence for customer-visible vendor facts.
 
-\*\*FR-A4 — Requirements Builder.\*\* Library of \~200 common HRIS features; user tags each as must-have / nice-to-have / not needed; requirements feed match scoring; exportable.
+**FR-VND-08 — Overrides.** Manual overrides require a source, reason, author, time, and expiration or review date.
 
+### 5.6 RFP and Vendor Responses
 
+**FR-RFP-01 — Questionnaire.** Capture functional needs, compliance, customizations, implementation, budget, timeline, stakeholders, demo rounds, and demo audiences.
 
-\*\*FR-A5 — Scorecards.\*\* Build from criteria library or custom; weighted scoring; expert question bank per criterion; per-vendor scoring by multiple team members; live use during vendor demos; aggregate + individual views; real-time updates.
+**FR-RFP-02 — Draft.** Generate a consolidated, versioned RFP draft from approved intake data.
 
+**FR-RFP-03 — Mandatory review.** No RFP can leave the server before recorded MMHR approval.
 
+**FR-RFP-04 — Clarification.** Track customer questions, answers, changes, decisions, and approval after MMHR review.
 
-\*\*FR-A6 — Project Plans.\*\* User sets go-live date → system generates phased milestone timeline with tasks/checklists and step-by-step guides; tasks can be checked off, assigned, and re-dated.
+**FR-RFP-05 — Versions (Open).** Preserve a common base.
 
+Support vendor-specific amendments only after the product owner closes the related decision.
 
+**FR-RFP-06 — Distribution.** Record recipients, version, delivery state, deadlines, reminders, and acknowledgements.
 
-\*\*FR-A7 — Team collaboration.\*\* Invite by email; roles: admin / contributor / viewer; permission enforcement across all tools; activity tracking.
+**FR-RSP-01 — Response methods.** Accept structured portal forms, email, and uploaded documents.
 
+**FR-RSP-02 — Ingestion.** Associate inbound messages, attachments, forms, and provider identifiers with the correct RFP and vendor.
 
+**FR-RSP-03 — Normalization.** Extract supported requirements, unsupported requirements, caveats, dependencies, commitments, implementation details, missing answers, and proposed follow-ups.
 
-\*\*FR-A8 — Advisor.\*\* Each org is assigned an advisor. Users can: chat (threaded, near-real-time), book meetings (scheduling embed), and request proposal reviews (upload proposal → advisor analysis with cost benchmarks and negotiation talking points).
+**FR-RSP-04 — Human review.** Consequential customer-facing conclusions require recorded MMHR approval.
 
+**FR-RSP-05 — Clarification.** Track clarification requests, responses, deadlines, and resulting revisions.
 
+**FR-RSP-06 — Failure.** Failed extraction or ingestion must remain visible and must never create approved data automatically.
 
-\### 3.4 Recommendation engine \& featured placement
+### 5.7 Demos, Proposals, and Contract Handoff
 
+**FR-DMO-01 — Demo plan.** Record each demo round, audience, purpose, participants, format, and required topics.
 
+**FR-DMO-02 — Scheduling.** Customers provide acceptable times, and MMHR brokers vendor coordination.
 
-\*\*FR-R1 — Match scoring.\*\* Match % per vendor per org computed from intake profile + tagged requirements against vendor capability data. Methodology is documented and published.
+Only MMHR confirmation creates a confirmed schedule. Track time zones, locations, conflicts, reminders, and changes.
 
+**FR-DMO-03 — Outcomes.** Record attendance, feedback, scores, commitments, requested changes, evidence, and next actions.
 
+**FR-PRP-01 — Proposal versions.** Preserve each proposal and pricing version with source documents and received dates.
 
-\*\*FR-R2 — Featured placement (CBIZ Centrally HR).\*\* CBIZ Centrally HR (white-labeled UKG Ready) appears in \*\*every\*\* recommendation list as a clearly labeled \*\*"Featured — our solution"\*\* placement. It uses identical data quality and scoring as all vendors; only the placement is guaranteed, and it is honestly labeled.
+**FR-PRP-02 — Pricing.** Track implementation costs, recurring costs, optional costs, terms, assumptions, discounts, and customer-requested changes.
 
+**FR-PRP-03 — Comparison.** Customer-visible proposal comparisons require approved data and source links.
 
+**FR-CTR-01 — Selection.** Record the selected vendor, decision reasons, approvals, and remaining risks.
 
-\*\*FR-R3 — De-duplication.\*\* A given organic results list shows either UKG Ready \*\*or\*\* CBIZ Centrally HR (not both). The affiliation is disclosed on the Centrally HR profile and the Transparency page.
+**FR-CTR-02 — Introduction.** Record the formal customer and vendor introduction and contract-handoff date.
 
+**FR-CTR-03 — Negotiation boundary.** The customer and vendor negotiate legal terms directly. MMHR tracks status without acting as legal negotiator.
 
+**FR-CTR-04 — Outcome.** Record signed, not-signed, stalled, or cancelled outcomes without deleting evaluation history.
 
-\*\*FR-R4 — Organic integrity.\*\* Organic rankings are never manipulated; Centrally HR / UKG Ready earn organic placement on merit like every other vendor.
+### 5.8 Commissions and Financial Closure
 
+**FR-FIN-01 — Structures.** Support vendor-specific commission structures with effective dates, calculation rules, terms, and source agreements.
 
+**FR-FIN-02 — Events.** A contract is eligible when it is signed under an effective vendor commission agreement.
 
-\### 3.5 Automated research \& scoring pipeline
+Create one idempotent commission event for each eligible contract.
 
+**FR-FIN-03 — Calculation.** Store calculation inputs, result, currency, reviewer, and approval state.
 
+**FR-FIN-04 — Invoice workflow.** Track invoice owner, readiness, issue date, number, amount, due date, and supporting documents.
 
-\*\*FR-P1 — Source registry.\*\* SuperAdmin-managed list of source URLs per vendor (vendor sites, pricing pages, docs, licensed/API data). Review-platform scraping that violates ToS is prohibited; prefer vendor-owned and licensed sources.
+**FR-FIN-05 — Collection.** Track expected payments, partial payments, received dates, balances, and reconciliation.
 
+**FR-FIN-06 — Exceptions.** Track overdue, disputed, adjusted, voided, and written-off states with approval, reason codes, and history.
 
+**FR-FIN-07 — Closure.** Paid, Voided, and Written Off are the approved terminal commission states.
 
-\*\*FR-P2 — Scheduling.\*\* Cadence configurable per source or globally: weekly / monthly / quarterly. Manual on-demand runs supported.
+A deal cannot close financially until every related commission event reaches one of these states with approval.
 
+**FR-FIN-08 — Separation.** A later signed contract creates a separate deal and commission event.
 
+### 5.9 Onboarding and Customer Success
 
-\*\*FR-P3 — Crawl \& extract.\*\* Firecrawl (or equivalent) fetches pages; an LLM structured-output step converts unstructured content into validated JSON fields: pricing, module capabilities, service model, geography, company facts, pros/cons.
+**FR-CSM-01 — Onboarding.** Track plans, milestones, owners, check-ins, issues, escalations, and completion.
 
+**FR-CSM-02 — Configurable follow-up.** Support vendor, customer, product, and risk-specific check-in schedules.
 
+**FR-CSM-03 — Failure.** Preserve failed onboarding history and allow authorized reactivation of a prior candidate in the existing deal.
 
-\*\*FR-P4 — Validate \& diff.\*\* Schema validation, anomaly detection, change-detection vs. prior snapshot. Suspicious or high-impact changes enter a human review queue; nothing publishes without approval rules being satisfied.
+A later signed contract must create a new deal and commission event.
 
+**FR-CSM-04 — Renewals.** Track renewal, replacement, and expansion opportunities with reminders and linked deals.
 
+**FR-CSM-05 — Outcomes.** Record customer and vendor outcomes for reporting and future evaluation.
 
-\*\*FR-P5 — Versioning \& traceability.\*\* Every snapshot versioned; every published score traceable to source data + capture date.
+### 5.10 Work, Communications, and Documents
 
+**FR-WRK-01 — Tasks.** Support owners, assignees, due dates, priorities, blockers, reminders, escalation, and reassignment.
 
+**FR-WRK-02 — Queues.** Provide role-based queues for approvals, follow-ups, overdue work, scheduling, commissions, and onboarding risks.
 
-\*\*FR-P6 — Publish.\*\* Approved data goes live in the Marketplace with "last verified" dates.
+**FR-WRK-03 — Project plans.** Generate editable milestones and tasks from the target go-live date and approved workflow template.
 
+**FR-CMN-01 — Associations.** Associate communications with customers, vendors, contacts, deals, RFPs, demos, proposals, contracts, commissions, and onboarding.
 
+**FR-CMN-02 — Delivery.** Track provider message identifiers, recipients, delivery state, failures, retries, and opt-out or consent state.
 
-\### 3.6 SuperAdmin dashboard (internal)
+**FR-CMN-03 — Provider independence.** Business workflows must use an internal communication interface instead of provider-specific calls.
 
+**FR-CMN-04 — Evaluation routing.** Evaluation communications normally route through MMHR until final selection.
 
+After contract handoff, direct customer and vendor negotiation communications stay outside MMHR unless the parties share status updates.
 
-\*\*FR-S1 — Pipeline control.\*\* Source registry CRUD; cadence config; manual run triggers; run status \& failure monitoring; extraction diff review; approve/reject queue.
+**FR-DOC-01 — Secure storage.** Store files privately with authorization, signed access, metadata, and retention rules.
 
+**FR-DOC-02 — Versions.** Preserve document versions and links to business records.
 
+**FR-DOC-03 — Safety.** Validate file type and size, scan or quarantine unsafe files, and block downstream use until safe.
 
-\*\*FR-S2 — Vendor data management.\*\* Full CRUD on vendor profiles, pricing benchmarks, capability scores; manual overrides with audit trail.
+**FR-DOC-04 — Processing.** Track uploaded, validating, processing, ready, quarantined, failed, and superseded states.
 
+**FR-DOC-05 — Search.** Search authorized document metadata and approved extracted content.
 
+### 5.11 AI Assistance
 
-\*\*FR-S3 — Scoring engine config.\*\* Adjust weights/methodology; preview ranking impact before publishing.
+**FR-AI-01 — Service boundary.** All AI use must pass through an internal AI service with replaceable provider and model adapters.
 
+**FR-AI-02 — Approved uses.** AI can draft, summarize, extract, normalize, find missing information, suggest follow-ups, identify risks, and support internal knowledge search.
 
+**FR-AI-03 — Prohibited decisions.** AI must not select a vendor, approve an RFP, publish consequential conclusions, change permissions, or close financial records autonomously.
 
-\*\*FR-S4 — User \& org management.\*\* All customer workspaces, role management, support impersonation (audited).
+**FR-AI-04 — Structured validation.** Structured outputs must pass versioned schema validation before workflow use.
 
+**FR-AI-05 — Provenance.** Each run must record configuration identifiers, template version, input artifacts, output artifact, validation, timing, cost, and approval result.
 
+**FR-AI-06 — Human review.** Rejected or unreviewed consequential output must not become customer-visible.
 
-\*\*FR-S5 — Advisor operations.\*\* Advisor assignment, client pipeline view, proposal review queue, chat oversight.
+**FR-AI-07 — Safe failure.** Provider, timeout, validation, and policy failures must enter visible failure states without bypassing review.
 
+**FR-AI-08 — Untrusted content.** Treat vendor messages and documents as untrusted data. Their instructions must not control system behavior.
 
+**FR-AI-09 — Interchangeability.** Changing a provider or model must not require domain-schema or workflow changes.
 
-\*\*FR-S6 — Deals \& commissions.\*\* Track demo requests → deals → closed-won → commission revenue.
+**FR-AI-10 — Evaluation.** Provider or model changes require the configured fixture evaluation and approval before production use.
 
+### 5.12 Administration, Reporting, and Analytics
 
+**FR-ADM-01 — Configuration.** Configure users, permissions, stages, questionnaires, scorecards, templates, reminders, commissions, AI review rules, document categories, and system settings.
 
-\*\*FR-S7 — Leads \& analytics.\*\* Lead records (name, company, work email, phone) with view/filter/export; visit tracking (sessions, referral sources, arrival times); most-visited pages; marketing-page → sign-up funnels.
+**FR-ADM-02 — Operations.** Manage customer, vendor, product, relationship, deal, response, and onboarding records.
 
+**FR-ADM-03 — Approval queues.** Provide queues for RFPs, vendor facts, response conclusions, scoring changes, financial changes, and AI output.
 
+**FR-ADM-04 — Audit viewer.** Search authorized audit events by actor, entity, action, and date.
 
-\*\*FR-S8 — Content \& site.\*\* Case studies, blog, featured-placement settings, transparency disclosures.
+**FR-RPT-01 — Revenue.** Report signed deals, contract value when known, and commission earned, invoiced, collected, outstanding, overdue, and disputed.
 
+**FR-RPT-02 — Pipeline.** Report deals by stage, customer, vendor, owner, conversion, and time in stage.
 
+**FR-RPT-03 — Vendor performance.** Report response, qualification, demo, win, payment, and onboarding outcomes.
 
-\*\*FR-S9 — System health.\*\* Job queues, API usage \& costs (Firecrawl + LLM), error rates.
+**FR-RPT-04 — Customer journey.** Report active evaluations, candidates, demo rounds, time to decision, repeat purchases, onboarding, and renewals.
 
+**FR-RPT-05 — Operations.** Report open and overdue tasks, pending approvals, scheduling work, contract follow-up, commissions, and onboarding issues.
 
+**FR-ANL-01 — Consent-aware marketing.** Collect public analytics only after the required consent.
 
-\*\*FR-S10 — Audit log.\*\* All SuperAdmin mutations logged (who, what, when, before/after).
+**FR-ANL-02 — Funnels.** Measure marketing, lead, intake, evaluation, and activation funnels.
 
+**FR-ANL-03 — Product use.** Measure workflow use without exposing sensitive content.
 
+**FR-ANL-04 — System health.** Measure application errors, job outcomes, communication delivery, AI runs, and provider cost.
 
-\### 3.7 Analytics \& tracking
+## 6. State Models
 
+State transitions must record the actor, time, reason, previous state, and new state.
 
-
-\*\*FR-T1 — Visit tracking.\*\* Arrival time, session, referral source, device — for all visitors (subject to consent).
-
-
-
-\*\*FR-T2 — Page analytics.\*\* Most-visited pages; content performance.
-
-
-
-\*\*FR-T3 — Funnels.\*\* Marketing page → sign-up form → completed lead → activated workspace.
-
-
-
-\*\*FR-T4 — Product analytics.\*\* Tool usage within the app (marketplace views, shortlists, scorecards completed, demo requests).
-
-
-
-\---
-
-
-
-\## 4. Non-functional requirements
-
-
-
-| Area | Requirement |
-
+| Entity | Minimum states |
 |---|---|
+| Deal | Intake, RFP, Evaluation, Demo, Proposal, Selection, Contracting, Stalled, Won, Lost, Cancelled, Onboarding, Closed |
+| Vendor candidate | Active, Paused, Eliminated, Selected |
+| RFP | Draft, Internal Review, Customer Clarification, Approved, Issued, Response Open, Closed, Superseded, Cancelled |
+| Vendor response | Requested, Received, Processing, Review Required, Approved, Clarification Required, Superseded, Failed |
+| Demo | Proposed, Coordinating, Confirmed, Completed, Cancelled, Reschedule Required |
+| Proposal | Received, Under Review, Revision Requested, Approved for Comparison, Superseded, Withdrawn |
+| Contract handoff | Introduction Pending, Introduced, Negotiating, Stalled, Signed, Not Signed, Cancelled |
+| Commission event | Earned, Calculation Review, Ready to Invoice, Invoiced, Partially Paid, Paid, Overdue, Disputed, Adjusted, Voided, Written Off |
+| Onboarding | Planned, Active, At Risk, Completed, Failed, Cancelled |
+| Document | Uploaded, Validating, Processing, Ready, Quarantined, Failed, Superseded |
+| AI run | Queued, Running, Validating, Review Required, Approved, Rejected, Failed |
+| Task | Open, In Progress, Blocked, Completed, Cancelled |
 
-| Performance | Marketing pages LCP < 2.5s; app interactions < 200ms perceived |
+Authorized workflows can skip, reverse, or reopen non-terminal business states. The system must preserve every transition.
 
-| Availability | 99.9% for app \& marketing site |
+## 7. Non-Functional Requirements
 
-| Security | Role-based access enforced server-side (RLS); encrypted at rest \& in transit; least-privilege for internal roles |
-
-| Privacy | GDPR/CCPA-aligned; privacy policy discloses lead-data collection \& use; data deletion on request |
-
-| Compliance | TCPA-compliant phone outreach; cookie consent; commission disclosure to every customer |
-
-| Data integrity | All published vendor data versioned \& traceable; freshness SLA ≥ 95% within cadence window |
-
-| Scalability | 50+ vendors, hundreds of sources, thousands of orgs without re-architecture |
-
-| Accessibility | WCAG 2.1 AA for marketing site and core app flows |
-
-
-
-\---
-
-
-
-\## 5. Technical architecture
-
-
-
-\### 5.1 Stack
-
-| Layer | Choice |
-
-|---|---|
-
-| Framework | Next.js 15 (React + TypeScript) — one codebase for marketing + app |
-
-| UI | Tailwind CSS + shadcn/ui |
-
-| State/data | TanStack Query + Zustand |
-
-| API | Next.js API routes / tRPC |
-
-| Database | PostgreSQL (Supabase) + Drizzle or Prisma |
-
-| Auth \& orgs | Supabase Auth (or Clerk for team-invite UX) |
-
-| Background jobs | Trigger.dev or Inngest |
-
-| Crawling | Firecrawl |
-
-| Extraction | LLM (Claude API) structured output |
-
-| CMS | Sanity or Payload |
-
-| Email | Resend (transactional) + Beehiiv (newsletter) |
-
-| PDF export | react-pdf or Puppeteer service |
-
-| Advisor chat | Postgres threads + Supabase Realtime |
-
-| Scheduling | Cal.com embed |
-
-| Hosting | Vercel + Supabase cloud |
-
-| Analytics | PostHog |
-
-
-
-\### 5.2 Core data model (tables)
-
-orgs, users, roles/permissions (incl. `superadmin`), vendors, vendor\_snapshots (versioned), vendor\_pricing, features, capability\_scores, sources, source\_schedules, ingestion\_runs, review\_queue, scoring\_configs, requirements, projects, shortlists, scorecards, criteria, scores, tasks/milestones, advisor\_threads, demo\_requests, deals, leads, audit\_log.
-
-
-
-\### 5.3 Design direction
-
-Approved homepage direction "Bold Sage": near-white soft-gray canvas (#F7F7F5), bold forest-green accent, warm soft card shadows, Bricolage Grotesque display + Manrope body. All subsequent screens extend this system. Reference: `Homepage.dc.html`.
-
-
-
-\---
-
-
-
-\## 6. Release plan
-
-
-
-| Phase | Contents | Est. duration |
-
+| ID | Area | Requirement |
 |---|---|---|
+| NFR-PERF-01 | Public performance | Largest Contentful Paint at or below 2.5 seconds at the 75th percentile |
+| NFR-PERF-02 | Interaction performance | Interaction to Next Paint at or below 200 milliseconds at the 75th percentile for critical workflows |
+| NFR-AVL-01 | Availability | 99.9% monthly production availability, excluding documented maintenance |
+| NFR-AUTH-01 | Authorization | Every protected operation uses server-side authorization |
+| NFR-ISO-01 | Isolation | The organization-role integration matrix permits zero unauthorized cross-organization access |
+| NFR-ACC-01 | Accessibility | WCAG 2.1 AA for public pages and critical workflows |
+| NFR-DATA-01 | Traceability | Every customer-visible vendor fact links to versioned evidence and capture time |
+| NFR-DATA-02 | Freshness | At least 95% of published vendor records stay inside configured freshness windows |
+| NFR-AUD-01 | Audit | Sensitive permissions, approvals, exports, financial changes, and ranking changes have complete audit records |
+| NFR-PRV-01 | Consent | Consent-required analytics stay disabled until consent |
+| NFR-PRV-02 | Deletion | Complete approved deletion requests within 30 days, subject to legal retention |
+| NFR-REC-01 | Recovery | Production recovery point is within 24 hours and recovery time is within eight hours |
+| NFR-REC-02 | Recovery tests | Complete and record a restore test at least quarterly |
+| NFR-AI-01 | AI safety | Every consequential customer-facing AI output has recorded approval |
+| NFR-DOC-01 | File safety | Validate every upload and quarantine failed or unsafe files before use |
+| NFR-OBS-01 | Observability | Record application, job, communication, AI, and security failures with actionable context |
 
-| 0 — Design | Hi-fi screens: marketing pages → 8 app screens → SuperAdmin key views | In progress |
+AI extraction quality targets require a versioned fixture baseline. The team must not invent quality percentages before that baseline exists.
 
-| 1 — Marketing site | Public pages + CMS + newsletter + analytics + lead gate | 2–3 wks |
+## 8. Global Acceptance Rules
 
-| 2 — App core | Auth/orgs, intake wizard, marketplace, vendor profiles, shortlists | 4–6 wks |
+Each requirement must have successful-path, permission-denial, invalid-input, boundary, state-transition, audit, and relevant organization-isolation tests.
 
-| 3 — Evaluation suite | Requirements builder, scorecards, project plans, team roles | 4 wks |
+Critical acceptance rules are:
 
-| 4 — Advisor layer | Chat, booking, proposal reviews, PDF reports, transparency page | 3–4 wks |
+1. An unapproved RFP cannot leave the server.
+2. A commission-rate change cannot alter an organic recommendation score.
+3. A rejected or unreviewed AI result cannot become customer-visible.
+4. A vendor-data override records its source, reason, author, and review date.
+5. An eliminated vendor can reactivate without history loss.
+6. A signed contract creates the required commission event.
+7. A deal cannot close financially while commission status remains unresolved.
+8. A protected request from another organization receives no protected data.
+9. An unsafe document cannot enter extraction or customer workflows.
+10. A provider failure cannot bypass validation, authorization, or approval.
 
-| 5 — Data pipeline | Source registry, Firecrawl + LLM extraction, review queue, scoring engine, scheduler | 4–6 wks (parallel with 2) |
+## 9. Trust and Compliance Controls
 
-| 6 — SuperAdmin | Pipeline control, vendor CRUD, scoring config, users, advisor ops, deals, content, health | 4 wks (pipeline views alongside 5) |
+- Publish or disclose the applicable recommendation methodology to affected customers.
+- Keep payout amounts outside organic eligibility and scoring.
+- Disclose variable commissions and material commercial conflicts.
+- Show approved recommendation reasons, limitations, confidence, and evidence freshness.
+- Version scoring configurations and manual overrides.
+- Preview ranking changes before publication.
+- Use permitted sources only.
+- Preserve commercial and approval history.
+- Let customers correct material intake data.
+- Audit sensitive exports and impersonation.
+- Apply privacy, consent, and outreach rules.
+- Do not publish placeholder claims or copied evidence.
+- Keep sponsored content outside organic ordering.
 
+## 10. Delivery and Release Policy
 
+Build the product in controlled, independently testable modules. Do not use throwaway architecture or remove agreed capabilities to label a partial build complete.
 
-\*\*Parallel data track (launch-critical):\*\* seed 50+ vendor profiles; author \& publish scoring methodology; populate pricing benchmarks.
+Before a module starts, its detailed plan must identify requirement IDs, state transitions, data changes, permissions, acceptance tests, risks, and recovery.
 
+Database and authorization changes require local integration evidence. Production changes require explicit approval.
 
+Production publication and search indexing remain blocked while the
+[R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) is active.
 
-\---
+A new v2 implementation roadmap must replace the legacy roadmap before feature work continues.
 
+## 11. Open Product Decisions
 
+| Decision | Owner | Required before |
+|---|---|---|
+| Common RFP plus vendor-specific amendments | Rob Speciale | RFP implementation |
+| Exact identity-unmasking rule | Rob Speciale | Evaluation implementation |
+| Customer-visible or public scoring methodology | Rob Speciale | Recommendation release |
+| Public vendor-ranking scope | Rob Speciale | Public ranking work |
+| Support impersonation | Rob Speciale, product and security owner | Administration implementation |
+| Category expansion beyond HR software | Rob Speciale | New-category work |
+| Sponsored-placement policy | Rob Speciale | Any sponsored placement |
 
-\## 7. Trust \& compliance guardrails
+The current default is no sponsored placement.
 
+## 12. Legacy Requirement Compatibility
 
+Existing code and tests can still cite the former identifiers until their owning modules change.
 
-1\. Commission rates disclosed to each customer.
+| Former identifiers | Canonical group |
+|---|---|
+| FR-M1 | FR-MKT-01 |
+| FR-M2 | FR-MKT-02 and FR-MKT-03 |
+| FR-M3 | FR-MKT-11 |
+| FR-M4 | FR-MKT-04 |
+| FR-M5 | FR-MKT-05 |
+| FR-L1 through FR-L5 | FR-MKT-06 through FR-MKT-10 |
+| FR-A1 through FR-A2 | FR-INT and FR-EVL-05 |
+| FR-A3 | FR-EVL-01, FR-EVL-02, and FR-EVL-09; broad self-service marketplace browsing is superseded |
+| FR-A4 through FR-A5 | FR-EVL-03, FR-EVL-04, and FR-EVL-10 |
+| FR-A6 through FR-A8 | FR-WRK-03, FR-EVL-06, FR-EVL-07, FR-DMO, and FR-PRP groups |
+| FR-R1 through FR-R4 | FR-MAT group |
+| FR-P1 through FR-P6 | FR-VND group |
+| FR-S1 through FR-S10 | FR-ADM and FR-RPT groups |
+| FR-T1 through FR-T4 | FR-ANL group |
 
-2\. CBIZ Centrally HR featured placement always labeled; reseller affiliation disclosed on profile + Transparency page.
+The v1 equal-commission claim, guaranteed vendor placement, named AI choices, vendor-portal exclusion, and obsolete design reference are superseded.
 
-3\. Scoring methodology published.
-
-4\. Source data licensed or vendor-owned; no ToS-violating scraping.
-
-5\. "Last verified" freshness dates on all vendor data.
-
-6\. Privacy policy discloses lead-data collection \& use; consent checkbox at sign-up; TCPA-compliant outreach; cookie-consent banner.
-
-7\. Organic rankings never manipulated.
-
-
-
-\---
-
-
-
-\## 8. Open questions
-
-
-
-1\. Final brand name — "MatchMaker HR" is a working name; alternatives (e.g., Peoplestack, Clearpick HR) proposed earlier.
-
-2\. Commission disclosure UX — where/how in-app (onboarding step vs. persistent footer link vs. both)?
-
-3\. Newsletter provider final choice (Beehiiv assumed).
-
-4\. Advisor chat: build (Supabase Realtime) vs. buy (Intercom) at launch?
-
-5\. Initial source registry: which licensed/vendor-owned sources per vendor for the seed crawl?
-
-6\. Pricing-estimate confidence labeling (ranges vs. point estimates; "verified" criteria definition).
-
-
-
-\---
-
-
-
-\## 9. Out of scope (v1)
-
-
-
-\- Public/SEO vendor ranking pages (all data stays behind the lead gate)
-
-\- Non-HRIS software categories
-
-\- Vendor self-service portal
-
-\- Native mobile apps
-
-\- Multi-language/localization
-
-
-
+Pulse is the current selected visual direction.

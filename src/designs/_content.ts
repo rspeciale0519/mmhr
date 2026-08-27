@@ -2,7 +2,7 @@
  * Shared marketing content for the design explorations, so the three directions
  * differ in *expression* rather than in what they say.
  *
- * Section order mirrors FR-M2 (and, deliberately, OutSail's proven homepage
+ * Section order mirrors FR-MKT-02 and OutSail's proven homepage
  * skeleton): hero + lead capture, vendor wall, six-tool tour, broker-model
  * explainer, stats, case studies, newsletter, footer.
  *

@@ -1,7 +1,7 @@
 import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**
- * Captured leads (FR-L1, FR-L5). Every field except `source` is mandatory at the
+ * Captured leads (FR-MKT-06, FR-MKT-10). Every field except `source` is mandatory at the
  * registration gate; `consentAt` records the TCPA/privacy consent timestamp and
  * is never nullable — a lead without recorded consent must not exist.
  */
@@ -20,8 +20,8 @@ export const leads = pgTable("leads", {
 });
 
 /**
- * Audit trail for admin mutations (FR-S10). Written by triggers and by the
- * impersonation flow; before/after snapshots are stored as JSON.
+ * Audit trail for sensitive mutations (FR-IAM-09). The current schema stores
+ * JSON snapshots; the canonical implementation must write redacted, allowlisted diffs.
  */
 export const auditLog = pgTable("audit_log", {
   id: uuid("id").primaryKey().defaultRandom(),

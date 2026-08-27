@@ -13,9 +13,8 @@ type Props = {
 };
 
 /**
- * Shared credentials form for sign-in and sign-up. Intentionally plain: the
- * themed, fully-specified versions land after the design direction is approved
- * (G3) and, for sign-up, when the lead gate is built in Phase 1.
+ * Shared credentials form for sign-in and sign-up. It remains intentionally
+ * plain until Pulse tokens and the canonical registration gate reach auth.
  */
 export function AuthForm({ action, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(

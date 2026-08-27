@@ -2,7 +2,7 @@
  * Every route on the public site, in one place.
  *
  * The nav and footer both read from here, so adding a page means adding it
- * once. Page list is FR-M1 (PRD §3.1).
+ * once. The canonical route requirement is FR-MKT-01 in PRD section 5.1.
  */
 
 export const PRIMARY_NAV = [

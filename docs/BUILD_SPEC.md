@@ -1,9 +1,11 @@
+> **Legacy v1 build contract:** [PRD.md](./PRD.md) and [TECH_STACK.md](./TECH_STACK.md) superseded this file on 2026-08-24. Preserve its evidence as history only.
+
 # MatchMaker HR — Build Spec (goal-run contract)
 
 > Machine-checkable contract for autonomous `/goal` runs. Scope and architecture live in
-> `docs/development-plan.md` (authoritative); this file translates each phase's exit
-> criteria into transcript-provable checks and defines the rules a goal run must obey.
-> `docs/ROADMAP.md` is checked off as items complete.
+> the historical `docs/development-plan.md`; this file translated each legacy phase's
+> exit criteria into transcript checks. It is no longer an active goal contract.
+> `docs/ROADMAP.md` preserves the matching historical checklist.
 
 ## How this is used
 One `/goal` per phase (commands in the autopilot handoff). A phase goal is satisfied when
@@ -22,7 +24,7 @@ Phase 0 goal runs uninterrupted from scaffold to the G3 design-approval stop.
 - **All third-party accounts are provisioned and `.env.local` is fully populated**
   (never commit it; `.gitignore` covers it): local Supabase (active) + cloud Supabase
   (commented out — copy to Vercel env vars for staging, never uncomment locally),
-  Payload, Anthropic, Firecrawl, Trigger.dev (project ref `proj_mmmffglqprpzbymxcwqe`,
+  Payload, the configured AI service, Firecrawl, Trigger.dev (project ref `proj_mmmffglqprpzbymxcwqe`,
   DEV secret key), Resend (sender domain `directmailmarketinghq.net` — verify it's a
   verified domain in Resend before relying on sends), Beehiiv (key + publication id),
   Cal.com (`miodiollc/30min`), PostHog (`phc_` project token verified correct),

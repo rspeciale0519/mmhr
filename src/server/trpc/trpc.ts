@@ -39,7 +39,7 @@ export const publicProcedure = t.procedure;
 /**
  * Requires a verified session. This is authentication only — it says nothing
  * about *what* the user may touch. Org-scoped authorization is enforced by RLS
- * plus an org-membership middleware, both of which land in Phase 2.
+ * plus organization permission middleware, which remains unimplemented.
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) {
