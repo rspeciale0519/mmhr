@@ -19,7 +19,7 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.6 records all required R1 owner approvals and the
+recovery controls. Version 1.7 records all required R1 owner approvals and the
 validated R1.1 status.
 
 ## Baseline
@@ -65,7 +65,7 @@ The fully owner-approved R1 plan is
 .codex/plans/module-r1-secure-platform-base.md.
 
 It defines identity, permissions, RLS, audit, invitations, MFA, migration,
-CI, evidence, and recovery. Rob Speciale is the temporary operations owner.
+CI, evidence, and recovery. The owning plan records the temporary operations owner.
 
 The approved amendment makes R1 the foundation for FR-IAM-10 and FR-IAM-11.
 Their final evidence belongs to R6 and R7.
@@ -74,8 +74,9 @@ FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
 R1.1 is complete. It adds the durable entry-point inventory and fail-closed
-identity and request boundaries. R1.0 remains open because the recovery roster
-and demonstrated three-person quorum are placeholders. R1.2 must wait.
+identity and request boundaries. R1.0 now has an approved interim pair and
+other-admin approval rule. Expiry, allowed actions, and lost-factor identity
+checks remain open. R1.2 must wait.
 
 ## Authorization
 

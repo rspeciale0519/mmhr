@@ -31,7 +31,7 @@ general SaaS product. See docs/PRD.md.
 **Document authority:** docs/README.md is the entry point. docs/PRD.md controls
 product behavior. docs/TECH_STACK.md controls architecture, security, and
 provider boundaries. The product owner approved the v2 roadmap on 2026-08-24.
-Roadmap v1.6 contains the approved amendment, the R0 control record, and the
+Roadmap v1.7 contains the approved amendment, the R0 control record, and the
 validated R1.1 status. All required R1 owner reviews are approved.
 Former plans in docs/ are legacy records.
 
@@ -72,6 +72,7 @@ docs/TECH_STACK.md for adopted and planned integration status.
 - Verified identity does not prove organization membership or permission.
 - `NEXT_PUBLIC_APP_URL` must match one canonical target origin.
 - The Next.js `authInterrupts` control is experimental.
+- The interim recovery pair has no backup, and no runtime recovery command exists.
 - Customer and administration routes do not implement the v2 workflows.
 - Public placeholder claims remain a release risk. The product owner chose to retain them for now.
 - The current production deployment remains accessible until an approved gate deployment occurs.
@@ -99,5 +100,5 @@ docs/TECH_STACK.md for adopted and planned integration status.
 
 ## Next Real Step
 
-Complete the real R1.0 recovery roster and demonstrate its quorum before R1.2
-schema work starts. Claim review remains deferred, and public release remains blocked.
+Approve the remaining R1.0 recovery controls before R1.2 schema work starts.
+Claim review remains deferred, and public release remains blocked.
