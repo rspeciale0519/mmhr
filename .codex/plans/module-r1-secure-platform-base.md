@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.7 R1.1 validated |
+| Version | 0.8 interim recovery pair approved |
 | Date | 2026-08-27 |
-| Status | R1.1 complete and validated; R1.0 recovery roster open |
+| Status | R1.1 complete; R1.0 pair approved with remaining recovery controls open |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -156,13 +156,14 @@ Engineering owns data paths and migration design. Operations owns member and inv
 | Password policy | Match server and interface rules; require at least 12 characters before production use |
 | Portal URLs | Use `/home` for routing, `/customer` and `/vendor` for portals, and `/admin` for internal administration |
 | Privileged MFA | Require AAL2 for security administration, member administration, invitations, and portal-grant changes |
-| Recovery approval | Require two current AAL2 approvers; neither can be the target or request initiator |
+| Recovery approval | Require one current AAL2 approval from the other named Super Admin; deny self-approval |
+| Recovery request expiry | Open R1.0 decision; keep recovery disabled until the duration is approved |
 | Invitation lifetime | Use a configured duration of 72 hours |
 | Invitation resend | Revoke the old invitation before requesting replacement delivery |
 | Invitation identity | Verify identity first; accept only when the normalized verified email matches the invitation |
 | Invitation delivery | Use provider-neutral identity email for new users; show pending invitations after existing users sign in |
 | First Super Admin | Use a local-only command with verified AAL2 identity, durable one-time state, and product-security approval |
-| Recovery capacity | Keep one separate initiator and three eligible approvers; recheck capacity after every security mutation |
+| Recovery capacity | Bind both names to distinct stable identity IDs; keep both identities active, MFA-enrolled, and authorized; fail closed otherwise |
 | Role versions | Assign a stable role key that follows one approved active version; audit every version activation |
 | Override scope | Persist platform and organization scopes in R1; add foreign-keyed resource scopes with each domain |
 | Organization removal | Archive or restrict; do not cascade-delete security history |
@@ -235,11 +236,13 @@ Every security mutation must evaluate effective administration after its propose
 
 Role labels alone do not satisfy this invariant.
 
-Reject a change that removes the last effective Super Admin or the last administrator of any active organization.
+Reject a change that leaves fewer than two active named Super Admins or removes the last administrator of any active organization.
 
-Reject a change that leaves fewer than three eligible recovery approvers.
+Reject a recovery request when the other named Super Admin cannot approve it.
 
-Reject overlapping active recovery-request and recovery-approval authority for one identity.
+Permit each named Super Admin to request or approve recovery across different requests.
+
+Reject same-request self-approval and approval by the recovery target.
 
 Apply these checks to roles, versions, permission definitions, defaults, overrides, delegations, identities, organizations, and memberships.
 
@@ -400,7 +403,7 @@ Use additive migrations. Keep legacy columns until a later approved contract mig
 | `invitations` | Add normalized email, creator, acceptor, state, revocation, and expiry | Permit one pending invitation per organization and email |
 | `identity_admin_intents` | Add durable identity-service requests and delivery state | Use unique idempotency keys and bounded retries |
 | `identity_recovery_requests` | Add target, initiator, reason, expiry, status, and evidence reference | Never store identity-verification evidence content |
-| `identity_recovery_approvals` | Add distinct approver, decision, assurance, and time | Require two valid approvals from non-target approvers |
+| `identity_recovery_approvals` | Add distinct approver, decision, assurance, and time | Require one valid approval from the other named Super Admin, who cannot be the target |
 | `security_bootstrap_state` | Add singleton target, approval references, consumption state, and time | No reset through application or worker roles |
 | `audit_events` | Add versioned, append-only, redacted security events | Mutation and audit must share one transaction |
 | `audit_log` | Freeze the legacy table and mark its format | Preserve existing records |
@@ -468,24 +471,40 @@ A later portal grant can use a new record after the prior grant becomes revoked.
 
 ### 8.2 Identity Recovery Sequence
 
-1. An authorized initiator creates an expiring recovery request for one identity.
+1. Either named Super Admin creates an expiring recovery request for one identity.
 2. The request records a reason and an external evidence reference without evidence content.
-3. Two distinct authorized approvers verify identity independently.
-4. Each approver must be AAL2 and cannot be the target or initiator.
-5. The command rechecks approver authority and request expiry before completion.
-6. One transaction consumes the approvals, applies the narrow recovery action, and writes audit events.
+3. Before approval, the other named Super Admin verifies the recovery target independently.
+4. The approver must be AAL2 and cannot be the target or initiator.
+5. The command rechecks approver authority and the configured request expiry before completion.
+6. One transaction consumes the approval, applies the narrow recovery action, and writes audit events.
 
 The request must name one allowed action. It cannot grant roles, permissions, memberships, or organization access.
 
-The request must fail when either approver loses authority before completion.
+The request must fail when the required approver loses authority before completion.
 
-Recovery cannot activate until the configured approver group can meet the quorum.
+Recovery cannot activate until both stable named identities are distinct, active, MFA-enrolled, and authorized.
 
-Maintain at least three active recovery approvers with verified MFA enrollment.
+Maintain both named Super Admins as active identities with verified MFA enrollment.
 
-Maintain at least one active recovery initiator who has no recovery-approval authority.
+Each person can hold request and approval authority, but cannot use both authorities on one request.
 
-Every security mutation must recheck recovery capacity after target and initiator exclusions.
+Every security mutation must recheck the two-person recovery capacity.
+
+If either person is unavailable, recovery must stop. No one-person application or local emergency bypass is approved.
+
+A target Super Admin must start their own request. Before approval, the other named Super Admin must independently verify the target.
+
+For another recovery target, either named Super Admin can start the request and the other must approve it.
+
+Normal recovery requests require requester AAL2. Lost-factor requests remain disabled until an independent identity-check procedure is approved and tested.
+
+A replacement requires an approved contract change, stable identity binding, active status, MFA enrollment, authorization, and a passed rehearsal before removal.
+
+Never authorize recovery by comparing display names or email addresses.
+
+Keep all recovery disabled until expiry, allowed actions, identity bindings, and required identity-check procedures are approved and tested.
+
+R1.0 approves the stable-ID binding method. R1.2 creates the identities and IDs. Create and verify the actual bindings before recovery activation.
 
 ### 8.3 Invitation and Identity-Service Sequence
 
@@ -638,7 +657,11 @@ Each database package must generate, review, and apply its migration before pack
 
 Completion status: open.
 
-The recovery officer names and demonstrated quorum remain placeholders.
+The named interim two-Super-Admin pair and other-admin approval rule are approved.
+
+The request expiry, allowed recovery actions, and lost-factor identity-check procedure remain open.
+
+R1.2 remains blocked until those R1.0 decisions are approved.
 
 Named owners:
 
@@ -648,6 +671,21 @@ Named owners:
 | Security | Rob Speciale | Authorization, private data, and technical risk |
 | Engineering | Rob Speciale | Architecture, implementation, and technical recovery |
 | Operations | Rob Speciale (temporary) | Business workflows and customer operations |
+
+Interim recovery pair:
+
+| Named Super Admin | Recovery rule |
+|---|---|
+| Rob Speciale | Can start an eligible request; Jason Reichard must approve it |
+| Jason Reichard | Can start an eligible request; Rob Speciale must approve it |
+
+The initiator cannot approve the same request. The approver cannot be the recovery target.
+
+The rows above are subject to the target rule in Section 8.2.
+
+No third recovery approver is required for this interim model.
+
+This model has no backup. Recovery stops when the required other Super Admin is unavailable.
 
 Outcome:
 
@@ -659,7 +697,8 @@ Outcome:
 - Approve audit redaction and retention rules.
 - Approve identity, intent, and recovery redaction and retention rules.
 - Approve the first Super Admin bootstrap procedure.
-- Approve recovery officers, quorum availability, expiry, and allowed recovery actions.
+- Approve the named Super Admin pair, other-admin approval, expiry, and allowed recovery actions.
+- Approve the lost-factor independent identity-check procedure.
 - Approve `/home`, `/customer`, `/vendor`, and `/admin` route purposes.
 - Approve new-user identity delivery, redirects, retries, and reconciliation.
 - Approve the existing-user pending-invitation experience and manual notice path.
@@ -847,7 +886,7 @@ Validation:
 - Self-escalation denial tests
 - Transaction rollback when audit writing fails
 - Audit immutability and sensitive-value rejection tests
-- Recovery requester-approver separation, approvals, expiry, exclusions, quorum, and authority-loss tests
+- Two-Super-Admin direction, self-approval, target-approval, expiry, and authority-loss tests
 - Every invalid recovery-state transition test
 - Recovery cannot change roles, permissions, memberships, or organization access
 - Worker command allowlist tests
@@ -857,9 +896,9 @@ Validation:
 - Existing-assignment propagation and prior-version reactivation tests
 - Duplicate, concurrent, revoke, and reassign platform-role assignment tests
 - Identity and organization state permission, AAL2, audit, concurrency, and worker-denial tests
-- Last-Super-Admin and affected-organization-administrator protection during concurrent identity-state changes
+- Two-active-Super-Admin and affected-organization-administrator protection during concurrent identity-state changes
 - Effective-administrator protection during role-version, override, delegation, and assignment changes
-- Recovery-capacity checks after every security mutation, including target and initiator exclusions
+- Recovery-capacity checks that preserve both named Super Admins and the other-admin approval path
 - Invalid identity and organization state-transition tests
 - Concurrent portal grant, revoke, and regrant tests
 - Identity-service and Trigger import-boundary tests
@@ -883,7 +922,9 @@ Outcome:
 - Add privileged MFA enrollment, challenge, and recovery flows.
 - Permit the approved pending bootstrap target to enroll and challenge TOTP without protected application access.
 - Add the local-only Super Admin bootstrap script after AAL2 enrollment works.
-- Require AAL2 for identity-state, role-version, platform-role, permission, delegation, and recovery commands.
+- Require AAL2 for every recovery approval and ordinary recovery request.
+- Keep lost-factor recovery disabled until its independent identity-check procedure is approved and tested.
+- Require AAL2 for identity-state, role-version, platform-role, permission, and delegation commands.
 - Require AAL2 for membership, invitation, portal-grant, and organization-state administration.
 
 Validation:
@@ -951,7 +992,7 @@ Validation:
 - External administrator denial for every other organization
 - Last-organization-administrator protection
 - Last-organization-administrator concurrent-revocation protection
-- Last-active-Super-Admin single-user and concurrent-revocation protection
+- Fewer-than-two-active-Super-Admins single-user and concurrent-revocation protection
 - Cross-organization member lookup denial
 - Successful own-organization administration
 - Loading, error, empty, and success browser states
@@ -1081,8 +1122,10 @@ Test these negative paths:
 - Omitted membership role input
 - Repeated or remotely exposed Super Admin bootstrap
 - Recovery self-approval, duplicate approval, expired request, and lost approver authority
-- Recovery requester-approver overlap and missing-initiator capacity
-- Security mutations that would leave fewer than three eligible recovery approvers
+- Approval by anyone except the other named Super Admin
+- Approval by the recovery target
+- Recovery authorization from a display name or email match
+- Security mutations that would leave fewer than two active named Super Admins
 - Recovery action outside its approved narrow target
 - Invalid recovery-state transitions
 - Missing, extra, and unknown permission definitions
@@ -1178,7 +1221,7 @@ The CI integration job must use this sequence:
 | Risk | Prevention | Recovery |
 |---|---|---|
 | Cross-organization access | Explicit grants, RLS, server permission checks, and real token tests | Revoke Data API access, preserve evidence, and apply a forward fix |
-| Administrator lockout | One-time bootstrap, tested recovery command, and two active Super Admins before production | Use the approved recovery command with product-security authorization |
+| Administrator lockout | One-time bootstrap, tested recovery command, and two active Super Admins before production | Use the approved other-admin recovery command; if the pair is unavailable, keep recovery and privileged commands disabled |
 | Identity relink abuse | Unique Auth links, two-person approval, narrow actions, and immutable audit | Suspend the command, preserve evidence, and restore through an approved request |
 | Role escalation | Deny precedence, delegation ceilings, and self-change blocks | Revoke the grant and preserve audit evidence |
 | RLS recursion | Private helpers, pinned search path, and isolated policy tests | Disable the affected route and replace the policy safely |
@@ -1188,7 +1231,7 @@ The CI integration job must use this sequence:
 | Auth user deletion | Stable internal identity and non-cascading history links | Anonymize the Auth link and preserve authorization history |
 | Audit data leakage | Allowlisted changes and sensitive-value rejection | Stop writes, restrict readers, and correct data under approved procedure |
 | Audit write failure | One transaction for database mutation and audit | Roll back the mutation and stop the command |
-| MFA lockout | Tested enrollment, separate recovery, and two active Super Admins before production | Use the approved two-person recovery command and preserve audit evidence |
+| MFA lockout | Tested enrollment, separate recovery, and two active Super Admins before production | Keep lost-factor recovery disabled until its identity-check procedure is approved and tested; never bypass AAL2 approval |
 | Privileged credential exposure | Separate roles, narrow adapters, and import boundaries | Rotate the credential and review every command event |
 | False requirement closure | Cross-release completion gates and evidence reconciliation | Reopen the requirement and block the affected release |
 
@@ -1233,8 +1276,8 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 - Unverified email and AAL1 cannot perform privileged operations.
 - Identity synchronization and relink controls pass their lifecycle and concurrency tests.
 - Suspended and archived organizations deny old-token access.
-- Recovery requires two current, distinct, non-target, non-initiator approvals.
-- Every security mutation preserves one separate initiator and three eligible recovery approvers.
+- Recovery requires one current AAL2 approval from the other named Super Admin, who cannot be the target or initiator.
+- Every security mutation preserves both active named Super Admins and the two-person recovery path.
 - AAL2 succeeds for every approved privileged operation.
 - R1 authorization code has no AI dependency.
 - The parent roadmap requires each R5 through R9 module plan to prove the invariant.
@@ -1248,12 +1291,13 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 
 | Approval | Status | Record |
 |---|---|---|
-| Parent roadmap v1.6 | Approved | Current Codex task, 2026-08-27 |
+| Parent roadmap v1.7 | Approved | Current Codex task, 2026-08-27 |
 | Section 2 roadmap amendment | Approved | Product owner, current Codex task, 2026-08-24 |
 | Product-owner R1 plan and defaults | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Security-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
+| Interim recovery pair and other-admin approval rule | Approved | Product and security owner, current Codex task, 2026-08-27 |
 | R1 implementation | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Branch creation | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Commit | Approved | User standing instruction, current Codex task, 2026-08-27 |

@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.6 |
+| Version | 1.7 |
 | Date | 2026-08-27 |
-| Status | Approved roadmap; R0 quarantine active; R1.1 complete; R1.0 recovery roster open |
+| Status | Approved roadmap; R0 quarantine active; R1.1 complete; R1.0 recovery controls open |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
@@ -193,9 +193,9 @@ Recovery:
 
 Owning plan: [module-r1-secure-platform-base.md](./module-r1-secure-platform-base.md).
 
-The product, security, and engineering owners approved its scope and defaults.
+The product, security, engineering, and operations owners approved its scope and defaults.
 
-The operations-owner review remains pending.
+The approved interim recovery pair uses approval from the other named Super Admin.
 
 Outcome:
 
@@ -763,6 +763,7 @@ Every PRD requirement appears exactly once below.
 | Security review of R1 boundaries | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering feasibility review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations workflow review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
+| Interim recovery pair and other-admin approval rule | Approved | Product and security owner, current Codex task, 2026-08-27 |
 | R1 implementation and routine Git through `develop` | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Finance workflow review | Pending | Add review reference |
 
