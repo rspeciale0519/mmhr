@@ -85,3 +85,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Reviewed each staged group before its commit.
 - Kept local settings and generated Codex hooks outside Git.
 - Kept push, pull request, merge, and deployment actions pending.
+
+## [2026-08-27] security | Implement R1.1 secure entry controls
+- Added one verified identity boundary, exact-origin Server Action checks, and deny-first protected routes.
+- Added a durable entry-point matrix with completeness and source-contract tests.
+- Passed all local gates, integration checks, rendered checks, and independent security review.
+- Kept R1.2 blocked until the real R1.0 recovery roster and quorum exist.

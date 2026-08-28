@@ -19,8 +19,8 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.4 links the R0 release-control record and records
-all required R1 owner approvals.
+recovery controls. Version 1.6 records all required R1 owner approvals and the
+validated R1.1 status.
 
 ## Baseline
 
@@ -73,8 +73,12 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
+R1.1 is complete. It adds the durable entry-point inventory and fail-closed
+identity and request boundaries. R1.0 remains open because the recovery roster
+and demonstrated three-person quorum are placeholders. R1.2 must wait.
+
 ## Authorization
 
-Roadmap approval does not authorize implementation. Each release needs an
-approved module plan from all required owners. Cloud migrations and
-deployments need separate approval.
+The current standing instruction authorizes R1 implementation and routine Git
+work through `develop`. Production dependencies, cloud migrations, bootstrap,
+`main`, and deployments need separate approval.
