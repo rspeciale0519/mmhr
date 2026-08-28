@@ -1,9 +1,12 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 
-import { createClient } from "@/lib/supabase/server";
+import {
+  getVerifiedIdentity,
+  type VerifiedIdentity,
+} from "@/server/auth/verified-identity";
 
-export type AuthedUser = { id: string; email?: string };
+export type AuthedUser = VerifiedIdentity;
 
 export type Context = {
   user: AuthedUser | null;
@@ -15,15 +18,7 @@ export type Context = {
  * procedure.
  */
 export async function createContext(): Promise<Context> {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-
-  const claims = data?.claims;
-  if (!claims?.sub) return { user: null };
-
-  return {
-    user: { id: String(claims.sub), email: claims.email as string | undefined },
-  };
+  return { user: await getVerifiedIdentity() };
 }
 
 const t = initTRPC.context<Context>().create({
@@ -41,7 +36,7 @@ export const publicProcedure = t.procedure;
  * about *what* the user may touch. Org-scoped authorization is enforced by RLS
  * plus organization permission middleware, which remains unimplemented.
  */
-export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+export const identityProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }

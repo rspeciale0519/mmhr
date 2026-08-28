@@ -5,13 +5,13 @@ Catalog of the mmhr brain. SessionStart reads this.
 - (none yet)
 
 ## Knowledge
-- [[knowledge/orientation]] — current (2026-08-27) — canonical v2 orientation and local release gate
-- [[knowledge/features]] — current (2026-08-27) — audited foundation status and v2 gaps
-- [[knowledge/roadmap]] — current (2026-08-27) — R0 control and partially approved R1 draft
+- [[knowledge/orientation]] — current (2026-08-27) — canonical v2 orientation, R0 gate, and R1.1 boundary
+- [[knowledge/features]] — current (2026-08-27) — secure entry controls, foundations, and v2 gaps
+- [[knowledge/roadmap]] — current (2026-08-27) — R1.1 complete; R1.0 recovery roster open
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
-- [[journal/2026-08-27]] — R0 control, R1 approvals, and baseline branch preparation.
+- [[journal/2026-08-27]] — R0 control, baseline integration, and R1.1 secure entry controls.
 - [[journal/2026-08-25]] — named R1 owners recorded; role reviews remain pending.
 - [[journal/2026-08-24]] — v2 baseline, amended roadmap, and product-approved R1 draft.
 - [[journal/2026-08-17]] — reduced and aligned root project instructions.

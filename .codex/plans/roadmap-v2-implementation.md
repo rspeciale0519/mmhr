@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.4 |
+| Version | 1.6 |
 | Date | 2026-08-27 |
-| Status | Approved roadmap; R0 quarantine active; all R1 owner reviews approved |
+| Status | Approved roadmap; R0 quarantine active; R1.1 complete; R1.0 recovery roster open |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
@@ -20,9 +20,9 @@
 
 This approved roadmap replaces legacy sequencing.
 
-Approval permits detailed R0 and R1 planning.
+The user authorized R1 implementation and routine Git work through `develop` on 2026-08-27.
 
-It does not authorize feature implementation, branches, commits, dependencies, cloud migrations, or deployments.
+Production dependencies, cloud migrations, bootstrap actions, `main`, and deployments remain separately controlled.
 
 ## 1. Outcome
 
@@ -763,6 +763,7 @@ Every PRD requirement appears exactly once below.
 | Security review of R1 boundaries | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering feasibility review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations workflow review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
+| R1 implementation and routine Git through `develop` | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Finance workflow review | Pending | Add review reference |
 
 Feature implementation starts only after the owning module plan receives its required approvals.

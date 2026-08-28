@@ -5,6 +5,7 @@ import {
   createPublicReleaseBlockResponse,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
+import { shouldRejectServerActionRequest } from "@/server/auth/server-action-request";
 
 /**
  * Enforces the temporary public-release quarantine. Then it refreshes the
@@ -14,6 +15,15 @@ import {
  * and admin protection belongs with the canonical IAM and RLS implementation.
  */
 export async function middleware(request: NextRequest) {
+  if (shouldRejectServerActionRequest(request)) {
+    return new NextResponse(null, {
+      status: 403,
+      headers: {
+        "cache-control": "private, no-store",
+      },
+    });
+  }
+
   if (isPublicReleaseBlocked()) {
     return createPublicReleaseBlockResponse(request.nextUrl.pathname);
   }
@@ -33,7 +43,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const response = NextResponse.next({ request });
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,9 +53,19 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
+          for (const { name, value } of cookiesToSet) {
+            request.cookies.set(name, value);
+          }
+
+          response = NextResponse.next({ request });
+
           for (const { name, value, options } of cookiesToSet) {
             response.cookies.set(name, value, options);
+          }
+
+          for (const [name, value] of Object.entries(headers)) {
+            response.headers.set(name, value);
           }
         },
       },

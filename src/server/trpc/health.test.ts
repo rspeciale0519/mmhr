@@ -7,12 +7,16 @@ test("health.ping is callable without a session", async () => {
   await expect(caller.health.ping()).resolves.toEqual({ ok: true });
 });
 
-test("health.ping reports the caller's auth state", async () => {
+test("health.whoami rejects an anonymous caller", async () => {
   const anon = appRouter.createCaller({ user: null });
-  await expect(anon.health.whoami()).resolves.toEqual({ userId: null });
+  await expect(anon.health.whoami()).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+});
 
+test("health.whoami returns only the verified caller identifier", async () => {
   const signedIn = appRouter.createCaller({
-    user: { id: "user-123", email: "buyer@acme.com" },
+    user: { id: "user-123" },
   });
   await expect(signedIn.health.whoami()).resolves.toEqual({
     userId: "user-123",

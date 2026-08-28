@@ -9,6 +9,20 @@ import { describe, expect, test } from "vitest";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+function requireLocalSupabase(value: string | undefined) {
+  if (!value) throw new Error("Local Supabase URL is required");
+
+  const { hostname, port } = new URL(value);
+  if (!["127.0.0.1", "localhost", "::1"].includes(hostname)) {
+    throw new Error("Integration tests require a loopback Supabase URL");
+  }
+  if (port !== "56321") {
+    throw new Error("Integration tests require the MMHR local Supabase API");
+  }
+}
+
+requireLocalSupabase(url);
+
 describe("supabase auth round-trip (local stack)", () => {
   test("env is wired for the local stack", () => {
     expect(url).toBeTruthy();
@@ -51,5 +65,35 @@ describe("supabase auth round-trip (local stack)", () => {
     });
     expect(error).toBeNull();
     expect(data.session?.access_token).toBeTruthy();
+  });
+
+  test("rejects malformed and tampered expired tokens", async () => {
+    const supabase = createClient(url!, anonKey!, {
+      auth: { persistSession: false },
+    });
+    const { data, error } = await supabase.auth.signUp({
+      email: `phase0-invalid-${Date.now()}@example.com`,
+      password: "phase0-test-password",
+    });
+    expect(error).toBeNull();
+
+    const token = data.session?.access_token;
+    expect(token).toBeTruthy();
+    const [header, payload, signature] = token!.split(".");
+    const expiredPayload = {
+      ...JSON.parse(Buffer.from(payload, "base64url").toString("utf8")),
+      exp: 1,
+    };
+    const expiredToken = [
+      header,
+      Buffer.from(JSON.stringify(expiredPayload)).toString("base64url"),
+      signature,
+    ].join(".");
+
+    for (const untrustedToken of ["malformed-token", expiredToken]) {
+      const result = await supabase.auth.getClaims(untrustedToken);
+      expect(result.error).not.toBeNull();
+      expect(result.data).toBeNull();
+    }
   });
 });

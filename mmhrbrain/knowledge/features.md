@@ -18,6 +18,9 @@ sources:
   - src/lib/public-release.ts
   - src/lib/public-release.test.ts
   - src/middleware.test.ts
+  - docs/security/r1-authorization-matrix.md
+  - src/server/auth/
+  - src/server/trpc/
 ---
 
 # Features — Evidence-Gated Build Status
@@ -36,7 +39,12 @@ Use the roadmap traceability matrix for per-requirement evidence and ownership.
 - Local Supabase and Drizzle create organizations, memberships, invitations,
   leads, and audit-log tables.
 - Supabase authentication uses verified claims.
-- tRPC is wired end to end with health-only procedures.
+- One shared identity helper returns only the verified subject identifier.
+- Server Actions reject missing or foreign origins before mutation.
+- `/home` requires verified identity and returns pending access.
+- `/admin` requires verified identity and then denies access.
+- tRPC is wired end to end with public health and identity-only procedures.
+- The authorization matrix and inventory tests cover current executable entry points.
 - PostHog initialization remains consent-gated.
 - Sentry and Trigger.dev wiring exists.
 - GitHub Actions runs installation, type checking, linting, unit tests, and
@@ -48,7 +56,8 @@ Use the roadmap traceability matrix for per-requirement evidence and ownership.
 
 - RLS is enabled on the first application tables, but policies are absent.
 - The direct Drizzle pool bypasses RLS and is suitable only for trusted paths.
-- Customer workspace and administration routes remain placeholders.
+- Customer access remains pending until stored membership and permission checks exist.
+- Administration remains denied until explicit permission checks exist.
 - Public route structure exists, but product copy and claims need v2 review.
 - The release gate is not active on the current production deployment.
 - No complete v2 domain router or workflow exists.

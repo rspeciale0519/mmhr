@@ -11,7 +11,10 @@ sources:
   - .codex/plans/roadmap-v2-implementation.md
   - .codex/plans/module-r0-roadmap-and-public-release-control.md
   - .codex/plans/module-r1-secure-platform-base.md
+  - docs/security/r1-authorization-matrix.md
   - src/lib/public-release.ts
+  - src/server/auth/
+  - src/middleware.ts
   - package.json
   - src/app/
   - src/server/
@@ -28,8 +31,8 @@ general SaaS product. See docs/PRD.md.
 **Document authority:** docs/README.md is the entry point. docs/PRD.md controls
 product behavior. docs/TECH_STACK.md controls architecture, security, and
 provider boundaries. The product owner approved the v2 roadmap on 2026-08-24.
-Roadmap v1.3 contains the approved amendment and the R0 control record.
-Security and engineering approved the R1 draft. Operations review remains pending.
+Roadmap v1.6 contains the approved amendment, the R0 control record, and the
+validated R1.1 status. All required R1 owner reviews are approved.
 Former plans in docs/ are legacy records.
 
 **Where the build is:** Foundations and the public marketing shell exist.
@@ -37,6 +40,10 @@ Pulse renders at the site root. The design gallery remains at /designs.
 Authentication, the first schema, tRPC, analytics consent, CI, Sentry, and
 Trigger.dev foundations exist. Customer and administration workflows remain
 mostly placeholders.
+
+R1.1 now verifies one identity subject, denies untrusted Server Action origins,
+denies `/admin`, and limits `/home` to a pending-access response. The durable
+entry-point record lives in docs/security/r1-authorization-matrix.md.
 
 A fail-closed production release gate is implemented and verified locally.
 The current production deployment does not include it yet.
@@ -62,6 +69,9 @@ docs/TECH_STACK.md for adopted and planned integration status.
 
 - RLS is enabled on the first application tables, but policies remain absent.
 - The direct server PostgreSQL pool bypasses RLS.
+- Verified identity does not prove organization membership or permission.
+- `NEXT_PUBLIC_APP_URL` must match one canonical target origin.
+- The Next.js `authInterrupts` control is experimental.
 - Customer and administration routes do not implement the v2 workflows.
 - Public placeholder claims remain a release risk. The product owner chose to retain them for now.
 - The current production deployment remains accessible until an approved gate deployment occurs.
@@ -76,6 +86,7 @@ docs/TECH_STACK.md for adopted and planned integration status.
 - .codex/plans/roadmap-v2-implementation.md — approved v2 execution order and amendment
 - .codex/plans/module-r0-roadmap-and-public-release-control.md — release quarantine and claim-source inventory
 - .codex/plans/module-r1-secure-platform-base.md — fully owner-approved R1 security plan
+- docs/security/r1-authorization-matrix.md — current entry-point and denial record
 - src/lib/public-release.ts — local fail-closed production release gate
 - docs/outsail-competitive-operating-model.md — supporting research
 - src/app/ — route surfaces
@@ -88,4 +99,5 @@ docs/TECH_STACK.md for adopted and planned integration status.
 
 ## Next Real Step
 
-Preserve the current work before new implementation. Claim review is deferred, and public release remains blocked.
+Complete the real R1.0 recovery roster and demonstrate its quorum before R1.2
+schema work starts. Claim review remains deferred, and public release remains blocked.
