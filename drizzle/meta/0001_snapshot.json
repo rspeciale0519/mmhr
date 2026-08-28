@@ -1,5 +1,5 @@
 {
-  "id": "64d7ab81-43b4-47b8-8876-9724e0aa731a",
+  "id": "becb93ec-42a4-4e6c-9b33-fe0c468d6ff8",
   "prevId": "4dba488f-f0ae-44ad-9c04-83696f172f77",
   "version": "7",
   "dialect": "postgresql",
@@ -1588,7 +1588,7 @@
       "checkConstraints": {
         "invitations_normalized_email_ck": {
           "name": "invitations_normalized_email_ck",
-          "value": "\"invitations\".\"normalized_email\" = lower(btrim(\"invitations\".\"normalized_email\"))"
+          "value": "\"invitations\".\"normalized_email\" = lower(btrim(\"invitations\".\"email\"))"
         },
         "invitations_role_map_ck": {
           "name": "invitations_role_map_ck",

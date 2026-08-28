@@ -269,6 +269,17 @@ describe.sequential("R1.2 populated database migration", () => {
     await expect(
       context!.client`
         INSERT INTO invitations (org_id, email, normalized_email, expires_at)
+        VALUES (
+          ${organizationId},
+          'bound-address@example.com',
+          'different-address@example.com',
+          ${futureTime}
+        )
+      `,
+    ).rejects.toThrow(/invitations_normalized_email_ck/);
+    await expect(
+      context!.client`
+        INSERT INTO invitations (org_id, email, normalized_email, expires_at)
         VALUES (${organizationId}, '   ', '', ${futureTime})
       `,
     ).rejects.toThrow();

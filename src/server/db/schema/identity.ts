@@ -222,7 +222,7 @@ export const invitations = pgTable(
     index("invitations_org_status_idx").on(t.orgId, t.status),
     check(
       "invitations_normalized_email_ck",
-      sql`${t.normalizedEmail} = lower(btrim(${t.normalizedEmail}))`,
+      sql`${t.normalizedEmail} = lower(btrim(${t.email}))`,
     ),
     check(
       "invitations_role_map_ck",

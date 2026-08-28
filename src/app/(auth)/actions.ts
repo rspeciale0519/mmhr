@@ -7,7 +7,10 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { requireTrustedServerActionOrigin } from "@/server/auth/server-action-request";
 
-export type AuthState = { error: string } | null;
+export type AuthState =
+  | { error: string; success?: never }
+  | { error?: never; success: string }
+  | null;
 
 async function requireTrustedOrigin() {
   const requestHeaders = await headers();
@@ -30,9 +33,14 @@ export async function signUp(
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) return { error: error.message };
+  if (!data.session) {
+    return {
+      success: "Check your email to confirm your account. Then sign in.",
+    };
+  }
 
   revalidatePath("/", "layout");
   redirect("/home");
