@@ -1,15 +1,14 @@
 # mmhr brain — STATE
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 ## Current focus
 The canonical v2 product baseline lives in docs/README.md, docs/PRD.md, and
 docs/TECH_STACK.md. The approved implementation roadmap lives in
 .codex/plans/roadmap-v2-implementation.md.
 
-Roadmap version 1.7 maps 148 requirements to evidence status, releases, owner
-roles, tests, risks, and recovery. R1.1 is implemented and validated on
-`feature/r1-secure-platform-base` in commits `721c1a8`, `04e47da`, and
-`fa93b43`. Routine R1 Git work through `develop` is authorized. `main`, cloud
+Roadmap version 1.8 maps 148 requirements to evidence status, releases, owner
+roles, tests, risks, and recovery. R1.1 is implemented, validated, and merged
+into `develop`. Routine R1 Git work through `develop` is authorized. `main`, cloud
 migrations, bootstrap, dependencies, and deployment remain separately
 controlled.
 
@@ -17,9 +16,10 @@ R1.1 now uses one verified identity boundary, rejects untrusted Server Action
 origins, denies `/admin`, limits `/home` to pending access, and records every
 current entry point in docs/security/r1-authorization-matrix.md.
 
-R1.0 now records an approved interim pair and other-admin approval rule.
-The request expiry, allowed actions, and lost-factor identity-check procedure
-remain open. Recovery is not implemented or active.
+R1.0 is complete. Requests expire after 30 minutes, allow only an MFA
+enrollment reset, and use a phone call to the pre-existing company record.
+The approved flow binds one replacement factor to the target's recovery
+session and denies stale AAL2 access. Recovery is not implemented or active.
 
 The baseline stabilization pull request was merged into `develop` at
 `6187d3d` before this R1.1 branch started.
@@ -33,13 +33,13 @@ Pulse remains the selected homepage direction at /. All 22 gallery layouts
 remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
-Approved the interim two-person recovery rule and removed the former
-three-approver proposal. Document checks and two independent reviews passed.
-See [[journal/2026-08-27]].
+Completed the R1.0 recovery policy and unblocked R1.2 schema work. Document
+checks and an independent adversarial security review passed. See
+[[journal/2026-08-28]].
 
 ## Open threads
-- R1.0 needs an approved request expiry, allowed actions, and lost-factor identity-check procedure.
-- R1.2 schema work must not start until those R1.0 decisions close.
+- R1.2 compatible identity and audit schema work is ready to start.
+- Recovery must stay disabled until implementation, stable identity binding, contact preparation, and required tests finish.
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Create and verify stable identity bindings after R1.2 and before recovery activation.
 - Target environments must set `NEXT_PUBLIC_APP_URL` to one canonical origin.

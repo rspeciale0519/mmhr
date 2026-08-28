@@ -97,3 +97,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Required the other named Super Admin to approve each eligible request.
 - Kept self-approval, target approval, and one-person bypasses denied.
 - Kept R1.0 open for expiry, allowed actions, and lost-factor identity checks.
+
+## [2026-08-28] decision | Complete R1.0 recovery policy
+- Set a 30-minute request window and limited recovery to MFA enrollment reset.
+- Approved a phone call to the pre-existing company contact as the identity check.
+- Added session binding, stale-token denial, fail-closed recovery state, and external-result reconciliation.
+- Unblocked R1.2 while keeping runtime recovery disabled until implementation and testing finish.
