@@ -103,3 +103,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Approved a phone call to the pre-existing company contact as the identity check.
 - Added session binding, stale-token denial, fail-closed recovery state, and external-result reconciliation.
 - Unblocked R1.2 while keeping runtime recovery disabled until implementation and testing finish.
+
+## [2026-08-28] database | Build R1.2 identity and audit foundation
+- Added one additive migration for compatible identity, permission, audit, and administration data.
+- Added an expiring restricted worker with committed lockout before role removal.
+- Passed empty, populated, rollback, restore, access, authentication, and standard release checks.
+- Kept runtime recovery, cloud migration, bootstrap, `main`, and deployment inactive.

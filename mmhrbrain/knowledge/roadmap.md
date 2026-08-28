@@ -11,6 +11,8 @@ sources:
   - .codex/plans/roadmap-v2-implementation.md
   - .codex/plans/module-r0-roadmap-and-public-release-control.md
   - .codex/plans/module-r1-secure-platform-base.md
+  - drizzle/0001_heavy_kulan_gath.sql
+  - scripts/r1-with-local-worker.mjs
   - memory:2026-08-27-r0-release-control
 ---
 
@@ -19,8 +21,8 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.8 records all required R1 owner approvals, the
-completed R1.0 security contract, and the validated R1.1 status.
+recovery controls. Version 1.8 records all required R1 owner approvals and the
+R1.0 and R1.1 status. Current source and tests provide R1.2 evidence.
 
 ## Baseline
 
@@ -73,9 +75,10 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
-R1.0 and R1.1 are complete. R1.0 fixes a 30-minute request window, an
-MFA-reset-only action, other-admin approval, and phone verification. R1.2 is
-ready, but runtime recovery remains disabled pending implementation and tests.
+R1.0, R1.1, and R1.2 are complete. R1.2 adds the compatible identity and audit
+schema, additive migration rehearsals, and an expiring restricted worker.
+R1.3 grants, policies, and request-scoped access are next. Runtime recovery
+remains disabled pending stable bindings and audited commands.
 
 ## Authorization
 

@@ -7,14 +7,19 @@ docs/TECH_STACK.md. The approved implementation roadmap lives in
 .codex/plans/roadmap-v2-implementation.md.
 
 Roadmap version 1.8 maps 148 requirements to evidence status, releases, owner
-roles, tests, risks, and recovery. R1.1 is implemented, validated, and merged
-into `develop`. Routine R1 Git work through `develop` is authorized. `main`, cloud
-migrations, bootstrap, dependencies, and deployment remain separately
-controlled.
+roles, tests, risks, and recovery. R1.1 is merged into `develop`. R1.2 is
+implemented and locally validated in commit `e7bc6c2`. Routine R1 Git work
+through `develop` is authorized. `main`, cloud migrations, bootstrap,
+dependencies, and deployment remain separately controlled.
 
 R1.1 now uses one verified identity boundary, rejects untrusted Server Action
 origins, denies `/admin`, limits `/home` to pending access, and records every
 current entry point in docs/security/r1-authorization-matrix.md.
+
+R1.2 adds compatible identity, role, permission, audit, invitation, and recovery
+data through one additive migration. It keeps legacy reads, enables RLS on all
+application tables, and uses an expiring restricted worker with no raw table
+access. Empty, populated, rollback, and restore rehearsals pass.
 
 R1.0 is complete. Requests expire after 30 minutes, allow only an MFA
 enrollment reset, and use a phone call to the pre-existing company record.
@@ -33,13 +38,13 @@ Pulse remains the selected homepage direction at /. All 22 gallery layouts
 remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
-Completed the R1.0 recovery policy and unblocked R1.2 schema work. Document
-checks and an independent adversarial security review passed. See
-[[journal/2026-08-28]].
+Built and validated the R1.2 compatible identity and audit foundation. All
+local gates and an independent adversarial security review passed. Runtime
+recovery remains disabled. See [[journal/2026-08-28]].
 
 ## Open threads
-- R1.2 compatible identity and audit schema work is ready to start.
-- Recovery must stay disabled until implementation, stable identity binding, contact preparation, and required tests finish.
+- R1.3 grants, RLS policies, and request-scoped access are the next R1 package.
+- Recovery must stay disabled until stable identity binding, contact preparation, audited commands, and required tests finish.
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Create and verify stable identity bindings after R1.2 and before recovery activation.
 - Target environments must set `NEXT_PUBLIC_APP_URL` to one canonical origin.
@@ -48,9 +53,10 @@ checks and an independent adversarial security review passed. See
 - Old deployment URLs and aliases must be protected or retired before R0 closes.
 - Open product decisions remain in docs/PRD.md and must close before their
   owning modules start.
-- RLS is enabled on the first application tables, but policies and the
+- RLS is enabled on all application tables, but policies and the
   organization-role integration matrix remain absent.
-- The direct server PostgreSQL pool bypasses RLS.
+- The direct server PostgreSQL pool now uses an expiring restricted worker.
+  R1.3 must add request-scoped policies before application data access.
 - Customer, vendor, and administration workflows remain mostly placeholders.
 - Legacy FR identifiers remain temporary aliases in the canonical PRD.
 - Placeholder figures and claims remain in source and on the current production site.
