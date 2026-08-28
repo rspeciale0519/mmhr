@@ -8,9 +8,10 @@ docs/TECH_STACK.md. The approved implementation roadmap lives in
 
 Roadmap version 1.8 maps 148 requirements to evidence status, releases, owner
 roles, tests, risks, and recovery. R1.1 is merged into `develop`. R1.2 is
-implemented and locally validated in commit `e7bc6c2`. Routine R1 Git work
-through `develop` is authorized. `main`, cloud migrations, bootstrap,
-dependencies, and deployment remain separately controlled.
+implemented and validated in commits `e7bc6c2` and `881f55d`. PR 7 has passing
+local and remote checks. Routine R1 Git work through `develop` is authorized.
+`main`, cloud migrations, bootstrap, dependencies, and deployment remain
+separately controlled.
 
 R1.1 now uses one verified identity boundary, rejects untrusted Server Action
 origins, denies `/admin`, limits `/home` to pending access, and records every
@@ -19,7 +20,9 @@ current entry point in docs/security/r1-authorization-matrix.md.
 R1.2 adds compatible identity, role, permission, audit, invitation, and recovery
 data through one additive migration. It keeps legacy reads, enables RLS on all
 application tables, and uses an expiring restricted worker with no raw table
-access. Empty, populated, rollback, and restore rehearsals pass.
+access. Empty, populated, rollback, and restore rehearsals pass. Invitation
+addresses stay bound to their normalized value. Confirmed-email sign-up now
+shows its next step, and sign-up enforces the local 12-character minimum.
 
 R1.0 is complete. Requests expire after 30 minutes, allow only an MFA
 enrollment reset, and use a phone call to the pre-existing company record.
@@ -38,9 +41,10 @@ Pulse remains the selected homepage direction at /. All 22 gallery layouts
 remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
-Built and validated the R1.2 compatible identity and audit foundation. All
-local gates and an independent adversarial security review passed. Runtime
-recovery remains disabled. See [[journal/2026-08-28]].
+Closed all R1.2 pull-request review findings. All local gates, 98 unit tests,
+33 integration tests, remote checks, rendered auth checks, and an independent
+adversarial security review passed. Runtime recovery remains disabled. See
+[[journal/2026-08-28]].
 
 ## Open threads
 - R1.3 grants, RLS policies, and request-scoped access are the next R1 package.

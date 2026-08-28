@@ -109,3 +109,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added an expiring restricted worker with committed lockout before role removal.
 - Passed empty, populated, rollback, restore, access, authentication, and standard release checks.
 - Kept runtime recovery, cloud migration, bootstrap, `main`, and deployment inactive.
+
+## [2026-08-28] review | Close R1.2 pull-request findings
+- Bound each normalized invitation address to its delivery address.
+- Added a confirmed-email sign-up state and the 12-character sign-up rule.
+- Passed all local gates, remote checks, rendered auth checks, and independent security review.
+- Kept runtime recovery, cloud migration, bootstrap, `main`, and deployment inactive.
