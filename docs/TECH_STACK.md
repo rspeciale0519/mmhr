@@ -285,6 +285,13 @@ Use role defaults and per-user overrides in the application authorization layer.
 
 Use narrow data-transfer objects, views, or commands for field-level permissions.
 
+R1.1 records every current executable entry point in
+[r1-authorization-matrix.md](./security/r1-authorization-matrix.md).
+
+`/home` returns pending access after identity verification.
+
+`/admin` remains denied until explicit permission checks exist.
+
 ## 10. RLS and Data Access Paths
 
 Enable RLS on every application table in the migration that creates it.

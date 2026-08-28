@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.5 approved |
+| Version | 0.7 R1.1 validated |
 | Date | 2026-08-27 |
-| Status | Product, security, engineering, and operations approved |
+| Status | R1.1 complete and validated; R1.0 recovery roster open |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -14,7 +14,11 @@
 | Baseline branch | develop |
 | Required owners | Product, security, engineering, and operations |
 
-This plan does not authorize application code, branches, commits, dependencies, cloud migrations, bootstrap actions, or deployments.
+The user authorized R1 implementation, branches, commits, pushes, pull requests, and integration into `develop` on 2026-08-27.
+
+That authorization remains active until the user revokes it.
+
+It does not authorize production dependencies, invitation delivery, cloud migrations, bootstrap actions, `main`, or deployments.
 
 ## 1. Outcome
 
@@ -31,7 +35,7 @@ FR-IAM-08 remains Deferred. R1 must not add impersonation code, routes, commands
 R0 records its decision ownership, claim inventory, and public-release block in
 [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md).
 
-Its remaining release owners must be named before R1.1 starts.
+R0 named every release owner before R1.1 started.
 
 ## 2. Approved Roadmap Amendment
 
@@ -64,7 +68,7 @@ Revoking an organization or deal grant must deny its descendant resources immedi
 
 R9 must repeat the complete customer and vendor isolation matrices.
 
-The parent roadmap v1.3 records the approved rows and cross-release notes.
+The parent roadmap v1.6 records the approved rows and cross-release notes.
 
 It requires deterministic-authorization regression evidence in every R5 through R9 module plan.
 
@@ -109,7 +113,7 @@ Each later module must preserve every Implemented R1 control.
 | Verified identity | `src/middleware.ts`, `src/lib/supabase/server.ts`, and tRPC use `getClaims()` | Identity does not prove organization or action access |
 | Application home | `/home` checks verified identity | Any authenticated account can enter |
 | Administration | `/admin` is a placeholder | The route is public |
-| tRPC | `protectedProcedure` rejects anonymous callers | No procedure checks organization or permission scope |
+| tRPC | `identityProcedure` rejects anonymous callers | No procedure checks organization or permission scope |
 | Organizations | `orgs`, `org_members`, and `invitations` exist | Types, states, policies, commands, and consumers are absent |
 | Membership roles | `admin`, `contributor`, and `viewer` exist | Omitted role input defaults to `admin` |
 | Invitations | Expiry and acceptance timestamps exist | Tokens are raw, reusable, non-unique, and not revocable |
@@ -632,6 +636,10 @@ Each database package must generate, review, and apply its migration before pack
 
 ### R1.0 — Approve the Security Contract
 
+Completion status: open.
+
+The recovery officer names and demonstrated quorum remain placeholders.
+
 Named owners:
 
 | Role | Named owner | Responsibility |
@@ -669,6 +677,12 @@ Exit evidence:
 No schema implementation starts before R1.0 completes.
 
 ### R1.1 — Inventory Entry Points and Deny Early Access
+
+Implementation status on 2026-08-27: complete and validated.
+
+The durable inventory is `docs/security/r1-authorization-matrix.md`.
+
+The implementation denies `/admin`, limits `/home` to a pending-access response, and keeps public entry classes explicit.
 
 Outcome:
 
@@ -1001,7 +1015,7 @@ Changes outside a package allowlist require plan-owner approval.
 | Package | Existing and proposed paths |
 |---|---|
 | R1.0 | `.codex/plans/module-r1-secure-platform-base.md`, `.codex/plans/roadmap-v2-implementation.md`, `docs/security/r1-authorization-matrix.md` |
-| R1.1 | `docs/security/r1-authorization-matrix.md`, `src/middleware.ts`, `src/server/auth/`, `src/server/trpc/`, `src/app/(app)/`, `src/app/(admin)/`, `src/app/(auth)/` |
+| R1.1 | `docs/security/r1-authorization-matrix.md`, `.env.example`, `.github/workflows/ci.yml`, `eslint.config.mjs`, `next.config.ts`, `supabase/config.toml`, `vitest.config.ts`, `src/middleware.ts`, `src/middleware.test.ts`, `src/server/auth/`, `src/server/trpc/`, `src/app/api/trpc/`, `src/app/(app)/`, `src/app/(admin)/`, `src/app/(auth)/`, `src/app/(marketing)/(site)/contact/`, `src/app/forbidden.tsx`, `src/app/not-found.tsx` |
 | R1.2 | `src/server/db/`, `src/server/db/r1-empty-migration.integration.test.ts`, `src/server/db/r1-populated-migration.integration.test.ts`, `src/server/db/r1-rollback-compatibility.integration.test.ts`, `src/server/db/r1-restore.integration.test.ts`, `scripts/r1-with-local-worker.mjs`, `drizzle/`, `drizzle.config.ts`, `supabase/config.toml`, `.env.example`, `package.json` |
 | R1.3 | `drizzle/`, `docs/security/r1-emergency-revocation.sql`, `docs/security/r1-emergency-containment.md`, `src/lib/supabase/`, `src/server/auth/`, `src/server/auth/rls.integration.test.ts` |
 | R1.4 | `drizzle/`, `src/server/db/`, `src/server/auth/`, `src/server/audit/`, `src/server/commands/`, `src/server/identity/`, `src/server/integrations/auth-admin/`, `src/server/trpc/`, `src/trigger/identity-admin-intents.ts` |
@@ -1234,13 +1248,18 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 
 | Approval | Status | Record |
 |---|---|---|
-| Parent roadmap v1.3 | Approved | Current Codex task, 2026-08-27 |
+| Parent roadmap v1.6 | Approved | Current Codex task, 2026-08-27 |
 | Section 2 roadmap amendment | Approved | Product owner, current Codex task, 2026-08-24 |
 | Product-owner R1 plan and defaults | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Security-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
-| Branch creation | Not authorized | Separate user approval required |
+| R1 implementation | Approved | User standing instruction, current Codex task, 2026-08-27 |
+| Branch creation | Approved | User standing instruction, current Codex task, 2026-08-27 |
+| Commit | Approved | User standing instruction, current Codex task, 2026-08-27 |
+| Push | Approved | User standing instruction, current Codex task, 2026-08-27 |
+| Pull request to `develop` | Approved | User standing instruction, current Codex task, 2026-08-27 |
+| Merge into `develop` | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Production dependencies | Not authorized | Separate user approval required |
 | Invitation delivery configuration | Not authorized | Separate product-security-operations approval required |
 | Legacy invitation revocation | Not authorized | Separate product-security-operations approval required |
@@ -1253,4 +1272,6 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 
 Approval of this plan approves its scope and defaults only.
 
-It does not authorize any Git, dependency, cloud, bootstrap, or deployment action.
+The standing instruction above separately authorizes R1 implementation and routine Git work through `develop`.
+
+The remaining Not authorized rows still require their named approval.

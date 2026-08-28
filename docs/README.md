@@ -15,6 +15,8 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - The v2 product baseline now lives in the canonical documents below.
 - The approved v2 roadmap maps all 148 requirements to releases and owner roles.
 - Product, security, engineering, and operations approvals are recorded for R1.
+- R1.1 inventories every current entry point and denies early protected access.
+- The R1.0 recovery officer roster remains open.
 - Rob Speciale is the temporary operations owner.
 - The R0 claim-source inventory and fail-closed local release gate are recorded.
 - Public claims remain blocked placeholders by product decision.
@@ -120,7 +122,8 @@ CI currently runs installation, type checking, linting, unit tests, and the prod
 | [`outsail-competitive-operating-model.md`](./outsail-competitive-operating-model.md) | Supporting operating-model research |
 | [`roadmap-v2-implementation.md`](../.codex/plans/roadmap-v2-implementation.md) | Approved v2 sequencing and traceability |
 | [`module-r0-roadmap-and-public-release-control.md`](../.codex/plans/module-r0-roadmap-and-public-release-control.md) | Active release quarantine, owner register, and public-claim inventory |
-| [`module-r1-secure-platform-base.md`](../.codex/plans/module-r1-secure-platform-base.md) | Approved R1 module plan; implementation remains separately gated |
+| [`module-r1-secure-platform-base.md`](../.codex/plans/module-r1-secure-platform-base.md) | Approved R1 plan and active implementation record |
+| [`security/r1-authorization-matrix.md`](./security/r1-authorization-matrix.md) | Current entry-point classes, data paths, and denial evidence |
 
 When documents conflict, use `PRD.md` for product behavior and `TECH_STACK.md` for implementation constraints.
 
