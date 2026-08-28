@@ -91,3 +91,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added a durable entry-point matrix with completeness and source-contract tests.
 - Passed all local gates, integration checks, rendered checks, and independent security review.
 - Kept R1.2 blocked until the real R1.0 recovery roster and quorum exist.
+
+## [2026-08-27] decision | Approve interim recovery pair
+- Replaced the proposed three-approver pool with one named two-person pair.
+- Required the other named Super Admin to approve each eligible request.
+- Kept self-approval, target approval, and one-person bypasses denied.
+- Kept R1.0 open for expiry, allowed actions, and lost-factor identity checks.

@@ -6,7 +6,7 @@ The canonical v2 product baseline lives in docs/README.md, docs/PRD.md, and
 docs/TECH_STACK.md. The approved implementation roadmap lives in
 .codex/plans/roadmap-v2-implementation.md.
 
-Roadmap version 1.6 maps 148 requirements to evidence status, releases, owner
+Roadmap version 1.7 maps 148 requirements to evidence status, releases, owner
 roles, tests, risks, and recovery. R1.1 is implemented and validated on
 `feature/r1-secure-platform-base` in commits `721c1a8`, `04e47da`, and
 `fa93b43`. Routine R1 Git work through `develop` is authorized. `main`, cloud
@@ -16,6 +16,10 @@ controlled.
 R1.1 now uses one verified identity boundary, rejects untrusted Server Action
 origins, denies `/admin`, limits `/home` to pending access, and records every
 current entry point in docs/security/r1-authorization-matrix.md.
+
+R1.0 now records an approved interim pair and other-admin approval rule.
+The request expiry, allowed actions, and lost-factor identity-check procedure
+remain open. Recovery is not implemented or active.
 
 The baseline stabilization pull request was merged into `develop` at
 `6187d3d` before this R1.1 branch started.
@@ -29,13 +33,15 @@ Pulse remains the selected homepage direction at /. All 22 gallery layouts
 remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
-Implemented and validated the R1.1 secure entry controls. Type checking, lint,
-93 unit tests, 7 local integration tests, the production build, browser checks,
-and direct HTTP denial checks passed. See [[journal/2026-08-27]].
+Approved the interim two-person recovery rule and removed the former
+three-approver proposal. Document checks and two independent reviews passed.
+See [[journal/2026-08-27]].
 
 ## Open threads
-- R1.0 needs real recovery officer names and a demonstrated three-person quorum.
-- R1.2 schema work must not start until R1.0 completes.
+- R1.0 needs an approved request expiry, allowed actions, and lost-factor identity-check procedure.
+- R1.2 schema work must not start until those R1.0 decisions close.
+- The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
+- Create and verify stable identity bindings after R1.2 and before recovery activation.
 - Target environments must set `NEXT_PUBLIC_APP_URL` to one canonical origin.
 - R0 claim review is deferred while the statements remain blocked placeholders.
 - The current production deployment remains accessible. Activating the gate needs separate production approval.
@@ -71,3 +77,4 @@ and direct HTTP denial checks passed. See [[journal/2026-08-27]].
 - Use [[knowledge/superseded]] before consulting a legacy planning file.
 - Public release stays blocked until exact claim review and production gate activation are complete.
 - Verified identity does not prove organization membership or permission.
+- The recovery rule is approved policy only. No runtime recovery command exists.
