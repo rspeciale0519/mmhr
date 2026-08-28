@@ -38,7 +38,7 @@ jobs:
         env:
           # Build-time only. Real values live in Vercel; these just satisfy the
           # env reads so the build can compile.
-          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55321
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:56321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
           NEXT_PUBLIC_BRAND_NAME: MatchMaker HR
           # Unset DSN keeps Sentry inert and skips source-map upload.
