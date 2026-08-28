@@ -1,0 +1,75 @@
+import { headers } from "next/headers";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { createClient } from "@/lib/supabase/server";
+
+vi.mock("next/headers", () => ({
+  headers: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn(),
+}));
+
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(),
+}));
+
+import { signIn, signOut, signUp } from "@/app/(auth)/actions";
+
+function authForm() {
+  const form = new FormData();
+  form.set("email", "member@example.test");
+  form.set("password", "local-test-password");
+  return form;
+}
+
+describe("auth Server Actions", () => {
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+    vi.mocked(headers).mockReset();
+    vi.mocked(createClient).mockReset();
+  });
+
+  test.each([
+    ["signUp", () => signUp(null, authForm())],
+    ["signIn", () => signIn(null, authForm())],
+    ["signOut", () => signOut()],
+  ])("denies direct %s execution without an origin", async (_name, action) => {
+    vi.mocked(headers).mockResolvedValue(new Headers() as never);
+
+    await expect(action()).rejects.toThrow("Server Action request rejected");
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    ["signUp", () => signUp(null, authForm())],
+    ["signIn", () => signIn(null, authForm())],
+    ["signOut", () => signOut()],
+  ])("denies direct %s execution from a foreign origin", async (_name, action) => {
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "https://evil.example" }) as never,
+    );
+
+    await expect(action()).rejects.toThrow("Server Action request rejected");
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  test("allows sign-out from the exact configured origin", async () => {
+    const signOutRequest = vi.fn().mockResolvedValue({ error: null });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signOut: signOutRequest },
+    } as never);
+
+    await signOut();
+
+    expect(signOutRequest).toHaveBeenCalledTimes(1);
+  });
+});

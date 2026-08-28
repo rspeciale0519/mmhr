@@ -1,4 +1,4 @@
-import { publicProcedure, router } from "../trpc";
+import { identityProcedure, publicProcedure, router } from "../trpc";
 
 /**
  * Liveness + context wiring check. Kept in the tree permanently: it is the
@@ -7,7 +7,7 @@ import { publicProcedure, router } from "../trpc";
 export const healthRouter = router({
   ping: publicProcedure.query(() => ({ ok: true as const })),
 
-  whoami: publicProcedure.query(({ ctx }) => ({
+  whoami: identityProcedure.query(({ ctx }) => ({
     userId: ctx.user?.id ?? null,
   })),
 });
