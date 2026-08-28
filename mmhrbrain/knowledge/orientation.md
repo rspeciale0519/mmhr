@@ -2,7 +2,7 @@
 kind: knowledge
 slug: orientation
 status: current
-updated: 2026-08-27
+updated: 2026-08-28
 layer: orientation
 sources:
   - docs/README.md
@@ -31,8 +31,9 @@ general SaaS product. See docs/PRD.md.
 **Document authority:** docs/README.md is the entry point. docs/PRD.md controls
 product behavior. docs/TECH_STACK.md controls architecture, security, and
 provider boundaries. The product owner approved the v2 roadmap on 2026-08-24.
-Roadmap v1.7 contains the approved amendment, the R0 control record, and the
-validated R1.1 status. All required R1 owner reviews are approved.
+Roadmap v1.8 contains the approved amendment, the R0 control record, the
+completed R1.0 contract, and the validated R1.1 status. All required R1 owner
+reviews are approved.
 Former plans in docs/ are legacy records.
 
 **Where the build is:** Foundations and the public marketing shell exist.
@@ -100,5 +101,5 @@ docs/TECH_STACK.md for adopted and planned integration status.
 
 ## Next Real Step
 
-Approve the remaining R1.0 recovery controls before R1.2 schema work starts.
+Start the approved R1.2 compatible identity and audit schema work.
 Claim review remains deferred, and public release remains blocked.

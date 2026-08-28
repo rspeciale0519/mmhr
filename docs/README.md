@@ -16,7 +16,8 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - The approved v2 roadmap maps all 148 requirements to releases and owner roles.
 - Product, security, engineering, and operations approvals are recorded for R1.
 - R1.1 inventories every current entry point and denies early protected access.
-- R1.0 has an approved interim Super Admin pair; remaining recovery controls stay open.
+- R1.0 is complete with a 30-minute expiry, MFA-reset-only scope, and phone identity check.
+- R1.2 is ready, but recovery remains disabled until stable identity binding, implementation, and testing finish.
 - Rob Speciale is the temporary operations owner.
 - The R0 claim-source inventory and fail-closed local release gate are recorded.
 - Public claims remain blocked placeholders by product decision.

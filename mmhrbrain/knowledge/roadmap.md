@@ -2,7 +2,7 @@
 kind: knowledge
 slug: roadmap
 status: current
-updated: 2026-08-27
+updated: 2026-08-28
 layer: roadmap
 sources:
   - docs/README.md
@@ -19,8 +19,8 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.7 records all required R1 owner approvals and the
-validated R1.1 status.
+recovery controls. Version 1.8 records all required R1 owner approvals, the
+completed R1.0 security contract, and the validated R1.1 status.
 
 ## Baseline
 
@@ -73,10 +73,9 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
-R1.1 is complete. It adds the durable entry-point inventory and fail-closed
-identity and request boundaries. R1.0 now has an approved interim pair and
-other-admin approval rule. Expiry, allowed actions, and lost-factor identity
-checks remain open. R1.2 must wait.
+R1.0 and R1.1 are complete. R1.0 fixes a 30-minute request window, an
+MFA-reset-only action, other-admin approval, and phone verification. R1.2 is
+ready, but runtime recovery remains disabled pending implementation and tests.
 
 ## Authorization
 

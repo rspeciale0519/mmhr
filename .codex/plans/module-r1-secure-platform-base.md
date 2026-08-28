@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.8 interim recovery pair approved |
-| Date | 2026-08-27 |
-| Status | R1.1 complete; R1.0 pair approved with remaining recovery controls open |
+| Version | 0.9 R1.0 recovery controls approved |
+| Date | 2026-08-28 |
+| Status | R1.0 and R1.1 complete; R1.2 ready to start |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -68,7 +68,7 @@ Revoking an organization or deal grant must deny its descendant resources immedi
 
 R9 must repeat the complete customer and vendor isolation matrices.
 
-The parent roadmap v1.6 records the approved rows and cross-release notes.
+The parent roadmap v1.8 records the approved rows and cross-release notes.
 
 It requires deterministic-authorization regression evidence in every R5 through R9 module plan.
 
@@ -151,19 +151,22 @@ Engineering owns data paths and migration design. Operations owns member and inv
 | Public account entry | Create pending access only; require a membership or internal assignment for protected routes |
 | Entry-point classes | Classify each entry as public, identity-only, organization-scoped, or privileged |
 | Email ownership | Require verified email before protected access |
-| Identity state | Use pending, active, suspended, and archived states; authorize only active identities |
+| Identity state | Use pending, active, recovery_pending, suspended, and archived states; permit recovery_pending only on fixed MFA enrollment and verification paths |
 | Identity relink | Require a separate two-person command; never relink from browser input |
 | Password policy | Match server and interface rules; require at least 12 characters before production use |
 | Portal URLs | Use `/home` for routing, `/customer` and `/vendor` for portals, and `/admin` for internal administration |
 | Privileged MFA | Require AAL2 for security administration, member administration, invitations, and portal-grant changes |
 | Recovery approval | Require one current AAL2 approval from the other named Super Admin; deny self-approval |
-| Recovery request expiry | Open R1.0 decision; keep recovery disabled until the duration is approved |
+| Recovery request expiry | Expire each request 30 minutes after creation; reject approval or reset dispatch after expiry |
+| Recovery action | Permit only an MFA enrollment reset that removes every MFA factor of any status before one replacement factor can activate; keep password reset and identity relink separate |
+| Lost-factor identity check | The approving Super Admin calls the target at the company-record phone number that existed before the request; deny recovery if identity is not confirmed |
+| Recovery session binding | Bind the request and replacement factor to the target's verified Auth session through an opaque recovery reference; never store an access token |
 | Invitation lifetime | Use a configured duration of 72 hours |
 | Invitation resend | Revoke the old invitation before requesting replacement delivery |
 | Invitation identity | Verify identity first; accept only when the normalized verified email matches the invitation |
 | Invitation delivery | Use provider-neutral identity email for new users; show pending invitations after existing users sign in |
 | First Super Admin | Use a local-only command with verified AAL2 identity, durable one-time state, and product-security approval |
-| Recovery capacity | Bind both names to distinct stable identity IDs; keep both identities active, MFA-enrolled, and authorized; fail closed otherwise |
+| Recovery capacity | Before recovery, bind both names to distinct active, MFA-enrolled, authorized identities; during recovery_pending, stop all other recovery and privileged actions |
 | Role versions | Assign a stable role key that follows one approved active version; audit every version activation |
 | Override scope | Persist platform and organization scopes in R1; add foreign-keyed resource scopes with each domain |
 | Organization removal | Archive or restrict; do not cascade-delete security history |
@@ -196,6 +199,8 @@ Do not store dynamic permissions in user-editable metadata.
 Read current membership, role, override, and delegation state from PostgreSQL.
 
 Require an active internal identity with a unique Auth user link.
+
+Permit recovery_pending only on the fixed MFA enrollment, challenge, verification, and reset-result reconciliation paths.
 
 Require verified claims and synchronized email-confirmation state from the identity service.
 
@@ -237,6 +242,10 @@ Every security mutation must evaluate effective administration after its propose
 Role labels alone do not satisfy this invariant.
 
 Reject a change that leaves fewer than two active named Super Admins or removes the last administrator of any active organization.
+
+The only exception is an atomically claimed, approved MFA reset that moves its target to recovery_pending.
+
+During recovery_pending, deny every other recovery or privileged mutation until fresh AAL2 reactivation.
 
 Reject a recovery request when the other named Super Admin cannot approve it.
 
@@ -314,7 +323,11 @@ Do not pass an actor identifier supplied by the browser.
 
 System-worker functions must remain separate from user-driven functions.
 
-The worker cannot change identity state, organization state, platform roles, or active role versions.
+The worker cannot use any generic identity-state, organization-state, platform-role, or active-role-version command.
+
+Only the fixed reset-intent claim can move its exact approved target from active to recovery_pending.
+
+Every other worker identity-state transition must fail.
 
 ### 6.6 Deterministic Authorization
 
@@ -390,7 +403,7 @@ Use additive migrations. Keep legacy columns until a later approved contract mig
 
 | Entity | Change | Safety rule |
 |---|---|---|
-| `identities` | Add stable identities, unique nullable Auth links, normalized email, verification time, status, and synchronization time | Keep non-archived verified emails unique; reject browser-controlled synchronization |
+| `identities` | Add stable identities, unique nullable Auth links, normalized email, verification time, recovery-aware status, and synchronization time | Keep non-archived verified emails unique; authorize recovery_pending only for fixed MFA enrollment and verification |
 | `orgs` | Add organization type, status, activation, suspension, and archival fields | Backfill only approved facts |
 | `org_members` | Add identity, stable role key, state, activation, suspension, revocation, and history | Replace the legacy unique index with approved nonterminal uniqueness |
 | `role_definitions` | Add stable key, immutable version, kind, approval state, and activation state | Permit one active approved version per stable role key |
@@ -401,9 +414,10 @@ Use additive migrations. Keep legacy columns until a later approved contract mig
 | `admin_delegation_grants` | Add scoped ceilings, state, expiry, issuer, reason, and revocation | Prevent cycles and self-escalation |
 | `portal_access_grants` | Add organization, portal, state, issuer, reason, and revocation | Permit one active grant per organization and portal |
 | `invitations` | Add normalized email, creator, acceptor, state, revocation, and expiry | Permit one pending invitation per organization and email |
-| `identity_admin_intents` | Add durable identity-service requests and delivery state | Use unique idempotency keys and bounded retries |
-| `identity_recovery_requests` | Add target, initiator, reason, expiry, status, and evidence reference | Never store identity-verification evidence content |
-| `identity_recovery_approvals` | Add distinct approver, decision, assurance, and time | Require one valid approval from the other named Super Admin, who cannot be the target |
+| `identity_admin_intents` | Add durable identity-service requests, recovery-reset results, and delivery state | Use unique idempotency keys, bounded retries, and `outcome_unknown` reconciliation |
+| `identity_recovery_presence` | Add target, verified Auth session ID, opaque-reference hash, state, expiry, request link, and expected replacement factor ID | Permit one active presence per target session; never store an access token, refresh token, or factor secret |
+| `identity_recovery_requests` | Add target, recovery-presence link, initiator, immutable action, reason, expiry, and status | Allow only MFA enrollment reset; never accept or store a phone number |
+| `identity_recovery_approvals` | Add distinct approver, decision, assurance, pre-existing-contact attestation, phone-check result, check time, and evidence reference | Require one valid approval from the other named Super Admin, who cannot be the target; never store the phone number or call content |
 | `security_bootstrap_state` | Add singleton target, approval references, consumption state, and time | No reset through application or worker roles |
 | `audit_events` | Add versioned, append-only, redacted security events | Mutation and audit must share one transaction |
 | `audit_log` | Freeze the legacy table and mark its format | Preserve existing records |
@@ -413,7 +427,8 @@ Use additive migrations. Keep legacy columns until a later approved contract mig
 Use these allowed transitions:
 
 - Pending identity: active or archived
-- Active identity: suspended or archived
+- Active identity: recovery_pending, suspended, or archived
+- Recovery-pending identity: active only through fixed recovery reactivation; suspended or archived through emergency containment
 - Suspended identity: active or archived
 - Archived identity: terminal
 - Pending organization: active or archived
@@ -433,9 +448,17 @@ Use these allowed transitions:
 - Active role version: approved
 - Rejected and retired role versions: terminal
 - Platform-role assignment: active to revoked
+- Pending recovery presence: linked, expired, or cancelled
+- Linked recovery presence: completed or cancelled
+- Completed, expired, and cancelled recovery presence: terminal
 - Pending recovery request: approved, expired, or cancelled
 - Approved recovery request: completed, expired, or cancelled
 - Completed, expired, and cancelled recovery requests: terminal
+- Pending recovery reset intent: in_flight or cancelled
+- In-flight recovery reset intent: succeeded, failed, or outcome_unknown
+- Outcome-unknown recovery reset intent: succeeded or failed only after provider reconciliation or manual review
+
+An approved request with an in-flight or outcome-unknown intent cannot expire or cancel through another command.
 
 Assignments follow the single approved active version for their stable role key.
 
@@ -471,38 +494,109 @@ A later portal grant can use a new record after the prior grant becomes revoked.
 
 ### 8.2 Identity Recovery Sequence
 
-1. Either named Super Admin creates an expiring recovery request for one identity.
-2. The request records a reason and an external evidence reference without evidence content.
-3. Before approval, the other named Super Admin verifies the recovery target independently.
-4. The approver must be AAL2 and cannot be the target or initiator.
-5. The command rechecks approver authority and the configured request expiry before completion.
-6. One transaction consumes the approval, applies the narrow recovery action, and writes audit events.
+1. The target establishes a verified Auth session and receives an opaque recovery reference bound to its session ID.
+2. Either named Super Admin creates a 30-minute recovery request linked to that recovery presence.
+3. The request names MFA enrollment reset and records a reason without accepting or storing a phone number.
+4. Before approval, the other named Super Admin calls the target, who confirms the request and recovery reference.
+5. The AAL2 approver records the call result, check time, and external evidence reference without evidence content.
+6. The command rechecks approver authority, session binding, and the 30-minute expiry before approval.
+7. One transaction consumes the approval, marks the request approved, creates an idempotent MFA reset intent, and writes audit events.
+8. One fixed command atomically claims a pending intent linked to a still-approved, unexpired request.
+9. The claim rechecks request and intent state, authority, target, action, session binding, and recovery capacity.
+10. The claim marks the intent in flight, moves the target to recovery_pending, and writes an audit event.
+11. The restricted worker then uses the original idempotency key for the external reset call.
+12. The worker records success, confirmed failure, or `outcome_unknown` with audit evidence.
+13. Only provider confirmation that no MFA factor of any status remains marks the reset intent succeeded and the request completed.
 
-The request must name one allowed action. It cannot grant roles, permissions, memberships, or organization access.
+Partial factor removal or a verified or unverified factor enrolled during reset cannot produce success.
 
-The request must fail when the required approver loses authority before completion.
+The only allowed recovery action is resetting the target's MFA enrollment by removing every MFA factor of any status.
+
+Password reset remains in the normal identity-provider flow. Identity relink remains a separate two-person command.
+
+Recovery cannot grant roles, permissions, memberships, organization access, or change account data outside the controlled recovery_pending lifecycle.
+
+The request must fail before dispatch when the required approver loses authority.
+
+After dispatch starts, the worker must record the external outcome even when authority changes.
 
 Recovery cannot activate until both stable named identities are distinct, active, MFA-enrolled, and authorized.
 
-Maintain both named Super Admins as active identities with verified MFA enrollment.
+Require both named Super Admins to be active and MFA-enrolled before request creation, approval, and dispatch claim.
 
 Each person can hold request and approval authority, but cannot use both authorities on one request.
 
 Every security mutation must recheck the two-person recovery capacity.
 
+After dispatch claim, recovery_pending is a controlled fail-closed state that temporarily suspends that capacity.
+
+During recovery_pending, deny old AAL2 sessions and every privileged action except fixed reset-result reconciliation and MFA enrollment verification.
+
+Server checks, fixed database commands, and RLS must check current identity status before trusting an AAL claim.
+
+Stop every new recovery request until the target verifies a replacement factor with a fresh AAL2 session.
+
 If either person is unavailable, recovery must stop. No one-person application or local emergency bypass is approved.
 
-A target Super Admin must start their own request. Before approval, the other named Super Admin must independently verify the target.
+A target Super Admin must establish recovery presence and start their own request. The other named Super Admin must verify the target.
 
-For another recovery target, either named Super Admin can start the request and the other must approve it.
+For another target, the target establishes recovery presence. Either named Super Admin can start the linked request, and the other approves it.
 
-Normal recovery requests require requester AAL2. Lost-factor requests remain disabled until an independent identity-check procedure is approved and tested.
+Normal recovery requests require requester AAL2.
+
+A lost-factor target must have verified AAL1 bound to their stable identity and Auth session ID.
+
+The fixed recovery-presence command is the only AAL1 exception available to every recovery target.
+
+A target Super Admin can use that presence to create only their own MFA reset request without AAL2.
+
+AAL1 cannot approve, create an intent, dispatch, complete, or execute an MFA reset.
+
+The approving Super Admin must call the target at the company-record phone number that existed before the request.
+
+The approver must place the outbound call. The target must answer and confirm that they requested the MFA reset.
+
+The approver cannot use a new number or a number supplied with the recovery request.
+
+The approver must attest that the number existed in company records before the request.
+
+The request must be denied when no pre-existing number exists, the target does not answer, or the target does not confirm the request.
+
+A failed phone check records a denial decision and atomically moves the pending request to terminal `cancelled`.
+
+That transaction also cancels the linked recovery presence.
+
+The evidence reference is an opaque pointer to the operations record. It cannot contain the phone number or call content.
+
+An unlinked recovery presence expires after 30 minutes. Linking it consumes its opaque reference for one request.
+
+Request cancellation or pre-dispatch expiry cancels its linked presence.
+
+After reset success, the linked presence remains usable only by its bound session until reactivation or emergency containment.
+
+If cancellation or expiry wins before the atomic claim, the claim must fail without calling the identity service.
+
+After the intent is in flight, cancellation and expiry commands must not change the request.
+
+The recorded provider outcome makes the next terminal request transition, even when the deadline passes during the call.
+
+An `outcome_unknown` result blocks completion and another reset call until provider reconciliation or manual review confirms the outcome.
+
+Confirmed success keeps the target recovery_pending and denies every old session, including a stale AAL2 token.
+
+After reset success, only the bound Auth session can use the fixed MFA enrollment, challenge, and verification flow.
+
+The enrollment command records the expected replacement factor ID without its secret.
+
+Reactivation requires the bound session, a succeeded reset intent, completed request, exactly one total factor, the expected factor verified, and fresh AAL2.
+
+Only the fixed recovery reactivation command can return recovery_pending to active. Generic identity-status commands must deny it.
 
 A replacement requires an approved contract change, stable identity binding, active status, MFA enrollment, authorization, and a passed rehearsal before removal.
 
 Never authorize recovery by comparing display names or email addresses.
 
-Keep all recovery disabled until expiry, allowed actions, identity bindings, and required identity-check procedures are approved and tested.
+Keep all recovery disabled until identity bindings, implementation, the phone-check procedure, and required tests are complete.
 
 R1.0 approves the stable-ID binding method. R1.2 creates the identities and IDs. Create and verify the actual bindings before recovery activation.
 
@@ -614,6 +708,7 @@ A context outside the caller's active memberships must fail before data access.
 | `audit_log` | No application mutation; preserve legacy records |
 | `audit_events` | No external mutation; authorized readers receive redacted fields only |
 | `identity_admin_intents` | No direct Data API access; the restricted worker uses fixed commands only |
+| `identity_recovery_presence` | No direct Data API access; fixed recovery commands bind verified sessions and return redacted state |
 | `identity_recovery_requests` | No direct Data API access; fixed recovery commands return redacted state |
 | `identity_recovery_approvals` | No direct Data API access; fixed commands control every decision |
 | `security_bootstrap_state` | No Data API or worker access; the local owner-only bootstrap function controls it |
@@ -655,13 +750,17 @@ Each database package must generate, review, and apply its migration before pack
 
 ### R1.0 — Approve the Security Contract
 
-Completion status: open.
+Completion status on 2026-08-28: complete.
 
 The named interim two-Super-Admin pair and other-admin approval rule are approved.
 
-The request expiry, allowed recovery actions, and lost-factor identity-check procedure remain open.
+The request expires 30 minutes after creation.
 
-R1.2 remains blocked until those R1.0 decisions are approved.
+The only allowed recovery action is an MFA enrollment reset.
+
+The lost-factor identity check is a phone call to the target's company-record number that existed before the request.
+
+R1.2 is ready to start. Recovery activation remains blocked until implementation, identity binding, and tests are complete.
 
 Named owners:
 
@@ -711,9 +810,11 @@ Exit evidence:
 - Recorded approvals
 - No unresolved role or permission ambiguity
 - No unresolved public sign-up or invitation ambiguity
-- No unresolved migration or recovery command
+- No unresolved recovery-policy decision
 
-No schema implementation starts before R1.0 completes.
+R1.0 is complete. R1.2 schema implementation can start.
+
+Recovery remains disabled until the required implementation and tests pass.
 
 ### R1.1 — Inventory Entry Points and Deny Early Access
 
@@ -879,17 +980,36 @@ Validation:
 - Expired-override boundary tests
 - Concurrent override set, revoke, and replacement tests
 - Exact code-to-database permission registry parity test
-- AAL1 denial and AAL2 success for every privileged R1.4 command
+- AAL1 denial and AAL2 success except fixed recovery presence and target-Super-Admin self-request creation
 - Field allowlist tests
 - Separate view, grant, revoke, and delegate ceiling tests
 - Direct and indirect delegation-cycle denial tests
 - Self-escalation denial tests
 - Transaction rollback when audit writing fails
 - Audit immutability and sensitive-value rejection tests
-- Two-Super-Admin direction, self-approval, target-approval, expiry, and authority-loss tests
+- Two-Super-Admin direction, self-approval, target-approval, expiry, and pre-dispatch authority-loss tests
+- Verified-AAL1 lost-factor request creation and wrong-identity denial tests
+- Recovery-presence session binding, 30-minute expiry, single-use reference, and wrong-session denial tests
+- Recovery records never store access tokens, refresh tokens, factor secrets, or raw opaque references
+- Request-supplied or missing pre-existing company-contact denial tests
+- No-answer and unconfirmed-request phone-check denial with atomic request-and-presence cancellation
+- Phone-check result, time, and evidence-reference tests
+- Phone-number and call-content non-storage tests
+- Expiry-before-dispatch request-and-presence cancellation without an identity-service call
+- Expiry-during-dispatch result recording and confirmed-success completion
+- Authority-change-during-dispatch result recording without another identity-service call
+- Cancel-versus-dispatch and expire-versus-claim concurrency tests
+- Atomic dispatch claim requires approved request, pending intent, valid authority, exact action, and unexpired deadline
+- Reset-intent idempotency, `outcome_unknown`, provider reconciliation, and duplicate-call prevention tests
+- Multiple factors with mixed status, partial deletion, and factor-enrollment-during-reset tests
+- Reset success requires provider confirmation that zero MFA factors of any status remain
+- Pre-existing and concurrently enrolled unverified-factor removal tests
+- Dispatch claim moves the target to recovery_pending before the identity-service call
+- Recovery-pending state denies stale AAL2 tokens, privileged actions, and every new recovery request
 - Every invalid recovery-state transition test
 - Recovery cannot change roles, permissions, memberships, or organization access
 - Worker command allowlist tests
+- Worker identity-state denial except the exact active-to-recovery_pending reset-intent claim
 - Worker database-role property tests
 - Worker credential non-disclosure, concurrent provisioning, expiry, renewal, child-process injection, and cleanup tests
 - Concurrent role-version activation tests
@@ -923,7 +1043,7 @@ Outcome:
 - Permit the approved pending bootstrap target to enroll and challenge TOTP without protected application access.
 - Add the local-only Super Admin bootstrap script after AAL2 enrollment works.
 - Require AAL2 for every recovery approval and ordinary recovery request.
-- Keep lost-factor recovery disabled until its independent identity-check procedure is approved and tested.
+- Keep lost-factor recovery disabled until the approved phone identity-check procedure is implemented and tested.
 - Require AAL2 for identity-state, role-version, platform-role, permission, and delegation commands.
 - Require AAL2 for membership, invitation, portal-grant, and organization-state administration.
 
@@ -931,7 +1051,7 @@ Validation:
 
 - Unverified-email denial and verified-email success
 - Server and interface password-policy parity tests
-- AAL1 privileged denial and AAL2 success
+- AAL1 privileged denial except fixed recovery presence and target-Super-Admin self-request creation, and AAL2 success
 - Unassigned-user denial
 - Pending bootstrap target MFA access and every other protected-route denial
 - Organization switching across two valid memberships
@@ -940,6 +1060,12 @@ Validation:
 - Local Auth configuration matches the approved plan.
 - Record staging and production parity as an R9 activation requirement.
 - MFA enrollment failure and cancelled challenge
+- Recovery-pending access permits only fixed MFA enrollment, challenge, and verification
+- Replacement-factor enrollment and verification deny every session except the bound recovery session
+- Replacement-factor verification and fresh AAL2 atomically restore active status and recovery capacity
+- Failed or outcome-unknown reset intent denies replacement-factor enrollment and reactivation
+- Extra verified factor and generic identity-status reactivation denial tests
+- Old-token denial before and after replacement-factor verification
 - Bootstrap unprepared, AAL1, expired-token, wrong-target, missing-approval, and existing-admin denial
 - Bootstrap AAL2 success, atomic audit, single use, standard-input handling, and absent remote entry point
 - Lost-factor recovery and unauthorized recovery denial
@@ -1125,7 +1251,23 @@ Test these negative paths:
 - Approval by anyone except the other named Super Admin
 - Approval by the recovery target
 - Recovery authorization from a display name or email match
-- Security mutations that would leave fewer than two active named Super Admins
+- Lost-factor recovery without verified AAL1 bound to the stable target identity and Auth session ID
+- Expired, reused, forged, wrong-target, or wrong-session recovery presence
+- Raw opaque reference, access token, refresh token, or factor secret in recovery records
+- AAL1 recovery approval, reset-intent creation, dispatch, completion, or reset execution
+- Request-supplied or missing pre-existing phone number
+- Unanswered call or target failure to confirm the MFA reset request, with atomic terminal cancellation
+- Missing phone-check result, check time, contact attestation, or evidence reference
+- Stored phone number or call content in recovery records
+- Cancellation or expiry racing an atomic reset-intent claim
+- Cancellation, expiry, or duplicate dispatch after the reset intent becomes in_flight
+- Privileged access or another recovery request while the target is recovery_pending
+- Stale AAL2 access after the MFA factor reset
+- Partial factor removal or verified or unverified factor enrollment racing the reset
+- Replacement-factor enrollment or reactivation from an unbound Auth session
+- Reactivation after a failed or outcome-unknown reset intent
+- Generic identity-status transition from recovery_pending to active
+- Security mutations that would leave fewer than two active named Super Admins outside the controlled recovery_pending transition
 - Recovery action outside its approved narrow target
 - Invalid recovery-state transitions
 - Missing, extra, and unknown permission definitions
@@ -1227,11 +1369,12 @@ The CI integration job must use this sequence:
 | RLS recursion | Private helpers, pinned search path, and isolated policy tests | Disable the affected route and replace the policy safely |
 | Migration backfill error | Additive schema, approved maps, and reconciliation | Roll back application reads and correct data forward |
 | Invitation exposure | No application token, short expiry, verified email, one use, and revocation | Revoke immediately; replace only with product-security-operations approval |
-| Identity-service partial failure | Durable intent, idempotency, bounded retry, and result events | Stop retries, reconcile the intent, and record terminal failure |
+| Identity-service partial failure | Durable intent, idempotency, bounded retry, and result events | Stop duplicate calls, record `outcome_unknown`, reconcile provider state, and require manual review when needed |
 | Auth user deletion | Stable internal identity and non-cascading history links | Anonymize the Auth link and preserve authorization history |
 | Audit data leakage | Allowlisted changes and sensitive-value rejection | Stop writes, restrict readers, and correct data under approved procedure |
 | Audit write failure | One transaction for database mutation and audit | Roll back the mutation and stop the command |
-| MFA lockout | Tested enrollment, separate recovery, and two active Super Admins before production | Keep lost-factor recovery disabled until its identity-check procedure is approved and tested; never bypass AAL2 approval |
+| MFA lockout | Tested enrollment, separate recovery, stale-token denial, and two active Super Admins before recovery | Keep the target recovery_pending until fresh AAL2; stop privileged actions and further recovery; require manual review when re-enrollment fails |
+| Phone verification error or spoofing | Outbound call to a pre-existing company record, target confirmation, other-admin AAL2 approval, and immutable audit | Deny or disable recovery, preserve evidence, and review the contact record before a new request |
 | Privileged credential exposure | Separate roles, narrow adapters, and import boundaries | Rotate the credential and review every command event |
 | False requirement closure | Cross-release completion gates and evidence reconciliation | Reopen the requirement and block the affected release |
 
@@ -1273,11 +1416,24 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 - Empty, populated, rollback, and restore rehearsals pass.
 - Type checking, lint, unit tests, integration tests, and production build pass.
 - CI runs the complete local Supabase integration matrix.
-- Unverified email and AAL1 cannot perform privileged operations.
+- Unverified email and AAL1 cannot perform privileged operations except fixed recovery presence and target-Super-Admin self-request creation.
 - Identity synchronization and relink controls pass their lifecycle and concurrency tests.
 - Suspended and archived organizations deny old-token access.
 - Recovery requires one current AAL2 approval from the other named Super Admin, who cannot be the target or initiator.
-- Every security mutation preserves both active named Super Admins and the two-person recovery path.
+- Each recovery request expires after 30 minutes and permits only an MFA enrollment reset.
+- Lost-factor recovery verifies the target through the approved call to the pre-existing company-record phone number.
+- Lost-factor recovery requires verified AAL1 bound to the stable target identity and Auth session ID.
+- Missing pre-existing numbers, unanswered calls, and unconfirmed requests deny recovery.
+- Recovery records phone-check metadata without the phone number or call content.
+- Recovery dispatch uses a durable idempotent intent and records external results before completion.
+- Expired requests cannot start a reset, and uncertain results cannot trigger a duplicate reset call.
+- Atomic dispatch claim moves the target to recovery_pending before the external reset call.
+- Recovery-pending state denies stale AAL2 sessions, privileged actions, and every new recovery request.
+- Replacement-factor verification with fresh AAL2 restores active status and two-person recovery capacity.
+- Reset success requires provider confirmation that every MFA factor is removed and no factor of any status remains.
+- Reactivation requires a succeeded reset, completed request, exactly one total factor, the expected factor verified, and fresh AAL2.
+- Generic identity-status commands cannot reactivate a recovery-pending identity.
+- Every security mutation preserves both active named Super Admins, except the controlled fail-closed recovery_pending transition.
 - AAL2 succeeds for every approved privileged operation.
 - R1 authorization code has no AI dependency.
 - The parent roadmap requires each R5 through R9 module plan to prove the invariant.
@@ -1291,13 +1447,16 @@ Never disable RLS, delete audit history, or invent backfill facts during recover
 
 | Approval | Status | Record |
 |---|---|---|
-| Parent roadmap v1.7 | Approved | Current Codex task, 2026-08-27 |
+| Parent roadmap v1.8 | Approved | Current Codex task, 2026-08-28 |
 | Section 2 roadmap amendment | Approved | Product owner, current Codex task, 2026-08-24 |
 | Product-owner R1 plan and defaults | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Security-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations-owner R1 review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Interim recovery pair and other-admin approval rule | Approved | Product and security owner, current Codex task, 2026-08-27 |
+| 30-minute recovery request expiry | Approved | Product and security owner, current Codex task, 2026-08-28 |
+| MFA enrollment reset as the only recovery action | Approved | Product and security owner, current Codex task, 2026-08-28 |
+| Lost-factor phone identity check | Approved | Product and security owner, current Codex task, 2026-08-28 |
 | R1 implementation | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Branch creation | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Commit | Approved | User standing instruction, current Codex task, 2026-08-27 |
