@@ -1,4 +1,6 @@
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createClient } from "@/lib/supabase/server";
@@ -31,6 +33,8 @@ function authForm() {
 describe("auth Server Actions", () => {
   beforeEach(() => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+    vi.mocked(revalidatePath).mockReset();
+    vi.mocked(redirect).mockReset();
     vi.mocked(headers).mockReset();
     vi.mocked(createClient).mockReset();
   });
@@ -71,5 +75,42 @@ describe("auth Server Actions", () => {
     await signOut();
 
     expect(signOutRequest).toHaveBeenCalledTimes(1);
+  });
+
+  test("shows confirmation guidance when sign-up creates no session", async () => {
+    const signUpRequest = vi.fn().mockResolvedValue({
+      data: { session: null, user: { id: "local-user" } },
+      error: null,
+    });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await expect(signUp(null, authForm())).resolves.toEqual({
+      success: "Check your email to confirm your account. Then sign in.",
+    });
+    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  test("redirects sign-up when the provider creates a session", async () => {
+    const signUpRequest = vi.fn().mockResolvedValue({
+      data: { session: { access_token: "test-token" }, user: { id: "local-user" } },
+      error: null,
+    });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await signUp(null, authForm());
+
+    expect(revalidatePath).toHaveBeenCalledWith("/", "layout");
+    expect(redirect).toHaveBeenCalledWith("/home");
   });
 });

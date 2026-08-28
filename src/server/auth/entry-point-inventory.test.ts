@@ -316,7 +316,7 @@ describe("R1 authorization inventory", () => {
     const matrix = readFileSync(
       path.join(root, "docs", "security", "r1-authorization-matrix.md"),
       "utf8",
-    );
+    ).replaceAll("\r\n", "\n");
 
     expect(matrix).toContain(renderEntryPointInventoryTable());
   });

@@ -2,7 +2,7 @@
 kind: knowledge
 slug: features
 status: current
-updated: 2026-08-27
+updated: 2026-08-28
 layer: reference
 sources:
   - docs/PRD.md
@@ -10,6 +10,7 @@ sources:
   - src/app/
   - src/server/
   - drizzle/0000_light_vanisher.sql
+  - drizzle/0001_heavy_kulan_gath.sql
   - .github/workflows/ci.yml
   - trigger.config.ts
   - package.json
@@ -21,6 +22,7 @@ sources:
   - docs/security/r1-authorization-matrix.md
   - src/server/auth/
   - src/server/trpc/
+  - scripts/r1-with-local-worker.mjs
 ---
 
 # Features — Evidence-Gated Build Status
@@ -36,8 +38,10 @@ Use the roadmap traceability matrix for per-requirement evidence and ownership.
   administration, and API route groups exist.
 - Pulse renders at the site root.
 - The 22-design gallery remains available under /designs.
-- Local Supabase and Drizzle create organizations, memberships, invitations,
-  leads, and audit-log tables.
+- Local Supabase and Drizzle create 19 RLS-enabled application tables.
+- Compatible identity, role, permission, audit, invitation, and recovery data exists.
+- One additive migration preserves legacy reads and marks uncertain rows for review.
+- The server pool uses an expiring restricted worker with no raw table access.
 - Supabase authentication uses verified claims.
 - One shared identity helper returns only the verified subject identifier.
 - Server Actions reject missing or foreign origins before mutation.
@@ -54,8 +58,8 @@ Use the roadmap traceability matrix for per-requirement evidence and ownership.
 
 ## Partial or Security-Incomplete
 
-- RLS is enabled on the first application tables, but policies are absent.
-- The direct Drizzle pool bypasses RLS and is suitable only for trusted paths.
+- RLS is enabled on all application tables, but policies are absent.
+- Request-scoped data access and field-safe functions remain for R1.3.
 - Customer access remains pending until stored membership and permission checks exist.
 - Administration remains denied until explicit permission checks exist.
 - Public route structure exists, but product copy and claims need v2 review.

@@ -9,6 +9,7 @@ import type { AuthState } from "./actions";
 
 type Props = {
   action: (prev: AuthState, formData: FormData) => Promise<AuthState>;
+  mode: "sign-in" | "sign-up";
   submitLabel: string;
 };
 
@@ -16,7 +17,7 @@ type Props = {
  * Shared credentials form for sign-in and sign-up. It remains intentionally
  * plain until Pulse tokens and the canonical registration gate reach auth.
  */
-export function AuthForm({ action, submitLabel }: Props) {
+export function AuthForm({ action, mode, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     action,
     null,
@@ -36,14 +37,20 @@ export function AuthForm({ action, submitLabel }: Props) {
           name="password"
           type="password"
           required
-          minLength={8}
-          autoComplete="current-password"
+          minLength={mode === "sign-up" ? 12 : 8}
+          autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
         />
       </div>
 
       {state?.error ? (
         <p role="alert" className="text-sm text-red-600">
           {state.error}
+        </p>
+      ) : null}
+
+      {state?.success ? (
+        <p role="status" className="text-sm text-green-700">
+          {state.success}
         </p>
       ) : null}
 

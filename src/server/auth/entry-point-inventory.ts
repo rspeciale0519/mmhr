@@ -7,6 +7,7 @@ export type EntryPointKind =
   | "server-action"
   | "trpc-procedure"
   | "background-task"
+  | "command"
   | "framework-hook";
 
 export type EntryPointAccess =
@@ -263,6 +264,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     scope: "verified identity",
     dataPath: "caller subject identifier only",
     denialEvidence: "identityProcedure and direct-call tests",
+  },
+  {
+    key: "scripts/r1-with-local-worker.mjs#command",
+    surface: "R1 worker wrapper",
+    kind: "command",
+    access: "system-only",
+    permission: "local migration owner role",
+    scope: "loopback MMHR database",
+    dataPath: "temporary worker login lifecycle; no application records",
+    denialEvidence: "exact child-command, URL, role, expiry, and cleanup checks",
   },
   {
     key: "src/trigger/health.ts#health-check",
