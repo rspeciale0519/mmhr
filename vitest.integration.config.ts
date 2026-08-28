@@ -2,9 +2,10 @@ import { defineConfig } from "vitest/config";
 import path from "node:path";
 import dotenv from "dotenv";
 
-// Integration tests hit the running local Supabase stack (supabase start).
-// They load .env.local because Vitest — unlike Next — does not read it itself.
-dotenv.config({ path: ".env.local" });
+// Scratch migration rehearsals run without application secrets.
+if (process.env.R1_REHEARSAL_ONLY !== "1") {
+  dotenv.config({ path: ".env.local" });
+}
 
 export default defineConfig({
   test: {

@@ -91,6 +91,7 @@ The browser extension produced unrelated message-channel errors during one sign-
 | `src/app/(auth)/actions.ts#signOut` | signOut | server-action | caller-only | none | caller session | Supabase Auth session cleanup | exact-origin guard and direct-action tests |
 | `src/server/trpc/routers/health.ts#ping` | health.ping | trpc-procedure | public | none | none | liveness constant | public by R1 contract |
 | `src/server/trpc/routers/health.ts#whoami` | health.whoami | trpc-procedure | identity-only | none | verified identity | caller subject identifier only | identityProcedure and direct-call tests |
+| `scripts/r1-with-local-worker.mjs#command` | R1 worker wrapper | command | system-only | local migration owner role | loopback MMHR database | temporary worker login lifecycle; no application records | exact child-command, URL, role, expiry, and cleanup checks |
 | `src/trigger/health.ts#health-check` | health-check | background-task | system-only | provider invocation control | Trigger.dev project | liveness log and constant response | no application data access |
 | `src/instrumentation.ts#register` | server instrumentation registration | framework-hook | framework | none | server runtime | loads the matching Sentry server configuration | no request identity or application data access |
 | `src/instrumentation.ts#onRequestError` | server request error capture | framework-hook | framework | none | server runtime | Sentry error event when monitoring is configured | generic error boundary and disabled replay |
