@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.7 |
-| Date | 2026-08-27 |
-| Status | Approved roadmap; R0 quarantine active; R1.1 complete; R1.0 recovery controls open |
+| Version | 1.8 |
+| Date | 2026-08-28 |
+| Status | Approved roadmap; R0 quarantine active; R1.0 and R1.1 complete; R1.2 ready |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
@@ -196,6 +196,14 @@ Owning plan: [module-r1-secure-platform-base.md](./module-r1-secure-platform-bas
 The product, security, engineering, and operations owners approved its scope and defaults.
 
 The approved interim recovery pair uses approval from the other named Super Admin.
+
+Recovery requests expire after 30 minutes and permit only an MFA enrollment reset.
+
+The reset removes every MFA factor and binds one verified replacement to the target's approved recovery session.
+
+Lost-factor recovery requires a call to the target's pre-existing company-record phone number.
+
+R1.2 is ready to start. Recovery remains disabled until implementation, identity binding, and tests are complete.
 
 Outcome:
 
@@ -764,6 +772,7 @@ Every PRD requirement appears exactly once below.
 | Engineering feasibility review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations workflow review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Interim recovery pair and other-admin approval rule | Approved | Product and security owner, current Codex task, 2026-08-27 |
+| Recovery expiry, allowed action, and phone identity check | Approved | Product and security owner, current Codex task, 2026-08-28 |
 | R1 implementation and routine Git through `develop` | Approved | User standing instruction, current Codex task, 2026-08-27 |
 | Finance workflow review | Pending | Add review reference |
 
