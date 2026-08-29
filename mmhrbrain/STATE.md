@@ -8,8 +8,9 @@ docs/TECH_STACK.md. The approved implementation roadmap lives in
 
 Roadmap version 1.8 maps 148 requirements to evidence status, releases, owner
 roles, tests, risks, and recovery. R1.1 is merged into `develop`. R1.2 is
-implemented and validated in commits `e7bc6c2` and `881f55d`. PR 7 has passing
-local and remote checks. Routine R1 Git work through `develop` is authorized.
+implemented and validated in commits `e7bc6c2` and `881f55d`. R1.3 is implemented
+on `feature/r1-request-scoped-rls` in commit `0e2af52`. Routine R1 Git work
+through `develop` is authorized.
 `main`, cloud migrations, bootstrap, dependencies, and deployment remain
 separately controlled.
 
@@ -18,9 +19,10 @@ origins, denies `/admin`, limits `/home` to pending access, and records every
 current entry point in docs/security/r1-authorization-matrix.md.
 
 R1.2 adds compatible identity, role, permission, audit, invitation, and recovery
-data through one additive migration. It keeps legacy reads, enables RLS on all
-application tables, and uses an expiring restricted worker with no raw table
-access. Empty, populated, rollback, and restore rehearsals pass. Invitation
+data through one additive migration. R1.3 adds explicit grants, deny policies,
+field-safe functions, and request-scoped access. It keeps legacy reads, enables
+RLS on all application tables, and uses an expiring restricted worker with no
+raw table access. Empty, populated, rollback, and restore rehearsals pass. Invitation
 addresses stay bound to their normalized value. Confirmed-email sign-up now
 shows its next step, and sign-up enforces the local 12-character minimum.
 
@@ -41,13 +43,15 @@ Pulse remains the selected homepage direction at /. All 22 gallery layouts
 remain in src/designs/ and stay available at /designs.
 
 ## Latest synopsis
+Built R1.3 grants, RLS, and request-scoped access. Targeted local gates, RLS
+integration, migration recovery rehearsals, and the production build passed.
 Closed all R1.2 pull-request review findings. All local gates, 98 unit tests,
 33 integration tests, remote checks, rendered auth checks, and an independent
 adversarial security review passed. Runtime recovery remains disabled. See
 [[journal/2026-08-28]].
 
 ## Open threads
-- R1.3 grants, RLS policies, and request-scoped access are the next R1 package.
+- Push and review the R1.3 feature branch through `develop`.
 - Recovery must stay disabled until stable identity binding, contact preparation, audited commands, and required tests finish.
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Create and verify stable identity bindings after R1.2 and before recovery activation.
@@ -57,10 +61,10 @@ adversarial security review passed. Runtime recovery remains disabled. See
 - Old deployment URLs and aliases must be protected or retired before R0 closes.
 - Open product decisions remain in docs/PRD.md and must close before their
   owning modules start.
-- RLS is enabled on all application tables, but policies and the
-  organization-role integration matrix remain absent.
+- RLS is enabled on all application tables with explicit R1.3 deny policies and
+  fixed safe functions. Route permissions remain for a later R1 package.
 - The direct server PostgreSQL pool now uses an expiring restricted worker.
-  R1.3 must add request-scoped policies before application data access.
+  Request-scoped access remains separate from this pool.
 - Customer, vendor, and administration workflows remain mostly placeholders.
 - Legacy FR identifiers remain temporary aliases in the canonical PRD.
 - Placeholder figures and claims remain in source and on the current production site.

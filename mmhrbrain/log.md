@@ -78,6 +78,12 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Created `feature/v2-baseline-stabilization` from the dirty `develop` worktree.
 - Grouped current work into release control, v2 baseline, project instructions, and project memory.
 - Passed type checking, lint, 30 tests, and the production build.
+
+## [2026-08-28] build | R1.3 grants and request-scoped access
+- Added explicit table revocations, deny policies, private authorization helpers,
+  field-safe functions, and request-scoped Supabase access.
+- Added emergency containment guidance and migration recovery rehearsals.
+- Passed targeted unit, RLS integration, migration rehearsal, type, lint, and build checks.
 - Kept commit, push, pull request, merge, and deployment actions pending.
 
 ## [2026-08-27] git | Commit baseline stabilization work
