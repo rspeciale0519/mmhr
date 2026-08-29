@@ -12,6 +12,7 @@ sources:
   - .codex/plans/module-r0-roadmap-and-public-release-control.md
   - .codex/plans/module-r1-secure-platform-base.md
   - drizzle/0001_heavy_kulan_gath.sql
+  - drizzle/0002_r1_request_scoped_access.sql
   - scripts/r1-with-local-worker.mjs
   - memory:2026-08-27-r0-release-control
 ---
@@ -75,10 +76,10 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
-R1.0, R1.1, and R1.2 are complete. R1.2 adds the compatible identity and audit
-schema, additive migration rehearsals, and an expiring restricted worker.
-R1.3 grants, policies, and request-scoped access are next. Runtime recovery
-remains disabled pending stable bindings and audited commands.
+R1.0, R1.1, R1.2, and R1.3 are complete on the implementation branch. R1.3
+adds explicit grants, deny policies, fixed field-safe functions, request-scoped
+access helpers, and migration recovery rehearsals. Runtime recovery remains
+disabled pending stable bindings and audited commands.
 
 ## Authorization
 

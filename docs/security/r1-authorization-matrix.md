@@ -4,8 +4,8 @@
 
 | Field | Value |
 |---|---|
-| Status | R1.1 complete and validated on `feature/r1-secure-platform-base` |
-| Date | 2026-08-27 |
+| Status | R1.3 grants, RLS, and request-scoped access implemented on `feature/r1-request-scoped-rls` |
+| Date | 2026-08-28 |
 | Source registry | `src/server/auth/entry-point-inventory.ts` |
 | Completeness test | `src/server/auth/entry-point-inventory.test.ts` |
 | Identity guard | `src/server/auth/verified-identity.ts` |
@@ -33,7 +33,7 @@ Middleware refreshes sessions. It does not grant route access.
 
 Claims do not prove identity state, organization membership, permission, or authentication assurance.
 
-R1.3 and R1.4 must add those stored-state checks before protected access opens.
+R1.3 adds stored-state checks before protected data access opens. R1.4 still owns route permissions.
 
 ## Validation Evidence
 
@@ -104,6 +104,10 @@ The current source contains no tRPC mutation, webhook, export handler, download 
 
 The current application request path does not import the direct Drizzle pool.
 
+Request-scoped data access uses `src/server/auth/request-scoped.ts` and fixed
+Supabase functions. It validates the token, active identity, and selected
+active organization before returning a client.
+
 These empty classes do not authorize future entries.
 
 The completeness test must change with the implementation that adds an entry.
@@ -144,7 +148,7 @@ FR-IAM-08 remains Deferred.
 
 ## Current Risks and Recovery
 
-Current tables have no RLS policies.
+All current application tables have explicit deny policies for `anon` and `authenticated`.
 
 The direct Drizzle pool can bypass RLS.
 

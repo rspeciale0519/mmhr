@@ -35,6 +35,7 @@ const rehearsalFiles = new Set(
 const integrationFiles = new Set([
   ...rehearsalFiles,
   normalizePath("src/server/auth/auth.integration.test.ts"),
+  normalizePath("src/server/auth/rls.integration.test.ts"),
   normalizePath("src/server/db/db.integration.test.ts"),
 ]);
 const samePath = (left, right) => normalizePath(left) === normalizePath(right);
