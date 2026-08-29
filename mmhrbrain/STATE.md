@@ -51,7 +51,7 @@ adversarial security review passed. Runtime recovery remains disabled. See
 [[journal/2026-08-28]].
 
 ## Open threads
-- Push and review the R1.3 feature branch through `develop`.
+- R1.3 is merged into `develop` at `b445b2e`.
 - Recovery must stay disabled until stable identity binding, contact preparation, audited commands, and required tests finish.
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Create and verify stable identity bindings after R1.2 and before recovery activation.
