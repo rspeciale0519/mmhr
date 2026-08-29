@@ -29,7 +29,7 @@ const expectedTables = [
   "user_permission_overrides",
 ];
 
-describe("R1.2 empty database migration", () => {
+describe("R1.3 empty database migration", () => {
   let context: RehearsalContext | undefined;
 
   beforeAll(async () => {
@@ -89,7 +89,7 @@ describe("R1.2 empty database migration", () => {
     ]);
   });
 
-  test("records the seven migration audit events", async () => {
+  test("records the R1 migration audit events", async () => {
     const events = await context!.client<{ action: string; count: number }[]>`
       SELECT action, count(*)::integer AS count
       FROM audit_events
@@ -99,6 +99,7 @@ describe("R1.2 empty database migration", () => {
 
     expect(events).toEqual([
       { action: "r1.2_schema.add", count: 1 },
+      { action: "r1.3_access.add", count: 1 },
       { action: "role_version.activate", count: 6 },
     ]);
   });
@@ -171,6 +172,9 @@ describe("R1.2 empty database migration", () => {
       "r1_remove_ephemeral_worker_login",
       "r1_remove_expired_worker_logins",
       "r1_renew_ephemeral_worker_login",
+      "r1_request_has_membership",
+      "r1_request_identity_id",
+      "r1_request_is_org_admin",
       "r1_worker_role_is_safe",
     ]);
     expect(workerFunctions.every((item) => !item.worker_execute)).toBe(true);

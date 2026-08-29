@@ -11,6 +11,7 @@ sources:
   - src/server/
   - drizzle/0000_light_vanisher.sql
   - drizzle/0001_heavy_kulan_gath.sql
+  - drizzle/0002_r1_request_scoped_access.sql
   - .github/workflows/ci.yml
   - trigger.config.ts
   - package.json
@@ -58,8 +59,9 @@ Use the roadmap traceability matrix for per-requirement evidence and ownership.
 
 ## Partial or Security-Incomplete
 
-- RLS is enabled on all application tables, but policies are absent.
-- Request-scoped data access and field-safe functions remain for R1.3.
+- RLS now has explicit deny policies on all current application tables.
+- Request-scoped access uses verified claims and fixed field-safe functions.
+- Customer and administration data access remains denied until route permissions exist.
 - Customer access remains pending until stored membership and permission checks exist.
 - Administration remains denied until explicit permission checks exist.
 - Public route structure exists, but product copy and claims need v2 review.

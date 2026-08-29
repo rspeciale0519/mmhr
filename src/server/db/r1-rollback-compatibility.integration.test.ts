@@ -13,7 +13,7 @@ import {
   stopRehearsal,
 } from "./r1-migration-rehearsal";
 
-describe("R1.2 read-only application rollback compatibility", () => {
+describe("R1.3 read-only application rollback compatibility", () => {
   let context: RehearsalContext | undefined;
   let beforeMigration: LegacySnapshot;
   let afterMigration: LegacySnapshot;
@@ -57,11 +57,11 @@ describe("R1.2 read-only application rollback compatibility", () => {
     });
   });
 
-  test("records both additive migrations", async () => {
+  test("records all additive migrations", async () => {
     const [history] = await context!.client<{ count: number }[]>`
       SELECT count(*)::integer AS count
       FROM drizzle.__drizzle_migrations
     `;
-    expect(history!.count).toBe(2);
+    expect(history!.count).toBe(3);
   });
 });

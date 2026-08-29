@@ -75,6 +75,7 @@ export const identities = pgTable(
         sql`${t.normalizedEmail} is not null and ${t.emailVerifiedAt} is not null and ${t.status} <> 'archived'`,
       ),
     index("identities_status_idx").on(t.status),
+    index("identities_auth_status_idx").on(t.authUserId, t.status),
     check(
       "identities_normalized_email_ck",
       sql`${t.normalizedEmail} is null or ${t.normalizedEmail} = lower(btrim(${t.normalizedEmail}))`,
@@ -160,6 +161,11 @@ export const orgMembers = pgTable(
       .where(sql`${t.status} in ('active', 'suspended')`),
     index("org_members_identity_idx").on(t.identityId),
     index("org_members_org_status_idx").on(t.orgId, t.status),
+    index("org_members_identity_org_status_idx").on(
+      t.identityId,
+      t.orgId,
+      t.status,
+    ),
     check(
       "org_members_role_map_ck",
       sql`(${t.role} = 'admin' and ${t.roleKey} = 'organization_admin') or (${t.role} = 'contributor' and ${t.roleKey} = 'contributor') or (${t.role} = 'viewer' and ${t.roleKey} = 'viewer')`,
