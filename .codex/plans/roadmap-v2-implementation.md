@@ -69,8 +69,7 @@ Architecture approval does not prove implementation.
 | DATA | Vendor-data owner | Rob Speciale |
 | REL | Production release owner | Rob Speciale |
 
-All roadmap owner roles match the
-[R0 owner register](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register).
+[All roadmap owner roles](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) have named people.
 
 ## 4. Evidence and Gap Codes
 
@@ -119,7 +118,7 @@ R2A lead-routing completion depends on the R2B CRM command. R3 depends on R2B.
 | R6 | Build demos, proposals, pricing, selection, and contract handoff | R5 | Product, operations, and security owners |
 | R7 | Build commissions, invoicing, collection, disputes, and finance reconciliation | R6 | Product, finance, and security owners |
 | R8 | Complete onboarding, work queues, administration, reporting, analytics, and operational health | R7 | Product, operations, finance, and security owners |
-| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and production release owners (PO, SEC, REL) |
+| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and [release owners](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) |
 
 Each release must build only from an approved module plan.
 

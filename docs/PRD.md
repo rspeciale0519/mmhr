@@ -507,7 +507,7 @@ Database and authorization changes require local integration evidence. Productio
 Production publication and search indexing remain blocked while the
 [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md#2-active-public-release-block) is active.
 
-The [R0 claim register](../.codex/plans/module-r0-roadmap-and-public-release-control.md#4-exact-public-claim-review-register) contains the exact public-claim inventory and required evidence,
+The [R0 record](../.codex/plans/module-r0-roadmap-and-public-release-control.md#4-exact-public-claim-review-register) contains the exact public-claim inventory and required evidence,
 reviewer, date, and approval fields. Every claim remains blocked until its row
 has approved evidence and publication approval.
 
