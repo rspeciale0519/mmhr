@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createClient } from "@/lib/supabase/server";
+import { createLead, LeadCreateError } from "@/server/commands/lead-create";
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
@@ -21,12 +22,21 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock("@/server/commands/lead-create", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/server/commands/lead-create")>();
+  return { ...actual, createLead: vi.fn() };
+});
+
 import { signIn, signOut, signUp } from "@/app/(auth)/actions";
 
 function authForm() {
   const form = new FormData();
+  form.set("fullName", "Alex Example");
+  form.set("company", "Example Co");
   form.set("email", "member@example.test");
+  form.set("directCompanyPhone", "+1 (212) 555-0100");
   form.set("password", "local-test-password");
+  form.set("consent", "on");
   return form;
 }
 
@@ -37,6 +47,13 @@ describe("auth Server Actions", () => {
     vi.mocked(redirect).mockReset();
     vi.mocked(headers).mockReset();
     vi.mocked(createClient).mockReset();
+    vi.mocked(createLead).mockReset().mockResolvedValue({
+      leadId: "11111111-1111-4111-8111-111111111111",
+      status: "new",
+      ownerIdentityId: null,
+      outcomeCode: "created",
+      correlationId: "22222222-2222-4222-8222-222222222222",
+    });
   });
 
   test.each([
@@ -107,6 +124,68 @@ describe("auth Server Actions", () => {
       error: "Use a password with at least 12 characters.",
     });
     expect(createClient).not.toHaveBeenCalled();
+  });
+
+  test("rejects sign-up without explicit consent before lead or provider calls", async () => {
+    const form = authForm();
+    form.delete("consent");
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+
+    await expect(signUp(null, form)).resolves.toEqual({
+      error: "Please agree to the contact and privacy notice.",
+    });
+    expect(createLead).not.toHaveBeenCalled();
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  test("blocks the auth provider when lead capture rejects the registration", async () => {
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createLead).mockRejectedValueOnce(new LeadCreateError("UNAVAILABLE"));
+    const signUpRequest = vi.fn();
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await expect(signUp(null, authForm())).resolves.toEqual({
+      error: "We could not complete registration. Please try again later.",
+    });
+    expect(signUpRequest).not.toHaveBeenCalled();
+  });
+
+  test("sends all registration fields to the shared lead command", async () => {
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    const signUpRequest = vi.fn().mockResolvedValue({
+      data: { session: null, user: { id: "local-user" } },
+      error: null,
+    });
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await signUp(null, authForm());
+
+    expect(createLead).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fullName: "Alex Example",
+        company: "Example Co",
+        workEmail: "member@example.test",
+        directCompanyPhone: "+1 (212) 555-0100",
+        source: "registration",
+        consentAt: expect.any(String),
+        idempotencyKey: expect.any(String),
+      }),
+      { supabase: expect.anything() },
+    );
+    expect(signUpRequest).toHaveBeenCalledWith({
+      email: "member@example.test",
+      password: "local-test-password",
+    });
   });
 
   test("keeps sign-in provider behavior for an eight-character password", async () => {

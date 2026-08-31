@@ -24,6 +24,11 @@ describe("AuthForm", () => {
   test("uses the 12-character rule for sign-up", () => {
     render(<AuthForm action={action} mode="sign-up" submitLabel="Sign up" />);
 
+    expect(screen.getByLabelText("Full name")).toBeRequired();
+    expect(screen.getByLabelText("Company")).toBeRequired();
+    expect(screen.getByLabelText("Work email")).toBeRequired();
+    expect(screen.getByLabelText("Direct company phone")).toBeRequired();
+    expect(screen.getByLabelText(/I agree that MatchMaker HR/)).toBeRequired();
     expect(screen.getByLabelText("Password")).toHaveAttribute("minlength", "12");
     expect(screen.getByLabelText("Password")).toHaveAttribute(
       "autocomplete",

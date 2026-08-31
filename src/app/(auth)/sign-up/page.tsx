@@ -3,12 +3,6 @@ import Link from "next/link";
 import { signUp } from "../actions";
 import { AuthForm } from "../auth-form";
 
-/**
- * Foundation sign-up uses email and password to prove the auth round-trip.
- * FR-MKT-06 through FR-MKT-09 require the full registration gate: mandatory full
- * name, company, work email with free-domain rejection, direct phone, and an
- * explicit consent checkbox.
- */
 export default function SignUpPage() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-6 p-8">

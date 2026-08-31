@@ -13,10 +13,6 @@ type Props = {
   submitLabel: string;
 };
 
-/**
- * Shared credentials form for sign-in and sign-up. It remains intentionally
- * plain until Pulse tokens and the canonical registration gate reach auth.
- */
 export function AuthForm({ action, mode, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     action,
@@ -25,10 +21,38 @@ export function AuthForm({ action, mode, submitLabel }: Props) {
 
   return (
     <form action={formAction} className="flex max-w-sm flex-col gap-4">
+      {mode === "sign-up" ? (
+        <>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="full-name">Full name</Label>
+            <Input id="full-name" name="fullName" required maxLength={200} autoComplete="name" />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="company">Company</Label>
+            <Input id="company" name="company" required maxLength={200} autoComplete="organization" />
+          </div>
+        </>
+      ) : null}
+
       <div className="flex flex-col gap-2">
         <Label htmlFor="email">Work email</Label>
         <Input id="email" name="email" type="email" required autoComplete="email" />
       </div>
+
+      {mode === "sign-up" ? (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="direct-company-phone">Direct company phone</Label>
+          <Input
+            id="direct-company-phone"
+            name="directCompanyPhone"
+            type="tel"
+            required
+            maxLength={24}
+            autoComplete="tel"
+          />
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Password</Label>
@@ -41,6 +65,16 @@ export function AuthForm({ action, mode, submitLabel }: Props) {
           autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
         />
       </div>
+
+      {mode === "sign-up" ? (
+        <label className="flex items-start gap-2 text-sm" htmlFor="consent">
+          <input id="consent" name="consent" type="checkbox" required />
+          <span>
+            I agree that MatchMaker HR may contact me about my request. See our{" "}
+            <a className="underline" href="/privacy">privacy notice</a>.
+          </span>
+        </label>
+      ) : null}
 
       {state?.error ? (
         <p role="alert" className="text-sm text-red-600">
