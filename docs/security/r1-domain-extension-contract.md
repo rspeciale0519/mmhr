@@ -17,8 +17,8 @@ If a later release cannot meet this contract, keep its routes, commands, and wri
 | R1 requirements and release order | [`module-r1-secure-platform-base.md`](../../.codex/plans/module-r1-secure-platform-base.md) |
 | Current entry-point inventory | [`r1-authorization-matrix.md`](./r1-authorization-matrix.md) and `src/server/auth/entry-point-inventory.ts` |
 | Permission evaluation | [`r1-permission-evaluation.md`](./r1-permission-evaluation.md), `src/server/auth/authorization.ts`, and `src/server/auth/permission-registry.ts` |
-| Page and layout guards | `src/server/auth/page-guards.ts` |
-| Current guard tests | `src/server/auth/page-guards.test.ts`, `src/app/(app)/customer/layout.test.tsx`, and `src/app/(app)/vendor/layout.test.tsx` |
+| Page and layout guards | `src/server/auth/page-guards.ts`, `src/server/auth/portal/portal-guards.ts` |
+| Current guard tests | `src/server/auth/page-guards.test.ts`, `src/server/auth/portal/portal-guards.test.ts`, `src/app/(app)/customer/layout.test.tsx`, and `src/app/(app)/vendor/layout.test.tsx` |
 
 ## Current portal guard contract
 

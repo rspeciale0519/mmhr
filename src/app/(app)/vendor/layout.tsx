@@ -1,7 +1,7 @@
-import { requireSelectedOrganizationPermission } from "@/server/auth/page-guards";
+import { requirePortalPageAccess } from "@/server/auth/portal/portal-guards";
 
 /** Every vendor route inherits the caller and selected-organization checks. */
 export default async function VendorLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  await requireSelectedOrganizationPermission("portal.vendor.access");
+  await requirePortalPageAccess("vendor");
   return children;
 }

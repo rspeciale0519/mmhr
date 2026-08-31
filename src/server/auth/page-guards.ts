@@ -17,7 +17,7 @@ import { z } from "zod";
 
 export const organizationContextCookie = "mmhr-organization-id";
 
-type PageAuthorization = {
+export type PageAuthorization = {
   identity: VerifiedIdentity;
   authorization: AuthorizationContext;
 };

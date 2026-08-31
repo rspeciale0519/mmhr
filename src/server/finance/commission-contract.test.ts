@@ -66,6 +66,15 @@ describe("R7 commission contract", () => {
     });
   });
 
+  test("keeps percentage arithmetic exact near the safe integer boundary", () => {
+    const maximumMinorUnits = Number.MAX_SAFE_INTEGER;
+    expect(calculateCommission(
+      structure({ rateBasisPoints: 10_000 }),
+      maximumMinorUnits,
+      "2026-08-31T12:00:00.000Z",
+    ).commissionAmountMinorUnits).toBe(maximumMinorUnits);
+  });
+
   test("supports flat amounts and rejects an out-of-date agreement", () => {
     expect(calculateCommission(structure({ calculationType: "flat_amount", rateBasisPoints: undefined, flatAmountMinorUnits: 2_500 }), 1, "2026-08-31T12:00:00.000Z").commissionAmountMinorUnits).toBe(2_500);
     expect(() => calculateCommission(structure({ effectiveTo: "2026-08-01T00:00:00.000Z" }), 100, "2026-08-31T12:00:00.000Z")).toThrow("not effective");

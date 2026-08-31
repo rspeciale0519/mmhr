@@ -115,7 +115,26 @@ BEGIN
     normalized_full_name, normalized_company, normalized_email, normalized_phone,
     normalized_source, 'new', consent_at, NULL, NULL, normalized_source,
     mmhr_create_lead.idempotency_key, request_digest, event_correlation
-  ) RETURNING * INTO new_lead;
+  )
+  ON CONFLICT (idempotency_key) WHERE idempotency_key IS NOT NULL DO NOTHING
+  RETURNING * INTO new_lead;
+
+  IF NOT FOUND THEN
+    SELECT * INTO existing FROM public.leads
+    WHERE public.leads.idempotency_key = mmhr_create_lead.idempotency_key
+    FOR UPDATE;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Lead idempotency record disappeared';
+    END IF;
+    IF existing.request_digest IS DISTINCT FROM request_digest THEN
+      RETURN QUERY SELECT NULL::uuid, NULL::text, NULL::uuid,
+        'idempotency_conflict'::text, event_correlation;
+      RETURN;
+    END IF;
+    RETURN QUERY SELECT existing.id, existing.status, existing.routing_owner_identity_id,
+      'replayed'::text, coalesce(existing.correlation_id, event_correlation);
+    RETURN;
+  END IF;
 
   INSERT INTO public.audit_events (
     actor_type, actor_identity_id, actor_reference, organization_id,

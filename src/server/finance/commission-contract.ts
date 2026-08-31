@@ -112,7 +112,10 @@ export function calculateCommission(
   }
 
   const commissionAmountMinorUnits = structure.calculationType === "contract_value_rate"
-    ? Math.floor((contractValueMinorUnits * (structure.rateBasisPoints ?? 0) + 5000) / 10_000)
+    ? Number(
+        (BigInt(contractValueMinorUnits) * BigInt(structure.rateBasisPoints ?? 0) + BigInt(5_000)) /
+          BigInt(10_000),
+      )
     : structure.flatAmountMinorUnits ?? 0;
 
   return {

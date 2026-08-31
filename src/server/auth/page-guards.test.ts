@@ -112,6 +112,20 @@ describe("page identity guard", () => {
     expect(authorizePermission).not.toHaveBeenCalled();
   });
 
+  test.each(["not-an-organization", "00000000-0000-0000-0000-000000000000"])(
+    "denies a malformed or nil selected organization before permission evaluation: %s",
+    async (value) => {
+      vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
+      vi.mocked(cookies).mockResolvedValue({
+        get: vi.fn().mockReturnValue({ value }),
+      } as never);
+
+      await expect(requireSelectedOrganizationPermission("portal.customer.access"))
+        .rejects.toThrow("NEXT_FORBIDDEN");
+      expect(authorizePermission).not.toHaveBeenCalled();
+    },
+  );
+
   test("validates the selected organization through the permission decision", async () => {
     const organizationId = "abcdef01-2345-4678-9abc-def012345678";
     vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
