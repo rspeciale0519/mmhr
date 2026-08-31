@@ -279,6 +279,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "lead route boundary tests; SQL idempotency and audit contract",
   },
   {
+    key: "src/app/api/newsletter/route.ts#POST",
+    surface: "POST /api/newsletter",
+    kind: "route-handler",
+    access: "public",
+    permission: "none; provider-neutral consent boundary",
+    scope: "newsletter subscriber",
+    dataPath: "exact-origin POST; normalized email and consent timestamp; redacted response",
+    denialEvidence: "newsletter route boundary tests; provider-neutral service fails closed",
+  },
+  {
     key: "src/app/(auth)/actions.ts#signUp",
     surface: "signUp",
     kind: "server-action",
@@ -467,6 +477,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     scope: "one organization and invitation record",
     dataPath: "strict command DTO; fail-closed unavailable result",
     denialEvidence: "invitation-database.test.ts; rejects invalid input and never guesses an RPC",
+  },
+  {
+    key: "src/server/commands/crm-database.ts#command",
+    surface: "CRM database command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization and contact or product record",
+    dataPath: "strict command DTO; caller JWT authorization; fail-closed until reviewed SQL functions exist",
+    denialEvidence: "crm-database.test.ts; rejects invalid and cross-organization scope and fails closed",
   },
   {
     key: "src/trigger/health.ts#health-check",

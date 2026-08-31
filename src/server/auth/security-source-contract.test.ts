@@ -50,10 +50,13 @@ function executableFiles() {
   ])].sort();
 }
 
+let executableSourceCache: string | undefined;
+
 function executableSource() {
-  return executableFiles()
+  executableSourceCache ??= executableFiles()
     .map((file) => readFileSync(file, "utf8"))
     .join("\n");
+  return executableSourceCache;
 }
 
 describe("R1 source security contract", () => {
