@@ -47,6 +47,16 @@ describe("recovery evidence", () => {
     });
   });
 
+  test("rejects recovery evidence from mixed environments", () => {
+    expect(evaluateRecoveryEvidenceSet(
+      [restore, { ...rollback, environment: "production" }],
+      "2026-08-31T18:00:00.000Z",
+    )).toMatchObject({
+      ready: false,
+      failedKinds: ["restore_drill", "rollback_rehearsal"],
+    });
+  });
+
   test.each([
     ["failed", { ...restore, outcome: "failed", approvedAt: null }, "failed"],
     ["stale", { ...restore, startedAt: "2026-01-01T00:00:00.000Z", completedAt: "2026-01-01T00:30:00.000Z", approvedAt: "2026-01-01T01:00:00.000Z" }, "stale"],

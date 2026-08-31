@@ -112,6 +112,10 @@ export function evaluateRecoveryEvidenceSet(
   const rollbackRehearsal = latest("rollback_rehearsal");
   const asOfIso = new Date(asOfMs).toISOString();
   const failedKinds: RecoveryEvidenceKind[] = [];
+  if (restoreDrill && rollbackRehearsal && restoreDrill.environment !== rollbackRehearsal.environment) {
+    failedKinds.push("restore_drill", "rollback_rehearsal");
+    return { restoreDrill, rollbackRehearsal, ready: false, failedKinds };
+  }
   if (!restoreDrill || !evaluateRecoveryEvidence(restoreDrill, asOfIso).eligible) failedKinds.push("restore_drill");
   if (!rollbackRehearsal || !evaluateRecoveryEvidence(rollbackRehearsal, asOfIso).eligible) failedKinds.push("rollback_rehearsal");
   return { restoreDrill, rollbackRehearsal, ready: failedKinds.length === 0, failedKinds };
