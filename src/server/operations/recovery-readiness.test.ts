@@ -32,7 +32,7 @@ const rollback = {
 
 describe("recovery evidence", () => {
   test("accepts approved restore and rollback records", () => {
-    expect(evaluateRecoveryEvidenceSet([restore, rollback], "2026-08-31T18:00:00.000Z")).toMatchObject({
+    expect(evaluateRecoveryEvidenceSet([restore, rollback], "2026-08-31T18:00:00.000Z", "staging")).toMatchObject({
       ready: true,
       failedKinds: [],
       restoreDrill: restore,
@@ -41,7 +41,7 @@ describe("recovery evidence", () => {
   });
 
   test("returns missing kinds when a record is absent", () => {
-    expect(evaluateRecoveryEvidenceSet([restore], "2026-08-31T18:00:00.000Z")).toMatchObject({
+    expect(evaluateRecoveryEvidenceSet([restore], "2026-08-31T18:00:00.000Z", "staging")).toMatchObject({
       ready: false,
       failedKinds: ["rollback_rehearsal"],
     });
@@ -51,6 +51,7 @@ describe("recovery evidence", () => {
     expect(evaluateRecoveryEvidenceSet(
       [restore, { ...rollback, environment: "production" }],
       "2026-08-31T18:00:00.000Z",
+      "staging",
     )).toMatchObject({
       ready: false,
       failedKinds: ["restore_drill", "rollback_rehearsal"],
@@ -64,6 +65,11 @@ describe("recovery evidence", () => {
     expect(evaluateRecoveryEvidence(value, "2026-08-31T18:00:00.000Z")).toEqual({ eligible: false, reason });
   });
 
+  test("rejects future completion and approval", () => {
+    expect(evaluateRecoveryEvidence({ ...restore, completedAt: "2026-09-01T00:00:00.000Z", approvedAt: "2026-09-01T01:00:00.000Z" }, "2026-08-31T18:00:00.000Z")).toEqual({ eligible: false, reason: "not_approved" });
+    expect(evaluateRecoveryEvidence({ ...restore, approvedAt: "2026-09-01T01:00:00.000Z" }, "2026-08-31T18:00:00.000Z")).toEqual({ eligible: false, reason: "not_approved" });
+  });
+
   test("rejects invalid timelines and early approval", () => {
     expect(recoveryEvidenceSchema.safeParse({ ...restore, completedAt: "2026-08-31T07:59:59.000Z" }).success).toBe(false);
     expect(recoveryEvidenceSchema.safeParse({ ...restore, approvedAt: "2026-08-31T11:00:00.000Z" }).success).toBe(false);
@@ -73,9 +79,10 @@ describe("recovery evidence", () => {
     expect(recoveryEvidenceSchema.safeParse({ ...restore, approvedAt: null }).success).toBe(false);
   });
 
-  test("rejects restore records above the RPO and RTO targets", () => {
-    expect(recoveryEvidenceSchema.safeParse({ ...restore, rpoSeconds: recoveryPointTargetSeconds + 1 }).success).toBe(false);
-    expect(recoveryEvidenceSchema.safeParse({ ...restore, rtoSeconds: recoveryTimeTargetSeconds + 1 }).success).toBe(false);
+  test("rejects passed records above the RPO and RTO targets", () => {
+    expect(evaluateRecoveryEvidence({ ...restore, rpoSeconds: recoveryPointTargetSeconds + 1 }, "2026-08-31T18:00:00.000Z")).toEqual({ eligible: false, reason: "rpo_exceeded" });
+    expect(evaluateRecoveryEvidence({ ...restore, rtoSeconds: recoveryTimeTargetSeconds + 1 }, "2026-08-31T18:00:00.000Z")).toEqual({ eligible: false, reason: "rto_exceeded" });
+    expect(recoveryEvidenceSchema.safeParse({ ...restore, outcome: "failed", approvedAt: null, rpoSeconds: recoveryPointTargetSeconds + 1 }).success).toBe(true);
   });
 
   test("rejects unknown personal or free-text fields", () => {
@@ -84,8 +91,8 @@ describe("recovery evidence", () => {
   });
 
   test("rejects duplicate and future records", () => {
-    expect(() => evaluateRecoveryEvidenceSet([restore, restore], "2026-08-31T18:00:00.000Z")).toThrow(/Duplicate/);
-    expect(() => evaluateRecoveryEvidenceSet([{ ...restore, completedAt: "2026-09-01T00:00:00.000Z", approvedAt: "2026-09-01T01:00:00.000Z" }], "2026-08-31T18:00:00.000Z")).toThrow(/future/);
+    expect(() => evaluateRecoveryEvidenceSet([restore, restore], "2026-08-31T18:00:00.000Z", "staging")).toThrow(/Duplicate/);
+    expect(() => evaluateRecoveryEvidenceSet([{ ...restore, completedAt: "2026-09-01T00:00:00.000Z", approvedAt: "2026-09-01T01:00:00.000Z" }], "2026-08-31T18:00:00.000Z", "staging")).toThrow(/future/);
   });
 
   test("keeps the latest failed evidence as not ready", () => {
@@ -93,9 +100,22 @@ describe("recovery evidence", () => {
       restore,
       { ...restore, evidenceId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", completedAt: "2026-08-31T14:00:00.000Z", outcome: "failed", approvedAt: null },
       rollback,
-    ], "2026-08-31T18:00:00.000Z")).toMatchObject({
+    ], "2026-08-31T18:00:00.000Z", "staging")).toMatchObject({
       ready: false,
       failedKinds: ["restore_drill"],
+    });
+  });
+
+  test("lets failed evidence win a completion-time tie", () => {
+    const failed = { ...restore, evidenceId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", outcome: "failed" as const, approvedAt: null };
+    expect(evaluateRecoveryEvidenceSet([restore, failed, rollback], "2026-08-31T18:00:00.000Z", "staging").failedKinds).toEqual(["restore_drill"]);
+    expect(evaluateRecoveryEvidenceSet([failed, restore, rollback], "2026-08-31T18:00:00.000Z", "staging").failedKinds).toEqual(["restore_drill"]);
+  });
+
+  test("requires the requested release environment", () => {
+    expect(evaluateRecoveryEvidenceSet([restore, rollback], "2026-08-31T18:00:00.000Z", "production")).toMatchObject({
+      ready: false,
+      failedKinds: ["restore_drill", "rollback_rehearsal"],
     });
   });
 });

@@ -13,6 +13,7 @@ const reference = z
 
 export const recoveryEvidenceKinds = ["restore_drill", "rollback_rehearsal"] as const;
 export const recoveryEvidenceOutcomes = ["passed", "failed"] as const;
+export const recoveryEvidenceEnvironments = ["staging", "production"] as const;
 export const recoveryPointTargetSeconds = 24 * 60 * 60;
 export const recoveryTimeTargetSeconds = 8 * 60 * 60;
 export const recoveryEvidenceFreshnessDays = 92;
@@ -21,11 +22,11 @@ export const recoveryEvidenceSchema = z
   .strictObject({
     evidenceId: uuid,
     kind: z.enum(recoveryEvidenceKinds),
-    environment: z.enum(["staging", "production"]),
+    environment: z.enum(recoveryEvidenceEnvironments),
     startedAt: timestamp,
     completedAt: timestamp,
-    rpoSeconds: z.number().int().nonnegative().max(recoveryPointTargetSeconds),
-    rtoSeconds: z.number().int().nonnegative().max(recoveryTimeTargetSeconds),
+    rpoSeconds: z.number().int().nonnegative(),
+    rtoSeconds: z.number().int().nonnegative(),
     outcome: z.enum(recoveryEvidenceOutcomes),
     artifactReference: reference,
     auditReference: reference,
@@ -72,12 +73,15 @@ export function evaluateRecoveryEvidence(value: unknown, asOfInput: string | Dat
   if (asOfMs - Date.parse(record.completedAt) > recoveryEvidenceFreshnessDays * 24 * 60 * 60 * 1000) {
     return { eligible: false, reason: "stale" };
   }
+  if (Date.parse(record.completedAt) > asOfMs || (record.approvedAt !== null && Date.parse(record.approvedAt) > asOfMs)) {
+    return { eligible: false, reason: "not_approved" };
+  }
   if (record.outcome !== "passed") return { eligible: false, reason: "failed" };
   if (record.approvedAt === null) return { eligible: false, reason: "not_approved" };
-  if (record.kind === "restore_drill" && record.rpoSeconds > recoveryPointTargetSeconds) {
+  if (record.rpoSeconds > recoveryPointTargetSeconds) {
     return { eligible: false, reason: "rpo_exceeded" };
   }
-  if (record.kind === "restore_drill" && record.rtoSeconds > recoveryTimeTargetSeconds) {
+  if (record.rtoSeconds > recoveryTimeTargetSeconds) {
     return { eligible: false, reason: "rto_exceeded" };
   }
   return { eligible: true, reason: "approved" };
@@ -94,6 +98,7 @@ export type RecoveryEvidenceSetReadiness = Readonly<{
 export function evaluateRecoveryEvidenceSet(
   values: readonly unknown[],
   asOfInput: string | Date,
+  expectedEnvironment: (typeof recoveryEvidenceEnvironments)[number],
 ): RecoveryEvidenceSetReadiness {
   const asOfMs = parseAsOf(asOfInput);
   const records = values.map(parseRecoveryEvidence);
@@ -107,18 +112,24 @@ export function evaluateRecoveryEvidenceSet(
   const latest = (kind: RecoveryEvidenceKind) =>
     [...records]
       .filter((record) => record.kind === kind)
-      .sort((left, right) => Date.parse(right.completedAt) - Date.parse(left.completedAt))[0] ?? null;
+      .sort((left, right) => {
+        const completedDifference = Date.parse(right.completedAt) - Date.parse(left.completedAt);
+        if (completedDifference !== 0) return completedDifference;
+        if (left.outcome !== right.outcome) return left.outcome === "failed" ? -1 : 1;
+        return left.evidenceId.localeCompare(right.evidenceId);
+      })[0] ?? null;
   const restoreDrill = latest("restore_drill");
   const rollbackRehearsal = latest("rollback_rehearsal");
   const asOfIso = new Date(asOfMs).toISOString();
   const failedKinds: RecoveryEvidenceKind[] = [];
+  if (!restoreDrill || restoreDrill.environment !== expectedEnvironment || !evaluateRecoveryEvidence(restoreDrill, asOfIso).eligible) failedKinds.push("restore_drill");
+  if (!rollbackRehearsal || rollbackRehearsal.environment !== expectedEnvironment || !evaluateRecoveryEvidence(rollbackRehearsal, asOfIso).eligible) failedKinds.push("rollback_rehearsal");
   if (restoreDrill && rollbackRehearsal && restoreDrill.environment !== rollbackRehearsal.environment) {
-    failedKinds.push("restore_drill", "rollback_rehearsal");
-    return { restoreDrill, rollbackRehearsal, ready: false, failedKinds };
+    if (!failedKinds.includes("restore_drill")) failedKinds.push("restore_drill");
+    if (!failedKinds.includes("rollback_rehearsal")) failedKinds.push("rollback_rehearsal");
   }
-  if (!restoreDrill || !evaluateRecoveryEvidence(restoreDrill, asOfIso).eligible) failedKinds.push("restore_drill");
-  if (!rollbackRehearsal || !evaluateRecoveryEvidence(rollbackRehearsal, asOfIso).eligible) failedKinds.push("rollback_rehearsal");
-  return { restoreDrill, rollbackRehearsal, ready: failedKinds.length === 0, failedKinds };
+  const orderedFailedKinds = recoveryEvidenceKinds.filter((kind) => failedKinds.includes(kind));
+  return { restoreDrill, rollbackRehearsal, ready: orderedFailedKinds.length === 0, failedKinds: orderedFailedKinds };
 }
 
 export { reference, timestamp, uuid };
