@@ -37,6 +37,10 @@ jobs:
           path: scripts/r9-release-evidence.json
           if-no-files-found: error
 
+      - name: Dependency audit (advisory)
+        run: npm run check:dependency-audit
+        continue-on-error: true
+
       - name: Type-check
         run: npm run type-check
 
