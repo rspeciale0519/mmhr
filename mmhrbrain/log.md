@@ -164,6 +164,12 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added a provider-neutral newsletter consent contract and exact-origin public route with redacted responses.
 - Passed 1910 unit tests, type checking, lint, integration-matrix validation, and the production build.
 - Kept reviewed SQL functions, provider delivery, target-environment integration, browser evidence, and release deployment open.
+
+## [2026-08-31] evidence | Require traceable AI and release evidence
+- Added immutable provider-neutral AI run records with output hashing and explicit approval transitions.
+- Tightened R9 readiness so every passed gate points to a non-empty evidence reference.
+- Passed focused AI and R9 checks; full local validation remains required after this package.
+- Kept durable AI storage, target-environment evidence, browser evidence, and production release open.
 ### 2026-08-31 — Add provider-neutral AI service boundary
 
 Added a server-only `AiService` contract with capability and data-class checks,

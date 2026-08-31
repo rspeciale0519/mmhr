@@ -549,6 +549,7 @@ Outcome:
 Exit evidence:
 
 - Full standard CI gates
+- Every passed gate must include a non-empty reference to its evidence record.
 - Local and CI integration tests
 - Critical browser journeys
 - Keyboard, screen-reader, contrast, and automated accessibility evidence

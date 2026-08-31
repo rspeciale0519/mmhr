@@ -38,7 +38,7 @@ Migration 0003 preserves approved version-one role history and activates
 version-two defaults. It is applied only to the validated local MMHR stack.
 No cloud or production migration occurred.
 
-Type checking, lint, 1910 unit tests, recovery and migration cases, worker
+Type checking, lint, 1923 unit tests, recovery and migration cases, worker
 cases, boundary cases, local Auth recovery flows, and the production build
 passed. The full integration command remains blocked because
 MIGRATION_DATABASE_URL is not set in this process.
@@ -67,9 +67,9 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - Customer and vendor routes have guard foundations. CRM, workflow, finance, and operations foundations are additive and deny-first.
 - Public claims and commission copy still need approved evidence before release.
 - Drizzle metadata has an orphaned journal entry for missing `0011_r1_invitation_email_binding_check.sql`; recover exact history before replay or deployment.
-- A provider-neutral server-only AI service boundary and fixture tests now exist.
-  Database run storage, approval records, provider evaluation, and target
-  environment evidence remain open.
+- A provider-neutral server-only AI service boundary, immutable run-record
+  contract, approval transition checks, and fixture tests now exist. Database
+  storage, provider evaluation, and target environment evidence remain open.
 - Retain all 22 gallery layouts. Verify both Pulse routes and themes if shared UI changes.
 - Keep unrelated local settings and generated Codex hooks outside task commits.
 - Keep the copied public-site corpus and questionnaire audit in docs/temp/ internal.

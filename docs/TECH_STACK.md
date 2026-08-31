@@ -239,6 +239,8 @@ Review provider retention and training controls before production use.
 
 Maintain fixed fixtures for regression tests. A provider or model change must pass the same fixtures before deployment.
 
+Release gates must store a non-empty reference to the evidence record that proves each passed check.
+
 ## 8. Database and Commercial History
 
 Define Drizzle schemas in `src/server/db/schema/`.

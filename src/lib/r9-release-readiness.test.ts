@@ -8,7 +8,10 @@ import {
 
 function passingEvidence(): R9ReleaseEvidence {
   return Object.fromEntries(
-    R9_RELEASE_CHECKS.map((check) => [check, true]),
+    R9_RELEASE_CHECKS.map((check) => [
+      check,
+      { passed: true, reference: `evidence://${check}` },
+    ]),
   ) as R9ReleaseEvidence;
 }
 
@@ -30,8 +33,8 @@ describe("R9 release readiness", () => {
   test("reports failed checks in the roadmap order", () => {
     const evidence = {
       ...passingEvidence(),
-      restoreDrill: false,
-      publicReleaseApproval: false,
+      restoreDrill: { passed: false, reference: "restore-review" },
+      publicReleaseApproval: { passed: false, reference: "release-review" },
     };
 
     expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
@@ -43,13 +46,39 @@ describe("R9 release readiness", () => {
   test("accepts only explicit true values", () => {
     const evidence = {
       ...passingEvidence(),
-      securityReview: undefined,
-      rollbackRehearsal: "passed",
+      securityReview: { passed: false, reference: "review-123" },
+      rollbackRehearsal: { passed: true, reference: "   " },
     } as unknown as R9ReleaseEvidence;
 
     expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
       ready: false,
       failedChecks: ["securityReview", "rollbackRehearsal"],
+    });
+  });
+
+  test("requires a non-empty evidence reference for passed checks", () => {
+    const evidence = {
+      ...passingEvidence(),
+      performanceEvidence: { passed: true, reference: "" },
+      availabilityMonitoring: { passed: true, reference: "  " },
+    };
+
+    expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
+      ready: false,
+      failedChecks: ["performanceEvidence", "availabilityMonitoring"],
+    });
+  });
+
+  test("fails closed for malformed evidence records", () => {
+    const evidence = {
+      ...passingEvidence(),
+      integrationTests: { passed: true },
+      securityReview: { passed: "yes", reference: "review-123" },
+    } as unknown as R9ReleaseEvidence;
+
+    expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
+      ready: false,
+      failedChecks: ["integrationTests", "securityReview"],
     });
   });
 });

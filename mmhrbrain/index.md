@@ -12,7 +12,7 @@ Catalog of the mmhr brain. SessionStart reads this.
 
 ## Recent journal
 - [[journal/2026-08-31]] — added R1.8 local security evidence and matrix checks; integration remains environment-gated.
-- [[journal/2026-08-31]] — added R2A through R9 foundations, invitation lifecycle contracts, the AI service boundary, CRM command validation, and newsletter consent handling; full integration remains environment-gated.
+- [[journal/2026-08-31]] — added R2A through R9 foundations, invitation lifecycle contracts, AI run records, release evidence references, CRM command validation, and newsletter consent handling; full integration remains environment-gated.
 - [[journal/2026-08-28]] — completed R1.0 policy and built the R1.2 and R1.3 platform foundations.
 - [[journal/2026-08-30]] — verified R1.4 worker and recovery delivery, started R1.5 routes and MFA, and closed R0 recordkeeping gaps.
 - [[journal/2026-08-27]] — R0 control, R1.1 secure entry controls, and interim recovery-pair approval.
