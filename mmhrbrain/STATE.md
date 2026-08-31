@@ -1,5 +1,5 @@
 # mmhr brain — STATE
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 ## Current focus
 The canonical product baseline is in docs/README.md, docs/PRD.md, and
@@ -41,9 +41,10 @@ worker cases, 47 boundary cases, two real local Auth recovery flows, and the
 production build passed. Independent security reviews found no remaining
 critical issue in the verified local package.
 
-See docs/security/r1-permission-evaluation.md and [[journal/2026-08-30]].
+See docs/security/r1-permission-evaluation.md, docs/security/r1-evidence.md, and
+[[journal/2026-08-31]].
 The existing request-scoped helper still needs dbac05f before integration.
-Permission-protected home, admin, customer, and vendor route foundations are active in code. Runtime recovery and production worker scheduling remain disabled.
+Permission-protected home, admin, customer, and vendor route foundations are active in code. R1.8 local evidence records and matrix checks are present. Runtime recovery and production worker scheduling remain disabled.
 
 ## Open threads
 - Submit dbac05f after exact remote-write approval. Close the late PR 8 and PR 9 findings after remote validation.

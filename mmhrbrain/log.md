@@ -147,3 +147,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added guarded customer, vendor, home, admin, and MFA routes with focused tests.
 - Recorded the R0 control gaps and drafted the R2B CRM substrate plan.
 - Kept public release, cloud migration, bootstrap, production credentials, and deployment blocked.
+
+## [2026-08-31] evidence | Add R1.8 local security record
+- Added the R1 evidence map and local check record in `docs/security/r1-evidence.md`.
+- Added focused route, fail-closed, matrix, RLS, and authorization-boundary checks.
+- Registered the integration evidence suite in `scripts/r1-with-local-worker.mjs`.
+- Kept CI Supabase setup, cloud migration, production worker activation, bootstrap, and deployment open.

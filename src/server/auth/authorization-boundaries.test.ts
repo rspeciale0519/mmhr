@@ -77,6 +77,7 @@ const directDatabaseFiles = new Set([
   "src/server/db/db.integration.test.ts",
   "src/server/db/r1-recovery-mfa-prefix.ts",
   "src/server/auth/rls.integration.test.ts",
+  "src/server/auth/r1-security.integration.test.ts",
   "src/server/db/r1-recovery-mfa-migration-cases.ts",
   "src/server/db/r1-identity-worker-fixtures.ts",
   "src/server/db/r1-identity-worker-prefix.ts",
@@ -92,6 +93,9 @@ const credentialFiles: Record<string, readonly string[]> = {
   "src/server/auth/auth.integration.test.ts": ["SUPABASE_SERVICE_ROLE_KEY"],
   "src/server/auth/rls.integration.test.ts": [
     "SUPABASE_SERVICE_ROLE_KEY", "TEST_MIGRATION_DATABASE_URL",
+  ],
+  "src/server/auth/r1-security.integration.test.ts": [
+    "TEST_MIGRATION_DATABASE_URL",
   ],
   "src/server/auth/permission-test-fixtures.ts": [
     "SUPABASE_SERVICE_ROLE_KEY", "TEST_MIGRATION_DATABASE_URL", "DATABASE_URL",

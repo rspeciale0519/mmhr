@@ -1,4 +1,15 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+  check,
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
+
+import { identities, orgs } from "./identity";
 
 /**
  * Captured leads (FR-MKT-06, FR-MKT-10). Every field except `source` is mandatory at the
@@ -14,7 +25,20 @@ export const leads = pgTable("leads", {
   source: text("source"),
   status: text("status").notNull().default("new"),
   consentAt: timestamp("consent_at", { withTimezone: true }).notNull(),
+  // These fields are nullable for legacy rows. New command-created rows always
+  // populate them, which keeps the additive migration reversible.
+  organizationId: uuid("organization_id").references(() => orgs.id, { onDelete: "restrict" }),
+  routingOwnerIdentityId: uuid("routing_owner_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  normalizedSource: text("normalized_source"),
+  idempotencyKey: uuid("idempotency_key"),
+  requestDigest: text("request_digest"),
+  correlationId: uuid("correlation_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("leads_idempotency_key_uq").on(t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
+  index("leads_organization_status_idx").on(t.organizationId, t.status),
+  check("leads_status_ck", sql`${t.status} in ('new', 'contacted', 'qualified', 'disqualified', 'converted', 'archived')`),
+  check("leads_request_digest_ck", sql`${t.requestDigest} is null or ${t.requestDigest} ~ '^[0-9a-f]{64}$'`),
+]);
