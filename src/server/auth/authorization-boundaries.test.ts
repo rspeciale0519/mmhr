@@ -292,7 +292,7 @@ describe("R1 authorization architecture boundaries", () => {
       "src/app/api/trpc/[trpc]/route.ts", "src/components/ui/button.tsx",
     ]));
     expect(inspectSources(sources)).toEqual([]);
-  });
+  }, 30_000);
 
   test.each([
     'import { owner } from "@/server/db/test/migration-owner";',

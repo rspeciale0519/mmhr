@@ -28,9 +28,12 @@ describe("R1 security evidence", () => {
     expect(source("src/app/(app)/home/page.tsx")).toContain("requireHomeAccess");
     expect(source("src/app/(admin)/admin/page.tsx")).toContain("requirePagePermission");
     expect(source("src/app/(app)/customer/layout.tsx")).toContain(
-      "requireSelectedOrganizationPermission",
+      "requirePortalPageAccess",
     );
     expect(source("src/app/(app)/vendor/layout.tsx")).toContain(
+      "requirePortalPageAccess",
+    );
+    expect(source("src/server/auth/portal/portal-guards.ts")).toContain(
       "requireSelectedOrganizationPermission",
     );
     expect(source("src/server/auth/page-guards.ts")).toContain("forbidden()");
