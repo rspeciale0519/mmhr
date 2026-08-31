@@ -30,6 +30,13 @@ jobs:
       - name: Validate R9 evidence manifest
         run: npm run check:r9-evidence
 
+      - name: Upload R9 evidence manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: r9-release-evidence
+          path: scripts/r9-release-evidence.json
+          if-no-files-found: error
+
       - name: Type-check
         run: npm run type-check
 
