@@ -1129,7 +1129,7 @@ The only allowed recovery action is an MFA enrollment reset.
 
 The lost-factor identity check is a phone call to the target's company-record number that existed before the request.
 
-R1.4 is locally verified. R1.5 route and MFA foundations are in progress, and recovery activation remains blocked until target-environment approval.
+R1.4 and R1.5 route and MFA foundations are locally verified. Recovery activation remains blocked until target-environment approval.
 
 Named owners:
 

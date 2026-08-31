@@ -209,7 +209,7 @@ The reset removes every MFA factor and binds one verified replacement to the tar
 
 Lost-factor recovery requires a call to the target's pre-existing company-record phone number.
 
-R1.4 is locally verified, and R1.5 route and MFA foundations are in progress. Recovery remains disabled until target-environment activation is approved.
+R1.4 and R1.5 route and MFA foundations are locally verified. Recovery remains disabled until target-environment activation is approved.
 
 Outcome:
 
