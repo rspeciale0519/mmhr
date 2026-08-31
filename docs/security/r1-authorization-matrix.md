@@ -125,7 +125,7 @@ These results prove local evaluation behavior only. Command, remote, staging, an
 | `src/app/(marketing)/(site)/broker-model/page.tsx#default` | /broker-model | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/case-studies/page.tsx#default` | /case-studies | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/case-studies/[slug]/page.tsx#default` | /case-studies/[slug] | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
-| `src/app/(marketing)/(site)/contact/page.tsx#default` | /contact | page | public | none | none | disabled form; no submission handler | R0 release gate; no R1 permission gate |
+| `src/app/(marketing)/(site)/contact/page.tsx#default` | /contact | page | public | none | none | public lead form; fixed DTO to exact-origin lead route; redacted status | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/faq/page.tsx#default` | /faq | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/partners/brokers-consultants/page.tsx#default` | /partners/brokers-consultants | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/partners/pe-vc/page.tsx#default` | /partners/pe-vc | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |

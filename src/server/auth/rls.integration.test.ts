@@ -269,12 +269,13 @@ describe("R1.3 request-scoped grants and RLS", () => {
           'identity_recovery_requests', 'security_bootstrap_state', 'identities',
           'invitations', 'org_members', 'orgs', 'leads', 'admin_delegation_grants',
           'permission_definitions', 'platform_role_assignments', 'portal_access_grants',
-          'role_definitions', 'role_permission_defaults', 'user_permission_overrides'
+          'role_definitions', 'role_permission_defaults', 'user_permission_overrides',
+          'customer_profiles', 'vendor_profiles', 'products', 'contacts', 'relationships'
         )
       GROUP BY c.relname
       ORDER BY c.relname
     `;
-    expect(rows).toHaveLength(19);
+    expect(rows).toHaveLength(24);
     expect(rows.every((row) => row.policy_count >= 1)).toBe(true);
   });
 

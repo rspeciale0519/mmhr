@@ -19,6 +19,8 @@ const expectedTables = [
   "admin_delegation_grants",
   "audit_events",
   "audit_log",
+  "contacts",
+  "customer_profiles",
   "identities",
   "identity_admin_intents",
   "identity_recovery_approvals",
@@ -31,10 +33,13 @@ const expectedTables = [
   "permission_definitions",
   "platform_role_assignments",
   "portal_access_grants",
+  "products",
+  "relationships",
   "role_definitions",
   "role_permission_defaults",
   "security_bootstrap_state",
   "user_permission_overrides",
+  "vendor_profiles",
 ];
 
 describe("R1.4 empty database migration", () => {

@@ -19,6 +19,7 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - R1.0 is complete with a 30-minute expiry, MFA-reset-only scope, and phone identity check.
 - R1.4 and R1.5 foundations are verified locally, and R1.8 local evidence is recorded.
 - R2B now has a shared lead-create command and status contract with redacted responses and idempotency.
+- R2B CRM foundation tables now cover customer and vendor profiles, products, contacts, and relationships with local isolation checks.
 - Rob Speciale is the temporary operations owner.
 - The R0 control record records owners, decisions, claim families, route coverage, and the release block.
 - Public claims remain blocked placeholders by product decision.

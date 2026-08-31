@@ -90,7 +90,7 @@ const checkedInContentPages: EntryPointInventoryRecord[] =
     scope: "none",
     dataPath:
       surface === "/contact"
-        ? "disabled form; no submission handler"
+        ? "public lead form; fixed DTO to exact-origin lead route; redacted status"
         : "checked-in public content",
     denialEvidence: "R0 release gate; no R1 permission gate",
   }));

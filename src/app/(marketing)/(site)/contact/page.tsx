@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { PageHero, SectionHead } from "../../_site/PageParts";
+import ContactForm from "./contact-form";
 
 export const metadata: Metadata = {
   title: "Contact — MatchMaker HR",
@@ -26,8 +27,6 @@ const REASONS = [
   },
 ];
 
-// The form is not wired to a handler yet. Keep every control disabled so
-// personal data cannot enter a query string, browser history, or access log.
 export default function ContactPage() {
   return (
     <>
@@ -41,71 +40,7 @@ export default function ContactPage() {
         <div className="pu-wrap pu-contact">
           <div>
             <SectionHead title="Send us a note" />
-            <form className="pu-fieldset" aria-describedby="contact-form-status">
-              <fieldset className="contents" disabled>
-                <div className="pu-field">
-                  <label htmlFor="c-name">Full name</label>
-                  <input className="pu-input" id="c-name" name="name" required />
-                </div>
-                <div className="pu-field">
-                  <label htmlFor="c-company">Company</label>
-                  <input
-                    className="pu-input"
-                    id="c-company"
-                    name="company"
-                    required
-                  />
-                </div>
-                <div className="pu-field">
-                  <label htmlFor="c-email">Work email</label>
-                  <input
-                    className="pu-input"
-                    id="c-email"
-                    name="email"
-                    type="email"
-                    required
-                  />
-                </div>
-                <div className="pu-field">
-                  <label htmlFor="c-size">Company size</label>
-                  <select
-                    className="pu-input"
-                    id="c-size"
-                    name="size"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      Select a range
-                    </option>
-                    <option>Under 100</option>
-                    <option>100–500</option>
-                    <option>500–1,000</option>
-                    <option>1,000–5,000</option>
-                    <option>Over 5,000</option>
-                  </select>
-                </div>
-                <div className="pu-field">
-                  <label htmlFor="c-msg">What can we help with?</label>
-                  <textarea
-                    className="pu-input"
-                    id="c-msg"
-                    name="message"
-                    rows={5}
-                  />
-                </div>
-                <button className="pu-btn pu-solid pu-lg" type="submit">
-                  Send
-                </button>
-              </fieldset>
-              <p className="pu-fine" id="contact-form-status" role="status">
-                Online contact is not active yet. Do not enter personal
-                information.
-              </p>
-              <p className="pu-fine">
-                We use your details to reply and to verify you are a buyer rather
-                than a competitor. We never sell them.
-              </p>
-            </form>
+            <ContactForm />
           </div>
 
           <aside>

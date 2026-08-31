@@ -2,17 +2,21 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 import * as audit from "./schema/audit";
+import * as crm from "./schema/crm";
 import * as identity from "./schema/identity";
 import * as identityAdmin from "./schema/identity-admin";
 import * as leads from "./schema/leads";
 import * as permissions from "./schema/permissions";
+import * as r3Intake from "./schema/r3-intake";
 
 export const schema = {
   ...audit,
+  ...crm,
   ...identity,
   ...identityAdmin,
   ...leads,
   ...permissions,
+  ...r3Intake,
 };
 
 const connectionString = process.env.DATABASE_URL;
@@ -28,7 +32,9 @@ const client = postgres(connectionString, { max: 10, max_lifetime: 60 });
 export const db = drizzle(client, { schema });
 
 export * from "./schema/audit";
+export * from "./schema/crm";
 export * from "./schema/identity";
 export * from "./schema/identity-admin";
 export * from "./schema/leads";
 export * from "./schema/permissions";
+export * from "./schema/r3-intake";
