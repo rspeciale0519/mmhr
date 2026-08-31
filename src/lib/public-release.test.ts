@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 
 import {
   createPublicReleaseBlockResponse,
+  createPublicReleaseRobotsResponse,
+  getPublicReleaseRobotsMetadata,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
 
@@ -45,6 +47,22 @@ describe("public release control", () => {
     ).toBe(true);
   });
 
+  test("keeps crawler metadata blocked until release approval", () => {
+    expect(getPublicReleaseRobotsMetadata(true)).toEqual({
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+    });
+  });
+
+  test("returns indexable crawler metadata after release approval", () => {
+    expect(getPublicReleaseRobotsMetadata(false)).toEqual({
+      index: true,
+      follow: true,
+    });
+  });
+
   test("serves a crawler block while production is closed", async () => {
     const response = createPublicReleaseBlockResponse("/robots.txt");
 
@@ -84,5 +102,24 @@ describe("public release control", () => {
     expect(response.status).toBe(503);
     expect(response.headers.get("content-type")).toContain("application/json");
     expect(await response.json()).toEqual({ error: "service_unavailable" });
+  });
+
+  test("keeps non-GET robots methods inside the release block", async () => {
+    const response = createPublicReleaseBlockResponse(
+      "/robots.txt",
+      undefined,
+      "POST",
+    );
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("x-robots-tag")).toContain("noindex");
+  });
+
+  test("allows indexing rules when the release is unlocked", async () => {
+    const response = createPublicReleaseRobotsResponse(false);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-robots-tag")).toBeNull();
+    expect(await response.text()).toBe("User-agent: *\nAllow: /\n");
   });
 });

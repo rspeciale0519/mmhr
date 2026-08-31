@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.8 |
-| Date | 2026-08-28 |
-| Status | Approved roadmap; R0 control records complete; R1 through R9 foundations verified locally; target-environment evidence and end-to-end workflow completion remain open |
+| Version | 1.9 |
+| Date | 2026-08-31 |
+| Status | Approved roadmap; R0 documentation audit recorded with public release blocked; R1 through R9 foundations verified locally; target-environment evidence and end-to-end workflow completion remain open |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
@@ -157,12 +157,12 @@ AI capability selection must remain interchangeable behind AIService.
 
 Control record: [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md).
 
-The R0 control record now records named owners, open decisions, claim-family
-owners, route coverage, the fail-closed local release gate, recovery, and
-linked control status.
+The R0 control record now records named owners, open decisions, the exact
+public-claim inventory, route coverage, the fail-closed local release gate,
+recovery, and linked control status.
 
-The exact statement review register remains incomplete. No public claim is
-approved by the inventory.
+The exact statement register is complete as a blocked inventory. No public
+claim is approved by the inventory.
 
 The product owner chose to retain the blocked statements as placeholders for now.
 
@@ -176,14 +176,16 @@ Outcome:
 - Approve this roadmap and its status mapping.
 - Assign named owners to every release and open decision.
 - Keep indexing and public deployment blocked until legacy claims are replaced.
-- Create an approved copy inventory with sources and review records.
+- Create the exact copy inventory with sources and review fields; approve each
+  statement separately before publication.
 - Record the first module plan approval.
 
 Exit evidence:
 
 - Product-owner approval of this roadmap
 - Decision register with owners and required dates or release gates
-- Complete legacy-claim inventory
+- Exact public-claim inventory with source, evidence, reviewer, date, and
+  decision fields
 - Written public-release block
 - No unresolved authority conflict between README, PRD, technical architecture, and roadmap
 
@@ -401,6 +403,12 @@ Recovery:
 - Reuse durable records and idempotency keys during reruns.
 
 ### R5 — Provider-Neutral AI Assistance
+
+The local foundation now includes a server-only `AiService` boundary with
+capability and data-class allowlists, schema validation, prompt-injection
+denial, safe provider failures, provenance fields, and mandatory human review.
+Database run storage, approval records, and target-provider evaluation remain
+open release work.
 
 Outcome:
 
@@ -772,6 +780,7 @@ Every PRD requirement appears exactly once below.
 | FR-IAM-10 and FR-IAM-11 roadmap amendment | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Product-owner R1 plan approval | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Product-owner R0 control approval | Approved | Rob Speciale, current Codex task, 2026-08-27 |
+| R0 exact public-claim inventory audit | Complete as a blocked register | Current Codex task, 2026-08-31; see R0 Section 4 |
 | Security review of R1 boundaries | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering feasibility review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations workflow review | Approved | Rob Speciale, current Codex task, 2026-08-27 |

@@ -9,6 +9,7 @@
 | Status | Canonical product baseline |
 | Product owner | Rob Speciale |
 | Architecture authority | [TECH_STACK.md](./TECH_STACK.md) |
+| R0 release authority | [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) |
 | Supporting research | [outsail-competitive-operating-model.md](./outsail-competitive-operating-model.md) |
 | Supersedes | Prior PRD v1 content and [PRD-2.md](./PRD-2.md) |
 
@@ -505,6 +506,10 @@ Database and authorization changes require local integration evidence. Productio
 
 Production publication and search indexing remain blocked while the
 [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) is active.
+
+The R0 record contains the exact public-claim inventory and required evidence,
+reviewer, date, and approval fields. Every claim remains blocked until its row
+has approved evidence and publication approval.
 
 A new v2 implementation roadmap must replace the legacy roadmap before feature work continues.
 

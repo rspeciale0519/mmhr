@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.5 |
-| Date | 2026-08-30 |
-| Status | Control records complete; policy quarantine active; claim approval and production activation pending |
+| Version | 0.6 |
+| Date | 2026-08-31 |
+| Status | Documentation audit recorded; policy quarantine active; claim approval and production activation pending |
 | Product owner | Rob Speciale |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -20,10 +20,10 @@ It does not authorize a branch, commit, dependency, cloud change, deployment, or
 This document closes the R0 recordkeeping gaps. It does not approve a public
 claim, activate production access, or replace a required release decision.
 
-Control records are complete for owners, decisions, claim families, route
+Control records are complete for owners, decisions, exact claim inventory, route
 coverage, the release block, recovery, and linked status. Claim evidence,
-statement review, deployment aliases, live verification, and production approval
-remain open.
+statement approval, deployment aliases, live verification, and production
+approval remain open.
 
 ## 1. Owner and Decision Register
 
@@ -117,9 +117,8 @@ The product owner decided on 2026-08-27 to retain these statements as placeholde
 
 Do not treat them as approved claims. Keep public release blocked until the required review is complete.
 
-This source-family inventory defines the review scope.
-
-It does not replace the exact claim-by-claim review register required for R0 closure.
+This source-family inventory defines the review scope. Section 4 records the
+exact statement text and stable source identifier for each review item.
 
 | ID | Claim family and examples | Render sources | Accountable owner(s) | Required evidence and approval |
 |---|---|---|---|---|
@@ -159,25 +158,63 @@ It does not replace the exact claim-by-claim review register required for R0 clo
 | `/partners` child routes | CLM-05 through CLM-12, CLM-14, and CLM-15 |
 | `/designs` and `/designs/[slug]` | CLM-01 through CLM-10, CLM-15, and CLM-17 |
 
-## 4. Claim Review Register
+## 4. Exact Public-Claim Review Register
 
-Use one row for each reviewed claim or approved group. The current row is a
-claim-family control, not an approval. No statement is approved by this record.
+This register was captured from the current public route sources and retained
+design gallery on 2026-08-31. Repeated renderings use one source identifier.
 
-| Claim ID | Evidence source | Capture date | Reviewer | Review date | Result |
-|---|---|---|---|---|---|
-| CLM-01 through CLM-17 | No approved evidence recorded | Not recorded | Accountable owners are listed in Section 3 | Not reviewed | Blocked |
+Every row is blocked. No row has approved evidence, reviewer, or publication
+approval. A source path does not prove that the statement is true.
 
-The exact statement register remains open. When a claim is ready for review,
-add its exact text or stable content identifier, source, capture date, reviewer,
-review date, decision, and approval record before publication.
+| Claim ID | Exact public statement | Stable source identifier | Evidence source | Capture date | Reviewer | Review date | Decision |
+|---|---|---|---|---|---|---|---|
+| CLM-01.1 | “kept current by an automated research pipeline rather than a stale spreadsheet.” | `src/designs/_content.ts:ADVANTAGES[0].body` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-01.2 | “Pricing is re-checked on a schedule by an automated pipeline.” | `src/app/(marketing)/(site)/platform/page.tsx:CAPABILITIES[1].p` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-01.3 | “An automated research pipeline re-checks vendor pricing on a schedule rather than when someone remembers to.” | `src/app/(marketing)/_site/data.ts:FAQS[3].a` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-02.1 | “52 HRIS profiles with verified pricing, module-level capability scores, and honest pros and cons.” | `src/designs/_content.ts:TOOLS[0].blurb` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-02.2 | “Tag ~200 HRIS features as must-have, nice-to-have, or irrelevant.” | `src/designs/_content.ts:TOOLS[1].blurb` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-02.3 | “52 systems, profiled the same way” and “+ 36 more” | `src/app/(marketing)/(site)/platform/page.tsx:CAPABILITIES[0].h; platform vendor wall` | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-02.4 | “+ 40 more” systems in the retained design gallery | `src/designs/pulse/Body.tsx:vendor wall` and repeated gallery vendor walls | Not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-03.1 | “40%” and “off annual payroll fees” for Northwind | `src/app/(marketing)/_site/data.ts:CASE_STUDIES[0]` | Client evidence and publication consent not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-03.2 | “75%” and “less evaluation time” for Vantage, including “three vendors in nine days” | `src/app/(marketing)/_site/data.ts:CASE_STUDIES[1]` | Client evidence and publication consent not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-03.3 | “3” and “best-fit vendors in 48h” for Copperline | `src/app/(marketing)/_site/data.ts:CASE_STUDIES[2]` | Client evidence and publication consent not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-04.1 | “74” and “Net promoter score” | `src/designs/_content.ts:STATS[1]` | Measurement source and period not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-04.2 | “310” and “Selections guided” | `src/designs/_content.ts:STATS[2]` | Measurement source and period not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-04.3 | “A dedicated expert who has run hundreds of these.” | `src/designs/_content.ts:TOOLS[5].blurb` | Operating record not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-05.1 | “Whichever system you pick, we're paid the identical commission. Steering you cannot make us more money.” | `src/designs/_content.ts:TRUST[0].body` | Current commission schedule and exception review not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-05.2 | “Our commission is the identical rate regardless of which system you choose” | `src/app/(marketing)/(site)/transparency/page.tsx:commission-rate section` | Current commission schedule and exception review not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-06.1 | “Not a fee, not a subscription, and not passed along in the price the vendor quotes you.” | `src/designs/_content.ts:TRUST[1].body` | Approved commercial policy not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-06.2 | “You pay nothing — not a fee, not a subscription, and nothing added to the price the vendor quotes you.” | `src/app/(marketing)/(site)/transparency/page.tsx:who-pays-us section` | Approved commercial policy not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-06.3 | “Free to you, always. The vendor pays our commission — the same rate whichever system you choose.” | `src/app/(marketing)/_site/PageParts.tsx:CTA.default body` | Approved commercial policy not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-07.1 | “We resell one system, CBIZ Centrally HR.” | `src/designs/_content.ts:TRUST[2].body` | Current agreement and disclosure review not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-07.2 | “We are a reseller of CBIZ Centrally HR.” | `src/app/(marketing)/(site)/transparency/page.tsx:reseller section` | Current agreement and disclosure review not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-07.3 | “It is labelled wherever it appears and ranks on the same data as everything else.” | `src/designs/_content.ts:TRUST[2].body` | Disclosure and ranking evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-08.1 | “The marketplace, requirements builder, scorecards, project plans, team collaboration and advisor access that run an HRIS evaluation end to end.” | `src/app/(marketing)/(site)/platform/page.tsx:metadata.description` | End-to-end product evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-08.2 | “The platform replaces both with shared requirements, verified pricing, and scorecards your whole team works from.” | `src/app/(marketing)/(site)/platform/page.tsx:PageHero.lede` | End-to-end product evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-09.1 | “Send us the quote. We benchmark it against what comparable companies paid.” | `src/app/(marketing)/(site)/broker-model/page.tsx:STEPS[3].p` | Licensed benchmark source and method not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-09.2 | “Every figure carries the date it was last verified.” | `src/app/(marketing)/(site)/resources/hris-landscape-report/page.tsx:method section` | Source registry and freshness record not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-10.1 | “No sponsored placements and no vendor-written blurbs.” | `src/app/(marketing)/(site)/platform/page.tsx:CAPABILITIES[0].p` | Ranking policy and test evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-10.2 | “Placement cannot be bought.” | `src/app/(marketing)/(site)/partners/software-vendors/page.tsx:arrangement list` | Ranking policy and test evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-11.1 | “We do not sell your contact details, and we do not pass them to vendors as leads.” | `src/app/(marketing)/(site)/privacy/page.tsx:who-we-share-it-with section` | Implemented privacy controls and legal review not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-11.2 | “Delete your account and we remove it inside 30 days, except where we are required to retain records.” | `src/app/(marketing)/(site)/privacy/page.tsx:how-long-we-keep-it section` | Retention and deletion evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-12.1 | “We take no commission on implementation work.” | `src/app/(marketing)/(site)/resources/partner-finder/page.tsx:how-partners-are-listed section` | Operating policy and agreement evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-12.2 | “Your client pays nothing, and you keep the relationship you already have with them.” | `src/app/(marketing)/(site)/partners/brokers-consultants/page.tsx:WAYS[0].p` | Current referral policy not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-13.1 | “What moved in vendor pricing this week, in one email. No account required.” | `src/app/(marketing)/(site)/resources/page.tsx:CTA` | Content workflow and consent evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-14.1 | “Most of the companies we guide are between 100 and 5,000 employees.” | `src/app/(marketing)/_site/data.ts:FAQS[7].a` | Service policy and capacity evidence not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-15.1 | “MatchMaker HR — buyer-side HRIS brokerage.” | `src/app/layout.tsx:metadata.description` | Approved positioning and disclosure not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-16.1 | “Every bad selection we have seen started with a demo instead of a requirement.” | `src/app/(marketing)/(site)/about/page.tsx:BELIEFS[1].p` | Approved editorial source not recorded | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+| CLM-17.1 | “Company names and figures on these pages are illustrative placeholders while the site is in build, not client claims.” | `src/app/(marketing)/designs/page.tsx:placeholder notice` | No production claim evidence; illustrative status is documented | 2026-08-31 | Not assigned | Not reviewed | Blocked |
+
+The inventory is complete as a control record. Replace each blocked decision
+with approved evidence, reviewer, review date, and approval reference before
+the statement can appear in an approved public release.
 
 ## 5. Control Status and Verification Links
 
 | Control | Current status | Canonical evidence | Owner |
 |---|---|---|---|
 | Owner and decision register | Complete | Section 1 and `docs/PRD.md#11-open-product-decisions` | PO |
-| Claim-family inventory and route coverage | Complete | Sections 3 and 4 | MKT, DATA, PO |
+| Exact public-claim inventory and route coverage | Complete as inventory; all decisions blocked | Sections 3 and 4 | MKT, DATA, PO |
 | Local fail-closed release gate | Verified locally; not active in current production | `src/lib/public-release.ts`, `src/middleware.ts`, and release tests | ENG, SEC |
 | Search crawler block | Active in code; live production state not verified | `src/app/layout.tsx`, `/robots.txt`, and release tests | ENG, MKT |
 | Production deployment and old aliases | Open; no current verification recorded | Exit rule 7 and the approved deployment record | REL, ENG |
@@ -194,15 +231,16 @@ record, while the release remains blocked until every open control passes.
 | Open product-decision ownership | Complete | PRD decision register and Section 1 |
 | Named release owners | Complete | Section 1 assigns every owner role |
 | Public claim-family and route inventory with accountable owners | Complete | Sections 3 and 4 |
-| Exact claim-by-claim review register | Incomplete | Each statement needs its own source, decision, reviewer, and date |
+| Exact claim-by-claim review register | Complete as a blocked register | Section 4 records each statement, source, reviewer, date, and decision |
 | Written public-release block | Complete | Section 2 |
 | Local technical public-release block | Complete | `src/lib/public-release.ts`, `src/middleware.ts`, and tests |
 | Production gate activation | Incomplete | Separate production deployment approval and verification required |
 | First module product approval | Complete | R1 plan approval record |
 | Canonical-document authority check | Complete | README, PRD, TECH_STACK, roadmap, R0, and R1 records agree |
 
-The R0 control record is complete. Public release remains blocked until the
-claim, deployment, live-verification, and approval exit items pass.
+The R0 control record is complete as a documentation and control record.
+Public release remains blocked until the claim, deployment, live-verification,
+and approval exit items pass.
 
 ## 7. Approval Record
 

@@ -65,7 +65,9 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - The restricted direct PostgreSQL worker has no raw table access. Worker delivery is locally verified but not activated in a target environment.
 - Customer and vendor routes have guard foundations. CRM, workflow, finance, and operations foundations are additive and deny-first.
 - Public claims and commission copy still need approved evidence before release.
-- No provider-neutral AI adapter, fixture suite, approval queue, or AI-run store exists yet.
+- A provider-neutral server-only AI service boundary and fixture tests now exist.
+  Database run storage, approval records, provider evaluation, and target
+  environment evidence remain open.
 - Retain all 22 gallery layouts. Verify both Pulse routes and themes if shared UI changes.
 - Keep unrelated local settings and generated Codex hooks outside task commits.
 - Keep the copied public-site corpus and questionnaire audit in docs/temp/ internal.

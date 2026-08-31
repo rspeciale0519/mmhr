@@ -8,6 +8,7 @@
 | Date | 2026-08-27 |
 | Status | Canonical technical authority |
 | Product authority | [PRD.md](./PRD.md) |
+| R0 release authority | [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) |
 | Dependency authority | [package.json](../package.json) and [package-lock.json](../package-lock.json) |
 
 This document defines approved architecture and identifies implementation status.
@@ -446,6 +447,9 @@ Do not apply a cloud migration or production deployment without explicit approva
 
 Production approval cannot override the active
 [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md).
+
+The R0 record keeps public routes and indexing blocked while the exact claim
+inventory lacks approved evidence, review, and publication approval.
 
 ## 16. CI and Testing Status
 

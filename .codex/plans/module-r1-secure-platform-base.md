@@ -41,6 +41,9 @@ R0 records its decision ownership, claim inventory, and public-release block in
 
 R0 named every release owner before R1.1 started.
 
+The R0 exact public-claim register is complete as a blocked inventory. R1 must
+not treat its source paths or local checks as public-claim approval.
+
 ## 2. Approved Roadmap Amendment
 
 Roadmap version 1.0 assigned FR-IAM-10 and FR-IAM-11 entirely to R1.

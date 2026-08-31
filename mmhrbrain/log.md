@@ -158,3 +158,9 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added consented lead capture, CRM tables, intake and matching, document and communication safety, contract handoff, finance controls, work queues, and release readiness contracts.
 - Passed the full unit suite with 1836 tests and passed type checking, lint, matrix checks, and the production build.
 - Kept target-environment integration, provider delivery, cloud migration, production deployment, and public-release evidence open.
+### 2026-08-31 — Add provider-neutral AI service boundary
+
+Added a server-only `AiService` contract with capability and data-class checks,
+schema validation, safe provider failure states, prompt-injection denial, and
+mandatory human review metadata. Focused tests and type checking passed.
+Database run storage, approval records, and provider evaluation remain open.

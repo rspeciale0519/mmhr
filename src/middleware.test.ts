@@ -43,6 +43,25 @@ describe("public-release middleware", () => {
     expect(response.headers.get("x-robots-tag")).toContain("nosnippet");
   });
 
+  test.each(["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])(
+    "blocks %s requests before action or session work",
+    async (method) => {
+      const response = await middleware(
+        new NextRequest("https://mmhr.test/", {
+          method,
+          headers: method === "POST" ? { "next-action": "action-id" } : {},
+        }),
+      );
+
+      expect(response.status).toBe(503);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+      expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+      expect(response.headers.get("x-robots-tag")).toContain("noindex");
+      expect(createServerClient).not.toHaveBeenCalled();
+    },
+  );
+
   test("serves robots.txt without starting a session", async () => {
     const response = await middleware(
       new NextRequest("https://mmhr.test/robots.txt?cache=miss"),
@@ -60,6 +79,8 @@ describe("public-release middleware", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("content-type")).toContain("application/json");
+    expect(response.headers.get("retry-after")).toBe("3600");
+    expect(response.headers.get("x-robots-tag")).toContain("noindex");
     expect(await response.json()).toEqual({ error: "service_unavailable" });
   });
 
@@ -75,8 +96,19 @@ describe("public-release middleware", () => {
 
   test("matches image-like application paths", () => {
     expect(config.matcher).toEqual([
-      "/((?!_next/static|_next/image|favicon.ico).*)",
+      "/((?!_next/static(?:/|$)|_next/image(?:/|$)|favicon\\.ico$).*)",
     ]);
+  });
+
+  test("does not let asset-like prefixes bypass the release matcher", () => {
+    const matcher = new RegExp(`^${config.matcher[0]}`);
+
+    expect(matcher.test("/favicon.ico/hidden")).toBe(true);
+    expect(matcher.test("/_next/static-attacker/page")).toBe(true);
+    expect(matcher.test("/_next/image-proxy/page")).toBe(true);
+    expect(matcher.test("/_next/static/chunk.js")).toBe(false);
+    expect(matcher.test("/_next/image")).toBe(false);
+    expect(matcher.test("/favicon.ico")).toBe(false);
   });
 });
 

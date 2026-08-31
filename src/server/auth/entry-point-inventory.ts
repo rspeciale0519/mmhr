@@ -459,6 +459,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "invitation-administration.test.ts; no direct database or provider access",
   },
   {
+    key: "src/server/commands/invitation-database.ts#command",
+    surface: "invitation database command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "organization invitation administration; database command unavailable until reviewed SQL functions exist",
+    scope: "one organization and invitation record",
+    dataPath: "strict command DTO; fail-closed unavailable result",
+    denialEvidence: "invitation-database.test.ts; rejects invalid input and never guesses an RPC",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",

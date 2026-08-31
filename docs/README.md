@@ -9,7 +9,7 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - Former Phase 0 foundations are mostly complete.
 - Pulse renders at the site root and remains the selected visual direction.
 - The public marketing routes and design gallery exist.
-- Existing public commission and affiliation copy still reflects the legacy product.
+- Existing public commission, affiliation, pricing, performance, and service copy remains unapproved; the R0 quarantine blocks release.
 - Authentication, database, analytics, tRPC, and background-job foundations exist.
 - Customer, vendor, and internal administration routes now have server-side guard foundations.
 - The v2 product baseline now lives in the canonical documents below.
@@ -22,9 +22,9 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - R2B CRM foundation tables now cover customer and vendor profiles, products, contacts, and relationships with local isolation checks.
 - R3 through R9 now have deny-first matching, workflow, finance, operations, reporting, and release-readiness foundations with focused tests.
 - Rob Speciale is the temporary operations owner.
-- The R0 control record records owners, decisions, claim families, route coverage, and the release block.
+- The R0 control record records named owners, decisions, exact public claims, route coverage, evidence fields, and the release block.
 - Public claims remain blocked placeholders by product decision.
-- The exact statement review register, deployment checks, and live release verification remain open.
+- The exact statement inventory is complete, but every claim decision, deployment check, and live release verification remains open.
 - Production gate activation requires a separate approved deployment.
 - All roadmap owner roles now have named people.
 - The former v1 execution plan and roadmap remain historical records.
@@ -147,5 +147,8 @@ Keep these files for history. Do not use them as current product scope or sequen
 A production deployment requires explicit approval.
 
 The active R0 policy blocks production access and search indexing.
+
+The R0 record is a documentation and control closure only. It does not approve
+public claims or activate production access.
 
 The local gate must reach production through a separately approved deployment.

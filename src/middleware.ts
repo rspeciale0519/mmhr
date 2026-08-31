@@ -15,6 +15,14 @@ import { shouldRejectServerActionRequest } from "@/server/auth/server-action-req
  * and admin protection belongs with the canonical IAM and RLS implementation.
  */
 export async function middleware(request: NextRequest) {
+  if (isPublicReleaseBlocked()) {
+    return createPublicReleaseBlockResponse(
+      request.nextUrl.pathname,
+      undefined,
+      request.method,
+    );
+  }
+
   if (shouldRejectServerActionRequest(request)) {
     return new NextResponse(null, {
       status: 403,
@@ -24,16 +32,19 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  if (isPublicReleaseBlocked()) {
-    return createPublicReleaseBlockResponse(request.nextUrl.pathname);
-  }
-
   // GALLERY_ONLY builds (the public design-review deployment) serve nothing but
   // /designs. The app and admin routes never render, and sign-up is unreachable
   // — so a public URL can't be used to create accounts against a real Supabase
   // project. Auth is skipped entirely here: there is nothing to authenticate.
   if (process.env.GALLERY_ONLY === "1") {
     const { pathname } = request.nextUrl;
+    if (pathname === "/robots.txt") {
+      return createPublicReleaseBlockResponse(
+        pathname,
+        undefined,
+        request.method,
+      );
+    }
     if (pathname === "/designs" || pathname.startsWith("/designs/")) {
       return NextResponse.next();
     }
@@ -81,7 +92,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except Next's generated assets and the exact favicon path.
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // Match application, API, and robots paths without prefix-based bypasses.
+    "/((?!_next/static(?:/|$)|_next/image(?:/|$)|favicon\\.ico$).*)",
   ],
 };

@@ -1,6 +1,8 @@
 import { brand } from "@/lib/brand";
 
 const ROBOTS_BLOCK = "noindex, nofollow, noarchive, nosnippet";
+const ROBOTS_DISALLOW_BODY = "User-agent: *\nDisallow: /\n";
+const ROBOTS_ALLOW_BODY = "User-agent: *\nAllow: /\n";
 
 // A future approved release must replace null with a versioned approval ID.
 // The production environment must contain the same ID before routes can open.
@@ -10,6 +12,13 @@ type PublicReleaseEnvironment = {
   NODE_ENV?: string;
   PUBLIC_RELEASE_APPROVAL_ID?: string;
   PUBLIC_RELEASE_ENABLED?: string;
+};
+
+export type PublicReleaseRobotsMetadata = {
+  index: boolean;
+  follow: boolean;
+  noarchive?: boolean;
+  nosnippet?: boolean;
 };
 
 export function isPublicReleaseBlocked(
@@ -25,6 +34,18 @@ export function isPublicReleaseBlocked(
     environment.PUBLIC_RELEASE_ENABLED === "1" &&
     environment.PUBLIC_RELEASE_APPROVAL_ID === checkedInReleaseId
   );
+}
+
+/**
+ * Keeps generated page metadata aligned with the production release gate.
+ * The checked-in release ID remains the source of truth for opening production.
+ */
+export function getPublicReleaseRobotsMetadata(
+  blocked = isPublicReleaseBlocked(),
+): PublicReleaseRobotsMetadata {
+  return blocked
+    ? { index: false, follow: false, noarchive: true, nosnippet: true }
+    : { index: true, follow: true };
 }
 
 const commonHeaders = {
@@ -56,9 +77,13 @@ function escapeHtml(value: string) {
 export function createPublicReleaseBlockResponse(
   pathname: string,
   brandName: string = brand.name,
+  method = "GET",
 ) {
-  if (pathname === "/robots.txt") {
-    return new Response("User-agent: *\nDisallow: /\n", {
+  if (
+    pathname === "/robots.txt" &&
+    (method === "GET" || method === "HEAD")
+  ) {
+    return new Response(ROBOTS_DISALLOW_BODY, {
       headers: {
         ...commonHeaders,
         "Content-Type": "text/plain; charset=utf-8",
@@ -94,4 +119,22 @@ export function createPublicReleaseBlockResponse(
       },
     },
   );
+}
+
+/**
+ * Returns crawler rules for the locked or unlocked production state.
+ * This is separate from the release block response because an unlocked site
+ * must expose allow rules without the block-only response status and headers.
+ */
+export function createPublicReleaseRobotsResponse(blocked: boolean) {
+  if (blocked) {
+    return createPublicReleaseBlockResponse("/robots.txt");
+  }
+
+  return new Response(ROBOTS_ALLOW_BODY, {
+    headers: {
+      "Cache-Control": "no-store",
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+  });
 }
