@@ -5,6 +5,13 @@ import {
   calculateCommission,
   canFinanciallyCloseCommission,
   commissionStructureSchema,
+  canIssueInvoice,
+  canViewCommissionData,
+  issueInvoice,
+  reconcileFinancialReport,
+  prepareFinanceHandoff,
+  type CommissionEvent,
+  type CommissionPayment,
   reconcilePayments,
 } from "./commission-contract";
 
@@ -16,6 +23,9 @@ const dealId = "00000000-0000-4000-8000-000000000005";
 const eventId = "00000000-0000-4000-8000-000000000006";
 const idempotencyKey = "00000000-0000-4000-8000-000000000007";
 const paymentId = "00000000-0000-4000-8000-000000000008";
+const invoiceId = "00000000-0000-4000-8000-000000000011";
+const ownerId = "00000000-0000-4000-8000-000000000012";
+const disputeId = "00000000-0000-4000-8000-000000000013";
 
 function structure(overrides: Record<string, unknown> = {}) {
   return {
@@ -45,6 +55,34 @@ function event(overrides: Record<string, unknown> = {}) {
     commissionAmountMinorUnits: 12_500,
     calculationRevision: 2,
     state: "pending_review",
+    ...overrides,
+  };
+}
+
+function invoice(overrides: Record<string, unknown> = {}) {
+  return {
+    invoiceId,
+    commissionEventId: eventId,
+    vendorOrganizationId: vendorId,
+    ownerIdentityId: ownerId,
+    currency: "USD",
+    amountMinorUnits: 12_500,
+    status: "ready",
+    invoiceNumber: null,
+    issueDate: null,
+    dueDate: null,
+    supportingDocumentReferences: ["document:invoice-support"],
+    ...overrides,
+  };
+}
+
+function payment(overrides: Record<string, unknown> = {}) {
+  return {
+    paymentId,
+    commissionEventId: eventId,
+    amountMinorUnits: 5_000,
+    receivedAt: "2026-08-31T12:00:00.000Z",
+    state: "received",
     ...overrides,
   };
 }
@@ -100,5 +138,89 @@ describe("R7 commission contract", () => {
     expect(canFinanciallyCloseCommission("written_off")).toBe(true);
     expect(canFinanciallyCloseCommission("disputed")).toBe(false);
     expect(canFinanciallyCloseCommission("pending_review")).toBe(false);
+  });
+
+  test("requires an approved event before issuing a matching invoice", () => {
+    expect(canIssueInvoice(event(), invoice())).toBe(false);
+    const approvedEvent = event({ state: "approved" });
+    expect(canIssueInvoice(approvedEvent, invoice())).toBe(true);
+    expect(issueInvoice(invoice(), {
+      invoiceNumber: "INV-1001",
+      issueDate: "2026-08-31T12:00:00.000Z",
+      dueDate: "2026-09-30T12:00:00.000Z",
+    })).toMatchObject({ status: "issued", invoiceNumber: "INV-1001" });
+    expect(() => issueInvoice(invoice({ status: "draft" }), {
+      invoiceNumber: "INV-1001",
+      issueDate: "2026-08-31T12:00:00.000Z",
+      dueDate: "2026-09-30T12:00:00.000Z",
+    })).toThrow("not ready");
+  });
+
+  test("rejects unresolved disputes and unapproved adjustments", async () => {
+    const { disputeSchema, adjustmentSchema } = await import("./commission-contract");
+    expect(disputeSchema.safeParse({
+      disputeId,
+      commissionEventId: eventId,
+      openedByIdentityId: ownerId,
+      openedAt: "2026-08-31T12:00:00.000Z",
+      reasonCode: "amount",
+      reason: "Amount needs review",
+      status: "open",
+      resolvedByIdentityId: null,
+      resolvedAt: null,
+      resolution: null,
+    }).success).toBe(true);
+    expect(disputeSchema.safeParse({
+      disputeId,
+      commissionEventId: eventId,
+      openedByIdentityId: ownerId,
+      openedAt: "2026-08-31T12:00:00.000Z",
+      reasonCode: "amount",
+      reason: "Amount needs review",
+      status: "resolved",
+      resolvedByIdentityId: null,
+      resolvedAt: null,
+      resolution: null,
+    }).success).toBe(false);
+    expect(adjustmentSchema.safeParse({
+      adjustmentId: "00000000-0000-4000-8000-000000000014",
+      commissionEventId: eventId,
+      direction: "decrease",
+      amountMinorUnits: 500,
+      reason: "Approved correction",
+      approvedByIdentityId: ownerId,
+      approvedAt: "2026-08-31T12:00:00.000Z",
+      createdAt: "2026-08-31T11:00:00.000Z",
+    }).success).toBe(true);
+  });
+
+  test("reconciles reports to immutable event and payment totals", () => {
+    const sourceEvent = event({ state: "approved" }) as CommissionEvent;
+    const sourcePayment = payment() as CommissionPayment;
+    const row = {
+      commissionEventId: eventId,
+      currency: "USD",
+      earnedMinorUnits: 12_500,
+      invoicedMinorUnits: 12_500,
+      receivedMinorUnits: 5_000,
+      balanceMinorUnits: 7_500,
+    };
+    expect(reconcileFinancialReport([sourceEvent], [sourcePayment], [row])).toEqual([row]);
+    expect(() => reconcileFinancialReport([sourceEvent], [sourcePayment], [{ ...row, receivedMinorUnits: 4_000, balanceMinorUnits: 8_500 }])).toThrow("does not reconcile");
+    expect(() => reconcileFinancialReport([sourceEvent], [sourcePayment], [{ ...row, invoicedMinorUnits: 10_000, balanceMinorUnits: 5_000 }])).toThrow("does not reconcile");
+  });
+
+  test("prepares an approved handoff and denies portal finance visibility", () => {
+    expect(prepareFinanceHandoff({
+      handoffId: "00000000-0000-4000-8000-000000000015",
+      destinationReference: "finance:approved-destination",
+      sourceEventIds: [eventId],
+      approvedByIdentityId: ownerId,
+      approvedAt: "2026-08-31T12:00:00.000Z",
+      reason: "Monthly finance reconciliation",
+    })).toMatchObject({ destinationReference: "finance:approved-destination" });
+    expect(canViewCommissionData("internal")).toBe(true);
+    expect(canViewCommissionData("customer")).toBe(false);
+    expect(canViewCommissionData("vendor")).toBe(false);
   });
 });

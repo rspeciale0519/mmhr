@@ -10,6 +10,10 @@ const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
 const currency = z.string().regex(/^[A-Z]{3}$/);
 const minorUnits = z.number().int().nonnegative().max(9_007_199_254_740_991);
+const identifier = z.string().trim().min(1).max(500).regex(
+  /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,499}$/,
+  "Identifier contains unsupported characters",
+);
 
 export const commissionStructureSchema = z
   .object({
@@ -72,6 +76,125 @@ export const commissionPaymentSchema = z
   .strict();
 
 export type CommissionPayment = z.infer<typeof commissionPaymentSchema>;
+
+export const invoiceStatuses = ["draft", "ready", "issued", "voided"] as const;
+export type InvoiceStatus = (typeof invoiceStatuses)[number];
+
+export const invoiceSchema = z
+  .object({
+    invoiceId: uuid,
+    commissionEventId: uuid,
+    vendorOrganizationId: uuid,
+    ownerIdentityId: uuid,
+    currency,
+    amountMinorUnits: minorUnits,
+    status: z.enum(invoiceStatuses),
+    invoiceNumber: identifier.nullable(),
+    issueDate: timestamp.nullable(),
+    dueDate: timestamp.nullable(),
+    supportingDocumentReferences: z.array(identifier).max(50),
+  })
+  .strict()
+  .superRefine((invoice, context) => {
+    if (invoice.status === "issued" && (invoice.invoiceNumber === null || invoice.issueDate === null || invoice.dueDate === null)) {
+      context.addIssue({ code: "custom", path: ["status"], message: "Issued invoices require number, issue date, and due date" });
+    }
+    if (invoice.issueDate !== null && invoice.dueDate !== null && Date.parse(invoice.dueDate) < Date.parse(invoice.issueDate)) {
+      context.addIssue({ code: "custom", path: ["dueDate"], message: "Due date cannot precede issue date" });
+    }
+  });
+
+export type Invoice = z.infer<typeof invoiceSchema>;
+
+export const invoiceIssueSchema = z
+  .object({
+    invoiceNumber: identifier,
+    issueDate: timestamp,
+    dueDate: timestamp,
+  })
+  .strict()
+  .refine((issue) => Date.parse(issue.dueDate) >= Date.parse(issue.issueDate), {
+    path: ["dueDate"],
+    message: "Due date cannot precede issue date",
+  });
+
+export const disputeSchema = z
+  .object({
+    disputeId: uuid,
+    commissionEventId: uuid,
+    openedByIdentityId: uuid,
+    openedAt: timestamp,
+    reasonCode: z.enum(["amount", "eligibility", "duplicate", "payment", "other"]),
+    reason: z.string().trim().min(1).max(2_000),
+    status: z.enum(["open", "resolved", "rejected"]),
+    resolvedByIdentityId: uuid.nullable(),
+    resolvedAt: timestamp.nullable(),
+    resolution: z.string().trim().max(2_000).nullable(),
+  })
+  .strict()
+  .superRefine((dispute, context) => {
+    const resolved = dispute.status !== "open";
+    if (resolved && (dispute.resolvedByIdentityId === null || dispute.resolvedAt === null || dispute.resolution === null)) {
+      context.addIssue({ code: "custom", path: ["status"], message: "Closed disputes require an approver, time, and resolution" });
+    }
+    if (!resolved && (dispute.resolvedByIdentityId !== null || dispute.resolvedAt !== null || dispute.resolution !== null)) {
+      context.addIssue({ code: "custom", path: ["status"], message: "Open disputes cannot contain a resolution" });
+    }
+    if (dispute.resolvedAt !== null && Date.parse(dispute.resolvedAt) < Date.parse(dispute.openedAt)) {
+      context.addIssue({ code: "custom", path: ["resolvedAt"], message: "Resolution cannot precede opening" });
+    }
+  });
+
+export type CommissionDispute = z.infer<typeof disputeSchema>;
+
+export const adjustmentSchema = z
+  .object({
+    adjustmentId: uuid,
+    commissionEventId: uuid,
+    direction: z.enum(["increase", "decrease"]),
+    amountMinorUnits: z.number().int().positive().max(9_007_199_254_740_991),
+    reason: z.string().trim().min(1).max(2_000),
+    approvedByIdentityId: uuid,
+    approvedAt: timestamp,
+    createdAt: timestamp,
+  })
+  .strict()
+  .refine((adjustment) => Date.parse(adjustment.approvedAt) >= Date.parse(adjustment.createdAt), {
+    path: ["approvedAt"],
+    message: "Adjustment approval cannot precede creation",
+  });
+
+export type CommissionAdjustment = z.infer<typeof adjustmentSchema>;
+
+export const financeReportRowSchema = z
+  .object({
+    commissionEventId: uuid,
+    currency,
+    earnedMinorUnits: minorUnits,
+    invoicedMinorUnits: minorUnits,
+    receivedMinorUnits: minorUnits,
+    balanceMinorUnits: z.number().int().max(9_007_199_254_740_991).min(-9_007_199_254_740_991),
+  })
+  .strict()
+  .refine((row) => row.balanceMinorUnits === row.invoicedMinorUnits - row.receivedMinorUnits, {
+    path: ["balanceMinorUnits"],
+    message: "Balance must equal invoiced minus received",
+  });
+
+export type FinanceReportRow = z.infer<typeof financeReportRowSchema>;
+
+export const financeHandoffSchema = z
+  .object({
+    handoffId: uuid,
+    destinationReference: identifier,
+    sourceEventIds: z.array(uuid).min(1).max(10_000),
+    approvedByIdentityId: uuid,
+    approvedAt: timestamp,
+    reason: z.string().trim().min(1).max(2_000),
+  })
+  .strict();
+
+export type FinanceHandoff = Readonly<z.infer<typeof financeHandoffSchema>>;
 
 export type CommissionCalculation = Readonly<{
   currency: string;
@@ -178,6 +301,81 @@ export function reconcilePayments(
 
 export function canFinanciallyCloseCommission(state: CommissionEvent["state"]): boolean {
   return state === "paid" || state === "voided" || state === "written_off";
+}
+
+/** An invoice may issue only after the commission calculation is approved. */
+export function canIssueInvoice(eventInput: unknown, invoiceInput: unknown): boolean {
+  const event = commissionEventSchema.safeParse(eventInput);
+  const invoice = invoiceSchema.safeParse(invoiceInput);
+  if (!event.success || !invoice.success) return false;
+  return event.data.state === "approved"
+    && invoice.data.status === "ready"
+    && invoice.data.commissionEventId === event.data.eventId
+    && invoice.data.vendorOrganizationId === event.data.vendorOrganizationId
+    && invoice.data.currency === event.data.currency
+    && invoice.data.amountMinorUnits === event.data.commissionAmountMinorUnits;
+}
+
+/** Issues a ready invoice as a new immutable snapshot. */
+export function issueInvoice(invoiceInput: unknown, issueInput: unknown): Invoice {
+  const invoice = invoiceSchema.safeParse(invoiceInput);
+  const issue = invoiceIssueSchema.safeParse(issueInput);
+  if (!invoice.success || !issue.success || invoice.data.status !== "ready") {
+    throw new Error("Invoice is not ready to issue");
+  }
+  return Object.freeze({
+    ...invoice.data,
+    status: "issued" as const,
+    invoiceNumber: issue.data.invoiceNumber,
+    issueDate: issue.data.issueDate,
+    dueDate: issue.data.dueDate,
+    supportingDocumentReferences: [...invoice.data.supportingDocumentReferences],
+  });
+}
+
+/** Reconciles a report only against immutable commission events and payments. */
+export function reconcileFinancialReport(
+  eventsInput: readonly unknown[],
+  paymentsInput: readonly unknown[],
+  reportInput: readonly unknown[],
+): readonly FinanceReportRow[] {
+  const events = eventsInput.map((value) => commissionEventSchema.parse(value));
+  const payments = paymentsInput.map((value) => commissionPaymentSchema.parse(value));
+  const reports = reportInput.map((value) => financeReportRowSchema.parse(value));
+  const eventIds = new Set(events.map((event) => event.eventId));
+  if (eventIds.size !== events.length) throw new Error("Duplicate finance source event");
+  const paymentIds = new Set(payments.map((payment) => payment.paymentId));
+  if (paymentIds.size !== payments.length) throw new Error("Duplicate finance payment");
+  if (payments.some((payment) => !eventIds.has(payment.commissionEventId))) throw new Error("Finance payment references an unknown event");
+  if (new Set(reports.map((row) => row.commissionEventId)).size !== reports.length) throw new Error("Duplicate finance report row");
+  if (reports.some((row) => !eventIds.has(row.commissionEventId))) throw new Error("Finance report references an unknown event");
+  const reconciled = events.map((event) => {
+    const receivedMinorUnits = payments
+      .filter((payment) => payment.commissionEventId === event.eventId && payment.state === "received")
+      .reduce((total, payment) => total + payment.amountMinorUnits, 0);
+    const report = reports.find((row) => row.commissionEventId === event.eventId);
+    if (!report || report.currency !== event.currency || report.earnedMinorUnits !== event.commissionAmountMinorUnits
+      || report.invoicedMinorUnits !== event.commissionAmountMinorUnits
+      || report.receivedMinorUnits !== receivedMinorUnits) {
+      throw new Error("Finance report does not reconcile to source events");
+    }
+    return report;
+  });
+  return reconciled.sort((left, right) => left.commissionEventId.localeCompare(right.commissionEventId));
+}
+
+/** Creates an approved handoff descriptor without contacting an external system. */
+export function prepareFinanceHandoff(input: unknown): FinanceHandoff {
+  const result = financeHandoffSchema.safeParse(input);
+  if (!result.success || new Set(result.data.sourceEventIds).size !== result.data.sourceEventIds.length) {
+    throw new Error("Invalid finance handoff");
+  }
+  return Object.freeze({ ...result.data, sourceEventIds: [...result.data.sourceEventIds] });
+}
+
+/** Finance data stays internal until a later reviewed permission is implemented. */
+export function canViewCommissionData(surface: "internal" | "customer" | "vendor"): boolean {
+  return surface === "internal";
 }
 
 export { currency, minorUnits };
