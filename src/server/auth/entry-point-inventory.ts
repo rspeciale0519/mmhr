@@ -359,6 +359,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "deterministic allowlist comparison and command test",
   },
   {
+    key: "scripts/check-r9-release-readiness.mjs#command",
+    surface: "R9 release evidence checker",
+    kind: "command",
+    access: "system-only",
+    permission: "local repository read",
+    scope: "checked-in R9 evidence manifest",
+    dataPath: "release check states and opaque evidence references",
+    denialEvidence: "manifest schema validation and fail-closed release mode",
+  },
+  {
     key: "scripts/r1-bootstrap-super-admin.mjs#command",
     surface: "local Super Admin bootstrap",
     kind: "command",

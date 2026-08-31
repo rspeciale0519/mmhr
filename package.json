@@ -11,6 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:integration-matrix": "node scripts/check-r1-integration-matrix.mjs",
+    "check:r9-evidence": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs",
+    "check:r9-evidence:release": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs --require-ready",
     "test:integration": "node scripts/r1-with-local-worker.mjs -- node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts"
   },
   "dependencies": {

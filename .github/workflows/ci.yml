@@ -27,6 +27,9 @@ jobs:
       - name: Check integration matrix
         run: npm run check:integration-matrix
 
+      - name: Validate R9 evidence manifest
+        run: npm run check:r9-evidence
+
       - name: Type-check
         run: npm run type-check
 

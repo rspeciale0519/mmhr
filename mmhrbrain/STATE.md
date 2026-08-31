@@ -43,6 +43,9 @@ cases, boundary cases, local Auth recovery flows, and the production build
 passed. The full integration command remains blocked because
 MIGRATION_DATABASE_URL is not set in this process.
 
+R9 now has a checked-in evidence manifest and CI validation command. The
+release mode remains fail-closed until each real gate has an evidence record.
+
 See docs/security/r1-permission-evaluation.md, docs/security/r1-evidence.md, and
 [[journal/2026-08-31]].
 The existing request-scoped helper still needs dbac05f before integration.
@@ -58,6 +61,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Do not use a stale AAL2 token as proof of current MFA enrollment.
 - Complete end-to-end R2A through R9 workflows with objective evidence.
+- Keep the R9 evidence manifest blocked until integration, browser, accessibility, performance, recovery, deployment, and release approvals exist.
 - R0 claim review, public-release controls, old deployment aliases, and live verification remain open.
 - Production state was not reverified during this local package. Do not infer current production safety from local checks.
 - Validate staging before production migration or deployment. The active goal grants authority, not evidence.
