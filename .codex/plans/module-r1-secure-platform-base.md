@@ -5,8 +5,8 @@
 | Field | Value |
 |---|---|
 | Version | 0.12 R1.4 recovery and worker delivery decisions |
-| Date | 2026-08-30 |
-| Status | R1.0 through R1.4 implemented and locally verified; R1.5 route and MFA foundations in progress |
+| Date | 2026-08-31 |
+| Status | R1.0 through R1.5 foundations implemented and locally verified; R1.8 evidence recorded; R1.6 invitation administration remains gated |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |

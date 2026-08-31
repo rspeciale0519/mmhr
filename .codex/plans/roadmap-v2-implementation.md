@@ -6,7 +6,7 @@
 |---|---|
 | Version | 1.8 |
 | Date | 2026-08-28 |
-| Status | Approved roadmap; R0 control records complete; public-release quarantine active; R1.0 through R1.4 verified; R1.5 in progress |
+| Status | Approved roadmap; R0 control records complete; public-release quarantine active; R1.0 through R1.5 foundations verified locally; R1.8 evidence recorded; R2B lead command started |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
