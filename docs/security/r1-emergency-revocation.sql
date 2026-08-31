@@ -1,4 +1,4 @@
--- R1.3 emergency revocation. Run as the migration owner on the affected
+-- R1.4 emergency revocation. Run as the migration owner on the affected
 -- environment after recording the change ticket and current evidence.
 -- These statements revoke Data API access without disabling RLS.
 
@@ -18,6 +18,14 @@ REVOKE ALL ON FUNCTION public.mmhr_get_organization(uuid) FROM anon, authenticat
 REVOKE ALL ON FUNCTION public.mmhr_get_my_memberships() FROM anon, authenticated;
 REVOKE ALL ON FUNCTION public.mmhr_get_organization_members(uuid) FROM anon, authenticated;
 REVOKE ALL ON FUNCTION public.mmhr_get_audit_events(uuid) FROM anon, authenticated;
+
+DO $$
+BEGIN
+  IF to_regprocedure('public.mmhr_authorize(text,uuid)') IS NOT NULL THEN
+    REVOKE ALL ON FUNCTION public.mmhr_authorize(text, uuid) FROM anon, authenticated;
+  END IF;
+END
+$$;
 
 -- If exact function revocation is not sufficient, stop the affected Data API
 -- service through the platform control plane, then disable the route.

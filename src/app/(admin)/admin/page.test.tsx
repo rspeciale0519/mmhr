@@ -1,30 +1,26 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
-import { forbidden } from "next/navigation";
-
 import AdminHome from "@/app/(admin)/admin/page";
-import { requirePageIdentity } from "@/server/auth/page-guards";
-
-vi.mock("next/navigation", () => ({
-  forbidden: vi.fn(),
-}));
+import { requirePagePermission } from "@/server/auth/page-guards";
 
 vi.mock("@/server/auth/page-guards", () => ({
-  requirePageIdentity: vi.fn(),
+  requirePagePermission: vi.fn(),
 }));
 
 beforeEach(() => {
-  vi.mocked(requirePageIdentity).mockReset();
-  vi.mocked(requirePageIdentity).mockResolvedValue({ id: "user-123" });
-  vi.mocked(forbidden).mockReset();
-  vi.mocked(forbidden).mockImplementation(() => {
-    throw new Error("NEXT_FORBIDDEN");
+  vi.mocked(requirePagePermission).mockReset();
+  vi.mocked(requirePagePermission).mockResolvedValue({
+    identity: { id: "user-123" },
+    authorization: {} as never,
   });
 });
 
-test("verifies identity and then denies all early admin access", async () => {
-  await expect(AdminHome()).rejects.toThrow("NEXT_FORBIDDEN");
+test("requires the platform admin permission", async () => {
+  const result = await AdminHome();
 
-  expect(requirePageIdentity).toHaveBeenCalledTimes(1);
-  expect(forbidden).toHaveBeenCalledTimes(1);
+  expect(requirePagePermission).toHaveBeenCalledWith("admin.access", { kind: "platform" });
+  expect(result).toMatchObject({
+    type: "main",
+    props: { children: expect.arrayContaining([expect.anything()]) },
+  });
 });

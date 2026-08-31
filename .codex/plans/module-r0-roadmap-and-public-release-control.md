@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.4 |
-| Date | 2026-08-27 |
-| Status | Active policy quarantine; placeholders retained; exact claim review and production activation pending |
+| Version | 0.5 |
+| Date | 2026-08-30 |
+| Status | Control records complete; policy quarantine active; claim approval and production activation pending |
 | Product owner | Rob Speciale |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -16,6 +16,14 @@
 This record requires public access, indexing, and release to stay blocked while unapproved claims remain.
 
 It does not authorize a branch, commit, dependency, cloud change, deployment, or release.
+
+This document closes the R0 recordkeeping gaps. It does not approve a public
+claim, activate production access, or replace a required release decision.
+
+Control records are complete for owners, decisions, claim families, route
+coverage, the release block, recovery, and linked status. Claim evidence,
+statement review, deployment aliases, live verification, and production approval
+remain open.
 
 ## 1. Owner and Decision Register
 
@@ -113,25 +121,25 @@ This source-family inventory defines the review scope.
 
 It does not replace the exact claim-by-claim review register required for R0 closure.
 
-| ID | Claim family and examples | Render sources | Required evidence and approval |
-|---|---|---|---|
-| CLM-01 | Automated or continuous vendor research, live checks, recheck times, and zero stale profiles | `src/designs/pulse/Body.tsx`; `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; platform and landscape-report routes | System evidence, operating record, MKT, DATA, and PO approval |
-| CLM-02 | Catalog and requirements counts, including `52`, `+40`, and about `200` capabilities | `src/designs/_content.ts`; `src/designs/pulse/Body.tsx`; broker-model and platform routes | Approved catalog count, capture date, DATA and MKT approval |
-| CLM-03 | Northwind, Vantage, and Copperline case studies and their `40%`, `75%`, nine-day, and `48h` outcomes | `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; case-study routes; gallery designs | Real client evidence, publication consent, source record, MKT and PO approval |
-| CLM-04 | `74` NPS, `310` selections, hundreds of advisor projects, and other performance history | `src/designs/_content.ts`; shared marketing copy; gallery designs | Measured source, period, method, MKT and PO approval |
-| CLM-05 | The same commission rate for every vendor and related neutrality statements | `src/designs/_content.ts`; shared footer and page parts; FAQ, blog, broker-model, contact, terms, transparency, and partner routes; gallery designs | Current commission schedule, exception review, FIN, MKT, and PO approval |
-| CLM-06 | Buyer cost statements, including free, no fee, `$0`, no obligation, and nothing added to price | `src/designs/_content.ts`; shared footer and page parts; FAQ, broker-model, contact, services, terms, transparency, resource, and partner routes; gallery designs | Approved commercial policy, FIN, MKT, and PO approval |
-| CLM-07 | CBIZ Centrally HR reseller affiliation, labeling, and equal-scoring statements | `src/designs/_content.ts`; FAQ, blog, contact, terms, and transparency routes; gallery designs | Current agreement, disclosure review, FIN, MKT, and PO approval |
-| CLM-08 | Available marketplace, builder, scorecard, plan, collaboration, advisor, and self-service behavior | `src/designs/_content.ts`; FAQ, broker-model, platform, services, resources, and partner routes; gallery designs | End-to-end product evidence, release status, PO and MKT approval |
-| CLM-09 | Verified pricing, market medians, comparable-company prices, savings, and scheduled refreshes | `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; about, blog, platform, services, FAQ, landscape-report, and partner routes; gallery designs | Licensed sources, method, freshness record, DATA, MKT, and PO approval |
-| CLM-10 | No sponsored placement, no paid position, organic ordering, and neutral ranking | platform, broker-model, transparency, landscape-report, and software-vendor routes; gallery designs | Approved ranking policy, tests, MKT, DATA, SEC, and PO approval |
-| CLM-11 | Privacy, retention, deletion, response-time, consent, and data-sharing statements | privacy, terms, transparency, FAQ, and resource routes | Implemented controls, legal review, SEC and PO approval |
-| CLM-12 | Partner, referral, implementation, private-equity, and broker service statements | partner-finder, brokers-consultants, pe-vc, and software-vendor routes | Current operating policy, agreement evidence, OPS, FIN, MKT, and PO approval |
-| CLM-13 | Active blog dates, weekly pricing updates, newsletters, reports, and gated downloads | `src/app/(marketing)/_site/data.ts`; blog, resources, landscape-report, and Pulse routes | Working content workflow, current content, consent evidence, MKT and PO approval |
-| CLM-14 | Customer-size ranges, service coverage, timelines, and advisor availability | FAQ, services, contact, about, broker-model, and partner routes | Current service policy, capacity evidence, OPS, MKT, and PO approval |
-| CLM-15 | Buyer-side brokerage and related positioning in global metadata and shared chrome | `src/app/layout.tsx`; `src/app/(marketing)/_site/Footer.tsx`; shared page metadata | Approved positioning and disclosure, MKT and PO approval |
-| CLM-16 | Claims about buyer behavior, vendor incentives, selection failures, and process outcomes | about, blog, broker-model, services, requirements-builder, and partner routes | Approved editorial source or qualified opinion label, MKT and PO approval |
-| CLM-17 | Design-specific vendor prices, fit scores, savings, timelines, testimonials, and operating figures | `src/designs/*/Design.tsx`; `src/designs/_content.ts`; `/designs`; `/designs/[slug]` | Treat as illustrative only or replace with approved evidence; MKT and PO approval |
+| ID | Claim family and examples | Render sources | Accountable owner(s) | Required evidence and approval |
+|---|---|---|---|---|
+| CLM-01 | Automated or continuous vendor research, live checks, recheck times, and zero stale profiles | `src/designs/pulse/Body.tsx`; `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; platform and landscape-report routes | ENG, OPS, DATA, MKT, PO | System evidence, operating record, MKT, DATA, and PO approval |
+| CLM-02 | Catalog and requirements counts, including `52`, `+40`, and about `200` capabilities | `src/designs/_content.ts`; `src/designs/pulse/Body.tsx`; broker-model and platform routes | DATA, MKT, PO | Approved catalog count, capture date, DATA and MKT approval |
+| CLM-03 | Northwind, Vantage, and Copperline case studies and their `40%`, `75%`, nine-day, and `48h` outcomes | `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; case-study routes; gallery designs | MKT, PO | Real client evidence, publication consent, source record, MKT and PO approval |
+| CLM-04 | `74` NPS, `310` selections, hundreds of advisor projects, and other performance history | `src/designs/_content.ts`; shared marketing copy; gallery designs | DATA, MKT, PO | Measured source, period, method, MKT and PO approval |
+| CLM-05 | The same commission rate for every vendor and related neutrality statements | `src/designs/_content.ts`; shared footer and page parts; FAQ, blog, broker-model, contact, terms, transparency, and partner routes; gallery designs | FIN, MKT, PO | Current commission schedule, exception review, FIN, MKT, and PO approval |
+| CLM-06 | Buyer cost statements, including free, no fee, `$0`, no obligation, and nothing added to price | `src/designs/_content.ts`; shared footer and page parts; FAQ, broker-model, contact, services, terms, transparency, resource, and partner routes; gallery designs | FIN, MKT, PO | Approved commercial policy, FIN, MKT, and PO approval |
+| CLM-07 | CBIZ Centrally HR reseller affiliation, labeling, and equal-scoring statements | `src/designs/_content.ts`; FAQ, blog, contact, terms, and transparency routes; gallery designs | FIN, MKT, PO | Current agreement, disclosure review, FIN, MKT, and PO approval |
+| CLM-08 | Available marketplace, builder, scorecard, plan, collaboration, advisor, and self-service behavior | `src/designs/_content.ts`; FAQ, broker-model, platform, services, resources, and partner routes; gallery designs | ENG, MKT, PO | End-to-end product evidence, release status, PO and MKT approval |
+| CLM-09 | Verified pricing, market medians, comparable-company prices, savings, and scheduled refreshes | `src/designs/_content.ts`; `src/app/(marketing)/_site/data.ts`; about, blog, platform, services, FAQ, landscape-report, and partner routes; gallery designs | DATA, MKT, PO | Licensed sources, method, freshness record, DATA, MKT, and PO approval |
+| CLM-10 | No sponsored placement, no paid position, organic ordering, and neutral ranking | platform, broker-model, transparency, landscape-report, and software-vendor routes; gallery designs | SEC, DATA, MKT, PO | Approved ranking policy, tests, MKT, DATA, SEC, and PO approval |
+| CLM-11 | Privacy, retention, deletion, response-time, consent, and data-sharing statements | privacy, terms, transparency, FAQ, and resource routes | SEC, PO | Implemented controls, legal review, SEC and PO approval |
+| CLM-12 | Partner, referral, implementation, private-equity, and broker service statements | partner-finder, brokers-consultants, pe-vc, and software-vendor routes | OPS, FIN, MKT, PO | Current operating policy, agreement evidence, OPS, FIN, MKT, and PO approval |
+| CLM-13 | Active blog dates, weekly pricing updates, newsletters, reports, and gated downloads | `src/app/(marketing)/_site/data.ts`; blog, resources, landscape-report, and Pulse routes | ENG, MKT, PO | Working content workflow, current content, consent evidence, MKT and PO approval |
+| CLM-14 | Customer-size ranges, service coverage, timelines, and advisor availability | FAQ, services, contact, about, broker-model, and partner routes | OPS, MKT, PO | Current service policy, capacity evidence, OPS, MKT, and PO approval |
+| CLM-15 | Buyer-side brokerage and related positioning in global metadata and shared chrome | `src/app/layout.tsx`; `src/app/(marketing)/_site/Footer.tsx`; shared page metadata | MKT, PO | Approved positioning and disclosure, MKT and PO approval |
+| CLM-16 | Claims about buyer behavior, vendor incentives, selection failures, and process outcomes | about, blog, broker-model, services, requirements-builder, and partner routes | MKT, PO | Approved editorial source or qualified opinion label, MKT and PO approval |
+| CLM-17 | Design-specific vendor prices, fit scores, savings, timelines, testimonials, and operating figures | `src/designs/*/Design.tsx`; `src/designs/_content.ts`; `/designs`; `/designs/[slug]` | MKT, PO | Treat as illustrative only or replace with approved evidence; MKT and PO approval |
 
 ### Route Coverage
 
@@ -151,22 +159,41 @@ It does not replace the exact claim-by-claim review register required for R0 clo
 | `/partners` child routes | CLM-05 through CLM-12, CLM-14, and CLM-15 |
 | `/designs` and `/designs/[slug]` | CLM-01 through CLM-10, CLM-15, and CLM-17 |
 
-## 4. Copy Review Record
+## 4. Claim Review Register
 
-Use one row for each reviewed claim or approved group.
+Use one row for each reviewed claim or approved group. The current row is a
+claim-family control, not an approval. No statement is approved by this record.
 
 | Claim ID | Evidence source | Capture date | Reviewer | Review date | Result |
 |---|---|---|---|---|---|
-| CLM-01 through CLM-17 | No approved evidence recorded | Not recorded | Not assigned | Not reviewed | Blocked |
+| CLM-01 through CLM-17 | No approved evidence recorded | Not recorded | Accountable owners are listed in Section 3 | Not reviewed | Blocked |
 
-## 5. R0 Exit Evidence
+The exact statement register remains open. When a claim is ready for review,
+add its exact text or stable content identifier, source, capture date, reviewer,
+review date, decision, and approval record before publication.
+
+## 5. Control Status and Verification Links
+
+| Control | Current status | Canonical evidence | Owner |
+|---|---|---|---|
+| Owner and decision register | Complete | Section 1 and `docs/PRD.md#11-open-product-decisions` | PO |
+| Claim-family inventory and route coverage | Complete | Sections 3 and 4 | MKT, DATA, PO |
+| Local fail-closed release gate | Verified locally; not active in current production | `src/lib/public-release.ts`, `src/middleware.ts`, and release tests | ENG, SEC |
+| Search crawler block | Active in code; live production state not verified | `src/app/layout.tsx`, `/robots.txt`, and release tests | ENG, MKT |
+| Production deployment and old aliases | Open; no current verification recorded | Exit rule 7 and the approved deployment record | REL, ENG |
+| Public release | Blocked | Section 2 and the PRD release policy | REL, SEC, PO |
+
+The linked status is authoritative: this record is complete as a control
+record, while the release remains blocked until every open control passes.
+
+## 6. R0 Exit Evidence
 
 | Exit item | Status | Evidence |
 |---|---|---|
 | Product-owner roadmap approval | Complete | Parent roadmap approval record |
 | Open product-decision ownership | Complete | PRD decision register and Section 1 |
 | Named release owners | Complete | Section 1 assigns every owner role |
-| Public claim-family and route inventory | Complete | Sections 3 and 4 |
+| Public claim-family and route inventory with accountable owners | Complete | Sections 3 and 4 |
 | Exact claim-by-claim review register | Incomplete | Each statement needs its own source, decision, reviewer, and date |
 | Written public-release block | Complete | Section 2 |
 | Local technical public-release block | Complete | `src/lib/public-release.ts`, `src/middleware.ts`, and tests |
@@ -174,9 +201,10 @@ Use one row for each reviewed claim or approved group.
 | First module product approval | Complete | R1 plan approval record |
 | Canonical-document authority check | Complete | README, PRD, TECH_STACK, roadmap, R0, and R1 records agree |
 
-R0 remains open until the pending records, owners, and production controls are complete.
+The R0 control record is complete. Public release remains blocked until the
+claim, deployment, live-verification, and approval exit items pass.
 
-## 6. Approval Record
+## 7. Approval Record
 
 | Approval | Status | Record |
 |---|---|---|

@@ -6,11 +6,14 @@ import { headers } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
 import { requireTrustedServerActionOrigin } from "@/server/auth/server-action-request";
+import { z } from "zod";
 
 export type AuthState =
   | { error: string; success?: never }
   | { error?: never; success: string }
   | null;
+
+const signUpPasswordSchema = z.string().min(12).max(72);
 
 async function requireTrustedOrigin() {
   const requestHeaders = await headers();
@@ -31,6 +34,9 @@ export async function signUp(
 
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  if (!signUpPasswordSchema.safeParse(password).success) {
+    return { error: "Use a password with at least 12 characters." };
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -54,7 +60,6 @@ export async function signIn(
 
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
-
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 

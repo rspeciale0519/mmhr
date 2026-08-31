@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "check:integration-matrix": "node scripts/check-r1-integration-matrix.mjs",
     "test:integration": "node scripts/r1-with-local-worker.mjs -- node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts"
   },
   "dependencies": {

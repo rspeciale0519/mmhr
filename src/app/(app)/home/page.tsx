@@ -1,21 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { requirePageIdentity } from "@/server/auth/page-guards";
+import { requireHomeAccess } from "@/server/auth/page-guards";
 import { signOut } from "../../(auth)/actions";
+import Link from "next/link";
 
 /**
- * Temporary pending-access response. R1.4 replaces this response only after
- * stored identity, organization, and permission checks pass.
+ * The home route is a permission-checked router for authorized users.
  */
 export default async function WorkspaceHome() {
-  await requirePageIdentity();
+  const access = await requireHomeAccess();
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Access pending</h1>
+      <h1 className="text-2xl font-semibold">Workspace</h1>
       <p className="text-sm">
-        Your identity is verified. An administrator must grant access before
-        you can use the workspace.
+        Your access is active. Select a workspace area to continue.
       </p>
+      {access.authorization.scope.kind === "organization" ? (
+        <nav aria-label="Workspace areas" className="flex gap-4 text-sm underline">
+          <Link href="/customer">Customer portal</Link>
+          <Link href="/vendor">Vendor portal</Link>
+        </nav>
+      ) : (
+        <Link className="text-sm underline" href="/admin">Administration</Link>
+      )}
       <form action={signOut}>
         <Button type="submit" variant="outline">
           Sign out

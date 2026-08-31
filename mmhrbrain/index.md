@@ -12,6 +12,7 @@ Catalog of the mmhr brain. SessionStart reads this.
 
 ## Recent journal
 - [[journal/2026-08-28]] — completed R1.0 policy and built the R1.2 and R1.3 platform foundations.
+- [[journal/2026-08-30]] — verified R1.4 worker and recovery delivery, started R1.5 routes and MFA, and closed R0 recordkeeping gaps.
 - [[journal/2026-08-27]] — R0 control, R1.1 secure entry controls, and interim recovery-pair approval.
 - [[journal/2026-08-25]] — named R1 owners recorded; role reviews remain pending.
 - [[journal/2026-08-24]] — v2 baseline, amended roadmap, and product-approved R1 draft.

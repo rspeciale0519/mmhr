@@ -4,11 +4,15 @@
 
 | Field | Value |
 |---|---|
-| Status | R1.3 grants, RLS, and request-scoped access implemented on `feature/r1-request-scoped-rls` |
-| Date | 2026-08-28 |
+| Status | Local R1.4 permission-evaluation foundation verified; full R1.4 remains open |
+| Date | 2026-08-30 |
+| Prior baseline | R1.3 grants, RLS, and request-scoped access recorded on `feature/r1-request-scoped-rls` on 2026-08-28 |
+| Merge prerequisite | Stable-ID correction `dbac05f` remains pending merge |
 | Source registry | `src/server/auth/entry-point-inventory.ts` |
 | Completeness test | `src/server/auth/entry-point-inventory.test.ts` |
 | Identity guard | `src/server/auth/verified-identity.ts` |
+| Permission service | `src/server/auth/authorization.ts` |
+| Shared tRPC guard | `src/server/trpc/trpc.ts` |
 | Recovery | Keep protected routes denied. Add a deny-all change before any rollback. |
 
 This matrix records each application entry point that can expose, change, or process application data.
@@ -19,6 +23,8 @@ The R0 public-release gate remains separate from authorization.
 
 Middleware refreshes sessions. It does not grant route access.
 
+This record describes local implementation only. It does not claim a remote merge or deployment.
+
 ## Response Contract
 
 | Condition | Response |
@@ -26,16 +32,55 @@ Middleware refreshes sessions. It does not grant route access.
 | Missing, invalid, or expired identity | Redirect to `/sign-in` before protected content renders |
 | Verified identity at `/home` | Show pending access only |
 | Verified identity at `/admin` | Return the generic 403 response |
+| tRPC mutation without POST or exact canonical Origin | Return `FORBIDDEN` before input or permission processing |
+| Permission-protected tRPC call without identity | Return `UNAUTHORIZED` after any mutation transport check |
+| Malformed permission scope | Return `BAD_REQUEST` |
+| Denied platform permission | Return generic `FORBIDDEN` |
+| Denied organization permission | Return generic `NOT_FOUND` |
 | Inaccessible future resource identifier | Return the generic not-found response |
 | Public content | Apply R0 release control, but no R1 permission gate |
 
 `getClaims()` supplies the verified subject.
 
-Claims do not prove identity state, organization membership, permission, or authentication assurance.
+The verified `aal` claim supplies the authentication assurance level.
 
-R1.3 adds stored-state checks before protected data access opens. R1.4 still owns route permissions.
+Claims alone do not prove active identity state, organization membership, or permission.
+
+R1.3 supplies stored-state reads. The local R1.4 evaluator adds current permission, scope, and assurance checks.
+
+Protected page activation remains pending. `/home` still shows pending access, and `/admin` still returns the generic 403 response.
+
+## Local R1.4 Permission-Evaluation Foundation
+
+The [permission-evaluation record](./r1-permission-evaluation.md) describes the local policy and migration package.
+
+The typed registry defines permission keys, allowed scopes, minimum assurance, and explicit role defaults.
+
+The server service repeats verified-claims checks for each call. It invokes the caller-bound `mmhr_authorize(permission_key, organization_id)` function.
+
+The function accepts no actor identifier. Its narrow result contains the stable identity ID, authorized organization ID, and assurance level.
+
+The service validates that result against the requested scope and verified assurance. It does not use a service credential or direct database pool.
+
+Permission-aware tRPC builders require a complete input schema, a permission key, and a scope resolver.
+
+They resolve scope only after input validation. They expose only query and mutation terminals, so later input transforms cannot change the authorized scope.
+
+The tRPC context uses one cookie-authenticated request client. The permission service rechecks that same client.
+
+`health.whoami` remains identity-only. No application router now exposes a permission-protected operation or mutation.
+
+The separate stable-ID correction at `dbac05f` remains a pending merge prerequisite for the existing request-scoped helper.
+
+This package is a permission-evaluation foundation, not full R1.4.
+
+R1.4 command, recovery, identity-adapter, and worker implementations are locally verified. Route activation and MFA foundations are now in R1.5.
+
+The inventory also classifies command support modules. They validate inputs or receipts and provide no independent authority.
 
 ## Validation Evidence
+
+### Historical R1.1 through R1.3 evidence
 
 The unit suite covers identity parsing, direct guards, tRPC denial, entry discovery, and exact-origin Server Actions.
 
@@ -46,6 +91,28 @@ Local HTTP checks redirected malformed and expired cookie requests for `/home` a
 Browser checks proved sign-up, pending access, sign-out, sign-in, and the authenticated 403 response.
 
 The browser extension produced unrelated message-channel errors during one sign-up check.
+
+### Local R1.4 evidence
+
+Registry and service tests cover permission keys, scope validation, assurance checks, caller-bound RPC use, and denied or malformed results.
+
+tRPC tests cover validated scope resolution, transformed input types, AAL1 privileged denial, generic organization denial, and mutation transport rejection.
+
+The transport tests call both procedure builders and the installed fetch adapter. They preserve direct identity-only query callers.
+
+`src/server/auth/authorization-boundaries.test.ts` checks production imports for fixture, direct-pool, and privileged-credential violations.
+
+Its synthetic cases prove detection. Exact existing fixture exceptions do not authorize a future provider adapter.
+
+`src/server/auth/permissions.integration.test.ts` and migration rehearsals cover database policy, field filtering, scope isolation, and registry parity.
+
+Type checking, lint, the production build, 320 unit tests, and 82 integration tests passed on 2026-08-30.
+
+The [verification record](./r1-permission-evaluation.md#local-verification-record) includes migration, audit-failure, containment, review, and test-retry evidence.
+
+No rendered behavior changed. Historical browser evidence does not prove these new database controls.
+
+These results prove local evaluation behavior only. Command, remote, staging, and production checks remain open.
 
 ## Entry Point Inventory
 
@@ -76,8 +143,13 @@ The browser extension produced unrelated message-channel errors during one sign-
 | `src/app/(marketing)/designs/[slug]/page.tsx#default` | /designs/[slug] | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(auth)/sign-in/page.tsx#default` | /sign-in | page | public | none | none | Supabase Auth sign-in form | public by R1 contract |
 | `src/app/(auth)/sign-up/page.tsx#default` | /sign-up | page | public | none | none | Supabase Auth sign-up form | public identity creation; protected access stays denied |
-| `src/app/(app)/home/page.tsx#default` | /home | page | identity-only | R1.4 permission checks pending | verified identity | pending-access response only | page guard and home page tests |
-| `src/app/(admin)/admin/page.tsx#default` | /admin | page | temporary-deny | R1.4 admin.access check pending | platform | none | page guard, forbidden response, and admin page tests |
+| `src/app/(app)/home/page.tsx#default` | /home | page | privileged | workspace.access or admin.access | selected organization or platform | authorized workspace shell | page guard and home page permission tests |
+| `src/app/(app)/customer/layout.tsx#default` | customer portal layout | layout | privileged | portal.customer.access | selected organization | customer portal children after organization authorization | customer layout guard tests |
+| `src/app/(app)/customer/page.tsx#default` | /customer | page | privileged | portal.customer.access | selected organization | customer portal shell | customer page and layout guard tests |
+| `src/app/(app)/vendor/layout.tsx#default` | vendor portal layout | layout | privileged | portal.vendor.access | selected organization | vendor portal children after organization authorization | vendor layout guard tests |
+| `src/app/(app)/vendor/page.tsx#default` | /vendor | page | privileged | portal.vendor.access | selected organization | vendor portal shell | vendor page and layout guard tests |
+| `src/app/(admin)/admin/page.tsx#default` | /admin | page | privileged | admin.access | platform | authorized administration shell | page guard, forbidden response, and admin page permission tests |
+| `src/app/(auth)/mfa/page.tsx#default` | /mfa | page | identity-only | none; Auth MFA enrollment | verified identity | Supabase Auth TOTP enrollment and challenge | MFA page guard and component tests |
 | `src/app/layout.tsx#default` | root layout | layout | public | none | none | shared presentation providers | authorization remains at each protected entry point |
 | `src/app/(marketing)/(site)/layout.tsx#default` | marketing layout | layout | public | none | none | public site chrome | R0 release gate |
 | `src/app/global-error.tsx#default` | global error | boundary | framework | none | none | redacted error response and Sentry event | does not return protected records |
@@ -85,14 +157,23 @@ The browser extension produced unrelated message-channel errors during one sign-
 | `src/app/not-found.tsx#default` | 404 boundary | boundary | framework | none | none | generic not-found response | does not reveal resource existence |
 | `src/middleware.ts#middleware` | all matched requests | middleware | framework | none | none | R0 release gate, GALLERY_ONLY routing, Server Action validation, session refresh | middleware tests; never the authorization boundary |
 | `src/app/api/trpc/[trpc]/route.ts#GET` | GET /api/trpc/* | route-handler | public | procedure-defined | procedure-defined | tRPC query transport | each procedure owns its identity or permission test |
-| `src/app/api/trpc/[trpc]/route.ts#POST` | POST /api/trpc/* | route-handler | public | procedure-defined | procedure-defined | tRPC query transport; zero mutations in R1.1 | inventory test blocks unrecorded procedures and mutations |
+| `src/app/api/trpc/[trpc]/route.ts#POST` | POST /api/trpc/* | route-handler | public | procedure-defined | procedure-defined | tRPC transport; no routed mutations; shared POST and exact-Origin mutation guard | inventory and transport tests; all exported mutation builders require POST and exact Origin |
 | `src/app/(auth)/actions.ts#signUp` | signUp | server-action | public | none | none | Supabase Auth identity creation | exact-origin guard and direct-action tests |
 | `src/app/(auth)/actions.ts#signIn` | signIn | server-action | public | none | none | Supabase Auth session creation | exact-origin guard and direct-action tests |
 | `src/app/(auth)/actions.ts#signOut` | signOut | server-action | caller-only | none | caller session | Supabase Auth session cleanup | exact-origin guard and direct-action tests |
 | `src/server/trpc/routers/health.ts#ping` | health.ping | trpc-procedure | public | none | none | liveness constant | public by R1 contract |
 | `src/server/trpc/routers/health.ts#whoami` | health.whoami | trpc-procedure | identity-only | none | verified identity | caller subject identifier only | identityProcedure and direct-call tests |
 | `scripts/r1-with-local-worker.mjs#command` | R1 worker wrapper | command | system-only | local migration owner role | loopback MMHR database | temporary worker login lifecycle; no application records | exact child-command, URL, role, expiry, and cleanup checks |
+| `src/server/commands/security.ts#command` | security command clients | command | privileged | fixed command permission; current AAL2 | platform or validated organization | caller JWT RPC; atomic mutation, audit, and receipt | security.test.ts; SQL command integration suites |
+| `src/server/commands/security-inputs.ts#command` | security input schemas | command-support | internal-only | none; validation only | server command inputs | strict schemas; no database access | security-inputs.test.ts; no authority or RPC input |
+| `src/server/commands/permission-administration.ts#command` | permission administration read | command | privileged | permissions.view and independent can_view ceiling; AAL2 | exact permission key and record scope | caller JWT RPC; filtered administration metadata | permission-administration.test.ts; SQL read and ceiling tests |
+| `src/server/commands/recovery.ts#command` | recovery command clients | command | caller-only | fixed recovery policy; AAL2 for approval and ending | verified caller and bound recovery reference | caller JWT RPC; server-memory reference; atomic audit and receipt | recovery.test.ts; recovery-presence.test.ts; SQL recovery tests |
+| `src/server/commands/recovery-inputs.ts#command` | recovery input schemas | command-support | internal-only | none; validation only | server recovery inputs | strict schemas; no database access | recovery-inputs.test.ts; no caller identity or phone content input |
+| `src/server/commands/recovery-receipt.ts#command` | recovery receipt parser | command-support | internal-only | none; validation only | fixed recovery command receipts | strict action and identifier allowlist; no database access | recovery.test.ts; rejects malformed and unexpected receipts |
+| `src/server/commands/recovery-mfa.ts#command` | recovery MFA command clients | command | caller-only | fixed recovery context; fresh AAL2 for reactivation | verified caller and bound recovery session | caller JWT RPC; factor proof; atomic audit and receipt | recovery-mfa.test.ts; SQL recovery MFA tests |
+| `src/server/commands/recovery-mfa-contract.ts#command` | recovery MFA schemas and receipts | command-support | internal-only | none; validation only | fixed recovery MFA inputs and responses | strict schemas and action allowlist; no database access | recovery-mfa-contract.test.ts; rejects extra authority inputs |
 | `src/trigger/health.ts#health-check` | health-check | background-task | system-only | provider invocation control | Trigger.dev project | liveness log and constant response | no application data access |
+| `src/trigger/identity-admin-intents.ts#identity-admin-intents` | identity-admin-intents | background-task | system-only | restricted worker command allowlist | identity intent ledger | leased intent dispatch and redacted outcome counts | worker integration, Trigger configuration, and import-boundary tests |
 | `src/instrumentation.ts#register` | server instrumentation registration | framework-hook | framework | none | server runtime | loads the matching Sentry server configuration | no request identity or application data access |
 | `src/instrumentation.ts#onRequestError` | server request error capture | framework-hook | framework | none | server runtime | Sentry error event when monitoring is configured | generic error boundary and disabled replay |
 | `src/instrumentation-client.ts#module` | client instrumentation initialization | framework-hook | framework | none | browser runtime | Sentry client setup when a public DSN exists | disabled without a DSN; session replay remains off |
@@ -100,13 +181,18 @@ The browser extension produced unrelated message-channel errors during one sign-
 
 ## Empty Entry Classes
 
-The current source contains no tRPC mutation, webhook, export handler, download handler, provider callback, cron route, domain command, or bootstrap command.
+The current source contains no tRPC mutation, webhook, export handler, download handler, provider callback, cron route, or bootstrap executable.
+
+Server-only security and recovery command clients exist. No application route or procedure exposes these clients yet.
 
 The current application request path does not import the direct Drizzle pool.
 
 Request-scoped data access uses `src/server/auth/request-scoped.ts` and fixed
-Supabase functions. It validates the token, active identity, and selected
-active organization before returning a client.
+Supabase functions. The helper checks the token, active identity, and selected
+active organization before returning a client. Its stable-ID comparison still
+needs the separate `dbac05f` merge.
+
+The new permission service uses the caller-bound SQL result without comparing the stable identity ID to the Auth subject.
 
 These empty classes do not authorize future entries.
 
@@ -126,13 +212,23 @@ The current tRPC routers contain zero mutations.
 
 The tRPC Route Handler exports only `GET` and `POST`.
 
-R1.4 must apply an exact-origin guard before it adds a cookie-authenticated tRPC mutation or Route Handler command.
+The shared tRPC base procedure now rejects mutations without `POST` or the exact canonical `Origin`.
+
+All exported public, identity-only, and permission-aware mutation builders inherit this guard.
+
+`createContext` captures immutable method and origin values from the fetch adapter's `Request`.
+
+Direct mutation callers without transport facts also receive `FORBIDDEN`.
+
+The guard uses `hasTrustedMutationOrigin` from `src/server/auth/server-action-request.ts`.
+
+Each future Route Handler command still needs its own POST and exact-Origin check before cookie-authenticated changes.
 
 The local canonical origin and Auth site URL use `http://localhost:3000`.
 
 `http://127.0.0.1:3000` remains an Auth redirect for command-line checks.
 
-It is not a trusted Server Action origin.
+It is not a trusted mutation origin.
 
 ## Impersonation and Unsafe Identity Sources
 
@@ -150,7 +246,7 @@ FR-IAM-08 remains Deferred.
 
 All current application tables have explicit deny policies for `anon` and `authenticated`.
 
-The direct Drizzle pool can bypass RLS.
+A privileged direct-pool connection can bypass RLS. The current runtime wrapper uses a restricted worker with no raw table access.
 
 No current application request imports that pool.
 
@@ -158,10 +254,16 @@ The 403 boundary uses the experimental Next.js `authInterrupts` setting.
 
 Each target environment must set `NEXT_PUBLIC_APP_URL` to its one canonical origin before sign-in opens.
 
-Keep `/home` pending and `/admin` denied until stored permission checks and RLS evidence pass.
+Keep `/home` pending and `/admin` denied until their own permission checks and required RLS evidence pass.
 
 If this control fails, add a deny-all route change before a rollback.
 
 Do not bypass the guard.
 
-No schema or data recovery is required for R1.1.
+Historical R1.1 controls required no schema or data recovery.
+
+The R1.4 foundation adds `drizzle/0003_r1_permission_evaluation.sql`. Keep its additive columns, role history, and RLS during application rollback.
+
+Use the [permission recovery guidance](./r1-permission-evaluation.md#migration-and-recovery) and [emergency containment procedure](./r1-emergency-containment.md).
+
+Do not restore the earlier role-label-only function bodies. Use a reviewed forward correction for permission-policy defects.

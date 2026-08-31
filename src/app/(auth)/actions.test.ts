@@ -96,6 +96,38 @@ describe("auth Server Actions", () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  test("rejects a sign-up password shorter than 12 characters before the provider call", async () => {
+    const form = authForm();
+    form.set("password", "short-pass");
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+
+    await expect(signUp(null, form)).resolves.toEqual({
+      error: "Use a password with at least 12 characters.",
+    });
+    expect(createClient).not.toHaveBeenCalled();
+  });
+
+  test("keeps sign-in provider behavior for an eight-character password", async () => {
+    const signInRequest = vi.fn().mockResolvedValue({ error: null });
+    const form = authForm();
+    form.set("password", "eight123");
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: signInRequest },
+    } as never);
+
+    await signIn(null, form);
+
+    expect(signInRequest).toHaveBeenCalledWith({
+      email: "member@example.test",
+      password: "eight123",
+    });
+  });
+
   test("redirects sign-up when the provider creates a session", async () => {
     const signUpRequest = vi.fn().mockResolvedValue({
       data: { session: { access_token: "test-token" }, user: { id: "local-user" } },

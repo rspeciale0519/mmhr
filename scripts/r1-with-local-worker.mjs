@@ -27,6 +27,16 @@ const normalizePath = (value) => {
 const rehearsalFiles = new Set(
   [
     "src/server/db/r1-empty-migration.integration.test.ts",
+    "src/server/db/r1-permission-migration-failure.integration.test.ts",
+    "src/server/db/r1-security-command.integration.test.ts",
+    "src/server/db/r1-security-command-role-lifetime.integration.test.ts",
+    "src/server/db/r1-security-command-role-revocation.integration.test.ts",
+    "src/server/db/r1-identity-intent.integration.test.ts",
+    "src/server/db/r1-recovery-command.integration.test.ts",
+    "src/server/db/r1-recovery-mfa.integration.test.ts",
+    "src/server/db/r1-recovery-mfa-api.integration.test.ts",
+    "src/server/db/r1-identity-worker.integration.test.ts",
+    "src/server/auth/security-command-api.integration.test.ts",
     "src/server/db/r1-populated-migration.integration.test.ts",
     "src/server/db/r1-rollback-compatibility.integration.test.ts",
     "src/server/db/r1-restore.integration.test.ts",
@@ -36,6 +46,7 @@ const integrationFiles = new Set([
   ...rehearsalFiles,
   normalizePath("src/server/auth/auth.integration.test.ts"),
   normalizePath("src/server/auth/rls.integration.test.ts"),
+  normalizePath("src/server/auth/permissions.integration.test.ts"),
   normalizePath("src/server/db/db.integration.test.ts"),
 ]);
 const samePath = (left, right) => normalizePath(left) === normalizePath(right);

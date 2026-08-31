@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import WorkspaceHome from "@/app/(app)/home/page";
-import { requirePageIdentity } from "@/server/auth/page-guards";
+import { requireHomeAccess } from "@/server/auth/page-guards";
 
 vi.mock("@/server/auth/page-guards", () => ({
-  requirePageIdentity: vi.fn(),
+  requireHomeAccess: vi.fn(),
 }));
 
 vi.mock("@/app/(auth)/actions", () => ({
@@ -13,17 +13,22 @@ vi.mock("@/app/(auth)/actions", () => ({
 }));
 
 beforeEach(() => {
-  vi.mocked(requirePageIdentity).mockReset();
-  vi.mocked(requirePageIdentity).mockResolvedValue({ id: "user-123" });
+  vi.mocked(requireHomeAccess).mockReset();
+  vi.mocked(requireHomeAccess).mockResolvedValue({
+    identity: { id: "user-123" },
+    authorization: {
+      scope: { kind: "organization", organizationId: "00000000-0000-4000-8000-000000000000" },
+    },
+  } as never);
 });
 
-test("returns only pending-access content after identity verification", async () => {
+test("returns workspace content after permission verification", async () => {
   render(await WorkspaceHome());
 
-  expect(requirePageIdentity).toHaveBeenCalledTimes(1);
+  expect(requireHomeAccess).toHaveBeenCalledTimes(1);
   expect(
-    screen.getByRole("heading", { name: "Access pending" }),
+    screen.getByRole("heading", { name: "Workspace" }),
   ).toBeInTheDocument();
-  expect(screen.queryByText("Workspace")).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Customer portal" })).toHaveAttribute("href", "/customer");
   expect(screen.queryByTestId("signed-in-email")).not.toBeInTheDocument();
 });

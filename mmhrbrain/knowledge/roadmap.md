@@ -2,7 +2,7 @@
 kind: knowledge
 slug: roadmap
 status: current
-updated: 2026-08-28
+updated: 2026-08-31
 layer: roadmap
 sources:
   - docs/README.md
@@ -22,8 +22,8 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.8 records all required R1 owner approvals and the
-R1.0 and R1.1 status. Current source and tests provide R1.2 evidence.
+recovery controls. Version 1.8 records the R0 control record and R1 owner
+approvals. Current source and tests provide verified R1.4 and early R1.5 evidence.
 
 ## Baseline
 
@@ -52,12 +52,13 @@ R2A and R2B can run in parallel after R1. R3 depends on R2B.
 
 ## R0 Control
 
-The R0 record defines assigned owner roles, the policy quarantine, claim-source inventory, local
-fail-closed gate, recovery, and remaining exit evidence. The local gate is
-verified but is not active on the current production deployment.
+The R0 record defines assigned owner roles, the policy quarantine, claim-family
+inventory with accountable owners, route coverage, the local fail-closed gate,
+recovery, and remaining exit evidence. The control records are complete. The
+local gate is verified but is not active on the current production deployment.
 
-R0 remains open for exact claim review, deployment and alias controls, and
-live verification.
+Public release remains blocked for exact statement review, deployment and alias
+controls, live verification, and the required approvals.
 
 The product owner chose to retain unverified statements as blocked placeholders
 for now. This decision does not approve public use.
@@ -76,10 +77,10 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
-R1.0, R1.1, R1.2, and R1.3 are complete on the implementation branch. R1.3
-adds explicit grants, deny policies, fixed field-safe functions, request-scoped
-access helpers, and migration recovery rehearsals. Runtime recovery remains
-disabled pending stable bindings and audited commands.
+R1.0 through R1.4 are complete on the implementation branch. R1.4 adds
+audited commands, recovery, identity adapters, and restricted worker delivery.
+R1.5 route and MFA foundations are in progress. Runtime recovery remains
+disabled until target-environment activation is separately approved.
 
 ## Authorization
 

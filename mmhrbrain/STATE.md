@@ -1,94 +1,81 @@
 # mmhr brain — STATE
-Updated: 2026-08-28
+Updated: 2026-08-30
 
 ## Current focus
-The canonical v2 product baseline lives in docs/README.md, docs/PRD.md, and
-docs/TECH_STACK.md. The approved implementation roadmap lives in
-.codex/plans/roadmap-v2-implementation.md.
+The canonical product baseline is in docs/README.md, docs/PRD.md, and
+docs/TECH_STACK.md. The approved roadmap is in
+.codex/plans/roadmap-v2-implementation.md. R1 implementation decisions are in
+.codex/plans/module-r1-secure-platform-base.md, version 0.12.
 
-Roadmap version 1.8 maps 148 requirements to evidence status, releases, owner
-roles, tests, risks, and recovery. R1.1 is merged into `develop`. R1.2 is
-implemented and validated in commits `e7bc6c2` and `881f55d`. R1.3 is implemented
-on `feature/r1-request-scoped-rls` in commit `0e2af52`. Routine R1 Git work
-through `develop` is authorized.
-`main`, cloud migrations, bootstrap, dependencies, and deployment remain
-separately controlled.
+The active full-delivery goal authorizes normal project implementation,
+dependencies, Git, cloud configuration, migrations, bootstrap, releases, and
+deployment. Required checks and real identity evidence still apply.
+Purchases and new paid commitments remain prohibited.
 
-R1.1 now uses one verified identity boundary, rejects untrusted Server Action
-origins, denies `/admin`, limits `/home` to pending access, and records every
-current entry point in docs/security/r1-authorization-matrix.md.
+The sandbox reviewer rejected the exact remote push for
+bugfix/r1-stable-identity-context. That write needs explicit user approval.
+Do not bypass the rejection through another command or branch.
+Independent local work can continue.
 
-R1.2 adds compatible identity, role, permission, audit, invitation, and recovery
-data through one additive migration. R1.3 adds explicit grants, deny policies,
-field-safe functions, and request-scoped access. It keeps legacy reads, enables
-RLS on all application tables, and uses an expiring restricted worker with no
-raw table access. Empty, populated, rollback, and restore rehearsals pass. Invitation
-addresses stay bound to their normalized value. Confirmed-email sign-up now
-shows its next step, and sign-up enforces the local 12-character minimum.
+R1.0 through R1.3 are merged into develop at b1ffbe1. Two late review
+findings remain open. The local correction dbac05f fixes the stable-ID
+comparison and restores the earlier journal text. It passed all local
+checks but is not pushed or merged.
 
-R1.0 is complete. Requests expire after 30 minutes, allow only an MFA
-enrollment reset, and use a phone call to the pre-existing company record.
-The approved flow binds one replacement factor to the target's recovery
-session and denies stale AAL2 access. Recovery is not implemented or active.
-
-The baseline stabilization pull request was merged into `develop` at
-`6187d3d` before this R1.1 branch started.
-
-The R0 owner assignments, claim-source inventory, and fail-closed release gate live in
-.codex/plans/module-r0-roadmap-and-public-release-control.md and
-src/lib/public-release.ts. The gate passes local production checks but is not
-active on the current production deployment.
-
-Pulse remains the selected homepage direction at /. All 22 gallery layouts
-remain in src/designs/ and stay available at /designs.
+Current branch: feature/r1-permission-evaluation, based on b1ffbe1.
+R1.4 commands, recovery, identity adapters, and restricted worker delivery are
+implemented and verified locally. R1.5 route and MFA foundations are in progress.
 
 ## Latest synopsis
-Built R1.3 grants, RLS, and request-scoped access. Targeted local gates, RLS
-integration, migration recovery rehearsals, and the production build passed.
-Closed all R1.2 pull-request review findings. All local gates, 98 unit tests,
-33 integration tests, remote checks, rendered auth checks, and an independent
-adversarial security review passed. Runtime recovery remains disabled. See
-[[journal/2026-08-28]].
+The current package adds 30 typed permissions, 60 explicit role defaults,
+caller-bound database evaluation, field filtering, permission-aware tRPC
+builders, audited commands, recovery, identity adapters, restricted worker
+delivery, guarded portal routes, and an identity-only MFA flow.
+
+Migration 0003 preserves approved version-one role history and activates
+version-two defaults. It is applied only to the validated local MMHR stack.
+No cloud or production migration occurred.
+
+Type checking, lint, 1762 unit tests, 100 recovery and migration cases, 64
+worker cases, 47 boundary cases, two real local Auth recovery flows, and the
+production build passed. Independent security reviews found no remaining
+critical issue in the verified local package.
+
+See docs/security/r1-permission-evaluation.md and [[journal/2026-08-30]].
+The existing request-scoped helper still needs dbac05f before integration.
+Permission-protected home, admin, customer, and vendor route foundations are active in code. Runtime recovery and production worker scheduling remain disabled.
 
 ## Open threads
-- R1.3 is merged into `develop` at `b445b2e`.
-- Recovery must stay disabled until stable identity binding, contact preparation, audited commands, and required tests finish.
+- Submit dbac05f after exact remote-write approval. Close the late PR 8 and PR 9 findings after remote validation.
+- Integrate the local evaluation foundation only after its stable-ID prerequisite and remote checks pass.
+- Complete R1.5 through R1.8 route, MFA, administration, and portal evidence.
+- Narrow platform allows to platform scope before mutation access opens. See the owning plan's command decisions.
+- Keep recovery disabled until stable identity bindings, verified factors, contact preparation, audited commands, and all recovery tests pass.
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
-- Create and verify stable identity bindings after R1.2 and before recovery activation.
-- Target environments must set `NEXT_PUBLIC_APP_URL` to one canonical origin.
-- R0 claim review is deferred while the statements remain blocked placeholders.
-- The current production deployment remains accessible. Activating the gate needs separate production approval.
-- Old deployment URLs and aliases must be protected or retired before R0 closes.
-- Open product decisions remain in docs/PRD.md and must close before their
-  owning modules start.
-- RLS is enabled on all application tables with explicit R1.3 deny policies and
-  fixed safe functions. Route permissions remain for a later R1 package.
-- The direct server PostgreSQL pool now uses an expiring restricted worker.
-  Request-scoped access remains separate from this pool.
-- Customer, vendor, and administration workflows remain mostly placeholders.
-- Legacy FR identifiers remain temporary aliases in the canonical PRD.
-- Placeholder figures and claims remain in source and on the current production site.
-- Public commission and affiliation copy still reflects the legacy fixed-rate
-  product. Replace it before any public release.
-- No AI adapter, fixture suite, approval queue, or AI-run store exists yet.
-- The generic AI environment names replace the former provider-specific
-  placeholder. No current application code consumes them.
-- The project has a linked production deployment. Do not change or redeploy it without explicit approval.
-- The comprehensive OutSail questionnaire audit remains in gitignored
-  docs/temp/.
-- The public-site corpus remains in gitignored docs/temp/. Keep copied media
-  internal.
-- The durable operating-model brief remains untracked.
+- Do not use a stale AAL2 token as proof of current MFA enrollment.
+- Complete R1.5 through R1.8, R2A, R2B, and R3 through R9 with objective evidence.
+- R0 claim review, public-release controls, old deployment aliases, and live verification remain open.
+- Production state was not reverified during this local package. Do not infer current production safety from local checks.
+- Validate staging before production migration or deployment. The active goal grants authority, not evidence.
+- Target environments must set NEXT_PUBLIC_APP_URL to one canonical origin.
+- RLS remains enabled on every application table. Request access uses fixed functions and a request-scoped public client.
+- The restricted direct PostgreSQL worker has no raw table access. Worker delivery is locally verified but not activated in a target environment.
+- Customer and vendor routes have guard foundations. CRM and workflow records remain future work.
+- Public claims and commission copy still need approved evidence before release.
+- No provider-neutral AI adapter, fixture suite, approval queue, or AI-run store exists yet.
+- Retain all 22 gallery layouts. Verify both Pulse routes and themes if shared UI changes.
+- Keep unrelated local settings and generated Codex hooks outside task commits.
+- Keep the copied public-site corpus and questionnaire audit in docs/temp/ internal.
 
 ## Active skills in play
 - (none)
 
 ## Notes
-- Use docs/README.md as the entry point.
+- Use docs/README.md as the project entry point.
 - Use docs/PRD.md for product authority.
 - Use docs/TECH_STACK.md for architecture and security authority.
 - Use docs/security/r1-authorization-matrix.md for current entry-point classes.
-- Use [[knowledge/superseded]] before consulting a legacy planning file.
-- Public release stays blocked until exact claim review and production gate activation are complete.
-- Verified identity does not prove organization membership or permission.
-- The recovery rule is approved policy only. No runtime recovery command exists.
+- Use [[knowledge/superseded]] before consulting legacy plans.
+- Verified identity does not prove membership or permission.
+- Keep immutable audit history and deny-first recovery controls.
+- Do not run consolidation before the current full-delivery task ends.

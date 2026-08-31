@@ -27,6 +27,10 @@ export const identityIntentState = pgEnum("identity_intent_state", [
   "outcome_unknown",
   "cancelled",
 ]);
+export const identityIntentWorkMode = pgEnum("identity_intent_work_mode", [
+  "dispatch",
+  "reconciliation",
+]);
 export const recoveryPresenceState = pgEnum("recovery_presence_state", [
   "pending",
   "linked",
@@ -72,6 +76,8 @@ export const identityRecoveryPresence = pgTable(
       .notNull()
       .references(() => identities.id, { onDelete: "restrict" }),
     authSessionId: text("auth_session_id").notNull(),
+    // Nullable legacy rows stay unusable until a new caller-bound presence exists.
+    authSubjectId: uuid("auth_subject_id"),
     opaqueReferenceHash: text("opaque_reference_hash").notNull(),
     state: recoveryPresenceState("state").notNull().default("pending"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
@@ -219,12 +225,23 @@ export const identityAdminIntents = pgTable(
       { onDelete: "restrict" },
     ),
     idempotencyKey: text("idempotency_key").notNull(),
+    correlationId: uuid("correlation_id"),
+    initiatedByIdentityId: uuid("initiated_by_identity_id").references(
+      () => identities.id,
+      { onDelete: "restrict" },
+    ),
+    // Snapshot the provider target. Relinking an identity cannot redirect a claimed reset.
+    authSubjectId: uuid("auth_subject_id"),
     state: identityIntentState("state").notNull().default("pending"),
     attemptCount: integer("attempt_count").notNull().default(0),
     maximumAttempts: integer("maximum_attempts").notNull().default(5),
     nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }),
     claimedAt: timestamp("claimed_at", { withTimezone: true }),
     leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    leaseToken: uuid("lease_token"),
+    workMode: identityIntentWorkMode("work_mode"),
+    dispatchCount: integer("dispatch_count").notNull().default(0),
+    manualReviewRequired: boolean("manual_review_required").notNull().default(false),
     safeErrorCode: text("safe_error_code"),
     resultCode: text("result_code"),
     providerReference: text("provider_reference"),
@@ -258,6 +275,14 @@ export const identityAdminIntents = pgTable(
       sql`${t.confirmedFactorCount} is null or (${t.operation} = 'mfa_enrollment_reset' and ${t.confirmedFactorCount} >= 0)`,
     ),
     check(
+      "identity_admin_intents_dispatch_count_ck",
+      sql`${t.dispatchCount} >= 0 and ${t.dispatchCount} <= ${t.attemptCount} and (${t.operation} <> 'mfa_enrollment_reset' or ${t.dispatchCount} <= 1)`,
+    ),
+    check(
+      "identity_admin_intents_lease_context_ck",
+      sql`(${t.leaseToken} is null and ${t.workMode} is null) or (${t.leaseToken} is not null and ${t.workMode} is not null and ${t.correlationId} is not null and ${t.initiatedByIdentityId} is not null and ${t.leaseExpiresAt} is not null)`,
+    ),
+    check(
       "identity_admin_intents_lifecycle_ck",
       sql`(${t.state} = 'pending' and ${t.claimedAt} is null and ${t.leaseExpiresAt} is null and ${t.completedAt} is null) or (${t.state} = 'in_flight' and ${t.claimedAt} is not null and ${t.leaseExpiresAt} is not null and ${t.completedAt} is null) or (${t.state} in ('succeeded', 'failed', 'outcome_unknown') and ${t.claimedAt} is not null and ${t.completedAt} is not null) or (${t.state} = 'cancelled' and ${t.completedAt} is not null)`,
     ),
@@ -271,6 +296,11 @@ export const securityBootstrapState = pgTable(
     targetIdentityId: uuid("target_identity_id")
       .notNull()
       .references(() => identities.id, { onDelete: "restrict" }),
+    // Null preserves legacy single-target state without inventing a binding.
+    secondTargetIdentityId: uuid("second_target_identity_id").references(
+      () => identities.id,
+      { onDelete: "restrict" },
+    ),
     productApprovalReference: text("product_approval_reference").notNull(),
     securityApprovalReference: text("security_approval_reference").notNull(),
     state: bootstrapState("state").notNull().default("prepared"),
@@ -281,6 +311,10 @@ export const securityBootstrapState = pgTable(
   },
   (t) => [
     check("security_bootstrap_state_singleton_ck", sql`${t.singletonKey} = 1`),
+    check(
+      "security_bootstrap_state_distinct_targets_ck",
+      sql`${t.secondTargetIdentityId} is null or ${t.secondTargetIdentityId} <> ${t.targetIdentityId}`,
+    ),
     check(
       "security_bootstrap_state_consumed_ck",
       sql`(${t.state} = 'prepared' and ${t.consumedAt} is null) or (${t.state} = 'consumed' and ${t.consumedAt} is not null)`,

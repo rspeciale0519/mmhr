@@ -22,6 +22,69 @@
       "when": 1787963410361,
       "tag": "0002_r1_request_scoped_access",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788123039473,
+      "tag": "0003_r1_permission_evaluation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788129342942,
+      "tag": "0004_r1_security_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788134915745,
+      "tag": "0005_r1_identity_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788136116243,
+      "tag": "0006_r1_role_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788136839782,
+      "tag": "0007_r1_recovery_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788137408734,
+      "tag": "0008_r1_assignment_deny_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788140145058,
+      "tag": "0009_r1_recovery_mfa",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788143390980,
+      "tag": "0010_r1_identity_worker_dispatch",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788147879124,
+      "tag": "0011_r1_invitation_email_binding_check",
+      "breakpoints": true
     }
   ]
 }

@@ -11,17 +11,17 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - The public marketing routes and design gallery exist.
 - Existing public commission and affiliation copy still reflects the legacy product.
 - Authentication, database, analytics, tRPC, and background-job foundations exist.
-- Customer and internal administration routes remain placeholders.
+- Customer, vendor, and internal administration routes now have server-side guard foundations.
 - The v2 product baseline now lives in the canonical documents below.
 - The approved v2 roadmap maps all 148 requirements to releases and owner roles.
 - Product, security, engineering, and operations approvals are recorded for R1.
 - R1.1 inventories every current entry point and denies early protected access.
 - R1.0 is complete with a 30-minute expiry, MFA-reset-only scope, and phone identity check.
-- R1.2 is ready, but recovery remains disabled until stable identity binding, implementation, and testing finish.
+- R1.4 is verified locally, and R1.5 route and MFA foundations are in progress.
 - Rob Speciale is the temporary operations owner.
-- The R0 claim-source inventory and fail-closed local release gate are recorded.
+- The R0 control record records owners, decisions, claim families, route coverage, and the release block.
 - Public claims remain blocked placeholders by product decision.
-- The exact claim review register remains incomplete.
+- The exact statement review register, deployment checks, and live release verification remain open.
 - Production gate activation requires a separate approved deployment.
 - All roadmap owner roles now have named people.
 - The former v1 execution plan and roadmap remain historical records.

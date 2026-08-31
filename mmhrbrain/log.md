@@ -121,3 +121,29 @@ Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 - Added a confirmed-email sign-up state and the 12-character sign-up rule.
 - Passed all local gates, remote checks, rendered auth checks, and independent security review.
 - Kept runtime recovery, cloud migration, bootstrap, `main`, and deployment inactive.
+
+## [2026-08-30] review | Correct late R1.3 identity and journal findings
+- Verified the PR 8 and PR 9 merges at `b445b2e` and `b1ffbe1`.
+- Removed the invalid stable-identity-to-Auth-ID comparison.
+- Added local request-wrapper tests with distinct identifiers and denial cases.
+- Restored the earlier journal text and appended the later merge evidence.
+- Passed type checking, lint, 112 unit tests, 48 integration tests, the production build, and independent security review.
+- Kept the correction's remote review and R1.4 through R9 work open.
+
+## [2026-08-30] authority | Full verified production delivery
+- The active goal authorizes normal implementation, dependencies, Git, cloud configuration, migrations, bootstrap, releases, and deployment.
+- Required checks, real identity evidence, and staging validation still apply.
+- Purchases and new paid commitments remain prohibited.
+
+## [2026-08-30] security | Verify local R1.4 permission evaluation
+- Added typed permissions, explicit role defaults, caller-bound evaluation, field controls, and guarded tRPC builders.
+- Passed type checking, lint, 320 unit tests, 82 integration tests, the production build, and independent review.
+- Proved audit-failure rollback, role-default concurrency, migration compatibility, restoration, and emergency containment.
+- Preserved dbac05f as a separate pending prerequisite. The exact remote push still needs approval after auto-review rejection.
+- Kept audited commands, delegation, bootstrap, recovery, workers, remote integration, and production delivery open.
+
+## [2026-08-30] delivery | Resume R1.4 and start R1.5
+- Verified 64 restricted-worker cases, 100 recovery and migration cases, 47 boundary cases, and two real local Auth recovery flows.
+- Added guarded customer, vendor, home, admin, and MFA routes with focused tests.
+- Recorded the R0 control gaps and drafted the R2B CRM substrate plan.
+- Kept public release, cloud migration, bootstrap, production credentials, and deployment blocked.

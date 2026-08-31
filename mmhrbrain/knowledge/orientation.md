@@ -2,7 +2,7 @@
 kind: knowledge
 slug: orientation
 status: current
-updated: 2026-08-28
+updated: 2026-08-31
 layer: orientation
 sources:
   - docs/README.md
@@ -34,26 +34,29 @@ general SaaS product. See docs/PRD.md.
 product behavior. docs/TECH_STACK.md controls architecture, security, and
 provider boundaries. The product owner approved the v2 roadmap on 2026-08-24.
 Roadmap v1.8 contains the approved amendment, the R0 control record, and the
-R1.0 and R1.1 status. Current source and tests provide R1.2 evidence. All
+R1 owner approvals. Current source and tests provide R1.4 and early R1.5 evidence. All
 required R1 owner reviews are approved.
 Former plans in docs/ are legacy records.
 
 **Where the build is:** Foundations and the public marketing shell exist.
 Pulse renders at the site root. The design gallery remains at /designs.
 Authentication, the first schema, tRPC, analytics consent, CI, Sentry, and
-Trigger.dev foundations exist. Customer and administration workflows remain
-mostly placeholders.
+Trigger.dev foundations exist. Customer and vendor route guards and MFA
+enrollment now exist; CRM and administration workflows remain incomplete.
 
 R1.1 now verifies one identity subject, denies untrusted Server Action origins,
 denies `/admin`, and limits `/home` to a pending-access response. The durable
 entry-point record lives in docs/security/r1-authorization-matrix.md.
 
-R1.2 adds compatible identity, permission, audit, and administration data. One
-additive migration preserves legacy reads. An expiring restricted worker has no
-raw table access. Fresh, populated, rollback, and restore rehearsals pass.
+R1.2 through R1.4 add compatible identity, permission, audit, recovery, and
+worker data. One additive migration preserves legacy reads. The restricted
+worker has no raw table access. Fresh, populated, rollback, restore, recovery,
+and worker rehearsals pass.
 
 A fail-closed production release gate is implemented and verified locally.
-The current production deployment does not include it yet.
+The R0 control record now links its owners, claim inventory, route coverage,
+recovery, and release status. The current production deployment does not
+include the gate yet.
 
 The v2 product baseline replaced the former buyer-marketplace plan on
 2026-08-24. The approved roadmap maps all 148 requirements to releases.
@@ -79,8 +82,8 @@ docs/TECH_STACK.md for adopted and planned integration status.
 - Verified identity does not prove organization membership or permission.
 - `NEXT_PUBLIC_APP_URL` must match one canonical target origin.
 - The Next.js `authInterrupts` control is experimental.
-- The interim recovery pair has no backup, and no runtime recovery command exists.
-- Customer and administration routes do not implement the v2 workflows.
+- The interim recovery pair has no backup, and runtime recovery remains disabled.
+- Customer and vendor routes have guard foundations, but CRM and administration workflows are incomplete.
 - Public placeholder claims remain a release risk. The product owner chose to retain them for now.
 - The current production deployment remains accessible until an approved gate deployment occurs.
 - Former roadmap phases and FR identifiers are not current sequencing.
@@ -107,5 +110,5 @@ docs/TECH_STACK.md for adopted and planned integration status.
 
 ## Next Real Step
 
-Start the approved R1.3 grants, RLS, and request-scoped access work.
-Claim review remains deferred, and public release remains blocked.
+Continue the approved R1 implementation and evidence work.
+Exact claim review remains open, and public release remains blocked.

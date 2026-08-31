@@ -24,6 +24,10 @@ export default defineConfig({
     ...windowsWorkerSettings,
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      // Vitest runs server modules outside Next's server-component resolver.
+      "server-only": path.resolve(__dirname, "node_modules/next/dist/compiled/server-only/empty.js"),
+    },
   },
 });

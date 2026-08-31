@@ -2,6 +2,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import postgres from "postgres";
 
+import { enrollTestTotp } from "./permission-test-fixtures";
+
 const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -32,6 +34,8 @@ let organizationId = "";
 let otherOrganizationId = "";
 let adminEmail = "";
 let viewerEmail = "";
+let adminMfaClient: SupabaseClient;
+let viewerMfaClient: SupabaseClient;
 
 async function createConfirmedUser(email: string) {
   const { data, error } = await admin.auth.admin.createUser({
@@ -61,56 +65,77 @@ describe("R1.3 request-scoped grants and RLS", () => {
     adminEmail = `r13-admin-${Date.now()}@example.com`;
     viewerEmail = `r13-viewer-${Date.now()}@example.com`;
     const user = await createConfirmedUser(adminEmail);
-    const viewer = await createConfirmedUser(viewerEmail);
     userId = user.id;
+    const viewer = await createConfirmedUser(viewerEmail);
     viewerUserId = viewer.id;
 
     const [identity] = await owner`
       INSERT INTO public.identities
-        (auth_user_id, normalized_email, email_verified_at, status, activated_at)
+        (auth_user_id, normalized_email, email_verified_at, status, activated_at, migration_review_required)
       VALUES
-        (${user.id}, ${user.email!.toLowerCase()}, now(), 'active', now())
-      RETURNING id
-    `;
-    const [viewerIdentity] = await owner`
-      INSERT INTO public.identities
-        (auth_user_id, normalized_email, email_verified_at, status, activated_at)
-      VALUES
-        (${viewer.id}, ${viewer.email!.toLowerCase()}, now(), 'active', now())
+        (${user.id}, ${user.email!.toLowerCase()}, now(), 'active', now(), false)
       RETURNING id
     `;
     identityId = identity!.id;
+    const [viewerIdentity] = await owner`
+      INSERT INTO public.identities
+        (auth_user_id, normalized_email, email_verified_at, status, activated_at, migration_review_required)
+      VALUES
+        (${viewer.id}, ${viewer.email!.toLowerCase()}, now(), 'active', now(), false)
+      RETURNING id
+    `;
     viewerIdentityId = viewerIdentity!.id;
 
     const [organization] = await owner`
-      INSERT INTO public.orgs (name, type, status, activated_at)
-      VALUES ('R1.3 customer', 'customer', 'active', now())
-      RETURNING id
-    `;
-    const [otherOrganization] = await owner`
-      INSERT INTO public.orgs (name, type, status, activated_at)
-      VALUES ('R1.3 other', 'vendor', 'active', now())
+      INSERT INTO public.orgs (name, type, status, activated_at, migration_review_required)
+      VALUES ('R1.3 customer', 'customer', 'active', now(), false)
       RETURNING id
     `;
     organizationId = organization!.id;
+    const [otherOrganization] = await owner`
+      INSERT INTO public.orgs (name, type, status, activated_at, migration_review_required)
+      VALUES ('R1.3 other', 'vendor', 'active', now(), false)
+      RETURNING id
+    `;
     otherOrganizationId = otherOrganization!.id;
 
     await owner`
       INSERT INTO public.org_members
-        (org_id, identity_id, user_id, role, role_key, status, activated_at)
+        (org_id, identity_id, user_id, role, role_key, status, activated_at, migration_review_required)
       VALUES
-        (${organizationId}, ${identityId}, ${userId}, 'admin', 'organization_admin', 'active', now()),
-        (${organizationId}, ${viewerIdentityId}, ${viewerUserId}, 'viewer', 'viewer', 'active', now())
+        (${organizationId}, ${identityId}, ${userId}, 'admin', 'organization_admin', 'active', now(), false),
+        (${organizationId}, ${viewerIdentityId}, ${viewerUserId}, 'viewer', 'viewer', 'active', now(), false)
     `;
-  });
+    adminMfaClient = await signIn(adminEmail);
+    await enrollTestTotp(adminMfaClient);
+    viewerMfaClient = await signIn(viewerEmail);
+    await enrollTestTotp(viewerMfaClient);
+  }, 60_000);
 
   afterAll(async () => {
-    await owner`DELETE FROM public.org_members WHERE org_id IN (${organizationId}, ${otherOrganizationId})`;
-    await owner`DELETE FROM public.orgs WHERE id IN (${organizationId}, ${otherOrganizationId})`;
-    await owner`DELETE FROM public.identities WHERE id IN (${identityId}, ${viewerIdentityId})`;
-    if (userId) await admin.auth.admin.deleteUser(userId);
-    if (viewerUserId) await admin.auth.admin.deleteUser(viewerUserId);
-    await owner.end({ timeout: 5 });
+    const organizationIds = [organizationId, otherOrganizationId].filter(Boolean);
+    const identityIds = [identityId, viewerIdentityId].filter(Boolean);
+    const failures: string[] = [];
+    async function attempt(label: string, action: () => Promise<unknown>) {
+      try { await action(); } catch { failures.push(label); }
+    }
+    await attempt("memberships", async () => {
+      if (organizationIds.length) await owner`DELETE FROM public.org_members WHERE org_id = ANY(${organizationIds}::uuid[])`;
+    });
+    await attempt("organizations", async () => {
+      if (organizationIds.length) await owner`DELETE FROM public.orgs WHERE id = ANY(${organizationIds}::uuid[])`;
+    });
+    await attempt("identities", async () => {
+      if (identityIds.length) await owner`DELETE FROM public.identities WHERE id = ANY(${identityIds}::uuid[])`;
+    });
+    for (const id of [userId, viewerUserId].filter(Boolean)) {
+      await attempt("Auth user", async () => {
+        const result = await admin.auth.admin.deleteUser(id);
+        if (result.error) throw new Error("RLS Auth fixture cleanup failed");
+      });
+    }
+    await attempt("owner connection", () => owner.end({ timeout: 5 }));
+    if (failures.length) throw new Error(`RLS fixture cleanup failed: ${failures.join(", ")}`);
   });
 
   test("anonymous clients cannot read tables or fixed functions", async () => {
@@ -120,6 +145,10 @@ describe("R1.3 request-scoped grants and RLS", () => {
 
     const functionRead = await anonymous.rpc("mmhr_get_my_memberships");
     expect(functionRead.error).not.toBeNull();
+    const authorization = await anonymous.rpc("mmhr_authorize", {
+      permission_key: "workspace.access",
+    });
+    expect(authorization.error).not.toBeNull();
   });
 
   test("active members receive only fixed, field-safe organization data", async () => {
@@ -183,9 +212,15 @@ describe("R1.3 request-scoped grants and RLS", () => {
     expect(remove.error).not.toBeNull();
   });
 
-  test("organization admins can read member roles, viewers cannot", async () => {
+  test("organization admins require AAL2 for member roles, viewers remain denied", async () => {
     const adminClient = await signIn(adminEmail);
-    const members = await adminClient.rpc("mmhr_get_organization_members", {
+    const lowAssurance = await adminClient.rpc("mmhr_get_organization_members", {
+      organization_id: organizationId,
+    });
+    expect(lowAssurance.error).toBeNull();
+    expect(lowAssurance.data).toEqual([]);
+
+    const members = await adminMfaClient.rpc("mmhr_get_organization_members", {
       organization_id: organizationId,
     });
     expect(members.error).toBeNull();
@@ -197,6 +232,11 @@ describe("R1.3 request-scoped grants and RLS", () => {
     });
     expect(denied.error).toBeNull();
     expect(denied.data).toEqual([]);
+    const elevatedDenied = await viewerMfaClient.rpc("mmhr_get_organization_members", {
+      organization_id: organizationId,
+    });
+    expect(elevatedDenied.error).toBeNull();
+    expect(elevatedDenied.data).toEqual([]);
   });
 
   test("suspending the identity revokes an old active token", async () => {
@@ -274,7 +314,15 @@ describe("R1.3 request-scoped grants and RLS", () => {
       WHERE n.nspname = 'public' AND p.proname LIKE 'mmhr_%'
       ORDER BY p.proname
     `;
-    expect(functions).toHaveLength(5);
+    expect(functions).toHaveLength(6);
+    expect(functions.map((fn) => fn.proname)).toEqual([
+      "mmhr_authorize",
+      "mmhr_get_audit_events",
+      "mmhr_get_my_identity",
+      "mmhr_get_my_memberships",
+      "mmhr_get_organization",
+      "mmhr_get_organization_members",
+    ]);
     expect(functions.every((fn) => fn.security_definer)).toBe(true);
     expect(functions.every((fn) => fn.configuration.includes("search_path="))).toBe(true);
   });

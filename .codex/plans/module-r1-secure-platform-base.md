@@ -4,9 +4,9 @@
 
 | Field | Value |
 |---|---|
-| Version | 0.9 R1.0 recovery controls approved |
-| Date | 2026-08-28 |
-| Status | R1.0 and R1.1 complete; R1.2 ready to start |
+| Version | 0.12 R1.4 recovery and worker delivery decisions |
+| Date | 2026-08-30 |
+| Status | R1.0 through R1.4 implemented and locally verified; R1.5 route and MFA foundations in progress |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
@@ -18,7 +18,11 @@ The user authorized R1 implementation, branches, commits, pushes, pull requests,
 
 That authorization remains active until the user revokes it.
 
-It does not authorize production dependencies, invitation delivery, cloud migrations, bootstrap actions, `main`, or deployments.
+The full-delivery goal of 2026-08-30 also authorizes dependencies, configuration, migrations, bootstrap, releases, and deployments after their required checks.
+
+Purchases and new paid commitments remain prohibited.
+
+The sandbox reviewer blocked the R1.3 correction's remote push. Explicit approval of that remote write remains pending.
 
 ## 1. Outcome
 
@@ -106,9 +110,13 @@ Expected post-R1 statuses require completed evidence:
 
 Each later module must preserve every Implemented R1 control.
 
-## 4. Current Evidence and Risks
+## 4. Historical Pre-R1 Evidence and Risks
 
-| Area | Current evidence | Material gap |
+This table preserves the pre-R1 planning baseline. It does not describe the current implementation.
+
+Use the [authorization matrix](../../docs/security/r1-authorization-matrix.md) and [local evaluation evidence](../../docs/security/r1-permission-evaluation.md) for current controls and remaining gaps.
+
+| Area | Pre-R1 evidence | Pre-R1 gap |
 |---|---|---|
 | Verified identity | `src/middleware.ts`, `src/lib/supabase/server.ts`, and tRPC use `getClaims()` | Identity does not prove organization or action access |
 | Application home | `/home` checks verified identity | Any authenticated account can enter |
@@ -277,6 +285,69 @@ Migrations or an approved idempotent command must synchronize required definitio
 
 Use database seeds only for test fixtures.
 
+### 6.3.1 R1.4 Registry and Role Decisions
+
+These implementation decisions resolve unspecified metadata under the full-delivery goal.
+
+`P` means platform scope. `O` means one validated organization.
+
+| Keys | Kind | Scope | Minimum assurance |
+|---|---|---|---|
+| `workspace.access` | feature | P/O | AAL1 |
+| `admin.access` | feature | P | AAL2 |
+| `portal.customer.access`, `portal.vendor.access` | feature | O | AAL1 |
+| `org.members.view`, `org.members.invite`, `org.members.change_role`, `org.members.revoke`, `org.members.status.change` | action | O | AAL2 |
+| `identity.status.change`, `identity.relink`, `identity.recovery.request`, `identity.recovery.approve` | action | P | AAL2 |
+| `org.status.change`, `org.type.change` | action | P | AAL2 |
+| `platform_roles.assign`, `platform_roles.revoke`, `role_versions.activate` | action | P | AAL2 |
+| `permissions.view`, `permissions.grant`, `permissions.revoke`, `permissions.delegate` | action | P/O | AAL2 |
+| `portal.access.grant`, `portal.access.revoke` | action | O | AAL2 |
+| `audit.view`, `audit.export` | action | P/O | AAL2 |
+| `org.name.read`, `member.role.read` | field | O | AAL1 |
+| `member.role.update` | field | O | AAL2 |
+| `audit.change_summary.read` | field | P/O | AAL2 |
+
+`org.members.status.change` covers activation and suspension. It does not replace role-change or revocation permission.
+
+The AAL1 recovery self-request remains a fixed exception. The general evaluator does not provide that exception.
+
+All identity, platform-role, role-version, organization-lifecycle, portal-grant, delegation, and `admin.access` operations require an active internal platform role.
+
+An internal user also needs active membership and an explicit organization-scoped `workspace.access` allow to enter a customer or vendor organization.
+
+Platform assignment history keeps a principal internal. A revoked assignment or inactive role version denies access instead of converting that principal to external membership.
+
+Every organization permission requires the same organization's `workspace.access` permission.
+
+Platform `admin.access` requires platform `workspace.access`. Other platform permissions also require `admin.access`.
+
+Internal-only organization permissions require platform `admin.access` in addition to the organization workspace gate.
+
+These fixed parent gates apply before any child allow. Parent retirement, metadata drift, and explicit denial block child access.
+
+Portal permission requires the matching organization type and an active portal grant.
+
+Portal revocation blocks the portal feature. Later portal resources must require that feature as well as their action permission.
+
+The shared organization-read set is `workspace.access`, `org.name.read`, and `member.role.read`.
+
+| Role | Explicit defaults |
+|---|---|
+| `super_admin` | All 30 configured keys, stored individually |
+| `admin`, `staff` | Shared read set and `admin.access` |
+| `organization_admin` | Shared read set, both portal keys, the five `org.members.*` keys, `member.role.update`, and scoped `audit.view` |
+| `contributor`, `viewer` | Shared read set and both portal keys |
+
+All other defaults deny. Later domain modules will separate Contributor and Viewer actions.
+
+An explicit override takes priority over role defaults. A matching role-default deny takes priority over another role-default allow.
+
+A delegation ceiling never grants permission use by itself. Permission administration needs its action permission and the separate target-specific ceiling.
+
+New version-two roles hold these defaults. Version-one content remains immutable and available for reviewed reactivation.
+
+The first package adds no security mutation grants, recovery activation, or worker commands.
+
 ### 6.4 Server Entry Points
 
 Use one authorization service for pages, layouts, actions, procedures, exports, and commands.
@@ -329,6 +400,281 @@ Only the fixed reset-intent claim can move its exact approved target from active
 
 Every other worker identity-state transition must fail.
 
+### 6.5.1 R1.4 Command Decisions
+
+These decisions define the next command package. They do not activate a mutation or weaken the existing evaluation gates.
+
+#### Serialized authority
+
+Every security writer must update one existing private guard row before reading authority.
+
+The update must change a transactional revision. A missing guard row must deny the command.
+
+Use fixed `VOLATILE` command functions with an empty search path.
+
+Read authority in a separate statement after the guard update. Capture the authorization time after any lock wait.
+
+Recheck identity, actual AAL2, expiry, permission, scope, and applicable delegation ceilings before changing data.
+
+Recompute effective administration after the proposed change. Write the audit event and command receipt in the same transaction.
+
+Bootstrap, identity synchronization, recovery transitions, and later security migrations must use the same guard.
+
+Propagate serialization failures. Retry only through a new complete transaction.
+
+An advisory lock or unchanged row lock does not replace the revision update.
+
+The revision update makes a stale Repeatable Read writer conflict with a committed security change.
+
+Keep provider calls outside database transactions. Claim the exact durable intent before external dispatch.
+
+#### Durable administration
+
+Capacity requires active, reviewed identities, verified email, and current verified MFA enrollment.
+
+A previous AAL2 token alone does not prove current enrollment.
+
+Evaluate durable permission capability at AAL2. Separately validate the command actor's actual assurance.
+
+Do not count an expiring positive override or an expiring delegation ancestor as durable capacity.
+
+Apply every current matching deny, including a deny that expires later. Require durable positive authority for every parent gate.
+
+Both approved stable Super Admin bindings must independently retain these platform permissions:
+
+`workspace.access`, `admin.access`, `identity.status.change`, `identity.relink`, `identity.recovery.request`, `identity.recovery.approve`, `org.status.change`, `org.type.change`, `platform_roles.assign`, `platform_roles.revoke`, `role_versions.activate`, `permissions.view`, `permissions.grant`, `permissions.revoke`, `permissions.delegate`, `audit.view`, `audit.export`, and `audit.change_summary.read`.
+
+Each binding also requires an active `super_admin` assignment. Additional administrators cannot replace either approved binding.
+
+Each active organization requires an active, reviewed `organization_admin` membership with these durable permissions in that organization:
+
+`workspace.access`, `org.name.read`, `member.role.read`, `member.role.update`, `org.members.view`, `org.members.invite`, `org.members.change_role`, `org.members.status.change`, `org.members.revoke`, and `audit.view`.
+
+The role label is necessary but insufficient. An expired grant, denied field, or denied feature can remove effective capacity.
+
+Do not include portal feature access in organization administration capacity. Portal grants remain separate.
+
+Check every active organization after a global security change. Pending organizations do not provide capacity.
+
+Keep the approved fixed recovery exception. Do not create another one-person bypass.
+
+#### Four delegation limits
+
+Add independent `can_view`, `can_grant`, `can_revoke`, and `can_delegate` flags. Each flag defaults to false.
+
+| Capability | Required action | Limit |
+|---|---|---|
+| View | `permissions.view` | Read covered permission-administration metadata |
+| Grant | `permissions.grant` | Increase authority, including adding an allow or removing a deny |
+| Revoke | `permissions.revoke` | Reduce authority, including adding a deny or removing an allow |
+| Delegate | `permissions.delegate` | Issue a bounded child ceiling; this does not grant permission use |
+
+No capability implies another. Restrict these administrative ceilings to the approved internal administration workflow.
+
+A delegated grant must store its parent. Its issuer must equal the parent's grantee.
+
+Require the same permission key and exact scope. The child can contain only capabilities present in its parent.
+
+Issuance also requires `can_delegate`. A child cannot outlive any ancestor.
+
+Invalidate positive delegated authority when its required ancestor becomes invalid.
+
+Store the source ceiling on an allow issued through delegated authority. That allow cannot remain effective after its source chain becomes invalid.
+
+Keep an issued deny effective until its explicit revocation or recorded expiry. Losing issuer authority must not silently remove a deny.
+
+Mixed replacements must pass both increase and decrease checks.
+
+Reject direct self-changes and changes to an ancestor that supplies the actor's authority.
+
+Reject delegation cycles across keys, scopes, and capabilities, not only cycles inside one permission key.
+
+Role assignments also form authority edges. A recipient cannot change the ancestor that assigned their active platform role.
+
+Delegated role changes require the applicable increase or decrease ceilings for every explicit permission default in the role bundle.
+
+Adding an allow or removing a deny requires grant authority. Adding a deny or removing an allow requires revoke authority.
+
+Only a current Super Admin can issue or remove the Super Admin role, which carries independent ceiling authority.
+
+Delegated role-version changes require both ceilings for every affected principal and scope. Shared-role changes cannot affect the actor.
+
+Shared-role changes also cannot affect an authority ancestor. This restriction includes a Super Admin acting without delegated ceilings.
+
+Removing a delegated deny must retain its grant-authority source until the original deny expires.
+
+A replacement ceiling cannot restore access through that removed deny.
+
+An explicit override deny has higher priority than role defaults. A later allow-only write cannot remove its source dependency.
+
+A new, authorized deny followed by its authorized removal can record a new source. Both actions require audit evidence.
+
+A removed role-default deny does not override a separate, authorized user allow. New role authority must also pass its own source checks.
+
+#### Command and record scopes
+
+Organization-only keys require an exact organization override or ceiling. Platform-only keys require platform scope.
+
+For dual-scope keys, platform allows and ceilings authorize platform use only. Organization allows and ceilings require the exact organization.
+
+Retain inherited platform denies for dual-scope keys. Never ignore an unsupported deny and thereby increase access.
+
+Retain unsupported existing records for review. Deny affected access until an authorized correction resolves them.
+
+The next migration must update evaluator semantics and tests before these command grants open.
+
+Keep command authority separate from the target record scope.
+
+A platform permission-administration command can manage an explicitly covered organization grant without giving its actor tenant-data access.
+
+#### Initialization and shared roles
+
+Expand bootstrap storage to two immutable stable targets before completion can run. Never infer the second target from an existing row.
+
+Preserve consumed bootstrap state. Require explicit review for any earlier single-target prepared state.
+
+Use a fixed organization-initialization command for pending organizations. Add explicit initialization authority before exposing that command.
+
+Require reviewed organization facts and an explicitly approved initial administrator. Do not infer membership creation from `org.status.change` alone.
+
+Create or validate the required membership and durable grants atomically. Activate the organization only when post-change administration checks pass.
+
+Do not weaken ordinary organization authorization to admit pending organizations.
+
+Application role-version activation must deny a change to a stable role that affects the acting identity.
+
+Use reviewed owner migrations for those shared-role changes. They must retain serialization, audit, and post-change capacity checks.
+
+#### Retry contract
+
+Add an immutable command receipt with a unique actor, command, and idempotency key.
+
+Bind the receipt to a digest of the complete validated request. Reject key reuse with different input.
+
+The digest includes every mutation input, including reason and expected effect. Correlation IDs are transport context, not mutation input.
+
+An identical retry can use a new correlation ID. Keep the original correlation ID in the immutable event referenced by the receipt.
+
+Do not use the audit table's non-unique idempotency field as the command deduplication boundary.
+
+#### Recovery and worker continuation
+
+The next additive package stores each intent's original correlation, initiating identity, and fixed provider subject.
+
+Legacy intents without that complete context cannot dispatch. Do not infer their missing authority or target binding.
+
+Use three fixed worker mutation functions: `mmhr_claim_identity_intent`, `mmhr_claim_identity_intent_reconciliation`, and `mmhr_record_identity_intent_result`.
+
+Claim arguments contain only an intent ID. Result arguments contain only the intent ID, current opaque lease token, and an allowlisted outcome.
+
+Each claim creates an attempt record with a unique lease token and a fifteen-minute deadline. Permit at most five total attempts.
+
+An expired dispatch lease becomes `outcome_unknown`. The next claim permits provider reads only, never another unconfirmed write.
+
+Only invitation delivery can retry a write after a confirmed `provider_rejected` result marked safe. Preserve its original idempotency key.
+
+An MFA reset can dispatch only once. A failed reset remains terminal. Unknown outcomes permit reconciliation, not another reset.
+
+Accept a late result only while its lease token remains current. A newer claim fences every earlier result.
+
+Result recording must check the stored operation and current provider facts. Zero factors of every status are required for reset success.
+
+Keep attempt identity and completed outcome fields immutable. A lost acknowledgement cannot restore dispatch eligibility.
+
+Store an authorization timestamp on the target when reset dispatch starts. Reject tokens issued before or within that timestamp's second.
+
+Keep that timestamp after reactivation. Fresh replacement-factor verification cannot revive an earlier AAL2 token.
+
+Reject refreshed tokens from every other Auth session created before the reset fence.
+
+The bound recovery session can remain usable only after the exact reset and replacement-factor completion records prove reactivation.
+
+Bind that exception to the current fence and original dispatch attempt. An earlier recovery cannot authorize a later reset.
+
+Require complete, ordered attempt history before a retry, reconciliation claim, or result write. Missing or conflicting history must deny access.
+
+Validate UUID metadata against the worker contract before any lease or containment write.
+
+Lock the target Auth user before the final zero-factor check. Hold that lock through the atomic result and request update.
+
+Verify that the provider factor foreign key makes concurrent enrollment wait for this lock. Do not change provider schema.
+
+Use Read Committed transactions for worker result recording. Reject older transaction snapshots that can hide a committed provider factor.
+
+While any identity is recovery_pending, deny every AAL2 permission at the request boundary, including privileged reads.
+
+Keep ordinary authorized AAL1 reads available for other active identities. Internal capacity checks do not grant request access.
+
+Recovery presence stores its verified Auth subject and session binding. Neither value can be supplied as a browser-selected provider target.
+
+An owner-only preparation record binds the approved pair to the phone procedure and its operations and rehearsal references.
+
+That setup adds no recovery approver. Each request still requires only the other named Super Admin's approval.
+
+Keep recovery disabled until this preparation and all required verification pass. Store opaque reference IDs, never phone numbers or call content.
+
+#### Durable worker delivery
+
+Use the existing intent ledger as the transactional outbox. An external enqueue acknowledgement must not control dispatch eligibility.
+
+Add one fixed read-only discovery function: `mmhr_list_identity_intent_candidates()`.
+
+It returns at most five due intent IDs. It accepts no actor, provider target, operation, state, or query input.
+
+Verify the actual expiring worker login, worker-role constraints, and absence of raw table or schema-creation rights before discovery.
+
+Filter invalid, terminal, busy, and future work. Include expired leases so the existing reconciliation command can finish or contain them.
+
+Keep the three mutation commands authoritative. A discovered ID is not a claim, permission, or provider-write authorization.
+
+Run one scheduled Trigger task each minute, with one queue slot and no automatic task retry.
+
+Process each discovered ID once per run. Use the existing dispatcher for claims, provider calls, and result recording.
+
+Keep `IDENTITY_INTENT_WORKER_ENABLED` disabled until the target environment passes its migration, identity, and provider checks.
+
+Report storage failures and operator-review outcomes explicitly. Log only intent IDs, fixed outcome codes, and counts.
+
+Validate empty, invalid, duplicate, concurrent, expired, terminal, failed, and recovered work. Verify the Trigger build and server-only boundary.
+
+Recovery disables the worker flag and schedule. It preserves intents, attempt history, containment, and the previous compatible application.
+
+These delivery decisions use the active full-delivery goal's implementation authority. They do not record production activation or human recovery evidence.
+
+#### Fixed recovery command inputs
+
+Generate each recovery reference from 32 random bytes on the server. Store only its SHA-256 digest.
+
+Use fixed reason codes: `lost_factor`, `compromised_factor`, and `replace_device`.
+
+Bind command receipts to all semantic input. Represent phone-check time as an absolute timestamp, independent of database time zone.
+
+An explicit retry must retain its original reference and idempotency key in memory. A lost reference requires a new key.
+
+Presence creation can replace only the current caller's unlinked presence in the same verified session.
+
+It can also expire that session's linked request after its deadline, but only before dispatch starts.
+
+Record request, intent, and presence changes with audit events in the same transaction. Never extend an old deadline or reuse its reference.
+
+#### Bound replacement-factor completion
+
+Expose one caller-bound context read, one expected-factor registration command, and one recovery reactivation command.
+
+The provider enrollment and challenge calls must use the verified caller's Auth client. Never accept another provider subject or session.
+
+Register only one new TOTP factor created after the successful reset. Store its ID, not its secret.
+
+Factor registration keeps the identity contained. Its fixed command writes an audit event and receipt without restoring administrator capacity.
+
+Reactivation requires fresh AAL2 from the bound session and exactly one verified factor with that recorded ID.
+
+Lock the target Auth user, session, and factor rows before final checks. Use Read Committed transactions for these fixed writes.
+
+Restore active status, complete the presence, verify full administration capacity, and write audit and receipt in one transaction.
+
+Permit an identical completion retry only after the current bound-session proof passes again. Reject other sessions and changed input.
+
 ### 6.6 Deterministic Authorization
 
 AI output must never evaluate permissions, select roles, create grants, approve identity actions, or influence RLS.
@@ -343,15 +689,25 @@ The bootstrap must exist only as `scripts/r1-bootstrap-super-admin.mjs`.
 
 Do not expose it through a page, action, handler, procedure, worker, or public database function.
 
-The target must supply a current AAL2 access token through standard input.
+Both approved targets must supply current AAL2 access tokens through standard input.
 
-The script must verify the token with `getClaims()` and keep it only in memory.
+The script must verify each token with `getClaims()` and keep both tokens only in memory.
 
-The verified identity must match the approved target and active internal identity.
+Each verified identity must match its approved stable identity binding.
+
+Use two distinct targets in one atomic bootstrap. A single-target bootstrap cannot satisfy section 6.2.
+
+The fixed completion function may activate both approved pending identities as part of that same transaction.
+
+It must create both assignments, consume the state, and write all audit events together.
+
+A failure must create neither assignment and must not activate either identity.
 
 The script must require distinct product and security approval references.
 
-Its separately approved prepare mode must store the target and approval references without granting access.
+Its prepare mode must store both targets and distinct product-security approval references without granting access.
+
+Prepared bindings are immutable. Display names and email addresses cannot select or replace a target.
 
 It must call fixed owner-only prepare and complete functions through `MIGRATION_DATABASE_URL`.
 
@@ -570,6 +926,12 @@ The evidence reference is an opaque pointer to the operations record. It cannot 
 
 An unlinked recovery presence expires after 30 minutes. Linking it consumes its opaque reference for one request.
 
+Linking must occur before the presence expires. The new request then receives its own 30-minute deadline.
+
+Keep the presence's original creation and expiry times immutable. Its linked time must equal the request's creation time.
+
+After linking, the request deadline controls approval and reset dispatch. The consumed reference cannot create another request.
+
 Request cancellation or pre-dispatch expiry cancels its linked presence.
 
 After reset success, the linked presence remains usable only by its bound session until reactivation or emergency containment.
@@ -744,7 +1106,11 @@ Primary references:
 
 ## 10. Work Packages
 
-R1.2, R1.3, and R1.4 can each add one reviewed additive migration.
+R1.2 and R1.3 each add one reviewed additive migration.
+
+R1.4 can use several focused additive migrations. Each must pass its own security, compatibility, and recovery checks before integration.
+
+This change permits separate evaluation and command packages. It does not reduce any R1.4 requirement or authorize stacked pull requests.
 
 Each database package must generate, review, and apply its migration before package validation.
 
@@ -760,7 +1126,7 @@ The only allowed recovery action is an MFA enrollment reset.
 
 The lost-factor identity check is a phone call to the target's company-record number that existed before the request.
 
-R1.2 is ready to start. Recovery activation remains blocked until implementation, identity binding, and tests are complete.
+R1.4 is locally verified. R1.5 route and MFA foundations are in progress, and recovery activation remains blocked until target-environment approval.
 
 Named owners:
 
@@ -1297,15 +1663,15 @@ Do not print environment values, tokens, invitation secrets, or user data.
 
 Run the smallest package test first.
 
-Before integration or migration work, run:
+Before integration or migration work, capture `supabase status --output json` in memory.
 
-```text
-supabase status
-```
+Never print, paste, or retain raw status output. It can contain credentials and keys.
 
-If the project stack is stopped, run `supabase start`. Then run `supabase status` again.
+Emit only allowlisted project, host, and port facts.
 
-Verify the local project name, API URL, and database port without printing secrets.
+If the project stack is stopped, capture `supabase start` output in memory. Then capture status again.
+
+Verify the local project name, API host, and database port without printing secrets.
 
 Run a preflight that compares `MIGRATION_DATABASE_URL` with the validated local host and port.
 
@@ -1477,4 +1843,10 @@ Approval of this plan approves its scope and defaults only.
 
 The standing instruction above separately authorizes R1 implementation and routine Git work through `develop`.
 
-The remaining Not authorized rows still require their named approval.
+The Not authorized rows above record the earlier approval state.
+
+The 2026-08-30 full-delivery goal authorizes those normal project actions after their required verification.
+
+This authority does not supply real administrator tokens, identity bindings, contact evidence, or approval references.
+
+The rejected remote push still requires explicit approval of that write before retry.

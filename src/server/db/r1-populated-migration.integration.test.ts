@@ -285,6 +285,20 @@ describe.sequential("R1.2 populated database migration", () => {
     ).rejects.toThrow();
   });
 
+  test("rejects an invitation with a non-normalized email binding", async () => {
+    await expect(
+      context!.client`
+        INSERT INTO invitations (org_id, email, normalized_email, expires_at)
+        VALUES (
+          ${organizationId},
+          'MixedCase-Bound@example.test',
+          'different@example.test',
+          ${futureTime}
+        )
+      `,
+    ).rejects.toThrow(/invitations_normalized_email_ck/);
+  });
+
   test("retains stable history when an Auth user is deleted and relinked", async () => {
     const [original] = await context!.client<{ id: string }[]>`
       SELECT id FROM identities WHERE auth_user_id = ${adminUserId}

@@ -6,6 +6,14 @@ import {
   startRehearsal,
   stopRehearsal,
 } from "./r1-migration-rehearsal";
+import {
+  verifyEmergencyContainment,
+  verifyInternalScopeContinuity,
+  verifyRegistrySynchronization,
+  verifyRoleApprovalSerialization,
+  verifyRoleDefaultPrecedence,
+  verifyWorkspaceDefinitionGate,
+} from "./r1-permission-rehearsal-cases";
 
 const expectedTables = [
   "admin_delegation_grants",
@@ -29,7 +37,7 @@ const expectedTables = [
   "user_permission_overrides",
 ];
 
-describe("R1.3 empty database migration", () => {
+describe("R1.4 empty database migration", () => {
   let context: RehearsalContext | undefined;
 
   beforeAll(async () => {
@@ -61,32 +69,45 @@ describe("R1.3 empty database migration", () => {
     >`
       SELECT stable_key, version, kind, state
       FROM role_definitions
+      WHERE state = 'active'
       ORDER BY stable_key
     `;
 
     expect(roles).toEqual([
-      { stable_key: "admin", version: 1, kind: "platform", state: "active" },
+      { stable_key: "admin", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "contributor",
-        version: 1,
+        version: 2,
         kind: "organization",
         state: "active",
       },
       {
         stable_key: "organization_admin",
-        version: 1,
+        version: 2,
         kind: "organization",
         state: "active",
       },
-      { stable_key: "staff", version: 1, kind: "platform", state: "active" },
+      { stable_key: "staff", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "super_admin",
-        version: 1,
+        version: 2,
         kind: "platform",
         state: "active",
       },
-      { stable_key: "viewer", version: 1, kind: "organization", state: "active" },
+      { stable_key: "viewer", version: 2, kind: "organization", state: "active" },
     ]);
+
+    const previous = await context!.client<{ count: number }[]>`
+      SELECT count(*)::integer AS count FROM role_definitions
+      WHERE version = 1 AND state = 'approved' AND activated_at IS NULL
+    `;
+    expect(previous[0]!.count).toBe(6);
+    const previousDefaults = await context!.client<{ count: number }[]>`
+      SELECT count(*)::integer AS count FROM role_permission_defaults AS defaults
+      JOIN role_definitions AS role ON role.id = defaults.role_definition_id
+      WHERE role.version = 1
+    `;
+    expect(previousDefaults[0]!.count).toBe(0);
   });
 
   test("records the R1 migration audit events", async () => {
@@ -98,9 +119,12 @@ describe("R1.3 empty database migration", () => {
     `;
 
     expect(events).toEqual([
+      { action: "permission_registry.sync", count: 1 },
       { action: "r1.2_schema.add", count: 1 },
       { action: "r1.3_access.add", count: 1 },
-      { action: "role_version.activate", count: 6 },
+      { action: "r1.4_permissions.add", count: 1 },
+      { action: "role_version.activate", count: 12 },
+      { action: "role_version.deactivate", count: 6 },
     ]);
   });
 
@@ -165,6 +189,8 @@ describe("R1.3 empty database migration", () => {
       "r1_disable_ephemeral_worker_login",
       "r1_disable_expired_worker_logins",
       "r1_enforce_state_transition",
+      "r1_has_permission_for_identity",
+      "r1_permission_registry",
       "r1_protect_legacy_invitation_token",
       "r1_protect_role_definition_history",
       "r1_protect_role_permission_defaults",
@@ -173,8 +199,10 @@ describe("R1.3 empty database migration", () => {
       "r1_remove_expired_worker_logins",
       "r1_renew_ephemeral_worker_login",
       "r1_request_has_membership",
+      "r1_request_has_permission",
       "r1_request_identity_id",
       "r1_request_is_org_admin",
+      "r1_sync_permission_registry",
       "r1_worker_role_is_safe",
     ]);
     expect(workerFunctions.every((item) => !item.worker_execute)).toBe(true);
@@ -204,5 +232,29 @@ describe("R1.3 empty database migration", () => {
       ORDER BY table_name
     `;
     expect(protectedRows.every((item) => item.count === 0)).toBe(true);
+  });
+
+  test("synchronizes registry definitions without silently changing policy", async () => {
+    await verifyRegistrySynchronization(context!);
+  });
+
+  test("emergency containment revokes all R1 RPCs and rolls back exact grants", async () => {
+    await verifyEmergencyContainment(context!, expectedTables);
+  });
+
+  test("serializes draft-default changes with role approval", async () => {
+    await verifyRoleApprovalSerialization(context!);
+  });
+
+  test("applies deny and override precedence across real role versions", async () => {
+    await verifyRoleDefaultPrecedence(context!);
+  });
+
+  test("platform revocation cannot convert an internal principal into an external member", async () => {
+    await verifyInternalScopeContinuity(context!);
+  });
+
+  test("workspace registry retirement denies organization action access", async () => {
+    await verifyWorkspaceDefinitionGate(context!);
   });
 });

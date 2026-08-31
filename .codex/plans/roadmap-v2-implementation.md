@@ -6,7 +6,7 @@
 |---|---|
 | Version | 1.8 |
 | Date | 2026-08-28 |
-| Status | Approved roadmap; R0 quarantine active; R1.0 and R1.1 complete; R1.2 ready |
+| Status | Approved roadmap; R0 control records complete; public-release quarantine active; R1.0 through R1.4 verified; R1.5 in progress |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
@@ -157,15 +157,19 @@ AI capability selection must remain interchangeable behind AIService.
 
 Control record: [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md).
 
-The claim-source inventory and fail-closed local release gate are recorded.
+The R0 control record now records named owners, open decisions, claim-family
+owners, route coverage, the fail-closed local release gate, recovery, and
+linked control status.
 
-The exact claim review register remains incomplete.
+The exact statement review register remains incomplete. No public claim is
+approved by the inventory.
 
 The product owner chose to retain the blocked statements as placeholders for now.
 
 Production activation still needs a separate approved deployment.
 
-The exact claim review register and production controls keep R0 open.
+Claim evidence, deployment and alias controls, live verification, and
+production approval keep the public release blocked.
 
 Outcome:
 
@@ -203,7 +207,7 @@ The reset removes every MFA factor and binds one verified replacement to the tar
 
 Lost-factor recovery requires a call to the target's pre-existing company-record phone number.
 
-R1.2 is ready to start. Recovery remains disabled until implementation, identity binding, and tests are complete.
+R1.4 is locally verified, and R1.5 route and MFA foundations are in progress. Recovery remains disabled until target-environment activation is approved.
 
 Outcome:
 

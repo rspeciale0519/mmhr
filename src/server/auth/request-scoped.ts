@@ -10,7 +10,7 @@ export type RequestIdentity = {
 
 export type RequestOrganization = {
   id: string;
-  name: string;
+  name: string | null;
   type: "internal" | "customer" | "vendor";
   status: "active";
 };
