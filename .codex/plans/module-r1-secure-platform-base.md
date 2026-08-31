@@ -75,7 +75,7 @@ Revoking an organization or deal grant must deny its descendant resources immedi
 
 R9 must repeat the complete customer and vendor isolation matrices.
 
-The parent roadmap v1.8 records the approved rows and cross-release notes.
+The [parent roadmap](./roadmap-v2-implementation.md) records the approved rows and cross-release notes.
 
 It requires deterministic-authorization regression evidence in every R5 through R9 module plan.
 

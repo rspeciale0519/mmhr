@@ -213,12 +213,12 @@ the statement can appear in an approved public release.
 
 | Control | Current status | Canonical evidence | Owner |
 |---|---|---|---|
-| Owner and decision register | Complete | Section 1 and `docs/PRD.md#11-open-product-decisions` | PO |
+| Owner and decision register | Complete | [Owner register](#1-owner-and-decision-register) and [PRD decisions](../../docs/PRD.md#11-open-product-decisions) | PO |
 | Exact public-claim inventory and route coverage | Complete as inventory; all decisions blocked | Sections 3 and 4 | MKT, DATA, PO |
 | Local fail-closed release gate | Verified locally; not active in current production | `src/lib/public-release.ts`, `src/middleware.ts`, and release tests | ENG, SEC |
 | Search crawler block | Active in code; live production state not verified | `src/app/layout.tsx`, `/robots.txt`, and release tests | ENG, MKT |
 | Production deployment and old aliases | Open; no current verification recorded | Exit rule 7 and the approved deployment record | REL, ENG |
-| Public release | Blocked | Section 2 and the PRD release policy | REL, SEC, PO |
+| Public release | Blocked | [Active block](#2-active-public-release-block) and [PRD release policy](../../docs/PRD.md#10-delivery-and-release-policy) | REL, SEC, PO |
 
 The linked status is authoritative: this record is complete as a control
 record, while the release remains blocked until every open control passes.
@@ -229,7 +229,7 @@ record, while the release remains blocked until every open control passes.
 |---|---|---|
 | Product-owner roadmap approval | Complete | Parent roadmap approval record |
 | Open product-decision ownership | Complete | PRD decision register and Section 1 |
-| Named release owners | Complete | Section 1 assigns every owner role |
+| Named release owners | Complete | [Section 1](#1-owner-and-decision-register) assigns every owner role |
 | Public claim-family and route inventory with accountable owners | Complete | Sections 3 and 4 |
 | Exact claim-by-claim review register | Complete as a blocked register | Section 4 records each statement, source, reviewer, date, and decision |
 | Written public-release block | Complete | Section 2 |

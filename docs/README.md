@@ -146,7 +146,7 @@ Keep these files for history. Do not use them as current product scope or sequen
 
 A production deployment requires explicit approval.
 
-The active R0 policy blocks production access and search indexing.
+The active [R0 policy](../.codex/plans/module-r0-roadmap-and-public-release-control.md#2-active-public-release-block) blocks production access and search indexing.
 
 The R0 record is a documentation and control closure only. It does not approve
 public claims or activate production access.

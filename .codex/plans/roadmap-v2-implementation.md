@@ -69,7 +69,8 @@ Architecture approval does not prove implementation.
 | DATA | Vendor-data owner | Rob Speciale |
 | REL | Production release owner | Rob Speciale |
 
-All roadmap owner roles have named people.
+All roadmap owner roles match the
+[R0 owner register](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register).
 
 ## 4. Evidence and Gap Codes
 
@@ -118,7 +119,7 @@ R2A lead-routing completion depends on the R2B CRM command. R3 depends on R2B.
 | R6 | Build demos, proposals, pricing, selection, and contract handoff | R5 | Product, operations, and security owners |
 | R7 | Build commissions, invoicing, collection, disputes, and finance reconciliation | R6 | Product, finance, and security owners |
 | R8 | Complete onboarding, work queues, administration, reporting, analytics, and operational health | R7 | Product, operations, finance, and security owners |
-| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and release owners |
+| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and production release owners (PO, SEC, REL) |
 
 Each release must build only from an approved module plan.
 
@@ -134,7 +135,7 @@ Each release must build only from an approved module plan.
 | Category expansion | HR software only | Any new-category work |
 | Sponsored placement | No sponsored placement | Any sponsored-placement work |
 
-Record each decision in the PRD before its owning module starts.
+Record each decision in the [PRD decision register](../../docs/PRD.md#11-open-product-decisions) before its owning module starts.
 
 ## 7. Integration Approval Gates
 
@@ -183,10 +184,10 @@ Outcome:
 Exit evidence:
 
 - Product-owner approval of this roadmap
-- Decision register with owners and required dates or release gates
-- Exact public-claim inventory with source, evidence, reviewer, date, and
+- [Decision register](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) with owners and required dates or release gates
+- [Exact public-claim inventory](./module-r0-roadmap-and-public-release-control.md#4-exact-public-claim-review-register) with source, evidence, reviewer, date, and
   decision fields
-- Written public-release block
+- [Written public-release block](./module-r0-roadmap-and-public-release-control.md#2-active-public-release-block)
 - No unresolved authority conflict between README, PRD, technical architecture, and roadmap
 
 Recovery:

@@ -448,7 +448,7 @@ Use `main` only for an approved production release.
 Do not apply a cloud migration or production deployment without explicit approval.
 
 Production approval cannot override the active
-[R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md).
+[R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md#2-active-public-release-block).
 
 The R0 record keeps public routes and indexing blocked while the exact claim
 inventory lacks approved evidence, review, and publication approval.
