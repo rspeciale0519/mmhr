@@ -41,6 +41,9 @@ jobs:
         run: npm run check:dependency-audit
         continue-on-error: true
 
+      - name: Secret scan
+        run: npm run check:secrets
+
       - name: Type-check
         run: npm run type-check
 

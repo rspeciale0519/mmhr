@@ -369,6 +369,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "manifest schema validation and fail-closed release mode",
   },
   {
+    key: "scripts/check-secret-scan.mjs#command",
+    surface: "repository secret scanner",
+    kind: "command",
+    access: "system-only",
+    permission: "local repository read",
+    scope: "tracked source and configuration files",
+    dataPath: "high-confidence credential pattern matches only",
+    denialEvidence: "CI required check; documented local-placeholder exclusions",
+  },
+  {
     key: "scripts/r1-bootstrap-super-admin.mjs#command",
     surface: "local Super Admin bootstrap",
     kind: "command",

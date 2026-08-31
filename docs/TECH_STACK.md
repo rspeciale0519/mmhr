@@ -485,7 +485,8 @@ Planned CI additions are:
 - Critical browser journeys
 - Accessibility checks
 - Marketing performance budgets
-- Dependency and secret scanning
+- Dependency scanning (currently advisory until remediation)
+- High-confidence repository secret scanning
 - Deployment approval gates
 
 Do not describe a planned gate as active.

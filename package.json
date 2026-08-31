@@ -14,6 +14,7 @@
     "check:r9-evidence": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs",
     "check:r9-evidence:release": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs --require-ready",
     "check:dependency-audit": "npm audit --omit=dev --audit-level=high",
+    "check:secrets": "node --experimental-strip-types scripts/check-secret-scan.mjs",
     "test:integration": "node scripts/r1-with-local-worker.mjs -- node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts"
   },
   "dependencies": {
