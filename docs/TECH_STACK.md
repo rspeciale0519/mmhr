@@ -468,6 +468,10 @@ Current CI does not start Supabase or run integration tests.
 CI validates and archives `scripts/r9-release-evidence.json`. The release
 command remains fail-closed until every required record has real evidence.
 
+CI also runs `npm run check:dependency-audit` as an advisory report. The
+current dependency baseline has 36 high-severity findings, so this step does
+not yet block merges. Make it blocking after dependency remediation.
+
 Run `npm run test:integration` locally for database, authentication, RLS, migration, and query changes.
 
 Planned CI additions are:
