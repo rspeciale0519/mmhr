@@ -64,7 +64,7 @@ export const leadCreateResultSchema = z.strictObject({
   leadId: z.uuid().nullable(),
   status: z.enum(leadStatuses).nullable(),
   ownerIdentityId: z.uuid().nullable(),
-  outcomeCode: z.enum(["created", "replayed", "idempotency_conflict"]),
+  outcomeCode: z.enum(["created", "replayed", "idempotency_conflict", "invalid_input"]),
   correlationId: z.uuid(),
 });
 
@@ -115,5 +115,9 @@ export async function createLead(
 
   const rows = z.array(leadCreateResultSchema).length(1).safeParse(response.data);
   if (!rows.success) throw new LeadCreateError("INVALID_RESPONSE");
-  return rows.data[0];
+  const result = rows.data[0];
+  if (result.outcomeCode === "invalid_input") {
+    throw new LeadCreateError("INVALID_INPUT");
+  }
+  return result;
 }

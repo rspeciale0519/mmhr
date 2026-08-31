@@ -71,6 +71,17 @@ describe("lead create contract", () => {
     await expect(createLead(input, { supabase: conflict as never })).resolves.toMatchObject({ outcomeCode: "idempotency_conflict" });
   });
 
+  test("maps database validation outcomes to invalid input", async () => {
+    const invalid = client([{
+      ...result,
+      leadId: null,
+      status: null,
+      outcomeCode: "invalid_input",
+    }]);
+    await expect(createLead(input, { supabase: invalid as never }))
+      .rejects.toMatchObject({ name: LeadCreateError.name, code: "INVALID_INPUT" });
+  });
+
   test("classifies invalid input and database failures without exposing details", async () => {
     await expect(createLead({ ...input, unexpected: true } as never, { supabase: client() as never }))
       .rejects.toMatchObject({ name: LeadCreateError.name, code: "INVALID_INPUT" });
