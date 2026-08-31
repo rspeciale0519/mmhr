@@ -4,6 +4,7 @@ import { Geist } from "next/font/google";
 import { CookieConsent } from "@/components/cookie-consent";
 import { brand } from "@/lib/brand";
 import { getPublicReleaseRobotsMetadata } from "@/lib/public-release";
+import { getSiteMetadataBase } from "@/lib/site-metadata";
 import { TRPCReactProvider } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -13,8 +14,10 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
+  metadataBase: getSiteMetadataBase(),
   title: brand.name,
   description: `${brand.name} — buyer-side HRIS brokerage.`,
+  alternates: { canonical: "/" },
   // The release gate controls indexing while claims remain unapproved.
   robots: getPublicReleaseRobotsMetadata(),
 };
