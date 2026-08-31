@@ -449,6 +449,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "lead-create.test.ts; database function validates, audits, and isolates records",
   },
   {
+    key: "src/server/commands/invitation-administration.ts#command",
+    surface: "invitation administration contract",
+    kind: "command-support",
+    access: "internal-only",
+    permission: "organization invitation administration; current AAL2 required at the database command",
+    scope: "one organization and invitation record",
+    dataPath: "token-free invitation lifecycle plan; durable identity delivery intent",
+    denialEvidence: "invitation-administration.test.ts; no direct database or provider access",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",
