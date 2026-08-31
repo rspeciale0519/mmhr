@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { getSiteMetadataBase } from "./site-metadata";
+import { getSiteMetadataBase, getSiteSocialMetadata } from "./site-metadata";
 
 describe("site metadata origin", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -24,5 +24,23 @@ describe("site metadata origin", () => {
     "http://app.example.test",
   ])("rejects an unsafe metadata origin: %s", (value) => {
     expect(getSiteMetadataBase({ NEXT_PUBLIC_APP_URL: value })).toBeUndefined();
+  });
+});
+
+describe("site social metadata", () => {
+  test("uses the configured brand without adding unapproved claims", () => {
+    expect(getSiteSocialMetadata("MatchMaker HR", "Buyer-side HRIS brokerage.")).toEqual({
+      openGraph: {
+        type: "website",
+        title: "MatchMaker HR",
+        description: "Buyer-side HRIS brokerage.",
+        siteName: "MatchMaker HR",
+      },
+      twitter: {
+        card: "summary",
+        title: "MatchMaker HR",
+        description: "Buyer-side HRIS brokerage.",
+      },
+    });
   });
 });

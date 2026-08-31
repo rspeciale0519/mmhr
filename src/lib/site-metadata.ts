@@ -1,5 +1,21 @@
 import { canonicalOrigin } from "@/server/identity/validation";
 
+export function getSiteSocialMetadata(name: string, description: string) {
+  return {
+    openGraph: {
+      type: "website" as const,
+      title: name,
+      description,
+      siteName: name,
+    },
+    twitter: {
+      card: "summary" as const,
+      title: name,
+      description,
+    },
+  };
+}
+
 /**
  * Returns the configured site origin only when it passes the same validation
  * used for redirects and invitation links.
