@@ -38,7 +38,7 @@ Migration 0003 preserves approved version-one role history and activates
 version-two defaults. It is applied only to the validated local MMHR stack.
 No cloud or production migration occurred.
 
-Type checking, lint, 1880 unit tests, recovery and migration cases, worker
+Type checking, lint, 1885 unit tests, recovery and migration cases, worker
 cases, boundary cases, local Auth recovery flows, and the production build
 passed. The full integration command remains blocked because
 MIGRATION_DATABASE_URL is not set in this process.
