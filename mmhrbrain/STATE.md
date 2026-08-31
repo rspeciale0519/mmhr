@@ -43,7 +43,9 @@ cases, boundary cases, local Auth recovery flows, and the production build
 passed. The full integration command remains blocked because
 MIGRATION_DATABASE_URL is not set in this process.
 
-R9 now has a checked-in evidence manifest and CI validation command. The
+R9 now has a checked-in evidence manifest and CI validation command. A
+server-only recovery evidence contract validates restore drills and rollback
+rehearsals, including RPO, RTO, approval, freshness, and duplicate checks. The
 release mode remains fail-closed until each real gate has an evidence record.
 CI also runs a high-confidence repository secret scan. Dependency auditing is
 visible but remains advisory until the current findings receive remediation.
