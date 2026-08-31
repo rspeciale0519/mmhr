@@ -12,10 +12,11 @@ import {
   type AiRunStatus,
 } from "./ai-service";
 
-const identifierSchema = z.string().trim().min(1).max(200).regex(
+export const aiRunIdentifierSchema = z.string().trim().min(1).max(200).regex(
   /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/,
   "Identifier contains unsupported characters",
 );
+const identifierSchema = aiRunIdentifierSchema;
 const sha256Schema = z.string().regex(/^[a-f0-9]{64}$/, "Expected a SHA-256 hash");
 const timestampSchema = z.iso.datetime({ offset: true });
 
