@@ -37,6 +37,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r1-recovery-mfa-api.integration.test.ts",
     "src/server/db/r1-identity-worker.integration.test.ts",
     "src/server/db/r2b-crm-foundation.integration.test.ts",
+    "src/server/db/r3-intake-matching.integration.test.ts",
     "src/server/auth/security-command-api.integration.test.ts",
     "src/server/auth/r1-security.integration.test.ts",
     "src/server/db/r1-populated-migration.integration.test.ts",
@@ -51,6 +52,7 @@ const integrationFiles = new Set([
   normalizePath("src/server/auth/permissions.integration.test.ts"),
   normalizePath("src/server/db/db.integration.test.ts"),
   normalizePath("src/server/db/r2b-crm-foundation.integration.test.ts"),
+  normalizePath("src/server/db/r3-intake-matching.integration.test.ts"),
 ]);
 const samePath = (left, right) => normalizePath(left) === normalizePath(right);
 const isVitestCommand =

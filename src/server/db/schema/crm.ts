@@ -120,6 +120,7 @@ export const products = pgTable(
   },
   (t) => [
     uniqueIndex("products_vendor_stable_key_uq").on(t.vendorProfileId, t.stableKey),
+    uniqueIndex("products_organization_id_id_uq").on(t.organizationId, t.id),
     index("products_organization_status_idx").on(t.organizationId, t.status),
     check(
       "products_stable_key_ck",

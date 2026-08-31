@@ -271,11 +271,12 @@ describe("R1.3 request-scoped grants and RLS", () => {
           'permission_definitions', 'platform_role_assignments', 'portal_access_grants',
           'role_definitions', 'role_permission_defaults', 'user_permission_overrides',
           'customer_profiles', 'vendor_profiles', 'products', 'contacts', 'relationships'
+          , 'evaluation_candidates', 'intake_requirements', 'intakes'
         )
       GROUP BY c.relname
       ORDER BY c.relname
     `;
-    expect(rows).toHaveLength(24);
+    expect(rows).toHaveLength(27);
     expect(rows.every((row) => row.policy_count >= 1)).toBe(true);
   });
 
