@@ -141,6 +141,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - Remediate the dependency audit findings before making the dependency check blocking.
 - R0 claim review, public-release controls, old deployment aliases, and live verification remain open.
 - Production state was not reverified during this local package. Do not infer current production safety from local checks.
+- The environment rejected the authorized feature-branch push because the configured private GitHub remote is unverified. Do not bypass that control.
 - Validate staging before production migration or deployment. The active goal grants authority, not evidence.
 - Target environments must set NEXT_PUBLIC_APP_URL to one canonical origin.
 - RLS remains enabled on every application table. Request access uses fixed functions and a request-scoped public client.
