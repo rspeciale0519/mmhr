@@ -17,6 +17,7 @@ import * as r3Workspace from "./schema/r3-workspace";
 import * as r6Workflow from "./schema/r6-workflow";
 import * as r7Finance from "./schema/r7-finance";
 import * as r8Operations from "./schema/r8-operations";
+import * as r9Evidence from "./schema/r9-evidence";
 
 export const schema = {
   ...audit,
@@ -35,6 +36,7 @@ export const schema = {
   ...r6Workflow,
   ...r7Finance,
   ...r8Operations,
+  ...r9Evidence,
 };
 
 const connectionString = process.env.DATABASE_URL;
@@ -65,3 +67,4 @@ export * from "./schema/r3-workspace";
 export * from "./schema/r6-workflow";
 export * from "./schema/r7-finance";
 export * from "./schema/r8-operations";
+export * from "./schema/r9-evidence";

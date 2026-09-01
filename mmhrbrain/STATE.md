@@ -38,7 +38,7 @@ Migration 0003 preserves approved version-one role history and activates
 version-two defaults. It is applied only to the validated local MMHR stack.
 No cloud or production migration occurred.
 
-Type checking, lint, 2324 unit tests, recovery and migration cases, worker
+Type checking, lint, 2332 unit tests, recovery and migration cases, worker
 cases, boundary cases, local Auth recovery flows, and the production build
 passed. The full integration command remains live but has produced no test
 output. Supabase startup remains live, no expected local ports are listening,
@@ -98,6 +98,12 @@ Supabase and Docker access returns.
 The focused R8 customer-success and operations migration review passed 8 tests,
 including onboarding snapshots and history, approved project-plan templates,
 revisioned plans, role-scoped queue work, retained failure states, organization
+isolation, and deny-first raw access. The migration remains unapplied until
+local Supabase and Docker access returns.
+
+The focused R9 evidence persistence migration review passed 8 tests, including
+deletion deadlines and retention, legal-hold decisions, bounded availability
+observations, route performance budgets, duplicate prevention, organization
 isolation, and deny-first raw access. The migration remains unapplied until
 local Supabase and Docker access returns.
 

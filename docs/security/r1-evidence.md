@@ -44,14 +44,14 @@ binding but remains live without test output. Supabase reports no service
 listeners on ports 56321 or 56322, and the Docker API returns permission denied
 even with elevated access.
 
-The latest complete unit suite passed 128 files and 2,324 tests after the
+The latest complete unit suite passed 129 files and 2,332 tests after the
 Next.js 16.3.4 upgrade and the R8 renewal, onboarding, project-plan, analytics,
 approval-queue, outcome, customer-journey, vendor-performance, operations report,
 audit-viewer, R9 deployment-smoke, R5 AI routing and fixture-evaluation, R3
 intake, R2B deal-lifecycle, R2A lead-command, R2B deal and vendor-evidence,
 R3 scorecard and workspace, R5 AI run-record, R6 demo, proposal, and
-contract-handoff, R7 finance, and R8 customer-success and operations
-persistence changes.
+contract-handoff, R7 finance, R8 customer-success and operations, and R9
+evidence persistence changes.
 
 The focused R3 intake migration review suite passed 7 tests. It checks the
 required tables, RLS, deny policies, organization-scoped requirement and
@@ -100,6 +100,11 @@ immutable event history, deny policies, and raw table revocation.
 The focused R8 customer-success and operations migration review suite passed 8
 tests. It checks onboarding snapshots and history, approved project-plan
 templates, revisioned plans, role-scoped queue work, retained failure states,
+organization isolation, deny policies, and raw table revocation.
+
+The focused R9 evidence persistence migration review suite passed 8 tests. It
+checks deletion deadlines and retention, legal-hold decisions, bounded
+availability observations, route performance budgets, duplicate prevention,
 organization isolation, deny policies, and raw table revocation.
 
 The full dependency audit reports 86 findings: 59 high, 25 moderate, 1 low,
