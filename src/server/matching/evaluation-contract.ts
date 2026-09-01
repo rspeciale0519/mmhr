@@ -171,6 +171,55 @@ export type UnmaskedCandidate = Readonly<CandidateIdentity & {
   }>;
 }>;
 
+export const candidateStates = [
+  "proposed",
+  "active",
+  "paused",
+  "eliminated",
+  "selected",
+  "archived",
+] as const;
+export type CandidateState = (typeof candidateStates)[number];
+
+const candidateStateTransitionSchema = z
+  .strictObject({
+    candidateId: reference,
+    organizationId: uuid,
+    fromState: z.enum(candidateStates),
+    toState: z.enum(candidateStates),
+    expectedRevision: z.number().int().min(1),
+    actorIdentityId: uuid,
+    occurredAt: timestamp,
+    auditReference: reference,
+    approvalReference: reference.regex(/^approval:/, "Approval reference must identify an approval record").nullable(),
+  })
+  .superRefine((transition, context) => {
+    if (transition.fromState === transition.toState) {
+      context.addIssue({ code: "custom", path: ["toState"], message: "Candidate state must change" });
+      return;
+    }
+
+    const allowed: Readonly<Record<CandidateState, readonly CandidateState[]>> = {
+      proposed: ["active", "paused", "eliminated"],
+      active: ["paused", "eliminated", "selected"],
+      paused: ["active", "eliminated", "archived"],
+      eliminated: ["active", "archived"],
+      selected: [],
+      archived: [],
+    };
+    if (!allowed[transition.fromState].includes(transition.toState)) {
+      context.addIssue({ code: "custom", path: ["toState"], message: "Candidate state transition is not allowed" });
+    }
+    if (transition.fromState === "eliminated" && transition.toState === "active" && transition.approvalReference === null) {
+      context.addIssue({ code: "custom", path: ["approvalReference"], message: "Candidate reactivation requires approval" });
+    }
+    if (transition.fromState !== "eliminated" && transition.approvalReference !== null) {
+      context.addIssue({ code: "custom", path: ["approvalReference"], message: "Approval is only required for reactivation" });
+    }
+  });
+
+export type CandidateStateTransition = z.output<typeof candidateStateTransitionSchema>;
+
 function deepFreeze<T>(value: T): T {
   if (value === null || typeof value !== "object" || Object.isFrozen(value)) return value;
   Object.freeze(value);
@@ -181,6 +230,12 @@ function deepFreeze<T>(value: T): T {
 function parseConfiguration(input: unknown): ScoringConfigurationInput {
   const result = scoringConfigurationInputSchema.safeParse(input);
   if (!result.success) throw new Error("Invalid scoring configuration");
+  return result.data;
+}
+
+export function parseCandidateStateTransition(input: unknown): CandidateStateTransition {
+  const result = candidateStateTransitionSchema.safeParse(input);
+  if (!result.success) throw new Error("Invalid candidate state transition");
   return result.data;
 }
 

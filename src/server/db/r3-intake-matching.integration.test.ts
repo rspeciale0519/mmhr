@@ -39,7 +39,7 @@ describe("R3 intake and matching foundation", () => {
       LEFT JOIN pg_policies AS p
         ON p.schemaname = n.nspname AND p.tablename = c.relname
       WHERE n.nspname = 'public' AND c.relname = ANY(${r3Tables}::text[])
-      GROUP BY c.relname, c.relrowsecurity
+      GROUP BY c.oid, c.relname, c.relrowsecurity
       ORDER BY c.relname
     `;
 
@@ -57,11 +57,11 @@ describe("R3 intake and matching foundation", () => {
     `;
     const [vendor] = await context!.client<{ id: string }[]>`
       INSERT INTO public.vendor_profiles (organization_id, description)
-      VALUES (${vendorOrganization!.id}, 'R3 vendor') RETURNING id
+      VALUES (${organization!.id}, 'R3 vendor') RETURNING id
     `;
     const [product] = await context!.client<{ id: string }[]>`
       INSERT INTO public.products (organization_id, vendor_profile_id, stable_key, name)
-      VALUES (${vendorOrganization!.id}, ${vendor!.id}, 'r3_product', 'R3 Product') RETURNING id
+      VALUES (${organization!.id}, ${vendor!.id}, 'r3_product', 'R3 Product') RETURNING id
     `;
     const [intake] = await context!.client<{ id: string }[]>`
       INSERT INTO public.intakes (organization_id, status)

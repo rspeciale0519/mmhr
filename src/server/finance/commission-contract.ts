@@ -65,6 +65,18 @@ export const commissionEventSchema = z
 
 export type CommissionEvent = z.infer<typeof commissionEventSchema>;
 
+export const commissionStateTransitionSchema = z.strictObject({
+  eventId: uuid,
+  fromState: z.enum(["pending_review", "approved", "invoiced", "partially_paid", "paid", "disputed", "adjusted", "voided", "written_off"]),
+  toState: z.enum(["pending_review", "approved", "invoiced", "partially_paid", "paid", "disputed", "adjusted", "voided", "written_off"]),
+  actorIdentityId: uuid,
+  occurredAt: timestamp,
+  reason: z.string().trim().min(1).max(2_000),
+  correlationId: uuid,
+});
+
+export type CommissionStateTransition = z.infer<typeof commissionStateTransitionSchema>;
+
 export const commissionPaymentSchema = z
   .object({
     paymentId: uuid,
@@ -266,6 +278,35 @@ export function assertOneEventPerContract(eventsInput: readonly unknown[]): read
     seenIdempotencyKeys.add(event.idempotencyKey);
   }
   return [...events].sort((left, right) => left.eventId.localeCompare(right.eventId));
+}
+
+const allowedCommissionTransitions: Readonly<Record<CommissionEvent["state"], readonly CommissionEvent["state"][]>> = {
+  pending_review: ["approved", "voided"],
+  approved: ["invoiced", "disputed", "voided"],
+  invoiced: ["partially_paid", "paid", "disputed", "voided"],
+  partially_paid: ["paid", "disputed", "adjusted"],
+  paid: ["disputed", "adjusted", "written_off"],
+  disputed: ["approved", "adjusted", "voided"],
+  adjusted: ["approved", "invoiced", "disputed", "voided"],
+  voided: [],
+  written_off: [],
+};
+
+/** Applies one audited state change without mutating the source commission event. */
+export function transitionCommissionEvent(
+  eventInput: unknown,
+  transitionInput: unknown,
+): CommissionEvent {
+  const event = commissionEventSchema.safeParse(eventInput);
+  const transition = commissionStateTransitionSchema.safeParse(transitionInput);
+  if (!event.success || !transition.success) throw new Error("Invalid commission state transition");
+  if (transition.data.eventId !== event.data.eventId || transition.data.fromState !== event.data.state) {
+    throw new Error("Commission state transition is stale");
+  }
+  if (!allowedCommissionTransitions[event.data.state].includes(transition.data.toState)) {
+    throw new Error("Commission state transition is not allowed");
+  }
+  return Object.freeze({ ...event.data, state: transition.data.toState });
 }
 
 /** Reconciles immutable payment records without changing their source history. */

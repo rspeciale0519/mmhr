@@ -39,10 +39,10 @@ Run the integration evidence with `npm run test:integration` after starting the
 local Supabase stack. The wrapper uses the restricted local worker path and
 keeps credentials out of logs and retained artifacts.
 
-The 2026-08-31 full integration attempt uses the validated local environment
-binding but remains live without test output. Supabase reports no service
-listeners on ports 56321 or 56322, and the Docker API returns permission denied
-even with elevated access.
+The 2026-09-01 full integration run used the validated local environment
+binding and passed 21 files and 592 tests. The local stack uses ports 57021
+through 57029. This evidence remains local and does not prove target or
+production readiness.
 
 The latest complete unit suite passed 129 files and 2,332 tests after the
 Next.js 16.3.4 upgrade and the R8 renewal, onboarding, project-plan, analytics,
@@ -139,6 +139,26 @@ handling, schema failures, and explicitly approved fallback records.
 The focused AI-evaluation suite passed 10 tests. It validates complete fixture
 coverage, input and output hashes, schema and provider failures, and redacted
 evaluation results without retaining raw provider output.
+
+## 2026-09-01 local completion record
+
+The local Supabase stack applied all 26 checked-in migrations through
+`drizzle/0025_r1_public_function_acl_repair.sql`.
+
+The complete integration suite passed 21 files and 592 tests.
+
+The full unit suite passed 129 files and 2,332 tests.
+
+Type checking, lint, the production build, integration-matrix check, secret
+scan, Drizzle schema check, and diff check passed.
+
+The ACL repair revokes inherited PUBLIC execution on all public functions and
+grants `mmhr_*` execution only to `authenticated`.
+
+The release manifest remains fail-closed. Target-environment, authenticated
+browser, accessibility, performance, availability, deletion, restore,
+deployment, rollback, security-review, and public-approval evidence remains
+required before production release.
 
 The focused R3 intake suite passed 9 tests. It validates immutable intake
 snapshots, strict requirements, organization scope, submission prerequisites,

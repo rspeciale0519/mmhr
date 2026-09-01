@@ -12,10 +12,9 @@ dependencies, Git, cloud configuration, migrations, bootstrap, releases, and
 deployment. Required checks and real identity evidence still apply.
 Purchases and new paid commitments remain prohibited.
 
-The sandbox reviewer rejected the exact remote push for
-bugfix/r1-stable-identity-context. That write needs explicit user approval.
-Do not bypass the rejection through another command or branch.
-Independent local work can continue.
+The sandbox reviewer rejected an earlier exact remote push for
+bugfix/r1-stable-identity-context. Do not bypass that rejection.
+Independent local work continues on the active feature branch.
 
 R1.0 through R1.3 are merged into develop at b1ffbe1. Two late review
 findings remain open. The local correction dbac05f fixes the stable-ID
@@ -40,9 +39,14 @@ No cloud or production migration occurred.
 
 Type checking, lint, 2332 unit tests, recovery and migration cases, worker
 cases, boundary cases, local Auth recovery flows, and the production build
-passed. The full integration command remains live but has produced no test
-output. Supabase startup remains live, no expected local ports are listening,
-and the Docker API returns permission denied even with elevated access.
+passed. The local Supabase stack now runs on ports 57021-57029. Database,
+Auth, security-boundary, permission, and RLS integration checks pass in focused
+runs. The complete integration suite now passes 21 files and 592 tests.
+
+The local migration ledger now applies 26 migrations through
+`drizzle/0025_r1_public_function_acl_repair.sql`. Public `mmhr_*` functions
+now revoke inherited PUBLIC access and grant execution only to `authenticated`.
+The empty-database and rollback rehearsals match the current R0-R9 inventory.
 
 The focused R4 workflow migration review passed 8 tests, including required
 tables, RLS, deny policies, organization-scoped composite keys, replay and
@@ -52,18 +56,17 @@ The focused R2B activity-task migration review passed 7 tests, including
 required tables, RLS, deny policies, organization-scoped history, indexes, and
 append-only posture. The focused R3 intake migration review also passed 7 tests,
 and the focused R2B CRM foundation migration review passed 7 tests. The
-complete suite now passes 127 files and 2,316 tests.
+complete unit suite now passes 129 files and 2,332 tests.
 
 The focused R2A lead-command migration review passed 8 tests, including raw
 table revocation for all runtime roles, consent and idempotency checks, fixed
-search-path command security, and audit recording. The migration remains
-unapplied until local Supabase and Docker access returns.
+search-path command security, and audit recording. Its reviewed migration is
+applied in the local rehearsal database.
 
 The focused R2B deal and vendor-evidence migration review passed 8 tests,
 including scoped deal history, renewal windows, vendor-source and fact links,
 immutable evidence versions, approval and freshness rules, and deny-first raw
-access. The migration remains unapplied until local Supabase and Docker access
-returns.
+access. Its reviewed migration is applied in the local rehearsal database.
 
 The focused R3 scorecard migration review passed 8 tests, including
 organization-scoped intake and candidate links, weighted criteria, unique
@@ -134,7 +137,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - The interim recovery pair has no backup. Recovery stops when the required other administrator is unavailable.
 - Do not use a stale AAL2 token as proof of current MFA enrollment.
 - Complete end-to-end R2A through R9 workflows with objective evidence.
-- Keep the R9 evidence manifest blocked until integration, browser, accessibility, performance, recovery, deployment, and release approvals exist.
+- Keep the R9 evidence manifest blocked until complete integration, browser, accessibility, performance, recovery, deployment, and release approvals exist.
 - Remediate the dependency audit findings before making the dependency check blocking.
 - R0 claim review, public-release controls, old deployment aliases, and live verification remain open.
 - Production state was not reverified during this local package. Do not infer current production safety from local checks.
@@ -148,7 +151,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - R2B controlled exports now require a same-organization approval, allow only resource-specific fields, redact all other row fields, and emit an audit record.
 - CRM command functions now accept an injected reviewed adapter and validate operation, organization, revision, outcome, and correlation fields. The default path still fails closed without an adapter.
 - Public claims and commission copy still need approved evidence before release.
-- Drizzle metadata has an orphaned journal entry for missing `0011_r1_invitation_email_binding_check.sql`; recover exact history before replay or deployment.
+- Drizzle metadata is reconciled with all 26 checked-in migrations. Review the generated ledger before any target deployment.
 - A provider-neutral server-only AI service boundary, immutable run-record
   contract, approval transition checks, and fixture tests now exist. Database
   storage, provider evaluation, and target environment evidence remain open.

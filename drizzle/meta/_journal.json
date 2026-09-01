@@ -82,8 +82,106 @@
     {
       "idx": 11,
       "version": "7",
-      "when": 1788147879124,
-      "tag": "0011_r1_invitation_email_binding_check",
+      "when": 1788143390981,
+      "tag": "0011_r2b_lead_command",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788143390982,
+      "tag": "0012_r2b_crm_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788143390983,
+      "tag": "0013_r3_intake_matching_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788143390984,
+      "tag": "0014_r2b_activity_task_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1788143390985,
+      "tag": "0015_r4_workflow_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788143390986,
+      "tag": "0016_r2b_deal_vendor_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788143390987,
+      "tag": "0017_r3_scorecard_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788143390988,
+      "tag": "0018_r3_workspace_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788143390989,
+      "tag": "0019_r5_ai_run_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788143390990,
+      "tag": "0020_r6_demo_proposal_handoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788143390991,
+      "tag": "0021_r7_finance_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788143390992,
+      "tag": "0022_r8_customer_success_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788143390993,
+      "tag": "0023_r9_evidence_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788143390994,
+      "tag": "0024_r1_role_authority_timestamp_repair",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788143390995,
+      "tag": "0025_r1_public_function_acl_repair",
       "breakpoints": true
     }
   ]

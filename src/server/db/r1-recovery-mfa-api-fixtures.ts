@@ -34,9 +34,9 @@ function requireScratchApi(context: RehearsalContext) {
   const api = new URL(context.api.url);
   const database = new URL(context.databaseUrl);
   if (api.protocol !== "http:" || api.hostname !== "127.0.0.1" || api.port !== String(context.ports.api)
-    || api.port === "56321" || api.username || api.password || api.search || api.hash || api.pathname !== "/"
+    || api.port === "57021" || api.username || api.password || api.search || api.hash || api.pathname !== "/"
     || database.hostname !== "127.0.0.1" || database.port !== String(context.ports.database)
-    || database.port === "56322" || database.username !== "postgres" || database.pathname !== "/postgres") {
+    || database.port === "57022" || database.username !== "postgres" || database.pathname !== "/postgres") {
     throw new Error("Recovery API fixtures refused a non-scratch endpoint");
   }
   return context.api;

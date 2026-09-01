@@ -389,6 +389,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "local-only endpoint, input, claim, and single-use checks",
   },
   {
+    key: "scripts/reconcile-drizzle-journal.mjs#command",
+    surface: "Drizzle journal reconciliation",
+    kind: "command",
+    access: "system-only",
+    permission: "local repository read and migration metadata write",
+    scope: "checked-in Drizzle SQL and journal files",
+    dataPath: "migration tags and monotonic journal timestamps only",
+    denialEvidence: "deterministic SQL-to-journal reconciliation and schema check",
+  },
+  {
     key: "src/server/commands/security.ts#command",
     surface: "security command clients",
     kind: "command",

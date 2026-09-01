@@ -6,6 +6,7 @@ import {
   approveScoringConfiguration,
   createScoringConfiguration,
   maskCandidateIdentity,
+  parseCandidateStateTransition,
   rankApprovedCandidates,
   unmaskCandidateIdentity,
 } from "./evaluation-contract";
@@ -137,5 +138,40 @@ describe("R3 evaluation contract", () => {
     });
     expect(Object.isFrozen(masked)).toBe(true);
     expect(Object.isFrozen(unmasked)).toBe(true);
+  });
+
+  test("allows bounded candidate lifecycle transitions", () => {
+    const transition = parseCandidateStateTransition({
+      candidateId: "vendor-a",
+      organizationId: ids.configuration,
+      fromState: "proposed",
+      toState: "active",
+      expectedRevision: 1,
+      actorIdentityId: ids.requester,
+      occurredAt: "2026-08-31T12:04:00.000Z",
+      auditReference: "audit:r3-state-1",
+      approvalReference: null,
+    });
+    expect(transition).toMatchObject({ fromState: "proposed", toState: "active" });
+  });
+
+  test("requires approval for reactivation and rejects terminal transitions", () => {
+    const base = {
+      candidateId: "vendor-a",
+      organizationId: ids.configuration,
+      fromState: "eliminated",
+      toState: "active",
+      expectedRevision: 2,
+      actorIdentityId: ids.requester,
+      occurredAt: "2026-08-31T12:05:00.000Z",
+      auditReference: "audit:r3-state-2",
+      approvalReference: null,
+    };
+    expect(() => parseCandidateStateTransition(base)).toThrow("Invalid candidate state transition");
+    expect(parseCandidateStateTransition({ ...base, approvalReference: "approval:r3-reactivate-1" })).toMatchObject({
+      toState: "active",
+    });
+    expect(() => parseCandidateStateTransition({ ...base, fromState: "selected", toState: "active" }))
+      .toThrow("Invalid candidate state transition");
   });
 });

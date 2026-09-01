@@ -18,6 +18,12 @@ CREATE UNIQUE INDEX leads_idempotency_key_uq ON public.leads (idempotency_key)
 CREATE INDEX leads_organization_status_idx ON public.leads (organization_id, status);
 --> statement-breakpoint
 
+-- Keep the legacy lead table closed to every raw runtime role. The reviewed
+-- command below is the only public request boundary for lead creation.
+REVOKE ALL ON TABLE public.leads
+  FROM PUBLIC, anon, authenticated, service_role, mmhr_worker;
+--> statement-breakpoint
+
 -- NOT VALID preserves old status values while enforcing the contract on all
 -- new rows. The constraint can be validated after a legacy data review.
 ALTER TABLE public.leads
@@ -154,6 +160,6 @@ $$;
 --> statement-breakpoint
 
 REVOKE ALL ON FUNCTION public.mmhr_create_lead(text, text, text, text, text, timestamptz, uuid)
-  FROM PUBLIC, anon, authenticated, service_role;
+  FROM PUBLIC, anon, authenticated, service_role, mmhr_worker;
 GRANT EXECUTE ON FUNCTION public.mmhr_create_lead(text, text, text, text, text, timestamptz, uuid)
   TO anon, authenticated;

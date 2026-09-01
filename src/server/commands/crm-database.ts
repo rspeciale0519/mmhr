@@ -86,7 +86,7 @@ export type CreateContactInput = z.input<typeof createContactInputSchema>;
 export type UpdateContactInput = z.input<typeof updateContactInputSchema>;
 export type CreateProductInput = z.input<typeof createProductInputSchema>;
 export type UpdateProductInput = z.input<typeof updateProductInputSchema>;
-type ParsedCrmInput =
+export type ParsedCrmInput =
   | z.output<typeof createContactInputSchema>
   | z.output<typeof updateContactInputSchema>
   | z.output<typeof createProductInputSchema>
@@ -100,8 +100,28 @@ export type CrmDatabaseInput =
 
 export type CrmDatabaseOperation = CrmDatabaseInput["operation"];
 
+const crmCommandResultSchema = z.strictObject({
+  operation: z.enum(["create_contact", "update_contact", "create_product", "update_product"]),
+  recordId: securityUuidSchema,
+  organizationId: securityUuidSchema,
+  revision: z.int().min(1),
+  outcomeCode: z.enum(["created", "updated", "replayed"]),
+  correlationId: securityUuidSchema,
+});
+
+export type CrmDatabaseResult = z.infer<typeof crmCommandResultSchema>;
+export type CrmDatabaseAdapter = (
+  operation: CrmDatabaseOperation,
+  input: ParsedCrmInput,
+  context: AuthorizationContext,
+) => Promise<unknown>;
+export type CrmDatabaseOptions = AuthorizationOptions & {
+  /** A reviewed server adapter. No default adapter is provided. */
+  adapter?: CrmDatabaseAdapter;
+};
+
 export class CrmDatabaseCommandError extends Error {
-  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE") {
+  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE" | "INVALID_RESPONSE") {
     super(code === "INVALID_INPUT"
       ? "CRM command input is invalid"
       : "CRM command could not be completed");
@@ -140,8 +160,8 @@ function requireExactOrganizationScope(
  */
 export async function executeCrmDatabaseCommand(
   command: CrmDatabaseInput,
-  options: AuthorizationOptions = {},
-): Promise<never> {
+  options: CrmDatabaseOptions = {},
+): Promise<CrmDatabaseResult> {
   if (
     !command || typeof command !== "object" || !("operation" in command)
     || !["create_contact", "update_contact", "create_product", "update_product"].includes(command.operation)
@@ -164,23 +184,39 @@ export async function executeCrmDatabaseCommand(
   }
   requireExactOrganizationScope(context, organizationId);
 
-  // Do not add an RPC name here until its SQL function has been reviewed,
-  // migrated, and covered by an integration isolation test.
-  throw new CrmDatabaseCommandError("UNAVAILABLE");
+  if (!options.adapter) {
+    // Do not add an RPC name here until its SQL function has been reviewed,
+    // migrated, and covered by an integration isolation test.
+    throw new CrmDatabaseCommandError("UNAVAILABLE");
+  }
+  let response: unknown;
+  try {
+    response = await options.adapter(command.operation, parsedInput, context);
+  } catch {
+    throw new CrmDatabaseCommandError("UNAVAILABLE");
+  }
+  const result = crmCommandResultSchema.safeParse(response);
+  if (!result.success
+    || result.data.operation !== command.operation
+    || result.data.organizationId !== organizationId
+  ) {
+    throw new CrmDatabaseCommandError("INVALID_RESPONSE");
+  }
+  return result.data;
 }
 
-export function createContact(input: CreateContactInput, options: AuthorizationOptions = {}) {
+export function createContact(input: CreateContactInput, options: CrmDatabaseOptions = {}) {
   return executeCrmDatabaseCommand({ operation: "create_contact", input }, options);
 }
 
-export function updateContact(input: UpdateContactInput, options: AuthorizationOptions = {}) {
+export function updateContact(input: UpdateContactInput, options: CrmDatabaseOptions = {}) {
   return executeCrmDatabaseCommand({ operation: "update_contact", input }, options);
 }
 
-export function createProduct(input: CreateProductInput, options: AuthorizationOptions = {}) {
+export function createProduct(input: CreateProductInput, options: CrmDatabaseOptions = {}) {
   return executeCrmDatabaseCommand({ operation: "create_product", input }, options);
 }
 
-export function updateProduct(input: UpdateProductInput, options: AuthorizationOptions = {}) {
+export function updateProduct(input: UpdateProductInput, options: CrmDatabaseOptions = {}) {
   return executeCrmDatabaseCommand({ operation: "update_product", input }, options);
 }

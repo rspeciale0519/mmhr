@@ -52,6 +52,13 @@ export type R9ReleaseReadiness = {
 export function evaluateR9ReleaseReadiness(
   evidence: R9ReleaseEvidence,
 ): R9ReleaseReadiness {
+  if (typeof evidence !== "object" || evidence === null) {
+    return {
+      ready: false,
+      failedChecks: [...R9_RELEASE_CHECKS],
+    };
+  }
+
   const failedChecks = R9_RELEASE_CHECKS.filter(
     (check) => {
       const record = evidence[check];
@@ -59,7 +66,8 @@ export function evaluateR9ReleaseReadiness(
       return (
         record?.passed !== true ||
         typeof record.reference !== "string" ||
-        record.reference.trim().length === 0
+        record.reference.trim().length === 0 ||
+        record.reference.trim().toLowerCase().startsWith("pending://")
       );
     },
   );

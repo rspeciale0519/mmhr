@@ -51,6 +51,24 @@ describe("pipeline reporting contract", () => {
     }))).toThrow("Invalid pipeline event");
   });
 
+  test("rejects backward and terminal stage transitions", () => {
+    expect(() => parsePipelineEvent(event({
+      eventType: "deal.stage_changed",
+      fromStage: "proposal",
+      toStage: "evaluation",
+    }))).toThrow("Invalid pipeline event");
+    expect(() => parsePipelineEvent(event({
+      eventType: "deal.stage_changed",
+      fromStage: "contracted",
+      toStage: "closed_lost",
+    }))).toThrow("Invalid pipeline event");
+    expect(() => parsePipelineEvent(event({
+      eventType: "deal.stage_changed",
+      fromStage: "closed_lost",
+      toStage: "new",
+    }))).toThrow("Invalid pipeline event");
+  });
+
   test("rebuilds current state in stable order and counts stage age", () => {
     const events = [
       event({

@@ -62,6 +62,6 @@ describe("R1.4 read-only application rollback compatibility", () => {
       SELECT count(*)::integer AS count
       FROM drizzle.__drizzle_migrations
     `;
-    expect(history!.count).toBe(4);
+    expect(history!.count).toBe(26);
   });
 });

@@ -325,14 +325,21 @@ describe("R1.4 real-token permission evaluation", () => {
     const client = aal2(principal);
     expect(await authorize(client, "workspace.access", customerId)).toHaveLength(1);
     expect(await authorize(client, "org.members.view", customerId)).toHaveLength(1);
-    await owner`UPDATE public.identities SET status = ${status},
-      suspended_at = ${status === "suspended" ? new Date() : null},
-      archived_at = ${status === "archived" ? new Date() : null} WHERE id = ${principal.identityId}`;
-    expect(await authorize(client, "workspace.access", customerId)).toEqual([]);
-    expect(await authorize(client, "org.members.view", customerId)).toEqual([]);
-    const identity = await client.rpc("mmhr_get_my_identity");
-    expect(identity.error).toBeNull();
-    expect(identity.data).toEqual([]);
+    try {
+      await owner`UPDATE public.identities SET status = ${status},
+        suspended_at = ${status === "suspended" ? new Date() : null},
+        archived_at = ${status === "archived" ? new Date() : null} WHERE id = ${principal.identityId}`;
+      expect(await authorize(client, "workspace.access", customerId)).toEqual([]);
+      expect(await authorize(client, "org.members.view", customerId)).toEqual([]);
+      const identity = await client.rpc("mmhr_get_my_identity");
+      expect(identity.error).toBeNull();
+      expect(identity.data).toEqual([]);
+    } finally {
+      if (status !== "archived") {
+        await owner`UPDATE public.identities SET status = 'active', suspended_at = NULL,
+          archived_at = NULL WHERE id = ${principal.identityId}`;
+      }
+    }
   });
 
   test("pending identities and missing synchronized email verification deny access", async () => {

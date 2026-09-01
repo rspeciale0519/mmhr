@@ -1,7 +1,5 @@
 -- R3 intake and deterministic matching foundation.
 -- All tables remain deny-by-default until audited commands and policies exist.
-CREATE UNIQUE INDEX products_organization_id_id_uq
-  ON public.products (organization_id, id);
 
 CREATE TABLE public.intakes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

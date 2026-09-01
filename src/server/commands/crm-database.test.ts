@@ -131,6 +131,53 @@ describe("CRM database command boundary", () => {
     );
   });
 
+  test("accepts a reviewed adapter result only when operation and organization match", async () => {
+    const result = await createContact(contactInput, {
+      supabase,
+      adapter: vi.fn().mockResolvedValue({
+        operation: "create_contact",
+        recordId: contactId,
+        organizationId,
+        revision: 1,
+        outcomeCode: "created",
+        correlationId,
+      }),
+    });
+    expect(result).toMatchObject({ operation: "create_contact", recordId: contactId });
+  });
+
+  test("rejects malformed or cross-organization adapter results", async () => {
+    const adapter = vi.fn().mockResolvedValue({
+      operation: "create_product",
+      recordId: productId,
+      organizationId,
+      revision: 1,
+      outcomeCode: "created",
+      correlationId,
+    });
+    await expect(createContact(contactInput, { supabase, adapter })).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+    });
+    await expect(createContact(contactInput, {
+      supabase,
+      adapter: vi.fn().mockResolvedValue({
+        operation: "create_contact",
+        recordId: contactId,
+        organizationId: otherOrganizationId,
+        revision: 1,
+        outcomeCode: "created",
+        correlationId,
+      }),
+    })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+  });
+
+  test("maps adapter failures to an unavailable command without exposing details", async () => {
+    await expect(createProduct(productInput, {
+      supabase,
+      adapter: vi.fn().mockRejectedValue(new Error("private database detail")),
+    })).rejects.toMatchObject({ code: "UNAVAILABLE", message: "CRM command could not be completed" });
+  });
+
   test("rejects unknown operations before authorization", async () => {
     await expect(executeCrmDatabaseCommand({ operation: "delete_contact", input: {} } as never))
       .rejects.toMatchObject({ code: "INVALID_INPUT" });

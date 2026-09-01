@@ -69,6 +69,18 @@ describe("R9 release readiness", () => {
     });
   });
 
+  test("rejects pending references for passed checks", () => {
+    const evidence = {
+      ...passingEvidence(),
+      restoreDrill: { passed: true, reference: "PENDING://restore-drill" },
+    };
+
+    expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
+      ready: false,
+      failedChecks: ["restoreDrill"],
+    });
+  });
+
   test("fails closed for malformed evidence records", () => {
     const evidence = {
       ...passingEvidence(),
@@ -79,6 +91,13 @@ describe("R9 release readiness", () => {
     expect(evaluateR9ReleaseReadiness(evidence)).toEqual({
       ready: false,
       failedChecks: ["integrationTests", "securityReview"],
+    });
+  });
+
+  test("fails closed for a null evidence payload", () => {
+    expect(evaluateR9ReleaseReadiness(null as unknown as R9ReleaseEvidence)).toEqual({
+      ready: false,
+      failedChecks: [...R9_RELEASE_CHECKS],
     });
   });
 });

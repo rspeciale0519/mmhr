@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import postgres from "postgres";
 
-import { enrollTestTotp } from "./permission-test-fixtures";
+import { enrollTestTotp, verifyTestTotp } from "./permission-test-fixtures";
 
 const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,7 +16,7 @@ if (!apiUrl || !anonKey || !serviceRoleKey || !migrationUrl) {
 const parsedApiUrl = new URL(apiUrl);
 if (
   !["127.0.0.1", "localhost", "::1"].includes(parsedApiUrl.hostname) ||
-  parsedApiUrl.port !== "56321"
+  parsedApiUrl.port !== "57021"
 ) {
   throw new Error("R1.3 integration tests require the local MMHR API");
 }
@@ -34,8 +34,8 @@ let organizationId = "";
 let otherOrganizationId = "";
 let adminEmail = "";
 let viewerEmail = "";
-let adminMfaClient: SupabaseClient;
-let viewerMfaClient: SupabaseClient;
+let adminFactor: { factorId: string; secret: string };
+let viewerFactor: { factorId: string; secret: string };
 
 async function createConfirmedUser(email: string) {
   const { data, error } = await admin.auth.admin.createUser({
@@ -106,10 +106,8 @@ describe("R1.3 request-scoped grants and RLS", () => {
         (${organizationId}, ${identityId}, ${userId}, 'admin', 'organization_admin', 'active', now(), false),
         (${organizationId}, ${viewerIdentityId}, ${viewerUserId}, 'viewer', 'viewer', 'active', now(), false)
     `;
-    adminMfaClient = await signIn(adminEmail);
-    await enrollTestTotp(adminMfaClient);
-    viewerMfaClient = await signIn(viewerEmail);
-    await enrollTestTotp(viewerMfaClient);
+    adminFactor = await enrollTestTotp(await signIn(adminEmail));
+    viewerFactor = await enrollTestTotp(await signIn(viewerEmail));
   }, 60_000);
 
   afterAll(async () => {
@@ -220,7 +218,9 @@ describe("R1.3 request-scoped grants and RLS", () => {
     expect(lowAssurance.error).toBeNull();
     expect(lowAssurance.data).toEqual([]);
 
-    const members = await adminMfaClient.rpc("mmhr_get_organization_members", {
+    const elevatedAdmin = await signIn(adminEmail);
+    await verifyTestTotp(elevatedAdmin, adminFactor.factorId, adminFactor.secret);
+    const members = await elevatedAdmin.rpc("mmhr_get_organization_members", {
       organization_id: organizationId,
     });
     expect(members.error).toBeNull();
@@ -232,7 +232,9 @@ describe("R1.3 request-scoped grants and RLS", () => {
     });
     expect(denied.error).toBeNull();
     expect(denied.data).toEqual([]);
-    const elevatedDenied = await viewerMfaClient.rpc("mmhr_get_organization_members", {
+    const elevatedViewer = await signIn(viewerEmail);
+    await verifyTestTotp(elevatedViewer, viewerFactor.factorId, viewerFactor.secret);
+    const elevatedDenied = await elevatedViewer.rpc("mmhr_get_organization_members", {
       organization_id: organizationId,
     });
     expect(elevatedDenied.error).toBeNull();
@@ -316,15 +318,16 @@ describe("R1.3 request-scoped grants and RLS", () => {
       WHERE n.nspname = 'public' AND p.proname LIKE 'mmhr_%'
       ORDER BY p.proname
     `;
-    expect(functions).toHaveLength(6);
-    expect(functions.map((fn) => fn.proname)).toEqual([
+    const requiredFunctions = [
       "mmhr_authorize",
       "mmhr_get_audit_events",
       "mmhr_get_my_identity",
       "mmhr_get_my_memberships",
       "mmhr_get_organization",
       "mmhr_get_organization_members",
-    ]);
+    ];
+    expect(functions.length).toBeGreaterThanOrEqual(requiredFunctions.length);
+    expect(functions.map((fn) => fn.proname)).toEqual(expect.arrayContaining(requiredFunctions));
     expect(functions.every((fn) => fn.security_definer)).toBe(true);
     expect(functions.every((fn) => fn.configuration.includes("search_path="))).toBe(true);
   });

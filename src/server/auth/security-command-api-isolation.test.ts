@@ -84,7 +84,7 @@ describe("disposable API network isolation", () => {
 
   test("rejects a main-project port or a missing expected port", async () => {
     const { state, run } = fixture();
-    state.bindings[apiId]!['8000/tcp']![0]!.HostPort = "56321";
+    state.bindings[apiId]!['8000/tcp']![0]!.HostPort = "57021";
     await expect(verifyScratchApiBindings(network, ports, run)).rejects.toThrow("unexpected port");
     state.bindings[apiId]!['8000/tcp'] = null;
     await expect(verifyScratchApiBindings(network, ports, run)).rejects.toThrow("both checked loopback ports");

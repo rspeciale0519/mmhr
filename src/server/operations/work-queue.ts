@@ -82,6 +82,14 @@ export type WorkQueueReport = Readonly<{
   byQueue: Readonly<Record<WorkQueueKind, readonly WorkItem[]>>;
 }>;
 
+export type OperationsReport = Readonly<{
+  asOf: string;
+  totalOpen: number;
+  overdueCount: number;
+  escalatedCount: number;
+  byQueue: Readonly<Record<(typeof sourceQueueKinds)[number], Readonly<{ open: number; overdue: number; escalated: number }>>>;
+}>;
+
 function parseAsOf(value: string | Date): string {
   const asOf = value instanceof Date ? value.toISOString() : value;
   if (!z.string().datetime({ offset: true }).safeParse(asOf).success) {
@@ -152,6 +160,32 @@ export function projectWorkQueues(
     visibleItemCount: new Set(Object.values(queues).flat().map((item) => item.taskId)).size,
     byQueue: queues,
   };
+}
+
+/** Summarizes the same role-scoped queue projection without trusting mutable counters. */
+export function summarizeOperations(
+  items: readonly unknown[],
+  asOfInput: string | Date,
+  viewerRole: WorkItemRole,
+): OperationsReport {
+  const report = projectWorkQueues(items, asOfInput, viewerRole);
+  const overdueIds = new Set(report.byQueue.overdue.map((item) => item.taskId));
+  const byQueue = Object.fromEntries(sourceQueueKinds.map((queue) => {
+    const entries = report.byQueue[queue];
+    return [queue, Object.freeze({
+      open: entries.length,
+      overdue: entries.filter((entry) => overdueIds.has(entry.taskId)).length,
+      escalated: entries.filter((entry) => entry.escalated).length,
+    })];
+  })) as OperationsReport["byQueue"];
+  const openItems = sourceQueueKinds.flatMap((queue) => report.byQueue[queue]);
+  return Object.freeze({
+    asOf: report.asOf,
+    totalOpen: openItems.length,
+    overdueCount: overdueIds.size,
+    escalatedCount: openItems.filter((item) => item.escalated).length,
+    byQueue: Object.freeze(byQueue),
+  });
 }
 
 export { workItemSchema };

@@ -45,7 +45,7 @@ describe("R2B CRM foundation", () => {
       LEFT JOIN pg_policies AS p
         ON p.schemaname = n.nspname AND p.tablename = c.relname
       WHERE n.nspname = 'public' AND c.relname = ANY(${crmTables}::text[])
-      GROUP BY c.relname, c.relrowsecurity
+      GROUP BY c.oid, c.relname, c.relrowsecurity
       ORDER BY c.relname
     `;
 
@@ -109,6 +109,11 @@ describe("R2B CRM foundation", () => {
     `;
     expect(columns).toHaveLength(20);
 
+    await context!.client`DELETE FROM public.relationships WHERE organization_id = ${customerId}`;
+    await context!.client`DELETE FROM public.contacts WHERE organization_id = ${customerId}`;
+    await context!.client`DELETE FROM public.products WHERE organization_id = ${vendorId}`;
+    await context!.client`DELETE FROM public.vendor_profiles WHERE organization_id = ${vendorId}`;
+    await context!.client`DELETE FROM public.customer_profiles WHERE organization_id = ${customerId}`;
     await context!.client`DELETE FROM public.orgs WHERE id IN (${customerId}, ${vendorId})`;
   });
 
@@ -144,6 +149,8 @@ describe("R2B CRM foundation", () => {
       ) VALUES (${firstOrg!.id}, 'other', ${firstOrg!.id}, ${firstContact!.id}, ${secondOrg!.id})
     `).rejects.toThrow();
 
+    await context!.client`DELETE FROM public.relationships WHERE organization_id IN (${firstOrg!.id}, ${secondOrg!.id})`;
+    await context!.client`DELETE FROM public.contacts WHERE organization_id IN (${firstOrg!.id}, ${secondOrg!.id})`;
     await context!.client`DELETE FROM public.orgs WHERE id IN (${firstOrg!.id}, ${secondOrg!.id})`;
   });
 });

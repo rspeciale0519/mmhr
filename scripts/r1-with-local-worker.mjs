@@ -39,7 +39,6 @@ const rehearsalFiles = new Set(
     "src/server/db/r2b-crm-foundation.integration.test.ts",
     "src/server/db/r3-intake-matching.integration.test.ts",
     "src/server/auth/security-command-api.integration.test.ts",
-    "src/server/auth/r1-security.integration.test.ts",
     "src/server/db/r1-populated-migration.integration.test.ts",
     "src/server/db/r1-rollback-compatibility.integration.test.ts",
     "src/server/db/r1-restore.integration.test.ts",
@@ -50,6 +49,7 @@ const integrationFiles = new Set([
   normalizePath("src/server/auth/auth.integration.test.ts"),
   normalizePath("src/server/auth/rls.integration.test.ts"),
   normalizePath("src/server/auth/permissions.integration.test.ts"),
+  normalizePath("src/server/auth/r1-security.integration.test.ts"),
   normalizePath("src/server/db/db.integration.test.ts"),
   normalizePath("src/server/db/r2b-crm-foundation.integration.test.ts"),
   normalizePath("src/server/db/r3-intake-matching.integration.test.ts"),
@@ -165,6 +165,17 @@ function validateLocalMigrationUrl(value) {
   }
 
   return parsed;
+}
+
+function readLocalApiPort() {
+  const config = readFileSync(
+    path.join(projectRoot, "supabase", "config.toml"),
+    "utf8",
+  );
+  const apiSection = config.match(/\[api\]([\s\S]*?)(?:\r?\n\[|$)/);
+  const port = apiSection?.[1]?.match(/^port\s*=\s*(\d+)\s*$/m)?.[1];
+  if (!port) throw new Error("The local MMHR API port is not configured");
+  return port;
 }
 
 let releaseSignalHandlers = () => undefined;
@@ -308,6 +319,7 @@ async function runWithWorker(isIntegrationTest, includeRehearsals) {
     };
     if (isIntegrationTest) {
       childEnvironment.TEST_MIGRATION_DATABASE_URL = migrationUrl.toString();
+      childEnvironment.NEXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${readLocalApiPort()}`;
     } else {
       delete childEnvironment.TEST_MIGRATION_DATABASE_URL;
     }

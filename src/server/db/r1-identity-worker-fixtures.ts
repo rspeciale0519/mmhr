@@ -21,7 +21,7 @@ function assertWorkerScratch(context: RehearsalContext) {
   if (!/^mmhr-r1-worker[a-z]*-[0-9a-f]{8}$/.test(context.projectId)
     || address.hostname !== "127.0.0.1" || Number(address.port) !== context.ports.database
     || address.pathname !== "/postgres" || address.username !== "postgres"
-    || [3000, 5432, 56322].includes(context.ports.database)) {
+    || [3000, 5432, 57022].includes(context.ports.database)) {
     throw new Error("Worker login changes require the exact disposable worker database");
   }
 }

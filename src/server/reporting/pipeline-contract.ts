@@ -22,6 +22,17 @@ export const pipelineStages = [
 
 export type PipelineStage = (typeof pipelineStages)[number];
 
+const pipelineStageOrder: Readonly<Record<PipelineStage, number>> = {
+  new: 0,
+  qualified: 1,
+  evaluation: 2,
+  demo: 3,
+  proposal: 4,
+  selected: 5,
+  contracted: 6,
+  closed_lost: 7,
+};
+
 export const pipelineEventTypes = ["deal.created", "deal.stage_changed"] as const;
 
 export type PipelineEventType = (typeof pipelineEventTypes)[number];
@@ -79,6 +90,41 @@ const pipelineEventSchema = z
         code: "custom",
         path: ["toStage"],
         message: "stage change must change the stage",
+      });
+    }
+
+    if (
+      event.eventType === "deal.stage_changed"
+      && event.fromStage !== undefined
+      && event.toStage !== "closed_lost"
+      && pipelineStageOrder[event.toStage] <= pipelineStageOrder[event.fromStage]
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["toStage"],
+        message: "deal stages cannot move backwards",
+      });
+    }
+
+    if (
+      event.eventType === "deal.stage_changed"
+      && event.fromStage === "closed_lost"
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["fromStage"],
+        message: "closed_lost is terminal",
+      });
+    }
+
+    if (
+      event.eventType === "deal.stage_changed"
+      && event.fromStage === "contracted"
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["fromStage"],
+        message: "contracted is terminal",
       });
     }
   });

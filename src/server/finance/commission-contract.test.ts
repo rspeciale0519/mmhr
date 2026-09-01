@@ -13,6 +13,7 @@ import {
   type CommissionEvent,
   type CommissionPayment,
   reconcilePayments,
+  transitionCommissionEvent,
 } from "./commission-contract";
 
 const structureId = "00000000-0000-4000-8000-000000000001";
@@ -138,6 +139,50 @@ describe("R7 commission contract", () => {
     expect(canFinanciallyCloseCommission("written_off")).toBe(true);
     expect(canFinanciallyCloseCommission("disputed")).toBe(false);
     expect(canFinanciallyCloseCommission("pending_review")).toBe(false);
+  });
+
+  test("applies audited forward-only commission state transitions", () => {
+    const approved = transitionCommissionEvent(event(), {
+      eventId,
+      fromState: "pending_review",
+      toState: "approved",
+      actorIdentityId: ownerId,
+      occurredAt: "2026-08-31T12:01:00.000Z",
+      reason: "Calculation reviewed",
+      correlationId: idempotencyKey,
+    });
+    expect(approved.state).toBe("approved");
+    expect(Object.isFrozen(approved)).toBe(true);
+    expect(() => transitionCommissionEvent(approved, {
+      eventId,
+      fromState: "approved",
+      toState: "pending_review",
+      actorIdentityId: ownerId,
+      occurredAt: "2026-08-31T12:02:00.000Z",
+      reason: "Rollback",
+      correlationId: idempotencyKey,
+    })).toThrow("not allowed");
+  });
+
+  test("rejects stale and terminal commission transitions", () => {
+    expect(() => transitionCommissionEvent(event(), {
+      eventId,
+      fromState: "approved",
+      toState: "invoiced",
+      actorIdentityId: ownerId,
+      occurredAt: "2026-08-31T12:01:00.000Z",
+      reason: "Invoice issued",
+      correlationId: idempotencyKey,
+    })).toThrow("stale");
+    expect(() => transitionCommissionEvent(event({ state: "voided" }), {
+      eventId,
+      fromState: "voided",
+      toState: "approved",
+      actorIdentityId: ownerId,
+      occurredAt: "2026-08-31T12:01:00.000Z",
+      reason: "Reopen",
+      correlationId: idempotencyKey,
+    })).toThrow("not allowed");
   });
 
   test("requires an approved event before issuing a matching invoice", () => {

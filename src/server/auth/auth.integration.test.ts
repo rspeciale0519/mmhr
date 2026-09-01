@@ -18,7 +18,7 @@ function requireLocalSupabase(value: string | undefined) {
   if (!["127.0.0.1", "localhost", "::1"].includes(hostname)) {
     throw new Error("Integration tests require a loopback Supabase URL");
   }
-  if (port !== "56321") {
+  if (port !== "57021") {
     throw new Error("Integration tests require the MMHR local Supabase API");
   }
 }

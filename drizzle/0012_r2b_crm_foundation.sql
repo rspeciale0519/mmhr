@@ -85,6 +85,8 @@ CREATE TABLE public.products (
 );
 CREATE UNIQUE INDEX products_vendor_stable_key_uq
   ON public.products (vendor_profile_id, stable_key);
+CREATE UNIQUE INDEX products_organization_id_id_uq
+  ON public.products (organization_id, id);
 CREATE INDEX products_organization_status_idx
   ON public.products (organization_id, status);
 ALTER TABLE public.products

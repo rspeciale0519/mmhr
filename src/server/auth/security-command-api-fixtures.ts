@@ -45,10 +45,10 @@ function requireScratchApi(context: RehearsalContext) {
   const api = new URL(context.api.url);
   const database = new URL(context.databaseUrl);
   if (api.protocol !== "http:" || !["127.0.0.1", "localhost", "[::1]"].includes(api.hostname) ||
-    api.port !== String(context.ports.api) || api.port === "56321" || api.username || api.password ||
+    api.port !== String(context.ports.api) || api.port === "57021" || api.username || api.password ||
     api.search || api.hash || api.pathname !== "/" ||
     !["127.0.0.1", "localhost", "[::1]"].includes(database.hostname) ||
-    database.port !== String(context.ports.database) || database.port === "56322") {
+    database.port !== String(context.ports.database) || database.port === "57022") {
     throw new Error("Security API fixtures refused a non-scratch endpoint");
   }
   return context.api;

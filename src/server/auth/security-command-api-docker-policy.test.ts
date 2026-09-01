@@ -50,7 +50,7 @@ describe("scratch Docker API write policy", () => {
     value.HostConfig.NetworkMode = "host";
     expect(() => createDockerGuardPolicy(scope).evaluate(request(value))).toThrow("unsafe_container_options");
     value.HostConfig.NetworkMode = scope.network.name;
-    value.HostConfig.PortBindings["5432/tcp"][0]!.HostPort = "56322";
+    value.HostConfig.PortBindings["5432/tcp"][0]!.HostPort = "57022";
     expect(() => createDockerGuardPolicy(scope).evaluate(request(value))).toThrow("unexpected_port_binding");
   });
 

@@ -58,7 +58,7 @@ describe("R1.4 local restore rehearsal", () => {
         SELECT count(*)::integer AS count
         FROM drizzle.__drizzle_migrations
       `;
-      expect(migrationHistory!.count).toBe(4);
+      expect(migrationHistory!.count).toBe(26);
     },
     600_000,
   );

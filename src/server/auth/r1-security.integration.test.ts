@@ -59,7 +59,7 @@ describe("R1 local security boundary evidence", () => {
         ON p.schemaname = n.nspname AND p.tablename = c.relname
       WHERE n.nspname = 'public' AND c.relkind = 'r'
         AND c.relname = ANY(${applicationTables}::text[])
-      GROUP BY c.relname, c.relrowsecurity
+      GROUP BY c.oid, c.relname, c.relrowsecurity
       ORDER BY c.relname
     `;
 

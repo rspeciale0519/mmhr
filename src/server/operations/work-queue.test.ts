@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseWorkItem, projectWorkQueues } from "./work-queue";
+import { parseWorkItem, projectWorkQueues, summarizeOperations } from "./work-queue";
 
 const orgId = "00000000-0000-4000-8000-000000000001";
 const advisorId = "00000000-0000-4000-8000-000000000101";
@@ -78,5 +78,19 @@ describe("work queue contract", () => {
       "Duplicate work item",
     );
     expect(() => projectWorkQueues([], "not-a-date", "advisor")).toThrow("Invalid work queue as-of timestamp");
+  });
+
+  test("summarizes open, overdue, and escalated work from the role-scoped projection", () => {
+    const report = summarizeOperations([
+      item({ taskId: "00000000-0000-4000-8000-000000000016", escalated: true }),
+      item({ taskId: "00000000-0000-4000-8000-000000000017", dueAt: "2026-09-01T12:00:00.000Z" }),
+      item({ taskId: "00000000-0000-4000-8000-000000000018", assignedRole: "finance", queue: "commissions" }),
+    ], "2026-08-31T12:00:00.000Z", "advisor");
+    expect(report).toMatchObject({ totalOpen: 2, overdueCount: 1, escalatedCount: 1, byQueue: { follow_ups: { open: 2, overdue: 1, escalated: 1 }, commissions: { open: 0 } } });
+    expect(Object.isFrozen(report)).toBe(true);
+  });
+
+  test("keeps the operations report deny-first for invalid input", () => {
+    expect(() => summarizeOperations([item({ blockerNotes: "private" })], "2026-08-31T12:00:00.000Z", "advisor")).toThrow("Invalid work item");
   });
 });

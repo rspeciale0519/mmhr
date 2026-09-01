@@ -32,8 +32,8 @@ describe("R1.4 security commands through real disposable Auth sessions", () => {
     expect(projectId).toMatch(/^mmhr-r1-commandapi-[0-9a-f]{8}$/);
     expect(isolation.apiLoopbackOnly).toBe(true);
     expect(new Set([isolation.apiPort, isolation.databasePort]).size).toBe(2);
-    expect([isolation.apiPort, isolation.databasePort]).not.toContain(56321);
-    expect([isolation.apiPort, isolation.databasePort]).not.toContain(56322);
+    expect([isolation.apiPort, isolation.databasePort]).not.toContain(57021);
+    expect([isolation.apiPort, isolation.databasePort]).not.toContain(57022);
     const [bootstrap] = await owner`
       SELECT state, target_identity_id, second_target_identity_id FROM public.security_bootstrap_state
     `;

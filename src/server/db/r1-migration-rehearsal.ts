@@ -69,7 +69,7 @@ const cliEnvironmentNames = new Set(
 export type RehearsalContext = Awaited<ReturnType<typeof startRehearsal>>;
 export type RehearsalApi = Readonly<{ url: string; publicKey: string; adminKey: string }>;
 type ScratchPorts = Readonly<{ database: number; api: number; all: readonly number[] }>;
-const originalPorts = [56320, 56321, 56322, 56323, 56324, 56327, 56329, 8083];
+const originalPorts = [57020, 57021, 57022, 57023, 57024, 57027, 57029, 8083];
 
 function supabaseCliEnvironment(workdir: string): NodeJS.ProcessEnv {
   const environment = {
@@ -207,8 +207,8 @@ async function buildScratchConfig(projectId: string, apiEnabled: boolean) {
   }
 
   const ports: ScratchPorts = {
-    database: replacements[originalPorts.indexOf(56322)],
-    api: replacements[originalPorts.indexOf(56321)],
+    database: replacements[originalPorts.indexOf(57022)],
+    api: replacements[originalPorts.indexOf(57021)],
     all: replacements,
   };
   if (apiEnabled) {

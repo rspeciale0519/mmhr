@@ -45,7 +45,7 @@ function totpCode(secret: string): string {
   return String((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, "0");
 }
 
-export async function enrollTestTotp(client: SupabaseClient): Promise<void> {
+export async function enrollTestTotp(client: SupabaseClient): Promise<{ factorId: string; secret: string }> {
   const enrollment = await client.auth.mfa.enroll({
     factorType: "totp",
     friendlyName: `R1.4 local test ${randomUUID()}`,
@@ -67,13 +67,38 @@ export async function enrollTestTotp(client: SupabaseClient): Promise<void> {
   if (claims.error || claims.data?.claims.aal !== "aal2") {
     throw new Error("The local MFA test did not obtain verified AAL2 claims");
   }
+  return { factorId: enrollment.data.id, secret: enrollment.data.totp.secret };
+}
+
+export async function verifyTestTotp(
+  client: SupabaseClient,
+  factorId: string,
+  secret: string,
+): Promise<string> {
+  const challenge = await client.auth.mfa.challenge({ factorId });
+  if (challenge.error || !challenge.data) {
+    throw new Error("The local MFA test could not create its challenge");
+  }
+  const verification = await client.auth.mfa.verify({
+    factorId,
+    challengeId: challenge.data.id,
+    code: totpCode(secret),
+  });
+  if (verification.error || !verification.data?.access_token) {
+    throw new Error("The local MFA test could not verify its challenge");
+  }
+  const claims = await client.auth.getClaims();
+  if (claims.error || claims.data?.claims.aal !== "aal2") {
+    throw new Error("The local MFA test did not obtain verified AAL2 claims");
+  }
+  return verification.data.access_token;
 }
 
 export function createPermissionFixtures() {
   if (process.env.NODE_ENV !== "test") throw new Error("Permission fixtures are test-only");
-  const apiUrl = requireLocalUrl(process.env.NEXT_PUBLIC_SUPABASE_URL, "56321");
-  const migrationUrl = requireLocalUrl(process.env.TEST_MIGRATION_DATABASE_URL, "56322");
-  const workerUrl = requireLocalUrl(process.env.DATABASE_URL, "56322");
+  const apiUrl = requireLocalUrl(process.env.NEXT_PUBLIC_SUPABASE_URL, "57021");
+  const migrationUrl = requireLocalUrl(process.env.TEST_MIGRATION_DATABASE_URL, "57022");
+  const workerUrl = requireLocalUrl(process.env.DATABASE_URL, "57022");
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!anonKey || !serviceKey) throw new Error("Local permission test credentials are missing");
@@ -84,6 +109,8 @@ export function createPermissionFixtures() {
   const worker = postgres(workerUrl, { max: 1, prepare: true });
   const userIds: string[] = [];
   const identityIds: string[] = [];
+  const platformIdentityIds: string[] = [];
+  const platformUserIds: string[] = [];
   const organizationIds: string[] = [];
 
   async function createPrincipal(options: {
@@ -105,22 +132,69 @@ export function createPermissionFixtures() {
     if (!identity) throw new Error("Permission identity fixture creation failed");
     identityIds.push(identity.id);
     if (options.platformRole) {
-      await owner`
-        INSERT INTO public.platform_role_assignments (identity_id, role_key, assignment_reason)
-        VALUES (${identity.id}, ${options.platformRole}, 'Synthetic local permission test')
+      const assignedAt = new Date();
+      const [assignment] = await owner<{ id: string }[]>`
+        INSERT INTO public.platform_role_assignments
+          (identity_id, role_key, assigned_at, assignment_reason)
+        VALUES (${identity.id}, ${options.platformRole}, ${assignedAt}, 'Synthetic local permission test')
+        RETURNING id
       `;
+      const [role] = await owner<{ id: string }[]>`
+        SELECT id FROM public.role_definitions
+        WHERE stable_key = ${options.platformRole} AND kind = 'platform' AND state = 'active'
+      `;
+      if (!assignment || !role) throw new Error("Permission role authority fixture creation failed");
+      await owner`
+        INSERT INTO public.role_authority_records
+          (record_kind, authority_kind, platform_assignment_id, role_definition_id,
+           correlation_id, created_at)
+        VALUES ('platform_assignment', 'reviewed_owner', ${assignment.id}, ${role.id},
+          ${randomUUID()}, (SELECT assigned_at FROM public.platform_role_assignments WHERE id = ${assignment.id}))
+      `;
+      platformIdentityIds.push(identity.id);
+      platformUserIds.push(userId);
     }
-    async function signIn() {
+    async function signInWithSession() {
       const client = createClient(apiUrl, anonKey!, authOptions);
       const signedIn = await client.auth.signInWithPassword({ email, password });
       if (signedIn.error || !signedIn.data.session) throw new Error("Permission fixture sign-in failed");
-      return client;
+      return { client, accessToken: signedIn.data.session.access_token };
     }
-    const client = await signIn();
+    async function signIn() {
+      return (await signInWithSession()).client;
+    }
+    let client: SupabaseClient;
     let elevated: SupabaseClient | null = null;
     if (options.mfa) {
-      elevated = await signIn();
-      await enrollTestTotp(elevated);
+      // Enroll the factor before creating the two sessions used by tests.
+      // Local GoTrue invalidates other sessions during factor enrollment.
+      const enrollmentClient = await signIn();
+      const factor = await enrollTestTotp(enrollmentClient);
+      const session = await signInWithSession();
+      const elevatedToken = await verifyTestTotp(session.client, factor.factorId, factor.secret);
+      const accessToken = session.accessToken;
+      client = createClient(apiUrl, anonKey!, {
+        ...authOptions,
+        global: {
+          fetch: async (input, init = {}) => {
+            const headers = new Headers(init.headers);
+            headers.set("Authorization", `Bearer ${accessToken}`);
+            return fetch(input, { ...init, headers });
+          },
+        },
+      });
+      elevated = createClient(apiUrl, anonKey!, {
+        ...authOptions,
+        global: {
+          fetch: async (input, init = {}) => {
+            const headers = new Headers(init.headers);
+            headers.set("Authorization", `Bearer ${elevatedToken}`);
+            return fetch(input, { ...init, headers });
+          },
+        },
+      });
+    } else {
+      client = await signIn();
     }
     return { userId, identityId: identity.id, client, elevated } satisfies PermissionPrincipal;
   }
@@ -239,7 +313,10 @@ export function createPermissionFixtures() {
       await assertion();
     } finally {
       const restored = await owner`UPDATE public.role_definitions SET state = 'active',
-        activated_at = ${original.activated_at} WHERE id = ${original.id} RETURNING id`;
+        activated_at = (SELECT activated_at FROM public.role_authority_records
+          WHERE role_definition_id = ${original.id} AND record_kind = 'role_activation'
+          ORDER BY id LIMIT 1)
+        WHERE id = ${original.id} RETURNING id`;
       if (restored.length !== 1) throw new Error("The platform role fixture was not restored");
     }
   }
@@ -281,7 +358,8 @@ export function createPermissionFixtures() {
       if (organizationIds.length) await owner`DELETE FROM public.portal_access_grants WHERE organization_id = ANY(${organizationIds}::uuid[])`;
     });
     await attempt("assignment cleanup", async () => {
-      if (identityIds.length) await owner`DELETE FROM public.platform_role_assignments WHERE identity_id = ANY(${identityIds}::uuid[])`;
+      const removable = identityIds.filter((id) => !platformIdentityIds.includes(id));
+      if (removable.length) await owner`DELETE FROM public.platform_role_assignments WHERE identity_id = ANY(${removable}::uuid[])`;
     });
     await attempt("membership cleanup", async () => {
       if (organizationIds.length) await owner`DELETE FROM public.org_members WHERE org_id = ANY(${organizationIds}::uuid[])`;
@@ -290,9 +368,11 @@ export function createPermissionFixtures() {
       if (organizationIds.length) await owner`DELETE FROM public.orgs WHERE id = ANY(${organizationIds}::uuid[])`;
     });
     await attempt("identity cleanup", async () => {
-      if (identityIds.length) await owner`DELETE FROM public.identities WHERE id = ANY(${identityIds}::uuid[])`;
+      const removable = identityIds.filter((id) => !platformIdentityIds.includes(id));
+      if (removable.length) await owner`DELETE FROM public.identities WHERE id = ANY(${removable}::uuid[])`;
     });
     for (const id of userIds) {
+      if (platformUserIds.includes(id)) continue;
       await attempt("Auth cleanup", async () => {
         const result = await admin.auth.admin.deleteUser(id);
         if (result.error) throw new Error("Auth fixture cleanup failed");

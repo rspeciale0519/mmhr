@@ -6,7 +6,7 @@
 |---|---|
 | Version | 0.2 |
 | Date | 2026-08-31 |
-| Status | Core CRM schema implemented locally; workflow, evidence, and release checks remain open |
+| Status | Core CRM, deal, renewal, and vendor-evidence schema implemented locally; commands, integration, and release checks remain open |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
 | Architecture authority | [docs/TECH_STACK.md](../../docs/TECH_STACK.md) |
@@ -25,12 +25,14 @@ changes its scope.
 ### Current implementation record
 
 The additive R2B foundation now contains organization-scoped customer and
-vendor profiles, vendor-owned products, contacts, and typed relationships.
+vendor profiles, vendor-owned products, contacts, typed relationships, deals,
+renewals, and vendor-evidence records.
 Every table has explicit status checks, revision and correlation fields,
-organization foreign keys, RLS, and deny policies. Local integration tests
-cover table boundaries, history-ready fields, invalid states, and cross-
-organization contact links. No request command, cloud migration, or production
-write is included in this increment.
+organization foreign keys, RLS, and deny policies. Local static migration
+reviews cover table boundaries, history-ready fields, invalid states, scoped
+deal and vendor-evidence links, and cross-organization denial posture. No
+request command, cloud migration, or production write is included in this
+increment.
 
 ## 1. Outcome
 
