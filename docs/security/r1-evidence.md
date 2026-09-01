@@ -1,6 +1,6 @@
 # R1 Security Evidence
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 This record summarizes local R1 evidence. It does not prove cloud, staging, or
 production activation. It does not record real administrator credentials,
@@ -26,7 +26,7 @@ phone evidence, or recovery approvals.
 The verified local R1.4 package recorded these checks before later R1.5 bootstrap test edits:
 
 - `npm test`: 1,762 tests passed in 48 files.
-- `npm run type-check`: passed for that package; the current worktree reports two undefined-value errors in `src/server/auth/r1-bootstrap-super-admin.test.ts`.
+- `npm run type-check`: passed for the current worktree. An earlier package checkpoint reported two undefined-value errors in `src/server/auth/r1-bootstrap-super-admin.test.ts`; later edits corrected them.
 - `npm run lint`: passed.
 - `npm run build`: passed with framework deprecation warnings only.
 - `npm run check:integration-matrix`: passed after the wrapper and source inventory matched.
@@ -38,6 +38,150 @@ The verified local R1.4 package recorded these checks before later R1.5 bootstra
 Run the integration evidence with `npm run test:integration` after starting the
 local Supabase stack. The wrapper uses the restricted local worker path and
 keeps credentials out of logs and retained artifacts.
+
+The 2026-08-31 full integration attempt uses the validated local environment
+binding but remains live without test output. Supabase reports no service
+listeners on ports 56321 or 56322, and the Docker API returns permission denied
+even with elevated access.
+
+The latest complete unit suite passed 128 files and 2,324 tests after the
+Next.js 16.3.4 upgrade and the R8 renewal, onboarding, project-plan, analytics,
+approval-queue, outcome, customer-journey, vendor-performance, operations report,
+audit-viewer, R9 deployment-smoke, R5 AI routing and fixture-evaluation, R3
+intake, R2B deal-lifecycle, R2A lead-command, R2B deal and vendor-evidence,
+R3 scorecard and workspace, R5 AI run-record, R6 demo, proposal, and
+contract-handoff, R7 finance, and R8 customer-success and operations
+persistence changes.
+
+The focused R3 intake migration review suite passed 7 tests. It checks the
+required tables, RLS, deny policies, organization-scoped requirement and
+candidate keys, and deterministic candidate-state constraints.
+
+The focused R2B CRM foundation migration review suite passed 7 tests. It
+checks the required tables, RLS, deny policies, organization-scoped foreign
+keys, approval and endpoint constraints, and scoped uniqueness indexes.
+
+The focused R2A lead-command migration review suite passed 8 tests. It checks
+organization and identity references, replay and request-digest boundaries,
+consent validation, fixed-search-path command security, audit events, and raw
+table revocation for all runtime roles.
+
+The focused R2B deal and vendor-evidence migration review suite passed 8 tests.
+It checks deal and renewal state boundaries, organization-scoped history and
+product links, vendor source and fact scope, immutable evidence versions,
+approval and freshness constraints, deny policies, and raw table revocation.
+
+The focused R3 scorecard migration review suite passed 8 tests. It checks
+organization-scoped intake and candidate links, weighted criteria, unique
+scorer entries, immutable replacement history, bounded scores, deny policies,
+and raw table revocation.
+
+The focused R3 workspace migration review suite passed 8 tests. It checks
+organization-scoped intake and workspace links, bounded snapshots, revision
+uniqueness, participant state timestamps, customer or internal visibility,
+deny policies, and raw table revocation.
+
+The focused R5 AI run-record migration review suite passed 8 tests. It checks
+provider-neutral identifiers and hashes, raw-payload exclusion, bounded
+capabilities and review states, usage and timestamp constraints, organization
+scope, immutable approval history, deny policies, and raw table revocation.
+
+The focused R6 demo, proposal, and contract-handoff migration review suite
+passed 8 tests. It checks organization-scoped deal links, demo scheduling and
+feedback bounds, source-backed proposal versions, approved comparison scope,
+handoff status boundaries, immutable history, deny policies, and raw table
+revocation.
+
+The focused R7 finance migration review suite passed 8 tests. It checks
+effective-dated commission structures, idempotent commission events, payment
+and invoice bounds, dispute and adjustment evidence, finance handoff scope,
+immutable event history, deny policies, and raw table revocation.
+
+The focused R8 customer-success and operations migration review suite passed 8
+tests. It checks onboarding snapshots and history, approved project-plan
+templates, revisioned plans, role-scoped queue work, retained failure states,
+organization isolation, deny policies, and raw table revocation.
+
+The full dependency audit reports 86 findings: 59 high, 25 moderate, 1 low,
+and 1 critical. The production-scope audit reports 54 findings: 35 high, 18
+moderate, and 1 low. A remediation dry-run could not fetch registry metadata
+because npm cache writes are denied in this environment.
+
+The focused administration-configuration suite passed 8 tests. Type checking,
+lint, and the production build passed after that change.
+
+The focused analytics-report suite passed 7 tests. Type checking, lint, and
+the production build passed after that change.
+
+The focused revenue-report suite passed 6 tests. Type checking, lint, and the
+production build passed after that change.
+
+The focused performance-evidence suite passed 7 tests. Type checking, lint,
+and the production build passed after that change.
+
+The focused security-review suite passed 9 tests. Type checking, lint, and
+the production build passed after that change.
+
+The focused deployment-smoke suite passed 9 tests. Type checking, lint, and
+the production build passed after that change. The contract validates a
+canonical HTTPS origin, deployment identity, health, protected-route closure,
+and migration rollback compatibility. It does not prove a real deployment.
+
+The focused AI-routing suite passed 8 tests. It validates capability and
+data-class routing, deterministic adapter selection, bounded retries, timeout
+handling, schema failures, and explicitly approved fallback records.
+
+The focused AI-evaluation suite passed 10 tests. It validates complete fixture
+coverage, input and output hashes, schema and provider failures, and redacted
+evaluation results without retaining raw provider output.
+
+The focused R3 intake suite passed 9 tests. It validates immutable intake
+snapshots, strict requirements, organization scope, submission prerequisites,
+and revision-checked state transitions.
+
+The focused R2B deal-lifecycle suite passed 8 tests. It validates organization
+scope, stage and status alignment, forward-only transitions, terminal outcomes,
+optimistic revisions, and immutable history.
+
+The focused R2B CRM entity suite passed 7 tests. It validates strict customer,
+vendor, product, contact, and relationship records with organization scope,
+approval evidence, date windows, normalized contact email, and immutable parsing.
+
+The focused R2B activity-task suite passed 6 tests. It validates immutable
+activity history, organization scope, open task creation, terminal states,
+optimistic revisions, and forward-only task transitions.
+
+The focused R3 scorecard suite passed 6 tests. It validates weighted criteria,
+multiple scorers, immutable entry history, optimistic conflict handling,
+replacement without destructive edits, and deterministic aggregation.
+
+The focused R3 workspace suite passed 6 tests. It validates scoped snapshots,
+participant status timestamps, immutable comments, duplicate and scope checks,
+and customer filtering of internal comments.
+
+The additive R2B activity-task persistence migration passed migration-order
+checks. It adds deny-first activity, task, and append-only task-history tables;
+local application remains unavailable until Supabase and Docker access returns.
+
+The focused R2B activity-task migration review suite passed 7 tests. It checks
+the required tables, RLS, deny policies, organization-scoped task history,
+addressable indexes, and immutable or append-only recovery posture. The
+complete suite passed 118 files and 2,246 tests after this review.
+
+The additive R4 workflow migration passed the full local build and suite
+checks. It adds deny-first RFP, recipient, inbound-email, document-version,
+communication, job, and job-attempt tables; database application remains open.
+
+The focused R4 workflow migration review suite passed 8 tests. It checks the
+required tables, row-level security, deny policies, organization-scoped
+composite keys, provider replay and job idempotency constraints, and recovery
+comments. The complete suite passed 117 files and 2,239 tests after the job
+scope correction.
+
+The local browser smoke record is in `docs/security/r9-browser-evidence.md`.
+It covers public routes and protected-route redirects only. It does not prove
+authenticated journeys, accessibility conformance, performance percentiles,
+staging, or production behavior.
 
 ## CI and release state
 

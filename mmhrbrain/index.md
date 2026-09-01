@@ -11,6 +11,7 @@ Catalog of the mmhr brain. SessionStart reads this.
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
+- [[journal/2026-09-01]] — added R5 AI routing, provider-neutral AI run records, R6 demo, proposal, and contract-handoff persistence, R7 finance persistence, R8 customer-success and operations persistence, R3 immutable intake, scorecards, workspace persistence, and workspace controls, R2B CRM entity, deal, activity, and task controls, R4 deny-first workflow persistence, R2A lead-command raw-access closure, R2B deal and vendor-evidence persistence, R3 scorecard persistence, and static migration reviews; 2,324 local tests and build pass, target evidence remains open.
 - [[journal/2026-08-31]] — added R1.8 local security evidence and matrix checks; integration remains environment-gated.
 - [[journal/2026-08-31]] — added R2A through R9 foundations, invitation lifecycle contracts, AI run records, release evidence references, CRM command validation, and newsletter consent handling; full integration remains environment-gated.
 - [[journal/2026-08-28]] — completed R1.0 policy and built the R1.2 and R1.3 platform foundations.

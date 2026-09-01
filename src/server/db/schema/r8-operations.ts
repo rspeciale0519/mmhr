@@ -1,0 +1,118 @@
+import { sql } from "drizzle-orm";
+import {
+  boolean,
+  check,
+  foreignKey,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
+
+import { identities, orgs } from "./identity";
+import { deals } from "./crm-workflow";
+
+export const onboardingPlans = pgTable("onboarding_plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  dealId: uuid("deal_id").notNull(),
+  ownerIdentityId: uuid("owner_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  targetGoLiveAt: timestamp("target_go_live_at", { withTimezone: true }).notNull(),
+  status: text("status").notNull().default("planned"),
+  revision: integer("revision").notNull().default(1),
+  milestones: jsonb("milestones").notNull(),
+  checkIns: jsonb("check_ins").notNull().default([]),
+  risks: jsonb("risks").notNull().default([]),
+  failureReason: text("failure_reason"),
+  reactivatedFromRevision: integer("reactivated_from_revision"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("onboarding_plans_organization_id_uq").on(t.organizationId, t.id),
+  index("onboarding_plans_status_go_live_idx").on(t.organizationId, t.status, t.targetGoLiveAt),
+  foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "onboarding_plans_deal_scope_fk" }),
+  check("onboarding_plans_status_ck", sql`${t.status} in ('planned', 'active', 'at_risk', 'failed', 'reactivated', 'completed', 'cancelled')`),
+  check("onboarding_plans_revision_ck", sql`${t.revision} > 0`),
+  check("onboarding_plans_arrays_ck", sql`jsonb_typeof(${t.milestones}) = 'array' and jsonb_typeof(${t.checkIns}) = 'array' and jsonb_typeof(${t.risks}) = 'array'`),
+]);
+
+export const onboardingHistory = pgTable("onboarding_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  onboardingId: uuid("onboarding_id").notNull(),
+  fromStatus: text("from_status").notNull(),
+  toStatus: text("to_status").notNull(),
+  expectedRevision: integer("expected_revision").notNull(),
+  actorIdentityId: uuid("actor_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  reason: text("reason").notNull(),
+  approvalReference: uuid("approval_reference"),
+  occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
+  correlationId: uuid("correlation_id").notNull(),
+}, (t) => [
+  index("onboarding_history_scope_time_idx").on(t.organizationId, t.onboardingId, t.occurredAt),
+  foreignKey({ columns: [t.organizationId, t.onboardingId], foreignColumns: [onboardingPlans.organizationId, onboardingPlans.id], name: "onboarding_history_scope_fk" }),
+  check("onboarding_history_revision_ck", sql`${t.expectedRevision} > 0`),
+]);
+
+export const projectPlanTemplates = pgTable("project_plan_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  version: integer("version").notNull(),
+  name: text("name").notNull(),
+  approved: boolean("approved").notNull().default(false),
+  approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  milestones: jsonb("milestones").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("project_plan_templates_organization_name_version_uq").on(t.organizationId, t.name, t.version),
+  uniqueIndex("project_plan_templates_organization_id_uq").on(t.organizationId, t.id),
+  check("project_plan_templates_version_ck", sql`${t.version} > 0`),
+  check("project_plan_templates_milestones_ck", sql`jsonb_typeof(${t.milestones}) = 'array'`),
+]);
+
+export const projectPlans = pgTable("project_plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  dealId: uuid("deal_id").notNull(),
+  templateId: uuid("template_id").notNull(),
+  templateVersion: integer("template_version").notNull(),
+  targetGoLiveAt: timestamp("target_go_live_at", { withTimezone: true }).notNull(),
+  revision: integer("revision").notNull().default(1),
+  milestones: jsonb("milestones").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("project_plans_organization_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "project_plans_deal_scope_fk" }),
+  foreignKey({ columns: [t.organizationId, t.templateId], foreignColumns: [projectPlanTemplates.organizationId, projectPlanTemplates.id], name: "project_plans_template_scope_fk" }),
+  check("project_plans_template_version_ck", sql`${t.templateVersion} > 0`),
+  check("project_plans_revision_ck", sql`${t.revision} > 0`),
+  check("project_plans_milestones_ck", sql`jsonb_typeof(${t.milestones}) = 'array'`),
+]);
+
+export const workItems = pgTable("work_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  queue: text("queue").notNull(),
+  assignedRole: text("assigned_role").notNull(),
+  assigneeIdentityId: uuid("assignee_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  status: text("status").notNull().default("open"),
+  priority: text("priority").notNull().default("normal"),
+  dueAt: timestamp("due_at", { withTimezone: true }),
+  reminderAt: timestamp("reminder_at", { withTimezone: true }),
+  escalated: boolean("escalated").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("work_items_organization_id_uq").on(t.organizationId, t.id),
+  index("work_items_queue_status_due_idx").on(t.organizationId, t.queue, t.status, t.dueAt),
+  check("work_items_queue_ck", sql`${t.queue} in ('approvals', 'follow_ups', 'scheduling', 'commissions', 'onboarding_risks')`),
+  check("work_items_status_ck", sql`${t.status} in ('open', 'in_progress', 'blocked', 'completed', 'cancelled')`),
+  check("work_items_priority_ck", sql`${t.priority} in ('low', 'normal', 'high', 'urgent')`),
+]);
