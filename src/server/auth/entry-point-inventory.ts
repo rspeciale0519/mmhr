@@ -739,6 +739,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "workspace-comment.test.ts; workspace comment migration review and authenticated isolation rehearsal",
   },
   {
+    key: "src/server/commands/rfp-create.ts#command",
+    surface: "RFP version creation command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization, submitted intake, and RFP version",
+    dataPath: "strict RFP draft DTO; fixed audited RPC; source revision binding and bounded sections",
+    denialEvidence: "rfp-create.test.ts; RFP create migration review and authenticated isolation rehearsal",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",

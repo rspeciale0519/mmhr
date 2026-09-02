@@ -50,6 +50,7 @@ const rehearsalFiles = new Set(
       "src/server/db/r3-requirement-metadata.integration.test.ts",
       "src/server/db/r3-workspace-view.integration.test.ts",
       "src/server/db/r3-workspace-comment.integration.test.ts",
+      "src/server/db/r4-rfp-create.integration.test.ts",
       "src/server/db/r3-candidate-transition.integration.test.ts",
       "src/server/db/r3-candidate-add.integration.test.ts",
       "src/server/db/r3-candidate-masking.integration.test.ts",

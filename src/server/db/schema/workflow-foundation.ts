@@ -13,6 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { identities, orgs } from "./identity";
+import { intakes } from "./r3-intake";
 
 const auditColumns = () => ({
   createdByIdentityId: uuid("created_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
@@ -26,6 +27,7 @@ export const rfpVersions = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
     rfpId: uuid("rfp_id").notNull(),
+    sourceIntakeId: uuid("source_intake_id"),
     version: integer("version").notNull(),
     status: text("status").notNull().default("draft"),
     title: text("title").notNull(),
@@ -38,11 +40,13 @@ export const rfpVersions = pgTable(
   (t) => [
     uniqueIndex("rfp_versions_organization_id_uq").on(t.organizationId, t.id),
     uniqueIndex("rfp_versions_organization_rfp_version_uq").on(t.organizationId, t.rfpId, t.version),
+    index("rfp_versions_organization_intake_idx").on(t.organizationId, t.sourceIntakeId),
     index("rfp_versions_organization_status_idx").on(t.organizationId, t.status),
     check("rfp_versions_version_ck", sql`${t.version} > 0`),
     check("rfp_versions_status_ck", sql`${t.status} in ('draft', 'review', 'approved', 'distributed', 'closed', 'archived')`),
     check("rfp_versions_title_ck", sql`length(btrim(${t.title})) between 1 and 200`),
     check("rfp_versions_approval_ck", sql`(${t.approvedByIdentityId} is null and ${t.approvalReference} is null and ${t.approvedAt} is null) or (${t.approvedByIdentityId} is not null and ${t.approvalReference} is not null and ${t.approvedAt} is not null)`),
+    foreignKey({ columns: [t.organizationId, t.sourceIntakeId], foreignColumns: [intakes.organizationId, intakes.id], name: "rfp_versions_source_intake_scope_fk" }).onDelete("restrict"),
   ],
 );
 
