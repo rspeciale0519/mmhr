@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| Version | 1.9 |
+| Version | 1.10 |
 | Date | 2026-08-31 |
 | Status | Approved roadmap; R0 documentation audit recorded with public release blocked; R1 through R9 foundations verified locally; target-environment evidence and end-to-end workflow completion remain open |
 | Approval date | 2026-08-24 |
@@ -35,8 +35,8 @@ The baseline audit found 148 requirement identifiers:
 - 132 functional requirements
 - 16 non-functional requirements
 - 5 Implemented
-- 36 Partial
-- 105 Missing
+- 40 Partial
+- 101 Missing
 - 1 Deferred
 - 1 Open
 
@@ -663,7 +663,7 @@ Every PRD requirement appears exactly once below.
 | FR-EVL-01 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-02 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-03 | Partial | R3 | PO + OPS | E2; G1 |
-| FR-EVL-04 | Missing | R3 | PO + OPS | G1 |
+| FR-EVL-04 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-05 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-06 | Partial | R3 | PO + OPS | E2 |
 | FR-EVL-07 | Missing | R3 | PO + OPS | G1 |
