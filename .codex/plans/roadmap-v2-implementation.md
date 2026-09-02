@@ -677,7 +677,7 @@ Every PRD requirement appears exactly once below.
 | FR-MAT-05 | Partial | R3 | PO + OPS | E4; G4 |
 | FR-MAT-06 | Missing | R3 | PO + OPS | G1 |
 | FR-MAT-07 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-08 | Missing | R3 | PO + OPS | G1 |
+| FR-MAT-08 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-VND-01 | Missing | R2B | DATA | G1 |
 | FR-VND-02 | Missing | R4 | DATA | G1 |
 | FR-VND-03 | Missing | R5 | DATA | G1 |
