@@ -1,0 +1,5 @@
+import { describe, expect, test } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+const migration = readFileSync(join(process.cwd(), "drizzle", "0043_r3_duplicate_product_review.sql"), "utf8");
+describe("R3 duplicate product review migration", () => { test("defines scoped immutable review evidence", () => { expect(migration).toContain("CREATE TABLE public.evaluation_product_duplicate_reviews"); expect(migration).toContain("evaluation_product_duplicate_reviews_pair_uq"); expect(migration).toContain("decision IN ('duplicate', 'distinct')"); }); test("uses an audited fixed command and deny-first raw access", () => { expect(migration).toContain("SET search_path = ''"); expect(migration).toContain("r1_start_security_command('workspace.access'"); expect(migration).toContain("r1_finish_security_command"); expect(migration).toContain("REVOKE ALL ON FUNCTION public.mmhr_review_evaluation_product_duplicate"); expect(migration).toContain("GRANT EXECUTE ON FUNCTION public.mmhr_review_evaluation_product_duplicate"); }); });

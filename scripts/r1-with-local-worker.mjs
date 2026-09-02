@@ -51,6 +51,7 @@ const rehearsalFiles = new Set(
       "src/server/db/r3-intake-save.integration.test.ts",
       "src/server/db/r3-matching.integration.test.ts",
       "src/server/db/r3-comparison-export.integration.test.ts",
+      "src/server/db/r3-duplicate-product.integration.test.ts",
     "src/server/db/r3-intake-matching.integration.test.ts",
     "src/server/auth/security-command-api.integration.test.ts",
     "src/server/db/r1-populated-migration.integration.test.ts",

@@ -34,6 +34,7 @@ phone evidence, or recovery approvals.
 | Deterministic matching | `src/server/commands/matching.ts`, `drizzle/0040_r3_deterministic_matching.sql`, matching migration and isolation tests |
 | Matching rule approval | `src/server/commands/matching-rule-approval.ts`, `drizzle/0041_r3_matching_rule_approval.sql`, rule approval migration review |
 | Comparison export controls | `src/server/commands/comparison-export.ts`, `drizzle/0042_r3_comparison_export_commands.sql`, comparison export migration and isolation tests |
+| Duplicate product review | `src/server/commands/duplicate-product-review.ts`, `drizzle/0043_r3_duplicate_product_review.sql`, duplicate product migration and isolation tests |
 
 ## Local check record
 

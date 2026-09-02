@@ -669,6 +669,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "comparison-export.test.ts; comparison export migration review and authenticated isolation rehearsal",
   },
   {
+    key: "src/server/commands/duplicate-product-review.ts#command",
+    surface: "duplicate product review command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization, intake, and candidate pair",
+    dataPath: "strict duplicate DTO; fixed audited RPC; duplicate archival preserves review evidence",
+    denialEvidence: "duplicate-product-review.test.ts; duplicate product migration review and authenticated isolation rehearsal",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",
