@@ -43,8 +43,8 @@ passed. The local Supabase stack now runs on ports 57021-57029. Database,
 Auth, security-boundary, permission, and RLS integration checks pass in focused
 runs. The complete integration suite now passes 21 files and 592 tests.
 
-The local migration ledger now applies 42 migrations through
-`drizzle/0041_r3_matching_rule_approval.sql`. Public `mmhr_*` functions
+The local migration ledger now applies 46 migrations through
+`drizzle/0045_r3_scorecard_view.sql`. Public `mmhr_*` functions
 now revoke inherited PUBLIC access and grant execution only to `authenticated`.
 The empty-database and rollback rehearsals match the current R0-R9 inventory.
 
