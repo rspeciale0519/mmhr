@@ -43,8 +43,8 @@ passed. The local Supabase stack now runs on ports 57021-57029. Database,
 Auth, security-boundary, permission, and RLS integration checks pass in focused
 runs. The complete integration suite now passes 21 files and 592 tests.
 
-The local migration ledger now applies 38 migrations through
-`drizzle/0037_r3_candidate_masking_commands.sql`. Public `mmhr_*` functions
+The local migration ledger now applies 39 migrations through
+`drizzle/0038_r3_comparison_read.sql`. Public `mmhr_*` functions
 now revoke inherited PUBLIC access and grant execution only to `authenticated`.
 The empty-database and rollback rehearsals match the current R0-R9 inventory.
 
@@ -89,6 +89,14 @@ The focused R3 candidate-masking migration review passed 3 tests. The elevated
 local rehearsal passed 2 tests for masked labels, replay, approval-bound
 unmasking, immutable disclosure state, and cross-organization denial. The
 migration is applied in the local rehearsal database.
+
+The focused R3 comparison migration review passed 2 tests. The elevated local
+rehearsal passed 2 tests for organization-scoped masked candidate reads,
+approved-scorecard filtering, hidden vendor fields, and cross-organization
+denial. The migration is applied in the local rehearsal database.
+
+The local migration ledger now applies 39 migrations through
+`drizzle/0038_r3_comparison_read.sql`.
 
 The focused R3 workspace migration review passed 8 tests, including
 organization-scoped intake and workspace links, bounded snapshots, revision
@@ -185,6 +193,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - R3 scorecard entry persistence now uses a fixed organization-scoped RPC with scorer binding, optimistic revision checks, replay receipts, and immutable entry history.
 - R3 candidate lifecycle transitions now use a fixed organization-scoped RPC with replay receipts, optimistic revisions, and approval-bound reactivation.
 - R3 candidate identity masking now records masked labels and requires an approval reference and reason for unmasking.
+- R3 comparison reads now expose only organization-scoped masked candidates and approved scorecard values.
 - R2B activity and task persistence now has an additive deny-first migration with organization-scoped tables and append-only task history; application remains unverified until local Supabase access returns.
 - R3 workspace controls now validate scoped snapshots, participant status timestamps, immutable comments, and customer filtering of internal comments.
 - R4 workflow persistence now has an additive deny-first schema for RFP versions, inbound email, immutable documents, communications, jobs, and job attempts; application and provider integration remain unverified.
