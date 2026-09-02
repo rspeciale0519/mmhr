@@ -30,6 +30,9 @@ phone evidence, or recovery approvals.
 | Candidate intake additions | `src/server/commands/candidate-add.ts`, `drizzle/0036_r3_candidate_add_commands.sql`, candidate add migration and isolation tests |
 | Candidate identity masking | `src/server/commands/candidate-masking.ts`, `drizzle/0037_r3_candidate_masking_commands.sql`, candidate masking migration and isolation tests |
 | Redacted evaluation comparison | `src/server/commands/comparison.ts`, `drizzle/0038_r3_comparison_read.sql`, comparison migration and isolation tests |
+| Saved intake persistence | `src/server/commands/intake-save.ts`, `drizzle/0039_r3_intake_save_commands.sql`, intake save migration and isolation tests |
+| Deterministic matching | `src/server/commands/matching.ts`, `drizzle/0040_r3_deterministic_matching.sql`, matching migration and isolation tests |
+| Matching rule approval | `src/server/commands/matching-rule-approval.ts`, `drizzle/0041_r3_matching_rule_approval.sql`, rule approval migration review |
 
 ## Local check record
 
@@ -62,6 +65,9 @@ intake, R2B deal-lifecycle, R2A lead-command, R2B deal and vendor-evidence,
 R3 scorecard and workspace, R5 AI run-record, R6 demo, proposal, and
 contract-handoff, R7 finance, R8 customer-success and operations, and R9
 evidence persistence changes.
+
+The current local migration ledger applies 42 checked-in migrations through
+`drizzle/0041_r3_matching_rule_approval.sql`. This remains local evidence only.
 
 The CRM command package passed fixed-RPC and authenticated isolation rehearsals.
 The CRM search package passed redaction, scope, paging, and malformed-input

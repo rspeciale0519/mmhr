@@ -35,8 +35,8 @@ The baseline audit found 148 requirement identifiers:
 - 132 functional requirements
 - 16 non-functional requirements
 - 5 Implemented
-- 22 Partial
-- 119 Missing
+- 35 Partial
+- 106 Missing
 - 1 Deferred
 - 1 Open
 
@@ -656,8 +656,8 @@ Every PRD requirement appears exactly once below.
 | FR-CRM-07 | Missing | R2B | OPS | G1 |
 | FR-CRM-08 | Missing | R2B | OPS | G1 |
 | FR-CRM-09 | Missing | R2B | OPS | G1 |
-| FR-INT-01 | Missing | R3 | PO + OPS | G1 |
-| FR-INT-02 | Missing | R3 | PO + OPS | G1 |
+| FR-INT-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-INT-02 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-INT-03 | Missing | R3 | PO + OPS | G1 |
 | FR-INT-04 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-01 | Partial | R3 | PO + OPS | E2; G1 |
@@ -670,12 +670,12 @@ Every PRD requirement appears exactly once below.
 | FR-EVL-08 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-09 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-10 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-01 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-02 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-03 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-04 | Missing | R3 | PO + OPS | G1 |
+| FR-MAT-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-02 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-03 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-04 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-MAT-05 | Partial | R3 | PO + OPS | E4; G4 |
-| FR-MAT-06 | Missing | R3 | PO + OPS | G1 |
+| FR-MAT-06 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-MAT-07 | Missing | R3 | PO + OPS | G1 |
 | FR-MAT-08 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-VND-01 | Missing | R2B | DATA | G1 |
