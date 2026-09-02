@@ -599,6 +599,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "candidate-add.test.ts; candidate add migration review and authenticated isolation rehearsal",
   },
   {
+    key: "src/server/commands/candidate-masking.ts#command",
+    surface: "candidate identity masking command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization and evaluation candidate identity record",
+    dataPath: "strict mask and approval-bound unmask DTOs; fixed audited RPCs; raw mask table remains closed",
+    denialEvidence: "candidate-masking.test.ts; candidate masking migration review and authenticated isolation rehearsal",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",

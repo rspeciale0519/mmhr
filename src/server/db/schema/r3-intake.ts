@@ -176,3 +176,21 @@ export const evaluationCandidates = pgTable(
     check("evaluation_candidates_revision_ck", sql`${t.revision} > 0`),
   ],
 );
+
+export const evaluationCandidateMasks = pgTable(
+  "evaluation_candidate_masks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    candidateId: uuid("candidate_id").notNull(),
+    maskedLabel: text("masked_label").notNull(),
+    state: text("state").notNull().default("masked"),
+    maskedAt: timestamp("masked_at", { withTimezone: true }).notNull().defaultNow(),
+    unmaskedAt: timestamp("unmasked_at", { withTimezone: true }),
+    unmaskedByIdentityId: uuid("unmasked_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    unmaskReason: text("unmask_reason"),
+    approvalReference: text("approval_reference"),
+    ...auditColumns(),
+  },
+  (t) => [uniqueIndex("evaluation_candidate_masks_candidate_uq").on(t.organizationId, t.candidateId), index("evaluation_candidate_masks_organization_state_idx").on(t.organizationId, t.state)],
+);

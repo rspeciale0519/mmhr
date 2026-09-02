@@ -28,6 +28,7 @@ phone evidence, or recovery approvals.
 | Scorecard entry persistence | `src/server/commands/scorecard-database.ts`, `drizzle/0034_r3_scorecard_entry_commands.sql`, scorecard entry migration and isolation tests |
 | Candidate lifecycle transitions | `src/server/commands/candidate-transition.ts`, `drizzle/0035_r3_candidate_transition_commands.sql`, candidate transition migration and isolation tests |
 | Candidate intake additions | `src/server/commands/candidate-add.ts`, `drizzle/0036_r3_candidate_add_commands.sql`, candidate add migration and isolation tests |
+| Candidate identity masking | `src/server/commands/candidate-masking.ts`, `drizzle/0037_r3_candidate_masking_commands.sql`, candidate masking migration and isolation tests |
 
 ## Local check record
 
