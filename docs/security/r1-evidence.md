@@ -33,6 +33,7 @@ phone evidence, or recovery approvals.
 | Saved intake persistence | `src/server/commands/intake-save.ts`, `drizzle/0039_r3_intake_save_commands.sql`, intake save migration and isolation tests |
 | Deterministic matching | `src/server/commands/matching.ts`, `drizzle/0040_r3_deterministic_matching.sql`, matching migration and isolation tests |
 | Matching rule approval | `src/server/commands/matching-rule-approval.ts`, `drizzle/0041_r3_matching_rule_approval.sql`, rule approval migration review |
+| Comparison export controls | `src/server/commands/comparison-export.ts`, `drizzle/0042_r3_comparison_export_commands.sql`, comparison export migration and isolation tests |
 
 ## Local check record
 

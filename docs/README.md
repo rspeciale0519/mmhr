@@ -29,6 +29,7 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - R3 saved intake persistence now supports bounded draft revisions with immutable change history and replay protection.
 - R3 deterministic matching now uses approved rule versions, published vendor facts, bounded explanations, and organization-scoped audited runs.
 - R3 matching rules now require an audited approval transition before they can affect active comparisons.
+- R3 comparison exports now require organization-scoped request validation and a separate audit decision.
 - R3 through R9 now have deny-first matching, workflow, finance, operations, reporting, and release-readiness foundations with focused tests.
 - Rob Speciale is the temporary operations owner.
 - The R0 control record records named owners, decisions, exact public claims, route coverage, evidence fields, and the release block.

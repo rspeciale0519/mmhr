@@ -95,8 +95,8 @@ rehearsal passed 2 tests for organization-scoped masked candidate reads,
 approved-scorecard filtering, hidden vendor fields, and cross-organization
 denial. The migration is applied in the local rehearsal database.
 
-The local migration ledger now applies 42 migrations through
-`drizzle/0041_r3_matching_rule_approval.sql`.
+The local migration ledger now applies 43 migrations through
+`drizzle/0042_r3_comparison_export_commands.sql`.
 
 The focused R3 workspace migration review passed 8 tests, including
 organization-scoped intake and workspace links, bounded snapshots, revision
@@ -197,6 +197,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - R3 saved intake persistence now stores bounded draft revisions with immutable history and replay-safe audited writes.
 - R3 deterministic matching now evaluates approved rule versions against published vendor facts, records bounded explanations, and excludes commercial fields from scoring.
 - R3 matching rule sets now require an audited approval transition before active matching runs can use them.
+- R3 comparison exports now use deny-first request and separate reviewer-decision records with replay and scope checks.
 - R2B activity and task persistence now has an additive deny-first migration with organization-scoped tables and append-only task history; application remains unverified until local Supabase access returns.
 - R3 workspace controls now validate scoped snapshots, participant status timestamps, immutable comments, and customer filtering of internal comments.
 - R4 workflow persistence now has an additive deny-first schema for RFP versions, inbound email, immutable documents, communications, jobs, and job attempts; application and provider integration remain unverified.

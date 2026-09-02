@@ -1,0 +1,7 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { AuthorizationError, requirePermission } from "@/server/auth/authorization";
+import { comparisonExportRequestSchema, createComparisonExport } from "./comparison-export";
+vi.mock("@/server/auth/authorization", async () => { const actual = await vi.importActual<typeof import("@/server/auth/authorization")>("@/server/auth/authorization"); return { ...actual, requirePermission: vi.fn() }; });
+const ids = { exportId: "11111111-1111-4111-8111-111111111111", organizationId: "22222222-2222-4222-8222-222222222222", intakeId: "33333333-3333-4333-8333-333333333333", requestedByIdentityId: "44444444-4444-4444-8444-444444444444", candidateIds: [], purpose: "approved customer review", requestedAt: "2026-09-01T00:00:00Z" };
+const rpc = vi.fn(); const context = { supabase: { rpc } as never, identityId: ids.requestedByIdentityId, scope: { kind: "organization", organizationId: ids.organizationId }, assurance: "aal2", correlationId: ids.exportId } as const;
+describe("comparison export command", () => { beforeEach(() => { rpc.mockReset(); vi.mocked(requirePermission).mockReset().mockResolvedValue(context); }); test("requires strict export input", () => { expect(comparisonExportRequestSchema.safeParse({ ...ids, extra: true }).success).toBe(false); }); test("rejects requester mismatch before RPC", async () => { await expect(createComparisonExport({ ...ids, requestedByIdentityId: ids.intakeId })).rejects.toBeInstanceOf(AuthorizationError); expect(rpc).not.toHaveBeenCalled(); }); });
