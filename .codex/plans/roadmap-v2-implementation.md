@@ -35,8 +35,8 @@ The baseline audit found 148 requirement identifiers:
 - 132 functional requirements
 - 16 non-functional requirements
 - 5 Implemented
-- 42 Partial
-- 99 Missing
+- 43 Partial
+- 98 Missing
 - 1 Deferred
 - 1 Open
 
@@ -688,7 +688,7 @@ Every PRD requirement appears exactly once below.
 | FR-VND-08 | Missing | R2B | DATA | G1 |
 | FR-RFP-01 | Missing | R4 | OPS | G1 |
 | FR-RFP-02 | Partial | R4 | OPS | E2; G1 |
-| FR-RFP-03 | Missing | R4 | OPS | G1 |
+| FR-RFP-03 | Partial | R4 | OPS | E2; G1 |
 | FR-RFP-04 | Missing | R4 | OPS | G1 |
 | FR-RFP-05 | Open | R4 | OPS | D1 |
 | FR-RFP-06 | Missing | R4 | OPS | G1 |

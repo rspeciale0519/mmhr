@@ -95,8 +95,8 @@ rehearsal passed 2 tests for organization-scoped masked candidate reads,
 approved-scorecard filtering, hidden vendor fields, and cross-organization
 denial. The migration is applied in the local rehearsal database.
 
-The local migration ledger now applies 52 migrations through
-`drizzle/0051_r4_rfp_create.sql`.
+The local migration ledger now applies 53 migrations through
+`drizzle/0052_r4_rfp_approval.sql`.
 
 The focused R3 requirement-metadata migration review passed 2 tests. The
 elevated local rehearsal passed 2 tests for structured and custom metadata,
@@ -118,6 +118,11 @@ The focused R4 RFP-create migration review passed 2 tests. The elevated local
 rehearsal passed 2 tests for submitted-intake revision binding, bounded
 versioned sections, idempotent replay, audit recording, and cross-organization
 denial. The migration is applied in the local rehearsal database.
+
+The focused R4 RFP-approval migration review passed 2 tests. The elevated
+local rehearsal passed 2 tests for distinct reviewer approval, approval
+references, replay, audit recording, and self-approval denial. The migration
+is applied in the local rehearsal database.
 
 The focused R3 workspace migration review passed 8 tests, including
 organization-scoped intake and workspace links, bounded snapshots, revision
