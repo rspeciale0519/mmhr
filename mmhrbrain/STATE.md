@@ -95,8 +95,8 @@ rehearsal passed 2 tests for organization-scoped masked candidate reads,
 approved-scorecard filtering, hidden vendor fields, and cross-organization
 denial. The migration is applied in the local rehearsal database.
 
-The local migration ledger now applies 46 migrations through
-`drizzle/0045_r3_scorecard_view.sql`.
+The local migration ledger now applies 47 migrations through
+`drizzle/0046_r3_initial_evaluation.sql`.
 
 The focused R3 workspace migration review passed 8 tests, including
 organization-scoped intake and workspace links, bounded snapshots, revision
