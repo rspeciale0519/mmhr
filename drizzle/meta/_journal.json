@@ -316,6 +316,13 @@
       "when": 1788143391014,
       "tag": "0044_r3_matching_rule_preview",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1788143391015,
+      "tag": "0045_r3_scorecard_view",
+      "breakpoints": true
     }
   ]
 }

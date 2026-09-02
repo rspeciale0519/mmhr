@@ -689,6 +689,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "matching-rule-preview.test.ts; matching rule preview migration review",
   },
   {
+    key: "src/server/commands/scorecard-view.ts#command",
+    surface: "scorecard view command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization and scorecard",
+    dataPath: "strict view DTO; fixed audited RPC; weighted aggregate and individual entries",
+    denialEvidence: "scorecard-view.test.ts; scorecard view migration review",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",
