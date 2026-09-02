@@ -330,6 +330,13 @@
       "when": 1788143391016,
       "tag": "0046_r3_initial_evaluation",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1788143391017,
+      "tag": "0047_r3_scorecard_create",
+      "breakpoints": true
     }
   ]
 }

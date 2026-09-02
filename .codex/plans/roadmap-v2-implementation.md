@@ -662,7 +662,7 @@ Every PRD requirement appears exactly once below.
 | FR-INT-04 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-01 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-02 | Partial | R3 | PO + OPS | E2; G1 |
-| FR-EVL-03 | Missing | R3 | PO + OPS | G1 |
+| FR-EVL-03 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-04 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-05 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-06 | Partial | R3 | PO + OPS | E2 |

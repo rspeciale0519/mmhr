@@ -34,6 +34,7 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - R3 matching rule previews now return an audited digest and bounded rule count within the organization scope.
 - R3 scorecard views now return weighted aggregate scores and organization-scoped individual entries.
 - R3 initial evaluations now create a bounded, masked assessment snapshot from submitted intake candidates.
+- R3 scorecard creation now stores bounded weighted criteria through an audited command.
 - R3 through R9 now have deny-first matching, workflow, finance, operations, reporting, and release-readiness foundations with focused tests.
 - Rob Speciale is the temporary operations owner.
 - The R0 control record records named owners, decisions, exact public claims, route coverage, evidence fields, and the release block.

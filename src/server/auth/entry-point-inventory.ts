@@ -699,6 +699,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "initial-evaluation.test.ts; initial evaluation migration review and authenticated isolation rehearsal",
   },
   {
+    key: "src/server/commands/scorecard-create.ts#command",
+    surface: "scorecard creation command boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization, intake, and active candidate",
+    dataPath: "strict scorecard DTO; fixed audited RPC; bounded weighted criteria",
+    denialEvidence: "scorecard-create.test.ts; scorecard creation migration review and authenticated isolation rehearsal",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",

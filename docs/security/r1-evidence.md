@@ -38,6 +38,7 @@ phone evidence, or recovery approvals.
 | Matching rule preview | `src/server/commands/matching-rule-preview.ts`, `drizzle/0044_r3_matching_rule_preview.sql`, matching rule preview migration review |
 | Scorecard aggregate view | `src/server/commands/scorecard-view.ts`, `drizzle/0045_r3_scorecard_view.sql`, scorecard view migration review and authenticated isolation rehearsal |
 | Initial masked evaluation | `src/server/commands/initial-evaluation.ts`, `drizzle/0046_r3_initial_evaluation.sql`, initial evaluation migration review and authenticated isolation rehearsal |
+| Scorecard creation | `src/server/commands/scorecard-create.ts`, `drizzle/0047_r3_scorecard_create.sql`, scorecard creation migration review and authenticated isolation rehearsal |
 
 ## Local check record
 
@@ -71,8 +72,8 @@ R3 scorecard and workspace, R5 AI run-record, R6 demo, proposal, and
 contract-handoff, R7 finance, R8 customer-success and operations, and R9
 evidence persistence changes.
 
-The current local migration ledger applies 47 checked-in migrations through
-`drizzle/0046_r3_initial_evaluation.sql`. This remains local evidence only.
+The current local migration ledger applies 48 checked-in migrations through
+`drizzle/0047_r3_scorecard_create.sql`. This remains local evidence only.
 
 The CRM command package passed fixed-RPC and authenticated isolation rehearsals.
 The CRM search package passed redaction, scope, paging, and malformed-input

@@ -46,6 +46,7 @@ const rehearsalFiles = new Set(
       "src/server/db/r3-scorecard-entry.integration.test.ts",
       "src/server/db/r3-scorecard-view.integration.test.ts",
       "src/server/db/r3-initial-evaluation.integration.test.ts",
+      "src/server/db/r3-scorecard-create.integration.test.ts",
       "src/server/db/r3-candidate-transition.integration.test.ts",
       "src/server/db/r3-candidate-add.integration.test.ts",
       "src/server/db/r3-candidate-masking.integration.test.ts",
