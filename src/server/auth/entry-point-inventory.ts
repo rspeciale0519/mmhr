@@ -719,6 +719,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "requirement-update.test.ts; requirement metadata migration review and authenticated isolation rehearsal",
   },
   {
+    key: "src/server/commands/workspace-view.ts#command",
+    surface: "workspace snapshot view boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "workspace.access; exact organization scope",
+    scope: "one organization and workspace",
+    dataPath: "strict workspace view DTO; fixed audited RPC; latest bounded snapshot only",
+    denialEvidence: "workspace-view.test.ts; workspace view migration review and authenticated isolation rehearsal",
+  },
+  {
     key: "src/trigger/health.ts#health-check",
     surface: "health-check",
     kind: "background-task",
