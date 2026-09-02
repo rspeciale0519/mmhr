@@ -116,18 +116,25 @@ export type CrmDatabaseAdapter = (
   context: AuthorizationContext,
 ) => Promise<unknown>;
 export type CrmDatabaseOptions = AuthorizationOptions & {
-  /** A reviewed server adapter. No default adapter is provided. */
+  /** Optional test or replacement adapter. The default uses fixed reviewed RPCs. */
   adapter?: CrmDatabaseAdapter;
 };
 
 export class CrmDatabaseCommandError extends Error {
-  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE" | "INVALID_RESPONSE") {
+  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE" | "REJECTED" | "INVALID_RESPONSE") {
     super(code === "INVALID_INPUT"
       ? "CRM command input is invalid"
       : "CRM command could not be completed");
     this.name = "CrmDatabaseCommandError";
   }
 }
+
+const rpcNames: Record<CrmDatabaseOperation, string> = {
+  create_contact: "mmhr_create_contact",
+  update_contact: "mmhr_update_contact",
+  create_product: "mmhr_create_product",
+  update_product: "mmhr_update_product",
+};
 
 function parseInput(operation: CrmDatabaseOperation, input: unknown): ParsedCrmInput {
   const parsed = operation === "create_contact"
@@ -155,8 +162,7 @@ function requireExactOrganizationScope(
 
 /**
  * Validates a CRM command and rechecks the caller for its exact organization.
- * Reviewed CRM SQL functions are not present yet, so this boundary stops
- * without calling a guessed RPC or touching CRM tables.
+ * The fixed SQL functions own the mutation, receipt, audit, and revision check.
  */
 export async function executeCrmDatabaseCommand(
   command: CrmDatabaseInput,
@@ -184,15 +190,21 @@ export async function executeCrmDatabaseCommand(
   }
   requireExactOrganizationScope(context, organizationId);
 
-  if (!options.adapter) {
-    // Do not add an RPC name here until its SQL function has been reviewed,
-    // migrated, and covered by an integration isolation test.
-    throw new CrmDatabaseCommandError("UNAVAILABLE");
-  }
   let response: unknown;
   try {
-    response = await options.adapter(command.operation, parsedInput, context);
-  } catch {
+    if (options.adapter) {
+      response = await options.adapter(command.operation, parsedInput, context);
+    } else {
+      const rpcResponse = await context.supabase.rpc(rpcNames[command.operation], {
+        payload: parsedInput,
+        correlation_id: context.correlationId,
+        idempotency_key: parsedInput.idempotencyKey,
+      });
+      if (rpcResponse.error) throw new CrmDatabaseCommandError("REJECTED");
+      response = rpcResponse.data;
+    }
+  } catch (error) {
+    if (error instanceof CrmDatabaseCommandError) throw error;
     throw new CrmDatabaseCommandError("UNAVAILABLE");
   }
   const result = crmCommandResultSchema.safeParse(response);

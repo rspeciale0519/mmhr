@@ -183,6 +183,83 @@
       "when": 1788143390995,
       "tag": "0025_r1_public_function_acl_repair",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788143390996,
+      "tag": "0026_r1_invitation_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788143390997,
+      "tag": "0027_r2b_crm_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788143390998,
+      "tag": "0028_r2b_crm_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788143390999,
+      "tag": "0029_r2b_crm_exports",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788143391000,
+      "tag": "0030_r2b_crm_duplicates",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788143391001,
+      "tag": "0031_r2b_vendor_evidence_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788143391002,
+      "tag": "0032_r2a_lead_routing",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788143391003,
+      "tag": "0033_r2a_lead_create_ambiguity_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788143391004,
+      "tag": "0034_r3_scorecard_entry_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1788143391005,
+      "tag": "0035_r3_candidate_transition_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788143391006,
+      "tag": "0036_r3_candidate_add_commands",
+      "breakpoints": true
     }
   ]
 }

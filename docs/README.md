@@ -20,6 +20,10 @@ MMHR staff use the platform with invited customer and vendor users. MMHR does no
 - R1.4 and R1.5 foundations are verified locally, and R1.8 local evidence is recorded.
 - R2B now has a shared lead-create command and status contract with redacted responses and idempotency.
 - R2B CRM foundation tables now cover customer and vendor profiles, products, contacts, and relationships with local isolation checks.
+- R2A lead routing and R2B CRM contact and product commands, scoped search, audited export approvals, review-only duplicate detection, and vendor-evidence commands now have fixed RPCs with local isolation evidence.
+- R3 scorecard entry persistence now has a fixed, organization-scoped RPC with optimistic revisions, immutable history, replay protection, and local isolation evidence.
+- R3 candidate lifecycle transitions now have a fixed, organization-scoped RPC with optimistic revisions, replay protection, and approval-bound reactivation evidence.
+- R3 candidate intake additions now enforce the initial five-candidate cap and reviewed post-intake additions through a fixed RPC.
 - R3 through R9 now have deny-first matching, workflow, finance, operations, reporting, and release-readiness foundations with focused tests.
 - Rob Speciale is the temporary operations owner.
 - The R0 control record records named owners, decisions, exact public claims, route coverage, evidence fields, and the release block.

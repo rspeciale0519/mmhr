@@ -1,5 +1,15 @@
 import "server-only";
 
+import { z } from "zod";
+
+import { createClient } from "@/lib/supabase/server";
+import {
+  AuthorizationError,
+  requirePermission,
+  type AuthorizationOptions,
+  type RequestSupabaseClient,
+} from "@/server/auth/authorization";
+import { securityUuidSchema } from "@/server/audit/security-values";
 import {
   acceptInvitationInputSchema,
   createInvitationInputSchema,
@@ -14,12 +24,8 @@ import {
   type InvitationCommandResult,
 } from "./invitation-administration";
 
-/**
- * The invitation SQL command functions are not present in the applied schema.
- * Keep this boundary explicit until reviewed functions provide atomic writes.
- */
 export class InvitationDatabaseCommandError extends Error {
-  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE") {
+  constructor(readonly code: "INVALID_INPUT" | "UNAVAILABLE" | "REJECTED" | "INVALID_RESPONSE") {
     super(code === "INVALID_INPUT"
       ? "Invitation command input is invalid"
       : "Invitation command could not be completed");
@@ -37,51 +43,166 @@ export type InvitationDatabaseInput =
   | { operation: "resend"; input: ResendInvitationInput };
 
 type InvitationDatabaseResult = Promise<InvitationCommandResult>;
+type InvitationDatabaseOptions = AuthorizationOptions;
 
-function validateInput(operation: InvitationDatabaseOperation, input: unknown): void {
-  const valid = operation === "create"
-    ? createInvitationInputSchema.safeParse(input).success
+const invitationCommandResultSchema = z.strictObject({
+  invitationId: securityUuidSchema,
+  status: z.enum(["pending", "accepted", "expired", "revoked"]),
+  outcome: z.enum(["created", "replayed", "accepted", "expired", "revoked", "replaced"]),
+  correlationId: securityUuidSchema,
+});
+
+function parseInput(operation: InvitationDatabaseOperation, input: unknown) {
+  const parsed = operation === "create"
+    ? createInvitationInputSchema.safeParse(input)
     : operation === "accept"
-      ? acceptInvitationInputSchema.safeParse(input).success
+      ? acceptInvitationInputSchema.safeParse(input)
       : operation === "expire"
-        ? expireInvitationInputSchema.safeParse(input).success
+        ? expireInvitationInputSchema.safeParse(input)
         : operation === "revoke"
-          ? revokeInvitationInputSchema.safeParse(input).success
-          : resendInvitationInputSchema.safeParse(input).success;
-  if (!valid) throw new InvitationDatabaseCommandError("INVALID_INPUT");
+          ? revokeInvitationInputSchema.safeParse(input)
+          : resendInvitationInputSchema.safeParse(input);
+  if (!parsed.success) throw new InvitationDatabaseCommandError("INVALID_INPUT");
+  return parsed.data;
+}
+
+function requireCallerIdentity(input: { actorIdentityId: string }, identityId: string) {
+  if (input.actorIdentityId.toLowerCase() !== identityId.toLowerCase()) {
+    throw new AuthorizationError();
+  }
+}
+
+async function rpcResult(
+  supabase: RequestSupabaseClient,
+  functionName: string,
+  args: Record<string, string>,
+): Promise<InvitationCommandResult> {
+  let response;
+  try {
+    response = await supabase.rpc(functionName, args);
+  } catch {
+    throw new InvitationDatabaseCommandError("UNAVAILABLE");
+  }
+  if (!response || response.error) throw new InvitationDatabaseCommandError("REJECTED");
+  const parsed = invitationCommandResultSchema.safeParse(response.data);
+  if (!parsed.success) throw new InvitationDatabaseCommandError("INVALID_RESPONSE");
+  return parsed.data;
+}
+
+async function getSupabase(options: InvitationDatabaseOptions): Promise<RequestSupabaseClient> {
+  try {
+    return options.supabase ?? await createClient();
+  } catch {
+    throw new InvitationDatabaseCommandError("UNAVAILABLE");
+  }
 }
 
 /**
- * Validate the provider-neutral command contract, then stop because no reviewed
- * database function exists for this operation. Never guess an RPC name here.
+ * Executes reviewed invitation RPCs after the caller-bound permission check.
+ * Acceptance and expiry use their own fixed SQL identity or lifecycle checks.
  */
 export async function executeInvitationDatabaseCommand(
   command: InvitationDatabaseInput,
-): Promise<never> {
-  if (!command || typeof command !== "object" || !("operation" in command)
-    || !["create", "accept", "expire", "revoke", "resend"].includes(command.operation)) {
+  options: InvitationDatabaseOptions = {},
+): Promise<InvitationCommandResult> {
+  if (
+    !command || typeof command !== "object" || !("operation" in command)
+    || !["create", "accept", "expire", "revoke", "resend"].includes(command.operation)
+  ) {
     throw new InvitationDatabaseCommandError("INVALID_INPUT");
   }
-  validateInput(command.operation, command.input);
-  throw new InvitationDatabaseCommandError("UNAVAILABLE");
+  switch (command.operation) {
+    case "accept": {
+      const parsed = parseInput("accept", command.input) as AcceptInvitationInput;
+      return rpcResult(await getSupabase(options), "mmhr_accept_invitation", {
+        invitation_id: parsed.invitationId,
+        verified_email: parsed.verifiedEmail,
+        correlation_id: parsed.correlationId,
+        idempotency_key: parsed.idempotencyKey,
+      });
+    }
+    case "expire": {
+      const parsed = parseInput("expire", command.input) as ExpireInvitationInput;
+      return rpcResult(await getSupabase(options), "mmhr_expire_invitation", {
+        invitation_id: parsed.invitationId,
+        occurred_at: parsed.occurredAt,
+        correlation_id: parsed.correlationId,
+      });
+    }
+    case "create": {
+      const parsed = parseInput("create", command.input) as CreateInvitationInput;
+      let context;
+      try {
+        context = await requirePermission("org.members.invite", { kind: "organization", organizationId: parsed.organizationId }, options);
+      } catch (error) {
+        if (error instanceof AuthorizationError) throw error;
+        throw new InvitationDatabaseCommandError("UNAVAILABLE");
+      }
+      requireCallerIdentity(parsed, context.identityId);
+      return rpcResult(context.supabase, "mmhr_create_invitation", {
+        organization_id: parsed.organizationId,
+        email: parsed.email,
+        role_key: parsed.roleKey,
+        reason: parsed.reason,
+        correlation_id: parsed.correlationId,
+        idempotency_key: parsed.idempotencyKey,
+      });
+    }
+    case "revoke": {
+      const parsed = parseInput("revoke", command.input) as RevokeInvitationInput;
+      let context;
+      try {
+        context = await requirePermission("org.members.revoke", { kind: "organization", organizationId: parsed.organizationId }, options);
+      } catch (error) {
+        if (error instanceof AuthorizationError) throw error;
+        throw new InvitationDatabaseCommandError("UNAVAILABLE");
+      }
+      requireCallerIdentity(parsed, context.identityId);
+      return rpcResult(context.supabase, "mmhr_revoke_invitation", {
+        organization_id: parsed.organizationId,
+        invitation_id: parsed.invitationId,
+        reason: parsed.reason,
+        correlation_id: parsed.correlationId,
+        idempotency_key: parsed.idempotencyKey,
+      });
+    }
+    case "resend": {
+      const parsed = parseInput("resend", command.input) as ResendInvitationInput;
+      let context;
+      try {
+        context = await requirePermission("org.members.invite", { kind: "organization", organizationId: parsed.organizationId }, options);
+      } catch (error) {
+        if (error instanceof AuthorizationError) throw error;
+        throw new InvitationDatabaseCommandError("UNAVAILABLE");
+      }
+      requireCallerIdentity(parsed, context.identityId);
+      return rpcResult(context.supabase, "mmhr_resend_invitation", {
+        organization_id: parsed.organizationId,
+        invitation_id: parsed.invitationId,
+        reason: parsed.reason,
+        correlation_id: parsed.correlationId,
+        idempotency_key: parsed.idempotencyKey,
+      });
+    }
+  }
 }
 
-export function createInvitation(input: CreateInvitationInput): InvitationDatabaseResult {
-  return executeInvitationDatabaseCommand({ operation: "create", input });
+export function createInvitation(input: CreateInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
+  return executeInvitationDatabaseCommand({ operation: "create", input }, options);
 }
 
-export function acceptInvitation(input: AcceptInvitationInput): InvitationDatabaseResult {
-  return executeInvitationDatabaseCommand({ operation: "accept", input });
+export function acceptInvitation(input: AcceptInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
+  return executeInvitationDatabaseCommand({ operation: "accept", input }, options);
 }
 
-export function expireInvitation(input: ExpireInvitationInput): InvitationDatabaseResult {
-  return executeInvitationDatabaseCommand({ operation: "expire", input });
+export function expireInvitation(input: ExpireInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
+  return executeInvitationDatabaseCommand({ operation: "expire", input }, options);
 }
 
-export function revokeInvitation(input: RevokeInvitationInput): InvitationDatabaseResult {
-  return executeInvitationDatabaseCommand({ operation: "revoke", input });
+export function revokeInvitation(input: RevokeInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
+  return executeInvitationDatabaseCommand({ operation: "revoke", input }, options);
 }
 
-export function resendInvitation(input: ResendInvitationInput): InvitationDatabaseResult {
-  return executeInvitationDatabaseCommand({ operation: "resend", input });
+export function resendInvitation(input: ResendInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
+  return executeInvitationDatabaseCommand({ operation: "resend", input }, options);
 }

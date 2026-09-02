@@ -37,14 +37,14 @@ Migration 0003 preserves approved version-one role history and activates
 version-two defaults. It is applied only to the validated local MMHR stack.
 No cloud or production migration occurred.
 
-Type checking, lint, 2332 unit tests, recovery and migration cases, worker
+Type checking, lint, 2345 unit tests, recovery and migration cases, worker
 cases, boundary cases, local Auth recovery flows, and the production build
 passed. The local Supabase stack now runs on ports 57021-57029. Database,
 Auth, security-boundary, permission, and RLS integration checks pass in focused
 runs. The complete integration suite now passes 21 files and 592 tests.
 
-The local migration ledger now applies 26 migrations through
-`drizzle/0025_r1_public_function_acl_repair.sql`. Public `mmhr_*` functions
+The local migration ledger now applies 37 migrations through
+`drizzle/0036_r3_candidate_add_commands.sql`. Public `mmhr_*` functions
 now revoke inherited PUBLIC access and grant execution only to `authenticated`.
 The empty-database and rollback rehearsals match the current R0-R9 inventory.
 
@@ -56,7 +56,9 @@ The focused R2B activity-task migration review passed 7 tests, including
 required tables, RLS, deny policies, organization-scoped history, indexes, and
 append-only posture. The focused R3 intake migration review also passed 7 tests,
 and the focused R2B CRM foundation migration review passed 7 tests. The
-complete unit suite now passes 129 files and 2,332 tests.
+complete unit suite previously passed 142 files and 2,386 tests. The latest full
+run was interrupted after two minutes without progress; focused tests and all
+static gates pass for the current lead-create correction.
 
 The focused R2A lead-command migration review passed 8 tests, including raw
 table revocation for all runtime roles, consent and idempotency checks, fixed
@@ -71,8 +73,17 @@ access. Its reviewed migration is applied in the local rehearsal database.
 The focused R3 scorecard migration review passed 8 tests, including
 organization-scoped intake and candidate links, weighted criteria, unique
 scorer entries, immutable replacement history, bounded scores, and deny-first
-raw access. The migration remains unapplied until local Supabase and Docker
-access returns.
+raw access. The migration is applied in the local rehearsal database.
+
+The focused R3 candidate-transition migration review passed 3 tests. The
+elevated local rehearsal passed 2 tests for lifecycle transitions, replay,
+optimistic revisions, approval-bound reactivation, and cross-organization
+denial. The migration is applied in the local rehearsal database.
+
+The focused R3 candidate-add migration review passed 3 tests. The elevated
+local rehearsal passed 2 tests for replay, the initial five-candidate cap,
+review-only additions, and cross-organization denial. The migration is applied
+in the local rehearsal database.
 
 The focused R3 workspace migration review passed 8 tests, including
 organization-scoped intake and workspace links, bounded snapshots, revision
@@ -130,7 +141,7 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 ## Open threads
 - Submit dbac05f after exact remote-write approval. Close the late PR 8 and PR 9 findings after remote validation.
 - Integrate the local evaluation foundation only after its stable-ID prerequisite and remote checks pass.
-- R1.6 invitation database adapters now fail closed until reviewed SQL functions exist; complete target-environment wiring and evidence.
+- R1.6 invitation database commands now call reviewed token-free SQL functions with permission checks, receipts, and audit records; target-environment wiring and evidence remain open.
 - Complete R1.8 target-environment evidence and browser evidence.
 - Narrow platform allows to platform scope before mutation access opens. See the owning plan's command decisions.
 - Keep recovery disabled until stable identity bindings, verified factors, contact preparation, audited commands, and all recovery tests pass.
@@ -147,12 +158,16 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - RLS remains enabled on every application table. Request access uses fixed functions and a request-scoped public client.
 - The restricted direct PostgreSQL worker has no raw table access. Worker delivery is locally verified but not activated in a target environment.
 - Customer and vendor routes have guard foundations. CRM, workflow, finance, and operations foundations are additive and deny-first.
-- R2B now includes strict search, duplicate-review, activity-history, and task-transition contracts. CRM database adapters remain fail-closed until reviewed SQL functions and integration evidence exist.
+- R2B now includes strict search, duplicate-review, activity-history, and task-transition contracts. CRM contact and product writes use reviewed fixed RPCs with authenticated local isolation evidence.
 - R2B vendor evidence now has strict source, fact, evidence-version, approval, freshness, and expiring-override contracts. Persistence and approval commands remain fail-closed.
 - R2B controlled exports now require a same-organization approval, allow only resource-specific fields, redact all other row fields, and emit an audit record.
-- CRM command functions now accept an injected reviewed adapter and validate operation, organization, revision, outcome, and correlation fields. The default path still fails closed without an adapter.
+- R2B CRM export requests and decisions now use fixed audited RPCs with explicit `audit.export` approval, self-approval denial, replay receipts, and closed raw tables.
+- R2B vendor evidence now has fixed audited record and approval RPCs with exact organization scope, draft-to-published approval, replay receipts, and closed raw tables.
+- R2A lead routing now has a fixed audited command with active-owner membership checks, terminal-state protection, replay receipts, and exact organization scope.
+- CRM command functions use fixed reviewed RPCs by default, with optional injected adapters for tests and replacements. They validate operation, organization, revision, outcome, and correlation fields.
+- The current local CRM, vendor-evidence, and lead-routing packages pass focused unit and authenticated isolation rehearsals. The previous complete unit suite passed 142 files and 2,386 tests. Type checking, lint, production build, integration-matrix, secret scan, and diff check pass locally; the latest full run was interrupted after two minutes without progress.
 - Public claims and commission copy still need approved evidence before release.
-- Drizzle metadata is reconciled with all 26 checked-in migrations. Review the generated ledger before any target deployment.
+- Drizzle metadata is reconciled with all 34 checked-in migrations. Review the generated ledger before any target deployment.
 - A provider-neutral server-only AI service boundary, immutable run-record
   contract, approval transition checks, and fixture tests now exist. Database
   storage, provider evaluation, and target environment evidence remain open.
@@ -161,6 +176,9 @@ Permission-protected home, admin, customer, and vendor route foundations are act
 - R3 candidate lifecycle transitions now enforce allowed paths, positive expected revisions, terminal selected and archived states, and approval-bound reactivation.
 - R3 intake now has immutable snapshots, strict organization-scoped requirements, submission prerequisites, and revision-checked status transitions.
 - R2B deals now have strict organization scope, stage and status alignment, forward-only transitions, terminal outcomes, optimistic revisions, and immutable history.
+- R2A lead capture now uses a private implementation with isolated parameter names behind the stable public RPC, removing the authenticated `idempotency_key` ambiguity while preserving replay and audit behavior.
+- R3 scorecard entry persistence now uses a fixed organization-scoped RPC with scorer binding, optimistic revision checks, replay receipts, and immutable entry history.
+- R3 candidate lifecycle transitions now use a fixed organization-scoped RPC with replay receipts, optimistic revisions, and approval-bound reactivation.
 - R2B activity and task persistence now has an additive deny-first migration with organization-scoped tables and append-only task history; application remains unverified until local Supabase access returns.
 - R3 workspace controls now validate scoped snapshots, participant status timestamps, immutable comments, and customer filtering of internal comments.
 - R4 workflow persistence now has an additive deny-first schema for RFP versions, inbound email, immutable documents, communications, jobs, and job attempts; application and provider integration remain unverified.

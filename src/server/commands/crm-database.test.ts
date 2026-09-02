@@ -52,7 +52,8 @@ const productInput = {
   description: null,
   idempotencyKey,
 };
-const supabase = {} as RequestSupabaseClient;
+const rpc = vi.fn();
+const supabase = { rpc } as unknown as RequestSupabaseClient;
 const context = {
   supabase,
   identityId: actorId,
@@ -63,6 +64,7 @@ const context = {
 
 describe("CRM database command boundary", () => {
   beforeEach(() => {
+    rpc.mockReset();
     vi.mocked(requirePermission).mockReset().mockResolvedValue(context);
   });
 
@@ -118,10 +120,34 @@ describe("CRM database command boundary", () => {
     await expect(createProduct(productInput, { supabase })).rejects.toBeInstanceOf(AuthorizationError);
   });
 
-  test("fails closed after exact organization authorization because reviewed CRM RPCs are absent", async () => {
+  test("calls the fixed contact RPC after exact organization authorization", async () => {
+    rpc.mockResolvedValue({
+      data: {
+        operation: "create_contact",
+        recordId: contactId,
+        organizationId,
+        revision: 1,
+        outcomeCode: "created",
+        correlationId,
+      },
+      error: null,
+    });
+
+    await expect(createContact(contactInput, { supabase })).resolves.toMatchObject({
+      operation: "create_contact", recordId: contactId,
+    });
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_create_contact", {
+      payload: createContactInputSchema.parse(contactInput),
+      correlation_id: correlationId,
+      idempotency_key: idempotencyKey,
+    });
+  });
+
+  test("maps a fixed CRM RPC error to a generic rejected command", async () => {
+    rpc.mockResolvedValue({ data: null, error: new Error("private database detail") });
     await expect(createContact(contactInput, { supabase })).rejects.toMatchObject({
       name: CrmDatabaseCommandError.name,
-      code: "UNAVAILABLE",
+      code: "REJECTED",
       message: "CRM command could not be completed",
     });
     expect(requirePermission).toHaveBeenCalledExactlyOnceWith(

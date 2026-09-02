@@ -112,6 +112,7 @@ describe("invitation administration contract", () => {
   test("revokes a pending invitation and preserves its reason", () => {
     const plan = prepareInvitationCreate(input, options);
     const revoked = revokeInvitation(plan.record, {
+      organizationId,
       invitationId,
       actorIdentityId: actorId,
       reason: "The access request changed",
@@ -120,6 +121,7 @@ describe("invitation administration contract", () => {
     }, options);
     expect(revoked.record).toMatchObject({ status: "revoked", revokedByIdentityId: actorId, revokedReason: "The access request changed" });
     expect(() => revokeInvitation(revoked.record, {
+      organizationId,
       invitationId,
       actorIdentityId: actorId,
       reason: "Duplicate revoke",
@@ -131,6 +133,7 @@ describe("invitation administration contract", () => {
   test("resend revokes before preparing one replacement intent", () => {
     const plan = prepareInvitationCreate(input, options);
     const resent = resendInvitation(plan.record, {
+      organizationId,
       invitationId,
       actorIdentityId: actorId,
       reason: "The previous notice expired from the inbox",

@@ -21,11 +21,17 @@ export const crmSearchStatuses = [
   "paused",
   "closed",
   "draft",
+  "lead",
+  "discovery",
   "qualified",
   "evaluation",
   "proposal",
   "selected",
   "contracted",
+  "selection",
+  "contracting",
+  "won",
+  "lost",
   "archived",
 ] as const;
 export type CrmSearchStatus = (typeof crmSearchStatuses)[number];

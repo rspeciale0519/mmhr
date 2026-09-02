@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const migration = readFileSync(join(process.cwd(), "drizzle", "0011_r2b_lead_command.sql"), "utf8");
+const correction = readFileSync(join(process.cwd(), "drizzle", "0033_r2a_lead_create_ambiguity_fix.sql"), "utf8");
 
 describe("R2A lead command migration review", () => {
   test("adds organization, routing, replay, and correlation fields", () => {
@@ -61,5 +62,12 @@ describe("R2A lead command migration review", () => {
     expect(migration).toContain("FROM PUBLIC, anon, authenticated, service_role, mmhr_worker;");
     expect(migration).toContain("GRANT EXECUTE ON FUNCTION public.mmhr_create_lead");
     expect(migration).toContain("TO anon, authenticated;");
+  });
+
+  test("corrective migration isolates public argument names from SQL columns", () => {
+    expect(correction).toContain("CREATE FUNCTION mmhr_private.r2a_create_lead_impl(");
+    expect(correction).toContain("WHERE l.idempotency_key = p_idempotency_key");
+    expect(correction).toContain("CREATE OR REPLACE FUNCTION public.mmhr_create_lead(");
+    expect(correction).toContain("RETURNING * INTO new_lead");
   });
 });

@@ -659,15 +659,15 @@ Every PRD requirement appears exactly once below.
 | FR-INT-01 | Missing | R3 | PO + OPS | G1 |
 | FR-INT-02 | Missing | R3 | PO + OPS | G1 |
 | FR-INT-03 | Missing | R3 | PO + OPS | G1 |
-| FR-INT-04 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-01 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-02 | Missing | R3 | PO + OPS | G1 |
+| FR-INT-04 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-02 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-03 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-04 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-05 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-06 | Partial | R3 | PO + OPS | E2 |
 | FR-EVL-07 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-08 | Missing | R3 | PO + OPS | G1 |
+| FR-EVL-08 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-09 | Missing | R3 | PO + OPS | G1 |
 | FR-EVL-10 | Missing | R3 | PO + OPS | G1 |
 | FR-MAT-01 | Missing | R3 | PO + OPS | G1 |

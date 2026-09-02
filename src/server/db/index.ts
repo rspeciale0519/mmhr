@@ -5,6 +5,8 @@ import * as audit from "./schema/audit";
 import * as aiRun from "./schema/ai-run";
 import * as crm from "./schema/crm";
 import * as crmActivity from "./schema/crm-activity";
+import * as crmExport from "./schema/crm-export";
+import * as crmDuplicate from "./schema/crm-duplicate";
 import * as crmWorkflow from "./schema/crm-workflow";
 import * as workflowFoundation from "./schema/workflow-foundation";
 import * as identity from "./schema/identity";
@@ -24,6 +26,8 @@ export const schema = {
   ...aiRun,
   ...crm,
   ...crmActivity,
+  ...crmExport,
+  ...crmDuplicate,
   ...crmWorkflow,
   ...workflowFoundation,
   ...identity,
@@ -55,6 +59,8 @@ export * from "./schema/audit";
 export * from "./schema/ai-run";
 export * from "./schema/crm";
 export * from "./schema/crm-activity";
+export * from "./schema/crm-export";
+export * from "./schema/crm-duplicate";
 export * from "./schema/crm-workflow";
 export * from "./schema/workflow-foundation";
 export * from "./schema/identity";

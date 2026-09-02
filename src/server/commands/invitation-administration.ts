@@ -49,12 +49,14 @@ export type ExpireInvitationInput = z.input<typeof expireInvitationInputSchema>;
 
 export const revokeInvitationInputSchema = z.strictObject({
   ...commandMetadata,
+  organizationId: securityUuidSchema,
   invitationId: securityUuidSchema,
 });
 export type RevokeInvitationInput = z.input<typeof revokeInvitationInputSchema>;
 
 export const resendInvitationInputSchema = z.strictObject({
   ...commandMetadata,
+  organizationId: securityUuidSchema,
   invitationId: securityUuidSchema,
 });
 export type ResendInvitationInput = z.input<typeof resendInvitationInputSchema>;

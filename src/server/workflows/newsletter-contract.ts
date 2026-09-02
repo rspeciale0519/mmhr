@@ -2,6 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
+import { getConfiguredNewsletterService } from "./beehiiv-newsletter-service";
+
 const normalizedEmailSchema = z.string().trim().toLowerCase().pipe(z.email().max(254));
 const consentTimestampSchema = z.iso.datetime({ offset: true })
   .transform((value) => new Date(value).toISOString())
@@ -42,7 +44,7 @@ export interface NewsletterService {
   ): Promise<NewsletterRegistrationResult>;
 }
 
-/** No provider is configured yet, so public writes fail closed without a network call. */
+/** Missing provider configuration still fails closed without a network call. */
 export const unavailableNewsletterService: NewsletterService = {
   async addOrUpdateSubscriber(): Promise<NewsletterRegistrationResult> {
     throw new NewsletterServiceError("UNAVAILABLE");
@@ -61,7 +63,7 @@ export async function registerNewsletterSubscriber(
   const parsed = newsletterRegistrationInputSchema.safeParse(input);
   if (!parsed.success) throw new NewsletterServiceError("INVALID_INPUT");
 
-  const result = await (options.service ?? unavailableNewsletterService).addOrUpdateSubscriber(parsed.data);
+  const result = await (options.service ?? getConfiguredNewsletterService()).addOrUpdateSubscriber(parsed.data);
   const validated = newsletterRegistrationResultSchema.safeParse(result);
   if (!validated.success) throw new NewsletterServiceError("INVALID_RESPONSE");
   return validated.data;

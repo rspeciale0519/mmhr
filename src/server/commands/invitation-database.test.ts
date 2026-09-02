@@ -1,5 +1,11 @@
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import {
+  AuthorizationError,
+  requirePermission,
+  type AuthorizationContext,
+  type RequestSupabaseClient,
+} from "@/server/auth/authorization";
 import {
   acceptInvitation,
   createInvitation,
@@ -9,6 +15,16 @@ import {
   resendInvitation,
   revokeInvitation,
 } from "./invitation-database";
+
+vi.mock("@/server/auth/authorization", () => {
+  class MockAuthorizationError extends Error {
+    constructor() {
+      super("Request is not authorized");
+      this.name = "AuthorizationError";
+    }
+  }
+  return { AuthorizationError: MockAuthorizationError, requirePermission: vi.fn() };
+});
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
 const actorId = "22222222-2222-4222-8222-222222222222";
@@ -37,23 +53,113 @@ const commandInputs = {
     correlationId,
   },
   expire: { invitationId, occurredAt: "2026-09-03T12:00:00.000Z", correlationId },
-  revoke: { invitationId, actorIdentityId: actorId, reason: "Access changed", idempotencyKey, correlationId },
-  resend: { invitationId, actorIdentityId: actorId, reason: "Please send again", idempotencyKey, correlationId },
+  revoke: { organizationId, invitationId, actorIdentityId: actorId, reason: "Access changed", idempotencyKey, correlationId },
+  resend: { organizationId, invitationId, actorIdentityId: actorId, reason: "Please send again", idempotencyKey, correlationId },
 } as const;
 
+const result = {
+  invitationId,
+  status: "pending" as const,
+  outcome: "created" as const,
+  correlationId,
+};
+const rpc = vi.fn();
+const supabase = { rpc } as unknown as RequestSupabaseClient;
+const context = {
+  supabase,
+  identityId: actorId,
+  scope: { kind: "organization", organizationId },
+  assurance: "aal2",
+  correlationId,
+} as const satisfies AuthorizationContext;
+
 describe("invitation database command boundary", () => {
-  test.each([
-    ["create", () => createInvitation(commandInputs.create)],
-    ["accept", () => acceptInvitation(commandInputs.accept)],
-    ["expire", () => expireInvitation(commandInputs.expire)],
-    ["revoke", () => revokeInvitation(commandInputs.revoke)],
-    ["resend", () => resendInvitation(commandInputs.resend)],
-  ])("fails closed when the %s SQL command is unavailable", async (_, invoke) => {
-    await expect(invoke()).rejects.toMatchObject({
+  beforeEach(() => {
+    vi.mocked(requirePermission).mockReset().mockResolvedValue(context);
+    rpc.mockReset().mockResolvedValue({ data: result, error: null });
+  });
+
+  test("calls the reviewed create RPC after exact organization authorization", async () => {
+    await expect(createInvitation(createInput, { supabase })).resolves.toEqual(result);
+    expect(requirePermission).toHaveBeenCalledExactlyOnceWith(
+      "org.members.invite",
+      { kind: "organization", organizationId },
+      { supabase },
+    );
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_create_invitation", {
+      organization_id: organizationId,
+      email: "person@example.com",
+      role_key: "contributor",
+      reason: createInput.reason,
+      correlation_id: correlationId,
+      idempotency_key: idempotencyKey,
+    });
+  });
+
+  test("uses revoke permission and preserves the organization boundary", async () => {
+    await expect(revokeInvitation(commandInputs.revoke, { supabase })).resolves.toEqual(result);
+    expect(requirePermission).toHaveBeenCalledExactlyOnceWith(
+      "org.members.revoke",
+      { kind: "organization", organizationId },
+      { supabase },
+    );
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_revoke_invitation", expect.objectContaining({
+      organization_id: organizationId,
+      invitation_id: invitationId,
+    }));
+  });
+
+  test("uses invite permission for resend and calls the fixed RPC", async () => {
+    await expect(resendInvitation(commandInputs.resend, { supabase })).resolves.toEqual(result);
+    expect(requirePermission).toHaveBeenCalledExactlyOnceWith(
+      "org.members.invite",
+      { kind: "organization", organizationId },
+      { supabase },
+    );
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_resend_invitation", expect.objectContaining({
+      organization_id: organizationId,
+      invitation_id: invitationId,
+    }));
+  });
+
+  test("calls acceptance and expiry RPCs without trusting a client actor", async () => {
+    await expect(acceptInvitation(commandInputs.accept, { supabase })).resolves.toEqual(result);
+    expect(rpc).toHaveBeenLastCalledWith("mmhr_accept_invitation", expect.objectContaining({
+      invitation_id: invitationId,
+      verified_email: "person@example.com",
+    }));
+    await expect(expireInvitation(commandInputs.expire, { supabase })).resolves.toEqual(result);
+    expect(rpc).toHaveBeenLastCalledWith("mmhr_expire_invitation", {
+      invitation_id: invitationId,
+      occurred_at: commandInputs.expire.occurredAt,
+      correlation_id: correlationId,
+    });
+    expect(requirePermission).not.toHaveBeenCalled();
+  });
+
+  test("rejects an actor mismatch before the RPC", async () => {
+    await expect(createInvitation({ ...createInput, actorIdentityId: identityId }, { supabase }))
+      .rejects.toBeInstanceOf(AuthorizationError);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  test("preserves an authorization denial and never reaches the RPC", async () => {
+    vi.mocked(requirePermission).mockRejectedValue(new AuthorizationError());
+    await expect(createInvitation(createInput, { supabase })).rejects.toBeInstanceOf(AuthorizationError);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  test("maps RPC failures and malformed responses without exposing details", async () => {
+    rpc.mockResolvedValueOnce({ data: null, error: { message: "private database detail" } });
+    await expect(createInvitation(createInput, { supabase })).rejects.toMatchObject({
       name: InvitationDatabaseCommandError.name,
-      code: "UNAVAILABLE",
+      code: "REJECTED",
       message: "Invitation command could not be completed",
     });
+    rpc.mockResolvedValueOnce({ data: { invitationId }, error: null });
+    await expect(createInvitation(createInput, { supabase })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+    rpc.mockRejectedValueOnce(new Error("network detail"));
+    await expect(createInvitation(createInput, { supabase })).rejects.toMatchObject({ code: "UNAVAILABLE" });
   });
 
   test.each([
@@ -62,13 +168,17 @@ describe("invitation database command boundary", () => {
     ["expire", { ...commandInputs.expire, occurredAt: "invalid" }],
     ["revoke", { ...commandInputs.revoke, reason: "" }],
     ["resend", { ...commandInputs.resend, invitationId: "invalid" }],
-  ] as const)("rejects invalid %s input before the unavailable result", async (operation, input) => {
-    const result = executeInvitationDatabaseCommand({ operation, input } as never);
-    await expect(result).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  ] as const)("rejects invalid %s input before authorization", async (operation, input) => {
+    const commandResult = executeInvitationDatabaseCommand({ operation, input } as never, { supabase });
+    await expect(commandResult).rejects.toMatchObject({ code: "INVALID_INPUT" });
+    expect(requirePermission).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
   });
 
   test("rejects an unknown operation without attempting a database call", async () => {
-    const result = executeInvitationDatabaseCommand({ operation: "delete", input: {} } as never);
-    await expect(result).rejects.toMatchObject({ code: "INVALID_INPUT" });
+    const commandResult = executeInvitationDatabaseCommand({ operation: "delete", input: {} } as never, { supabase });
+    await expect(commandResult).rejects.toMatchObject({ code: "INVALID_INPUT" });
+    expect(requirePermission).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
   });
 });

@@ -20,6 +20,14 @@ phone evidence, or recovery approvals.
 | Recovery and MFA reset controls | `src/server/db/r1-recovery-mfa.integration.test.ts`, `src/server/db/r1-recovery-mfa-api.integration.test.ts`, recovery command tests |
 | Restricted identity worker | `src/server/db/r1-identity-worker.integration.test.ts`, `scripts/r1-with-local-worker.mjs` |
 | Source and import boundaries | `src/server/auth/security-source-contract.test.ts`, `src/server/auth/authorization-boundaries.test.ts` |
+| CRM contact, product, and search boundaries | `src/server/commands/crm-database.ts`, `src/server/commands/crm-search-database.ts`, CRM migration and isolation tests |
+| CRM export approvals | `src/server/commands/crm-export-database.ts`, `drizzle/0029_r2b_crm_exports.sql`, CRM export migration and isolation tests |
+| CRM duplicate review | `src/server/commands/crm-duplicate-database.ts`, `drizzle/0030_r2b_crm_duplicates.sql`, CRM duplicate migration and isolation tests |
+| Vendor evidence commands | `src/server/commands/vendor-evidence-database.ts`, `drizzle/0031_r2b_vendor_evidence_commands.sql`, vendor evidence migration and isolation tests |
+| Lead routing and capture | `src/server/commands/lead-routing.ts`, `drizzle/0032_r2a_lead_routing.sql`, `drizzle/0033_r2a_lead_create_ambiguity_fix.sql`, lead routing migration and isolation tests |
+| Scorecard entry persistence | `src/server/commands/scorecard-database.ts`, `drizzle/0034_r3_scorecard_entry_commands.sql`, scorecard entry migration and isolation tests |
+| Candidate lifecycle transitions | `src/server/commands/candidate-transition.ts`, `drizzle/0035_r3_candidate_transition_commands.sql`, candidate transition migration and isolation tests |
+| Candidate intake additions | `src/server/commands/candidate-add.ts`, `drizzle/0036_r3_candidate_add_commands.sql`, candidate add migration and isolation tests |
 
 ## Local check record
 
@@ -44,7 +52,7 @@ binding and passed 21 files and 592 tests. The local stack uses ports 57021
 through 57029. This evidence remains local and does not prove target or
 production readiness.
 
-The latest complete unit suite passed 129 files and 2,332 tests after the
+The latest complete unit suite passed 132 files and 2,351 tests after the
 Next.js 16.3.4 upgrade and the R8 renewal, onboarding, project-plan, analytics,
 approval-queue, outcome, customer-journey, vendor-performance, operations report,
 audit-viewer, R9 deployment-smoke, R5 AI routing and fixture-evaluation, R3
@@ -52,6 +60,11 @@ intake, R2B deal-lifecycle, R2A lead-command, R2B deal and vendor-evidence,
 R3 scorecard and workspace, R5 AI run-record, R6 demo, proposal, and
 contract-handoff, R7 finance, R8 customer-success and operations, and R9
 evidence persistence changes.
+
+The CRM command package passed fixed-RPC and authenticated isolation rehearsals.
+The CRM search package passed redaction, scope, paging, and malformed-input
+tests. The local ledger now applies 30 checked-in migrations through
+`drizzle/0029_r2b_crm_exports.sql`.
 
 The focused R3 intake migration review suite passed 7 tests. It checks the
 required tables, RLS, deny policies, organization-scoped requirement and
@@ -142,12 +155,13 @@ evaluation results without retaining raw provider output.
 
 ## 2026-09-01 local completion record
 
-The local Supabase stack applied all 26 checked-in migrations through
-`drizzle/0025_r1_public_function_acl_repair.sql`.
+The local Supabase stack applied all 30 checked-in migrations through
+`drizzle/0029_r2b_crm_exports.sql`.
 
 The complete integration suite passed 21 files and 592 tests.
 
-The full unit suite passed 129 files and 2,332 tests.
+The expanded unit run exercised 134 files and 2,359 tests. Two stale matrix
+assertions were corrected, and the affected tests passed in focused reruns.
 
 Type checking, lint, the production build, integration-matrix check, secret
 scan, Drizzle schema check, and diff check passed.
