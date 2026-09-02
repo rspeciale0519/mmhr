@@ -36,7 +36,7 @@ phone evidence, or recovery approvals.
 | Comparison export controls | `src/server/commands/comparison-export.ts`, `drizzle/0042_r3_comparison_export_commands.sql`, comparison export migration and isolation tests |
 | Duplicate product review | `src/server/commands/duplicate-product-review.ts`, `drizzle/0043_r3_duplicate_product_review.sql`, duplicate product migration and isolation tests |
 | Matching rule preview | `src/server/commands/matching-rule-preview.ts`, `drizzle/0044_r3_matching_rule_preview.sql`, matching rule preview migration review |
-| Scorecard aggregate view | `src/server/commands/scorecard-view.ts`, `drizzle/0045_r3_scorecard_view.sql`, scorecard view migration review |
+| Scorecard aggregate view | `src/server/commands/scorecard-view.ts`, `drizzle/0045_r3_scorecard_view.sql`, scorecard view migration review and authenticated isolation rehearsal |
 
 ## Local check record
 

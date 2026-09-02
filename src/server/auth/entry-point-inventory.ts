@@ -696,7 +696,7 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     permission: "workspace.access; exact organization scope",
     scope: "one organization and scorecard",
     dataPath: "strict view DTO; fixed audited RPC; weighted aggregate and individual entries",
-    denialEvidence: "scorecard-view.test.ts; scorecard view migration review",
+    denialEvidence: "scorecard-view.test.ts; scorecard view migration review and authenticated isolation rehearsal",
   },
   {
     key: "src/trigger/health.ts#health-check",
