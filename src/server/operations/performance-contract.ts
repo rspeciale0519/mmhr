@@ -15,8 +15,8 @@ export const performanceMeasurementSchema = z.strictObject({
   route,
   measuredAt: timestamp,
   sampleCount: z.number().int().positive().max(100_000),
-  lcpP75Ms: z.number().finite().nonnegative().max(60_000),
-  inpP75Ms: z.number().finite().nonnegative().max(60_000),
+  lcpP75Ms: z.number().int().nonnegative().max(60_000),
+  inpP75Ms: z.number().int().nonnegative().max(60_000),
 });
 
 export type PerformanceMeasurement = z.output<typeof performanceMeasurementSchema>;

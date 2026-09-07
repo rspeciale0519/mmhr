@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 
 const migration = readFileSync("drizzle/0029_r2b_crm_exports.sql", "utf8");
+const schema = readFileSync("src/server/db/schema/crm-export.ts", "utf8");
 
 describe("R2B CRM export migration review", () => {
   test("creates scoped request and decision records", () => {
@@ -31,4 +32,5 @@ describe("R2B CRM export migration review", () => {
     expect(migration).toContain("REVOKE ALL ON TABLE public.crm_export_requests, public.crm_export_decisions");
     expect(migration).toContain("GRANT EXECUTE ON FUNCTION public.mmhr_create_crm_export_request(jsonb,uuid,uuid),");
   });
+  test("keeps request and decision constraints aligned", () => { for (const name of ["crm_export_requests_fields_ck", "crm_export_requests_purpose_ck", "crm_export_requests_state_ck", "crm_export_decisions_reason_ck", "crm_export_decisions_export_fk"]) expect(schema).toContain(name); });
 });

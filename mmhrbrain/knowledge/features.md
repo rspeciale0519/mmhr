@@ -2,7 +2,7 @@
 kind: knowledge
 slug: features
 status: current
-updated: 2026-08-28
+updated: 2026-09-03
 layer: reference
 sources:
   - docs/PRD.md
@@ -28,8 +28,8 @@ sources:
 
 # Features — Evidence-Gated Build Status
 
-The v2 roadmap audit classifies all 148 requirement identifiers. It found 5
-Implemented, 22 Partial, 119 Missing, 1 Deferred, and 1 Open.
+The v2 roadmap audit classifies all 148 requirement identifiers. The current
+roadmap records 6 Implemented, 141 Partial, 0 Missing, 1 Deferred, and 0 Open.
 
 Use the roadmap traceability matrix for per-requirement evidence and ownership.
 

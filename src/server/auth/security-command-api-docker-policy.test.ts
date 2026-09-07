@@ -89,6 +89,28 @@ describe("scratch Docker API write policy", () => {
     expect(() => policy.evaluate({ ...start, target: "/containers/supabase_db_mmhr/start" })).toThrow("foreign_container");
   });
 
+  test("allows the CLI secret archive only for a registered container root", () => {
+    const policy = createDockerGuardPolicy(scope);
+    const id = "c".repeat(64);
+    policy.registerContainer(Buffer.from(JSON.stringify({ Id: id })));
+    const archive = { method: "PUT", target: `/containers/${id}/archive?path=%2F`, body: Buffer.from("tar") };
+    expect(policy.evaluate(archive).body.toString()).toBe("tar");
+    expect(policy.evaluate({ ...archive, method: "POST", target: `/containers/${id}/archive` }).body.toString()).toBe("tar");
+    expect(policy.evaluate({ ...archive, method: "HEAD", target: `/containers/${id}/archive?path=%2F` }).body.toString()).toBe("tar");
+    expect(policy.evaluate({ ...archive, target: `/containers/${id.slice(0, 12)}/archive?path=%2F` }).body.toString()).toBe("tar");
+    expect(policy.evaluate({ ...archive, target: `/containers/${name}/archive?path=%2F` }).body.toString()).toBe("tar");
+    expect(() => policy.evaluate({ ...archive, target: `/containers/${id}/archive?path=%2Ftmp` })).toThrow("unsafe_archive_path");
+    expect(() => policy.evaluate({ ...archive, target: `/containers/${"d".repeat(64)}/archive?path=%2F` })).toThrow("foreign_container");
+  });
+
+  test("allows only project-owned container attach requests", () => {
+    const policy = createDockerGuardPolicy(scope);
+    const attach = { method: "POST", target: `/containers/${name}/attach?stream=1&stdout=1&stderr=1`, body: Buffer.alloc(0) };
+    expect(policy.evaluate(attach).body.length).toBe(0);
+    expect(() => policy.evaluate({ ...attach, target: `/containers/${"d".repeat(64)}/attach` })).toThrow("foreign_container");
+    expect(() => policy.evaluate({ ...attach, method: "GET" })).toThrow("unsupported_endpoint");
+  });
+
   test("allows cleanup only with the exact generated project filter", () => {
     const policy = createDockerGuardPolicy(scope);
     const filter = JSON.stringify({ label: [`com.supabase.cli.project=${projectId}`] });

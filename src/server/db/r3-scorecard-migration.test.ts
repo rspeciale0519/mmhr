@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const migration = readFileSync(join(process.cwd(), "drizzle", "0017_r3_scorecard_persistence.sql"), "utf8");
+const schema = readFileSync(join(process.cwd(), "src", "server", "db", "schema", "r3-scorecard.ts"), "utf8");
 
 describe("R3 scorecard migration review", () => {
   test("creates scorecards, criteria, current entries, and immutable history", () => {
@@ -53,5 +54,11 @@ describe("R3 scorecard migration review", () => {
     expect(migration).toContain("scorecards_configuration_version_ck");
     expect(migration).toContain("scorecards_revision_ck");
     expect(migration).toContain("scorecards_candidate_uq");
+  });
+
+  test("keeps Drizzle scorecard scope and evidence constraints aligned", () => {
+    for (const name of ["scorecards_intake_scope_fk", "scorecards_candidate_scope_fk", "scorecard_criteria_scorecard_scope_fk", "scorecard_entries_scorecard_scope_fk", "scorecard_entries_criterion_scope_fk", "scorecard_entries_evidence_ck", "scorecard_entry_history_scorecard_scope_fk", "scorecard_entry_history_criterion_scope_fk", "scorecard_entry_history_evidence_ck"]) {
+      expect(schema).toContain(name);
+    }
   });
 });

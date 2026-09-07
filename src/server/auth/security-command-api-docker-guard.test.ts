@@ -17,7 +17,7 @@ const headerName = "x-mmhr-scratch-guard";
 type Guard = Awaited<ReturnType<typeof startScratchDockerGuard>>;
 type RecordedRequest = { method: string; target: string; body: string; hasGuardHeader: boolean };
 
-function simulatedDocker(reply?: { status?: number; error?: boolean }) {
+function simulatedDocker(reply?: { status?: number; error?: boolean; delayedWaitBodyMs?: number }) {
   const recorded: RecordedRequest[] = [];
   const send = ((options: RequestOptions, receive: (response: IncomingMessage) => void) => {
     const stream = new PassThrough({ autoDestroy: false });
@@ -32,10 +32,20 @@ function simulatedDocker(reply?: { status?: number; error?: boolean }) {
       queueMicrotask(() => {
         if (reply?.error) { stream.destroy(new Error("private upstream diagnostic")); return; }
         const create = options.path?.startsWith("/containers/create");
-        const response = Readable.from([JSON.stringify(create ? { Id: containerId } : { message: "not found" })]) as IncomingMessage;
-        response.statusCode = reply?.status ?? (create ? 201 : 404);
+        const wait = options.path?.includes("/wait");
+        const responseBody = JSON.stringify(create ? { Id: containerId } : wait ? { StatusCode: 0 } : { message: "not found" });
+        const response = wait && reply?.delayedWaitBodyMs
+          ? new PassThrough() as unknown as IncomingMessage
+          : Readable.from([responseBody]) as IncomingMessage;
+        response.statusCode = reply?.status ?? (create ? 201 : wait ? 200 : 404);
         response.headers = { "content-type": "application/json" };
         receive(response);
+        if (wait && reply?.delayedWaitBodyMs) {
+          setTimeout(() => {
+            response.push(responseBody);
+            response.push(null);
+          }, reply.delayedWaitBodyMs);
+        }
       });
     });
     return Object.assign(stream, { setTimeout: () => stream }) as unknown as ClientRequest;
@@ -43,7 +53,9 @@ function simulatedDocker(reply?: { status?: number; error?: boolean }) {
   return { send, recorded };
 }
 
-async function withGuard(run: (guard: Guard, recorded: RecordedRequest[]) => Promise<void>, reply?: { status?: number; error?: boolean }) {
+async function withGuard(run: (guard: Guard, recorded: RecordedRequest[]) => Promise<void>, reply?: {
+  status?: number; error?: boolean; delayedWaitBodyMs?: number;
+}) {
   const scratchRoot = await mkdtemp(path.join(tmpdir(), "mmhr-r1-guard-test-"));
   const docker = simulatedDocker(reply);
   const guard = await startScratchDockerGuard({
@@ -57,7 +69,9 @@ async function withGuard(run: (guard: Guard, recorded: RecordedRequest[]) => Pro
   }
 }
 
-function sendToGuard(guard: Guard, options: { method?: string; target?: string; body?: unknown; credential?: string | null } = {}) {
+function sendToGuard(guard: Guard, options: {
+  method?: string; target?: string; body?: unknown; credential?: string | null; headersOnly?: boolean;
+} = {}) {
   const endpoint = guard.environment.DOCKER_HOST;
   const socketPath = endpoint.startsWith("npipe:")
     ? `\\\\.\\pipe\\${endpoint.split("/").at(-1)}`
@@ -71,6 +85,12 @@ function sendToGuard(guard: Guard, options: { method?: string; target?: string; 
       socketPath, path: options.target ?? `/v1.51/containers/${name}/json`, method: options.method ?? "GET",
       agent: false, headers: { ...(credential === null ? {} : { [headerName]: credential }), "content-length": Buffer.byteLength(body) },
     }, (incoming) => {
+      if (options.headersOnly) {
+        const status = incoming.statusCode ?? 0;
+        incoming.resume();
+        resolve({ status, body: "" });
+        return;
+      }
       const chunks: Buffer[] = [];
       incoming.on("data", (chunk: Buffer) => chunks.push(chunk));
       incoming.once("end", () => resolve({ status: incoming.statusCode ?? 0, body: Buffer.concat(chunks).toString() }));
@@ -129,6 +149,23 @@ describe("authenticated scratch Docker IPC guard", () => {
       expect((await sendToGuard(guard, { method: "POST", target: `/containers/${containerId}/start` })).status).toBe(404);
       expect(recorded).toHaveLength(3);
     });
+  });
+
+  test("flushes Docker wait headers before the long-lived response body", async () => {
+    await withGuard(async (guard) => {
+      await sendToGuard(guard);
+      guard.enableWritesAfterRoutingProbe();
+      expect((await sendToGuard(guard, {
+        method: "POST", target: `/containers/create?name=${name}`, body: createBody(),
+      })).status).toBe(201);
+      const result = await Promise.race([
+        sendToGuard(guard, {
+          method: "POST", target: `/containers/${containerId}/wait`, headersOnly: true,
+        }),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 50)),
+      ]);
+      expect(result).toEqual({ status: 200, body: "" });
+    }, { delayedWaitBodyMs: 250 });
   });
 
   test("does not forward unknown or unrelated writes after the routing probe", async () => {

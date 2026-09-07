@@ -1,6 +1,7 @@
+// @vitest-environment node
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 
 const root = process.cwd();
 
@@ -60,6 +61,10 @@ function executableSource() {
 }
 
 describe("R1 source security contract", () => {
+  // Read the repository once during fixture setup. Cold Windows filesystem
+  // reads must not consume the individual authorization assertion budgets.
+  beforeAll(() => { executableSource(); }, 30_000);
+
   test("scans each current executable configuration class", () => {
     const files = executableFiles().map(projectPath);
 

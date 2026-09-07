@@ -57,7 +57,12 @@ export function createDockerGuardPolicy(scope: Scope) {
 
   const projectName = (value: unknown): value is string => typeof value === "string" &&
     /^supabase_[a-z0-9_]+_mmhr-r1-[a-z0-9]+-[0-9a-f]{8}$/.test(value) && value.endsWith(`_${network.projectId}`);
-  const containerReference = (value: string) => containerIds.has(value) || projectName(value);
+  const registeredContainer = (value: string) => {
+    if (containerIds.has(value)) return true;
+    if (value.length < 12 || !/^[0-9a-f]+$/.test(value)) return false;
+    return [...containerIds].filter((id) => id.startsWith(value)).length === 1;
+  };
+  const containerReference = (value: string) => registeredContainer(value) || projectName(value);
   const imageReference = (value: string) => /^(?:public\.ecr\.aws\/supabase|ghcr\.io\/supabase|supabase)\/[a-z0-9_.-]+(?::[a-zA-Z0-9_.-]+|@sha256:[0-9a-f]{64})$/.test(value);
   function labels(value: unknown) {
     const actual = object(value);
@@ -144,19 +149,40 @@ export function createDockerGuardPolicy(scope: Scope) {
     const untouched = { body: request.body, captureCreatedContainer: false };
     if ((method === "GET" || method === "HEAD") && ["/_ping", "/version", "/info"].includes(route)) return untouched;
     if (method === "GET" && route === "/containers/json") { filteredToProject(url); return untouched; }
+    const attach = route.match(/^\/containers\/([^/]+)\/attach$/);
+    if (attach && method === "POST") {
+      const reference = decodeURIComponent(attach[1]!);
+      if (!containerReference(reference)) return denied("foreign_container");
+      return untouched;
+    }
     const container = route.match(/^\/containers\/([^/]+)\/(json|logs|wait|start|stop|kill)$/);
     if (container) {
       const reference = decodeURIComponent(container[1]!);
       if (!containerReference(reference)) return denied("foreign_container");
       if (method === "GET" && ["json", "logs"].includes(container[2]!)) return untouched;
       if (method === "POST" && ["wait", "start", "stop", "kill"].includes(container[2]!) &&
-        containerIds.has(reference)) return untouched;
-      return denied("unregistered_container_write");
+        registeredContainer(reference)) return untouched;
+      return denied(`unregistered_container_write:${method}:${container[2]}`);
+    }
+    // Supabase CLI uses Docker's archive endpoint to copy generated secrets
+    // into a newly created scratch container. Keep this write scoped to a
+    // container that this guard registered and to the exact root destination.
+    const archive = route.match(/^\/containers\/([^/]+)\/archive$/);
+    if (archive) {
+      const reference = decodeURIComponent(archive[1]!);
+      // Docker clients may address the container by its generated name after
+      // creation, so accept only a registered ID or a name owned by this
+      // scratch project. The CLI uses PUT; a few installed clients use POST.
+      if (!registeredContainer(reference) && !projectName(reference)) return denied("foreign_container");
+      if (!["HEAD", "PUT", "POST"].includes(method) || ![null, "/"].includes(url.searchParams.get("path"))) {
+        return denied("unsafe_archive_path");
+      }
+      return untouched;
     }
     const remove = route.match(/^\/containers\/([^/]+)$/);
     if (method === "DELETE" && remove) {
       const reference = decodeURIComponent(remove[1]!);
-      if (!containerIds.has(reference)) return denied("unregistered_container_write");
+      if (!registeredContainer(reference)) return denied(`unregistered_container_write:${method}:remove`);
       return untouched;
     }
     const image = route.match(/^\/images\/(.+)\/json$/);

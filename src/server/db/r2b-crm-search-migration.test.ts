@@ -28,4 +28,11 @@ describe("R2B CRM search migration review", () => {
     expect(migration).toContain("'label'");
     expect(migration).toContain("'status'");
   });
+
+  test("keeps the status contract aligned with resource output values", () => {
+    expect(migration).toContain("'retired','inactive'");
+    expect(migration).toContain("'lead','discovery','qualified','evaluation','proposal','selected','contracted'");
+    expect(migration).toContain("'selection','contracting','won','lost','archived'");
+    expect(migration).toContain("CASE WHEN p.status = 'open' THEN p.stage ELSE p.status END");
+  });
 });

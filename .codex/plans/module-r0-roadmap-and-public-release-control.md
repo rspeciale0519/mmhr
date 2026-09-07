@@ -74,6 +74,8 @@ Repository controls:
 - `/robots.txt` returns `Disallow: /` while the block is active.
 - `src/app/layout.tsx` keeps site-wide `noindex` and `nofollow` metadata.
 - Static build assets can load, but they do not expose an application page.
+- `.github/workflows/production-release-gate.yml` requires the complete R9
+  evidence manifest before a manual production release workflow can proceed.
 
 The current production site remains accessible with `noindex` metadata.
 

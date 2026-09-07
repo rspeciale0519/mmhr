@@ -35,6 +35,9 @@ export const permissionKeys = [
   "member.role.read",
   "member.role.update",
   "audit.change_summary.read",
+  "finance.manage",
+  "rfp.approve",
+  "rfp.distribute",
 ] as const;
 
 export type PermissionKey = (typeof permissionKeys)[number];
@@ -201,6 +204,21 @@ export const permissionRegistry = {
     minimumAssurance: "aal2", internalOnly: false, requiredPortal: null,
     description: "Read an authorized redacted audit change summary.",
   },
+  "finance.manage": {
+    kind: "action", platformScope: false, organizationScope: true,
+    minimumAssurance: "aal2", internalOnly: true, requiredPortal: null,
+    description: "Manage authorized organization finance records.",
+  },
+  "rfp.approve": {
+    kind: "action", platformScope: false, organizationScope: true,
+    minimumAssurance: "aal2", internalOnly: true, requiredPortal: null,
+    description: "Approve organization RFP versions after MMHR review.",
+  },
+  "rfp.distribute": {
+    kind: "action", platformScope: false, organizationScope: true,
+    minimumAssurance: "aal2", internalOnly: true, requiredPortal: null,
+    description: "Distribute organization RFP versions with MMHR approval.",
+  },
 } as const satisfies Record<PermissionKey, PermissionDefinition>;
 
 export const permissionScopeSchema = z.discriminatedUnion("kind", [
@@ -273,6 +291,9 @@ export const rolePermissionDefaults = {
     "member.role.read",
     "member.role.update",
     "audit.change_summary.read",
+    "finance.manage",
+    "rfp.approve",
+    "rfp.distribute",
   ],
   admin: [
     "workspace.access",

@@ -52,7 +52,7 @@ export default function ResourcesPage() {
             {RESOURCES.map((r) => (
               <Link className="pu-pcard" href={r.href} key={r.href}>
                 <div className="pu-cell-k">{r.k}</div>
-                <h3>{r.h}</h3>
+                <h2>{r.h}</h2>
                 <p>{r.p}</p>
                 <div className="pu-pcard-more">Open →</div>
               </Link>

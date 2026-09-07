@@ -57,13 +57,13 @@ describe("R1.4 real-token permission evaluation", () => {
 
   afterAll(() => fixtures.close(), 60_000);
 
-  test("database definitions match all 30 registry keys and metadata exactly", async () => {
+  test("database definitions match all 33 registry keys and metadata exactly", async () => {
     const definitions = await owner`
       SELECT key, kind, platform_scope, organization_scope, minimum_assurance,
         internal_only, required_portal, description, active, retired_at
       FROM public.permission_definitions ORDER BY key
     `;
-    expect(permissionKeys).toHaveLength(30);
+    expect(permissionKeys).toHaveLength(33);
     const expected = permissionKeys.map((key) => {
       const definition = permissionRegistry[key];
       return {
@@ -77,13 +77,17 @@ describe("R1.4 real-token permission evaluation", () => {
     expect([...definitions]).toEqual(expected);
   });
 
-  test("version-two defaults match the explicit registry without changing version one", async () => {
+  test("active defaults match the registry and preserve prior role versions", async () => {
     const definitions = await owner`
       SELECT stable_key, version, state FROM public.role_definitions ORDER BY stable_key, version
     `;
     expect([...definitions]).toEqual(Object.keys(rolePermissionDefaults).sort().flatMap((stableKey) => [
       { stable_key: stableKey, version: 1, state: "approved" },
-      { stable_key: stableKey, version: 2, state: "active" },
+      { stable_key: stableKey, version: 2, state: stableKey === "super_admin" ? "approved" : "active" },
+      ...(stableKey === "super_admin" ? [
+        { stable_key: stableKey, version: 3, state: "approved" },
+        { stable_key: stableKey, version: 4, state: "active" },
+      ] : []),
     ]));
     const defaults = await owner`
       SELECT role.stable_key, permission.permission_key, permission.effect
@@ -94,7 +98,7 @@ describe("R1.4 real-token permission evaluation", () => {
     const expected = Object.entries(rolePermissionDefaults).flatMap(([role, keys]) =>
       keys.map((permission) => ({ stable_key: role, permission_key: permission, effect: "allow" })),
     ).sort((a, b) => a.stable_key.localeCompare(b.stable_key) || a.permission_key.localeCompare(b.permission_key));
-    expect(expected).toHaveLength(60);
+    expect(expected).toHaveLength(63);
     expect([...defaults]).toEqual(expected);
     const prior = await owner`
       SELECT permission.id FROM public.role_permission_defaults permission
@@ -179,6 +183,25 @@ describe("R1.4 real-token permission evaluation", () => {
       try { expect(await authorize(aal2(viewer), "permissions.view", customerId)).toEqual([]); }
       finally { await fixtures.removeOverrides(grants); }
     }
+  });
+
+  test("finance authority requires internal status, MFA, and scoped membership", async () => {
+    expect(await authorize(aal2(superAdmin), "finance.manage", internalId)).toHaveLength(1);
+    expect(await authorize(superAdmin.client, "finance.manage", internalId)).toEqual([]);
+    // Internal staff need an explicit workspace grant for external organizations.
+    expect(await authorize(aal2(superAdmin), "finance.manage", customerId)).toEqual([]);
+    expect(await authorize(aal2(superAdmin), "finance.manage", vendorId)).toEqual([]);
+    expect(await authorize(aal2(platformAdmin), "finance.manage", internalId)).toEqual([]);
+    expect(await authorize(aal2(staff), "finance.manage", internalId)).toEqual([]);
+    const grants = [
+      await fixtures.addOverride(viewer, superAdmin, "finance.manage", "allow", customerId),
+      await fixtures.addOverride(platformAdmin, superAdmin, "finance.manage", "allow", internalId),
+    ];
+    try {
+      expect(await authorize(aal2(viewer), "finance.manage", customerId)).toEqual([]);
+      expect(await authorize(aal2(platformAdmin), "finance.manage", internalId)).toHaveLength(1);
+      expect(await authorize(aal2(platformAdmin), "finance.manage", customerId)).toEqual([]);
+    } finally { await fixtures.removeOverrides(grants); }
   });
 
   test("an explicit allow can grant an absent default only within its organization", async () => {
@@ -344,6 +367,11 @@ describe("R1.4 real-token permission evaluation", () => {
 
   test("pending identities and missing synchronized email verification deny access", async () => {
     const principal = await fixtures.createPrincipal({ pending: true });
+    const setup = await principal.client.rpc("mmhr_get_my_account_setup");
+    expect(setup.error).toBeNull();
+    expect(setup.data).toHaveLength(1);
+    expect(setup.data[0]).toMatchObject({ id: principal.identityId, status: "pending" });
+    expect(Object.keys(setup.data[0]).sort()).toEqual(["email_verified_at", "id", "status"]);
     await fixtures.addMembership(principal, customerId, "viewer");
     expect(await authorize(principal.client, "workspace.access", customerId)).toEqual([]);
     try {

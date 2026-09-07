@@ -195,6 +195,21 @@ export function acceptInvitation(input: AcceptInvitationInput, options: Invitati
   return executeInvitationDatabaseCommand({ operation: "accept", input }, options);
 }
 
+/** Pending callers have no workspace identity read. SQL resolves their identity from auth.uid(). */
+export async function acceptCallerInvitation(
+  input: Omit<AcceptInvitationInput, "identityId">,
+  options: InvitationDatabaseOptions = {},
+): InvitationDatabaseResult {
+  const parsed = acceptInvitationInputSchema.omit({ identityId: true }).safeParse(input);
+  if (!parsed.success) throw new InvitationDatabaseCommandError("INVALID_INPUT");
+  return rpcResult(await getSupabase(options), "mmhr_accept_invitation", {
+    invitation_id: parsed.data.invitationId,
+    verified_email: parsed.data.verifiedEmail,
+    correlation_id: parsed.data.correlationId,
+    idempotency_key: parsed.data.idempotencyKey,
+  });
+}
+
 export function expireInvitation(input: ExpireInvitationInput, options: InvitationDatabaseOptions = {}): InvitationDatabaseResult {
   return executeInvitationDatabaseCommand({ operation: "expire", input }, options);
 }

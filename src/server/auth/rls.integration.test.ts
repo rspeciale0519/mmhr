@@ -143,6 +143,8 @@ describe("R1.3 request-scoped grants and RLS", () => {
 
     const functionRead = await anonymous.rpc("mmhr_get_my_memberships");
     expect(functionRead.error).not.toBeNull();
+    const invitationRead = await anonymous.rpc("mmhr_get_my_invitations");
+    expect(invitationRead.error).not.toBeNull();
     const authorization = await anonymous.rpc("mmhr_authorize", {
       permission_key: "workspace.access",
     });
@@ -169,6 +171,10 @@ describe("R1.3 request-scoped grants and RLS", () => {
     expect(memberships.error).toBeNull();
     expect(memberships.data).toHaveLength(1);
     expect(memberships.data[0]).not.toHaveProperty("created_at");
+
+    const invitations = await member.rpc("mmhr_get_my_invitations");
+    expect(invitations.error).toBeNull();
+    expect(invitations.data).toEqual([]);
 
     const audit = await member.rpc("mmhr_get_audit_events", {
       organization_id: organizationId,
@@ -323,6 +329,7 @@ describe("R1.3 request-scoped grants and RLS", () => {
       "mmhr_get_audit_events",
       "mmhr_get_my_identity",
       "mmhr_get_my_memberships",
+      "mmhr_get_my_invitations",
       "mmhr_get_organization",
       "mmhr_get_organization_members",
     ];

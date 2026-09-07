@@ -38,6 +38,8 @@ export const onboardingPlans = pgTable("onboarding_plans", {
   check("onboarding_plans_status_ck", sql`${t.status} in ('planned', 'active', 'at_risk', 'failed', 'reactivated', 'completed', 'cancelled')`),
   check("onboarding_plans_revision_ck", sql`${t.revision} > 0`),
   check("onboarding_plans_arrays_ck", sql`jsonb_typeof(${t.milestones}) = 'array' and jsonb_typeof(${t.checkIns}) = 'array' and jsonb_typeof(${t.risks}) = 'array'`),
+  check("onboarding_plans_failure_ck", sql`(${t.status} in ('failed', 'reactivated')) = (${t.failureReason} is not null)`),
+  check("onboarding_plans_updated_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
 ]);
 
 export const onboardingHistory = pgTable("onboarding_history", {
@@ -56,6 +58,7 @@ export const onboardingHistory = pgTable("onboarding_history", {
   index("onboarding_history_scope_time_idx").on(t.organizationId, t.onboardingId, t.occurredAt),
   foreignKey({ columns: [t.organizationId, t.onboardingId], foreignColumns: [onboardingPlans.organizationId, onboardingPlans.id], name: "onboarding_history_scope_fk" }),
   check("onboarding_history_revision_ck", sql`${t.expectedRevision} > 0`),
+  check("onboarding_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
 ]);
 
 export const projectPlanTemplates = pgTable("project_plan_templates", {
@@ -73,6 +76,7 @@ export const projectPlanTemplates = pgTable("project_plan_templates", {
   uniqueIndex("project_plan_templates_organization_name_version_uq").on(t.organizationId, t.name, t.version),
   uniqueIndex("project_plan_templates_organization_id_uq").on(t.organizationId, t.id),
   check("project_plan_templates_version_ck", sql`${t.version} > 0`),
+  check("project_plan_templates_approval_ck", sql`${t.approved} = (${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null)`),
   check("project_plan_templates_milestones_ck", sql`jsonb_typeof(${t.milestones}) = 'array'`),
 ]);
 
@@ -96,6 +100,75 @@ export const projectPlans = pgTable("project_plans", {
   check("project_plans_milestones_ck", sql`jsonb_typeof(${t.milestones}) = 'array'`),
 ]);
 
+export const administrationConfigurations = pgTable("administration_configurations", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  category: text("category").notNull(),
+  version: integer("version").notNull(),
+  revision: integer("revision").notNull().default(1),
+  status: text("status").notNull().default("draft"),
+  entries: jsonb("entries").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  approvalReference: text("approval_reference"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("administration_configurations_scope_version_uq").on(t.organizationId, t.category, t.version),
+  check("administration_configurations_category_ck", sql`${t.category} in ('stage', 'questionnaire', 'scorecard', 'template', 'reminder', 'commission', 'ai_review', 'document_category', 'system')`),
+  check("administration_configurations_version_ck", sql`${t.version} > 0 and ${t.revision} > 0`),
+  check("administration_configurations_status_ck", sql`${t.status} in ('draft', 'approved', 'retired')`),
+  check("administration_configurations_entries_ck", sql`jsonb_typeof(${t.entries}) = 'array'`),
+  check("administration_configurations_approval_ck", sql`(${t.status} = 'draft' and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.status} in ('approved', 'retired') and ${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null and ${t.approvalReference} is not null)`),
+]);
+
+export const approvalRequests = pgTable("approval_requests", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  category: text("category").notNull(),
+  resourceId: uuid("resource_id").notNull(),
+  requestedByIdentityId: uuid("requested_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  requestedAt: timestamp("requested_at", { withTimezone: true }).notNull(),
+  status: text("status").notNull().default("pending"),
+  reviewedByIdentityId: uuid("reviewed_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  decisionReason: text("decision_reason"),
+  revision: integer("revision").notNull().default(1),
+}, (t) => [
+  index("approval_requests_queue_idx").on(t.organizationId, t.status, t.requestedAt),
+  check("approval_requests_category_ck", sql`${t.category} in ('permission', 'workflow', 'finance', 'content', 'document', 'configuration')`),
+  check("approval_requests_status_ck", sql`${t.status} in ('pending', 'approved', 'rejected', 'expired')`),
+  check("approval_requests_revision_ck", sql`${t.revision} > 0`),
+  check("approval_requests_decision_ck", sql`(${t.status} = 'pending' and ${t.reviewedByIdentityId} is null and ${t.reviewedAt} is null and ${t.decisionReason} is null) or (${t.status} <> 'pending' and ${t.reviewedByIdentityId} is not null and ${t.reviewedAt} is not null and ${t.decisionReason} is not null)`),
+]);
+
+export const followUpSchedules = pgTable("follow_up_schedules", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  subjectType: text("subject_type").notNull(),
+  subjectId: uuid("subject_id").notNull(),
+  intervalDays: integer("interval_days").notNull(),
+  firstCheckInAt: timestamp("first_check_in_at", { withTimezone: true }).notNull(),
+  nextCheckInAt: timestamp("next_check_in_at", { withTimezone: true }).notNull(),
+  status: text("status").notNull().default("draft"),
+  revision: integer("revision").notNull().default(1),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  approvalReference: text("approval_reference"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("follow_up_schedules_scope_subject_uq").on(t.organizationId, t.subjectType, t.subjectId),
+  index("follow_up_schedules_due_idx").on(t.organizationId, t.status, t.nextCheckInAt),
+  check("follow_up_schedules_subject_type_ck", sql`${t.subjectType} in ('vendor', 'customer', 'product', 'risk')`),
+  check("follow_up_schedules_interval_ck", sql`${t.intervalDays} between 1 and 3650`),
+  check("follow_up_schedules_status_ck", sql`${t.status} in ('draft', 'approved', 'paused', 'retired')`),
+  check("follow_up_schedules_revision_ck", sql`${t.revision} > 0`),
+  check("follow_up_schedules_approval_ck", sql`(${t.status} = 'draft' and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.status} in ('approved', 'paused', 'retired') and ${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null and ${t.approvalReference} is not null)`),
+  check("follow_up_schedules_next_check_in_ck", sql`${t.nextCheckInAt} >= ${t.firstCheckInAt}`),
+]);
+
 export const workItems = pgTable("work_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
@@ -113,6 +186,10 @@ export const workItems = pgTable("work_items", {
   uniqueIndex("work_items_organization_id_uq").on(t.organizationId, t.id),
   index("work_items_queue_status_due_idx").on(t.organizationId, t.queue, t.status, t.dueAt),
   check("work_items_queue_ck", sql`${t.queue} in ('approvals', 'follow_ups', 'scheduling', 'commissions', 'onboarding_risks')`),
+  check("work_items_role_ck", sql`${t.assignedRole} in ('super_admin', 'admin', 'advisor', 'sales', 'finance', 'operations', 'support')`),
   check("work_items_status_ck", sql`${t.status} in ('open', 'in_progress', 'blocked', 'completed', 'cancelled')`),
   check("work_items_priority_ck", sql`${t.priority} in ('low', 'normal', 'high', 'urgent')`),
+  check("work_items_reminder_ck", sql`${t.reminderAt} is null or ${t.reminderAt} >= ${t.createdAt}`),
+  check("work_items_escalation_ck", sql`${t.status} not in ('completed', 'cancelled') or ${t.escalated} = false`),
+  check("work_items_updated_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
 ]);

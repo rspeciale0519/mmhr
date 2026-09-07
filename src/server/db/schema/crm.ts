@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   check,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -89,6 +90,7 @@ export const vendorProfiles = pgTable(
   },
   (t) => [
     uniqueIndex("vendor_profiles_organization_uq").on(t.organizationId),
+    uniqueIndex("vendor_profiles_organization_id_id_uq").on(t.organizationId, t.id),
     index("vendor_profiles_status_idx").on(t.status),
     check(
       "vendor_profiles_status_ck",
@@ -123,6 +125,7 @@ export const products = pgTable(
     uniqueIndex("products_organization_id_id_uq").on(t.organizationId, t.id),
     uniqueIndex("products_organization_vendor_id_uq").on(t.organizationId, t.vendorProfileId, t.id),
     index("products_organization_status_idx").on(t.organizationId, t.status),
+    foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "products_vendor_scope_fk" }).onDelete("restrict"),
     check(
       "products_stable_key_ck",
       sql`${t.stableKey} ~ '^[a-z][a-z0-9_]{0,99}$'`,
@@ -211,6 +214,8 @@ export const relationships = pgTable(
   (t) => [
     index("relationships_organization_status_idx").on(t.organizationId, t.status),
     index("relationships_owner_idx").on(t.ownerIdentityId, t.status),
+    foreignKey({ columns: [t.organizationId, t.subjectContactId], foreignColumns: [contacts.organizationId, contacts.id], name: "relationships_subject_contact_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.relatedContactId], foreignColumns: [contacts.organizationId, contacts.id], name: "relationships_related_contact_scope_fk" }).onDelete("restrict"),
     check(
       "relationships_type_ck",
       sql`${t.relationshipType} in ('customer_vendor', 'customer_contact', 'vendor_contact', 'partner', 'other')`,

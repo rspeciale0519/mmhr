@@ -64,10 +64,10 @@ describe("page identity guard", () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  test("requires the requested platform permission", async () => {
+  test("requires platform permission with distinct Auth and application identity IDs", async () => {
     vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
     vi.mocked(authorizePermission).mockResolvedValue({
-      identityId: "user-123",
+      identityId: validIdentityId,
       scope: { kind: "platform" },
     } as never);
 
@@ -87,6 +87,7 @@ describe("page identity guard", () => {
     } as never);
 
     await expect(requireMfaPageIdentity()).resolves.toEqual({ id: validIdentityId });
+    expect((await createClient()).rpc).toHaveBeenCalledWith("mmhr_get_my_account_setup");
   });
 
   test.each([
@@ -98,7 +99,7 @@ describe("page identity guard", () => {
     vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
     vi.mocked(createClient).mockResolvedValue({
       rpc: vi.fn().mockResolvedValue({
-        data: [{ id: "user-123", status, email_verified_at: emailVerifiedAt }],
+        data: [{ id: validIdentityId, status, email_verified_at: emailVerifiedAt }],
         error: null,
       }),
     } as never);
@@ -126,14 +127,14 @@ describe("page identity guard", () => {
     },
   );
 
-  test("validates the selected organization through the permission decision", async () => {
+  test("validates selected organization access with distinct Auth and application IDs", async () => {
     const organizationId = "abcdef01-2345-4678-9abc-def012345678";
     vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
     vi.mocked(cookies).mockResolvedValue({
       get: vi.fn().mockReturnValue({ value: organizationId }),
     } as never);
     vi.mocked(authorizePermission).mockResolvedValue({
-      identityId: "user-123",
+      identityId: validIdentityId,
       scope: { kind: "organization", organizationId },
     } as never);
 
@@ -159,7 +160,7 @@ describe("page identity guard", () => {
   test("uses platform access for an administrator without an organization cookie", async () => {
     vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "user-123" });
     vi.mocked(authorizePermission).mockResolvedValue({
-      identityId: "user-123",
+      identityId: validIdentityId,
       scope: { kind: "platform" },
     } as never);
 
@@ -167,5 +168,40 @@ describe("page identity guard", () => {
       authorization: { scope: { kind: "platform" } },
     });
     expect(authorizePermission).toHaveBeenCalledWith("admin.access", { kind: "platform" });
+  });
+
+  test("uses selected workspace access without comparing distinct identity namespaces", async () => {
+    vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "provider-subject" });
+    vi.mocked(cookies).mockResolvedValue({ get: vi.fn().mockReturnValue({ value: validIdentityId }) } as never);
+    vi.mocked(authorizePermission).mockResolvedValue({
+      identityId: "22222222-2222-4222-8222-222222222222",
+      scope: { kind: "organization", organizationId: validIdentityId },
+    } as never);
+    await expect(requireHomeAccess()).resolves.toMatchObject({
+      identity: { id: "provider-subject" }, authorization: { scope: { kind: "organization" } },
+    });
+    expect(authorizePermission).toHaveBeenCalledTimes(1);
+  });
+
+  test("accepts the real MFA identity response with a distinct application ID", async () => {
+    vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "provider-subject" });
+    vi.mocked(createClient).mockResolvedValue({ rpc: vi.fn().mockResolvedValue({ data: [{
+      id: validIdentityId, status: "active", normalized_email: "fixture@example.invalid",
+      email_verified_at: "2026-09-05T12:00:00.000Z",
+    }], error: null }) } as never);
+    await expect(requireMfaPageIdentity()).resolves.toEqual({ id: "provider-subject" });
+  });
+
+  test("still denies a verified subject when the current permission decision is absent", async () => {
+    vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "provider-subject" });
+    vi.mocked(authorizePermission).mockResolvedValue(null);
+    await expect(requirePagePermission("admin.access", { kind: "platform" })).rejects.toThrow("NEXT_FORBIDDEN");
+  });
+
+  test("routes a caller without a selected workspace or platform access to workspace selection", async () => {
+    vi.mocked(getVerifiedIdentity).mockResolvedValue({ id: "provider-subject" });
+    vi.mocked(authorizePermission).mockResolvedValue(null);
+    await expect(requireHomeAccess()).rejects.toThrow("NEXT_REDIRECT");
+    expect(redirect).toHaveBeenCalledWith("/workspaces");
   });
 });

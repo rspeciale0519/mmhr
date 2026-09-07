@@ -16,6 +16,8 @@ export type AuthState =
   | null;
 
 const signUpPasswordSchema = z.string().min(12).max(72);
+const signUpFailureMessage = "We could not complete registration. Please try again later.";
+const signInFailureMessage = "We could not sign you in. Check your email and password, then try again.";
 
 async function requireTrustedOrigin() {
   const requestHeaders = await headers();
@@ -61,7 +63,7 @@ export async function signUp(
 
   const { data, error } = await supabase.auth.signUp({ email, password });
 
-  if (error) return { error: error.message };
+  if (error) return { error: signUpFailureMessage };
   if (!data.session) {
     return {
       success: "Check your email to confirm your account. Then sign in.",
@@ -83,7 +85,7 @@ export async function signIn(
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) return { error: error.message };
+  if (error) return { error: signInFailureMessage };
 
   revalidatePath("/", "layout");
   redirect("/home");
@@ -92,8 +94,15 @@ export async function signIn(
 export async function signOut() {
   await requireTrustedOrigin();
 
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  const failureMessage = "Sign-out could not be confirmed. Please try again.";
+  let response;
+  try {
+    const supabase = await createClient();
+    response = await supabase.auth.signOut();
+  } catch {
+    throw new Error(failureMessage);
+  }
+  if (!response || response.error) throw new Error(failureMessage);
 
   revalidatePath("/", "layout");
   redirect("/sign-in");

@@ -70,6 +70,23 @@ export const intakes = pgTable(
   ],
 );
 
+export const intakeHistory = pgTable("intake_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  intakeId: uuid("intake_id").notNull(),
+  revision: integer("revision").notNull(),
+  snapshot: jsonb("snapshot").notNull(),
+  changedByIdentityId: uuid("changed_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
+  correlationId: uuid("correlation_id").notNull(),
+}, (t) => [
+  uniqueIndex("intake_history_revision_uq").on(t.organizationId, t.intakeId, t.revision),
+  index("intake_history_scope_time_idx").on(t.organizationId, t.intakeId, t.changedAt),
+  foreignKey({ columns: [t.organizationId, t.intakeId], foreignColumns: [intakes.organizationId, intakes.id], name: "intake_history_scope_fk" }).onDelete("restrict"),
+  check("intake_history_snapshot_ck", sql`jsonb_typeof(${t.snapshot}) = 'object' and pg_column_size(${t.snapshot}) <= 100000`),
+  check("intake_history_revision_ck", sql`${t.revision} > 0`),
+]);
+
 export const intakeRequirements = pgTable(
   "intake_requirements",
   {
@@ -87,6 +104,9 @@ export const intakeRequirements = pgTable(
     }),
     response: jsonb("response"),
     status: text("status").notNull().default("active"),
+    requirementType: text("requirement_type").notNull().default("structured"),
+    evidenceReferences: jsonb("evidence_references").notNull().default([]),
+    vendorResponseLinks: jsonb("vendor_response_links").notNull().default([]),
     ...auditColumns(),
   },
   (t) => [
@@ -114,6 +134,9 @@ export const intakeRequirements = pgTable(
       "intake_requirements_status_ck",
       sql`${t.status} in ('active', 'archived')`,
     ),
+    check("intake_requirements_type_ck", sql`${t.requirementType} in ('structured', 'custom')`),
+    check("intake_requirements_evidence_ck", sql`jsonb_typeof(${t.evidenceReferences}) = 'array' and jsonb_array_length(${t.evidenceReferences}) <= 20`),
+    check("intake_requirements_vendor_links_ck", sql`jsonb_typeof(${t.vendorResponseLinks}) = 'array' and jsonb_array_length(${t.vendorResponseLinks}) <= 20`),
     check("intake_requirements_revision_ck", sql`${t.revision} > 0`),
   ],
 );
@@ -139,6 +162,7 @@ export const evaluationCandidates = pgTable(
   },
   (t) => [
     uniqueIndex("evaluation_candidates_intake_product_uq").on(t.intakeId, t.productId),
+    uniqueIndex("evaluation_candidates_organization_id_id_uq").on(t.organizationId, t.id),
     index("evaluation_candidates_organization_state_idx").on(
       t.organizationId,
       t.state,
@@ -192,5 +216,12 @@ export const evaluationCandidateMasks = pgTable(
     approvalReference: text("approval_reference"),
     ...auditColumns(),
   },
-  (t) => [uniqueIndex("evaluation_candidate_masks_candidate_uq").on(t.organizationId, t.candidateId), index("evaluation_candidate_masks_organization_state_idx").on(t.organizationId, t.state)],
+  (t) => [
+    uniqueIndex("evaluation_candidate_masks_candidate_uq").on(t.organizationId, t.candidateId),
+    index("evaluation_candidate_masks_organization_state_idx").on(t.organizationId, t.state),
+    foreignKey({ columns: [t.organizationId, t.candidateId], foreignColumns: [evaluationCandidates.organizationId, evaluationCandidates.id], name: "evaluation_candidate_masks_candidate_fk" }).onDelete("restrict"),
+    check("evaluation_candidate_masks_state_ck", sql`(${t.state} = 'masked' and ${t.unmaskedAt} is null and ${t.unmaskedByIdentityId} is null and ${t.unmaskReason} is null and ${t.approvalReference} is null) or (${t.state} = 'unmasked' and ${t.unmaskedAt} is not null and ${t.unmaskedByIdentityId} is not null and length(btrim(${t.unmaskReason})) between 1 and 500 and length(btrim(${t.approvalReference})) between 1 and 300)`),
+    check("evaluation_candidate_masks_label_ck", sql`${t.maskedLabel} ~ '^Candidate-[A-Fa-f0-9]{8}$'`),
+    check("evaluation_candidate_masks_revision_ck", sql`${t.revision} > 0`),
+  ],
 );

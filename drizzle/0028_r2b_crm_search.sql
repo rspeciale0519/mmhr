@@ -38,8 +38,9 @@ BEGIN
       AND coalesce(payload->>'cursor', '') !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
     OR EXISTS (
       SELECT 1 FROM jsonb_array_elements_text(statuses) AS value
-      WHERE value NOT IN ('prospect','active','paused','closed','draft','qualified',
-        'evaluation','proposal','selected','contracted','archived')
+      WHERE value NOT IN ('prospect','active','paused','closed','draft','retired','inactive',
+        'lead','discovery','qualified','evaluation','proposal','selected','contracted',
+        'selection','contracting','won','lost','archived')
     )
   THEN RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'Invalid CRM search input'; END IF;
 
@@ -104,7 +105,7 @@ BEGIN
         'label', p.stage, 'status', CASE WHEN p.status = 'open' THEN p.stage ELSE p.status END) AS row_data
       FROM public.deals p
       WHERE p.organization_id = organization_id AND (cursor_id IS NULL OR p.id > cursor_id)
-        AND (jsonb_array_length(statuses) = 0 OR p.status = ANY(ARRAY(SELECT jsonb_array_elements_text(statuses))))
+        AND (jsonb_array_length(statuses) = 0 OR (CASE WHEN p.status = 'open' THEN p.stage ELSE p.status END) = ANY(ARRAY(SELECT jsonb_array_elements_text(statuses))))
         AND (query_text IS NULL OR lower(p.stage) LIKE '%' || query_text || '%')
       ORDER BY p.id LIMIT limit_value
     ) rows;

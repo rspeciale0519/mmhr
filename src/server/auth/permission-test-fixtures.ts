@@ -350,7 +350,7 @@ export function createPermissionFixtures() {
     async function attempt(label: string, action: () => Promise<unknown>) {
       try { await action(); } catch { failures.push(label); }
     }
-    // Never remove audit events. These fixtures create no audited domain commands.
+    // Never remove audit events or immutable authority records.
     await attempt("override cleanup", async () => {
       if (identityIds.length) await owner`DELETE FROM public.user_permission_overrides WHERE identity_id = ANY(${identityIds}::uuid[])`;
     });
@@ -358,6 +358,26 @@ export function createPermissionFixtures() {
       if (organizationIds.length) await owner`DELETE FROM public.portal_access_grants WHERE organization_id = ANY(${organizationIds}::uuid[])`;
     });
     await attempt("assignment cleanup", async () => {
+      // Authority rows are immutable. Retire synthetic assignments instead of
+      // retaining active administrators after the test finishes.
+      if (platformIdentityIds.length) await owner.begin(async (transaction) => {
+        const retired = await transaction<{ id: string }[]>`
+          UPDATE public.platform_role_assignments
+          SET state = 'revoked', revoked_at = clock_timestamp(),
+            revocation_reason = 'Retire completed synthetic local permission test'
+          WHERE identity_id = ANY(${platformIdentityIds}::uuid[])
+            AND assignment_reason = 'Synthetic local permission test' AND state = 'active'
+          RETURNING id
+        `;
+        for (const assignment of retired) await transaction`
+          INSERT INTO public.audit_events (actor_type, actor_reference, command, action,
+            entity_type, entity_id, reason, correlation_id, before_summary, after_summary)
+          VALUES ('system', 'local-permission-fixture', 'test.fixture.retire', 'platform_role.revoke',
+            'platform_role_assignment', ${assignment.id},
+            'Retire completed synthetic local permission test', ${randomUUID()},
+            '{"state":"active"}'::jsonb, '{"state":"revoked"}'::jsonb)
+        `;
+      });
       const removable = identityIds.filter((id) => !platformIdentityIds.includes(id));
       if (removable.length) await owner`DELETE FROM public.platform_role_assignments WHERE identity_id = ANY(${removable}::uuid[])`;
     });

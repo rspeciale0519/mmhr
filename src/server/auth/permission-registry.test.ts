@@ -25,13 +25,15 @@ const expectedKeys = [
   "permissions.view", "permissions.grant", "permissions.revoke", "permissions.delegate",
   "portal.access.grant", "portal.access.revoke", "audit.view", "audit.export",
   "org.name.read", "member.role.read", "member.role.update", "audit.change_summary.read",
+  "finance.manage",
+  "rfp.approve", "rfp.distribute",
 ];
 
 describe("R1 permission registry", () => {
-  test("defines exactly the 30 current R1 permissions", () => {
+  test("defines exactly the 33 current permissions", () => {
     expect(permissionKeys).toEqual(expectedKeys);
     expect(Object.keys(permissionRegistry)).toEqual(expectedKeys);
-    expect(new Set(permissionKeys).size).toBe(30);
+    expect(new Set(permissionKeys).size).toBe(33);
     for (const key of expectedKeys) {
       expect(isPermissionKey(key)).toBe(true);
       expect(permissionKeySchema.parse(key)).toBe(key);
@@ -87,6 +89,9 @@ describe("R1 permission registry", () => {
     ["member.role.read", "field", false, true, "aal1", false, null],
     ["member.role.update", "field", false, true, "aal2", false, null],
     ["audit.change_summary.read", "field", true, true, "aal2", false, null],
+    ["finance.manage", "action", false, true, "aal2", true, null],
+    ["rfp.approve", "action", false, true, "aal2", true, null],
+    ["rfp.distribute", "action", false, true, "aal2", true, null],
   ] as const)("declares scope, assurance, and boundaries for %s", (
     key, kind, platformScope, organizationScope, minimumAssurance, internalOnly, requiredPortal,
   ) => {

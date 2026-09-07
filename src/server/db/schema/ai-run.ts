@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -12,11 +13,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { orgs } from "./identity";
+import { identities, orgs } from "./identity";
 
 export const aiRuns = pgTable("ai_runs", {
   runId: text("run_id").primaryKey(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  createdByIdentityId: uuid("created_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
   capability: text("capability").notNull(),
   dataClass: text("data_class").notNull(),
   adapterId: text("adapter_id").notNull(),
@@ -46,12 +48,15 @@ export const aiRuns = pgTable("ai_runs", {
   correlationId: uuid("correlation_id").notNull(),
 }, (t) => [
   uniqueIndex("ai_runs_organization_id_run_uq").on(t.organizationId, t.runId),
+  index("ai_runs_created_by_idx").on(t.createdByIdentityId),
   index("ai_runs_organization_status_idx").on(t.organizationId, t.status, t.createdAt),
   check("ai_runs_capability_ck", sql`${t.capability} in ('draft', 'summarize', 'extract_vendor_evidence', 'normalize_response', 'suggest_follow_up', 'identify_risk')`),
   check("ai_runs_data_class_ck", sql`${t.dataClass} in ('public', 'internal', 'confidential', 'restricted')`),
+  check("ai_runs_identifier_ck", sql`${t.adapterId} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$' and ${t.modelId} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$' and ${t.templateVersion} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$' and ${t.schemaVersion} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$'`),
   check("ai_runs_hash_ck", sql`${t.outputHash} is null or ${t.outputHash} ~ '^[a-f0-9]{64}$'`),
   check("ai_runs_status_ck", sql`${t.status} in ('queued', 'running', 'validating', 'review_required', 'approved', 'rejected', 'failed')`),
   check("ai_runs_review_ck", sql`${t.reviewDecision} in ('pending', 'approved', 'rejected')`),
+  check("ai_runs_failure_ck", sql`(${t.failureCode} is null and ${t.failureRetryable} is null) or (${t.failureCode} in ('provider_timeout', 'provider_error', 'validation_failed', 'policy_denied') and ${t.failureRetryable} is not null)`),
   check("ai_runs_usage_ck", sql`(${t.inputTokens} is null or ${t.inputTokens} >= 0) and (${t.outputTokens} is null or ${t.outputTokens} >= 0) and (${t.totalTokens} is null or ${t.totalTokens} >= 0) and ${t.costCents} >= 0 and ${t.latencyMs} >= 0`),
   check("ai_runs_arrays_ck", sql`jsonb_typeof(${t.inputArtifacts}) = 'array' and jsonb_typeof(${t.sourceReferences}) = 'array'`),
   check("ai_runs_revision_ck", sql`${t.revision} > 0`),
@@ -73,6 +78,7 @@ export const aiRunHistory = pgTable("ai_run_history", {
 }, (t) => [
   uniqueIndex("ai_run_history_run_revision_uq").on(t.runId, t.revision),
   index("ai_run_history_organization_time_idx").on(t.organizationId, t.recordedAt),
+  foreignKey({ columns: [t.organizationId, t.runId], foreignColumns: [aiRuns.organizationId, aiRuns.runId], name: "ai_run_history_run_scope_fk" }).onDelete("restrict"),
   check("ai_run_history_revision_ck", sql`${t.revision} > 0`),
   check("ai_run_history_status_ck", sql`${t.status} in ('queued', 'running', 'validating', 'review_required', 'approved', 'rejected', 'failed')`),
   check("ai_run_history_review_ck", sql`${t.reviewDecision} in ('pending', 'approved', 'rejected')`),

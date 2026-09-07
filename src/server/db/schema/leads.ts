@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   check,
+  foreignKey,
   index,
   pgTable,
   text,
@@ -27,8 +28,8 @@ export const leads = pgTable("leads", {
   consentAt: timestamp("consent_at", { withTimezone: true }).notNull(),
   // These fields are nullable for legacy rows. New command-created rows always
   // populate them, which keeps the additive migration reversible.
-  organizationId: uuid("organization_id").references(() => orgs.id, { onDelete: "restrict" }),
-  routingOwnerIdentityId: uuid("routing_owner_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  organizationId: uuid("organization_id"),
+  routingOwnerIdentityId: uuid("routing_owner_identity_id"),
   normalizedSource: text("normalized_source"),
   idempotencyKey: uuid("idempotency_key"),
   requestDigest: text("request_digest"),
@@ -37,6 +38,8 @@ export const leads = pgTable("leads", {
     .notNull()
     .defaultNow(),
 }, (t) => [
+  foreignKey({ columns: [t.organizationId], foreignColumns: [orgs.id], name: "leads_organization_id_orgs_id_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.routingOwnerIdentityId], foreignColumns: [identities.id], name: "leads_routing_owner_identity_id_identities_id_fk" }).onDelete("restrict"),
   uniqueIndex("leads_idempotency_key_uq").on(t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
   index("leads_organization_status_idx").on(t.organizationId, t.status),
   check("leads_status_ck", sql`${t.status} in ('new', 'contacted', 'qualified', 'disqualified', 'converted', 'archived')`),

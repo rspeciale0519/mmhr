@@ -27,6 +27,9 @@ const normalizePath = (value) => {
 const rehearsalFiles = new Set(
   [
     "src/server/db/r1-empty-migration.integration.test.ts",
+    "src/server/db/r1-account-setup.integration.test.ts",
+    "src/server/db/r1-invitation-command.integration.test.ts",
+    "src/server/db/r1-member-read.integration.test.ts",
     "src/server/db/r1-permission-migration-failure.integration.test.ts",
     "src/server/db/r1-security-command.integration.test.ts",
     "src/server/db/r1-security-command-role-lifetime.integration.test.ts",
@@ -52,6 +55,44 @@ const rehearsalFiles = new Set(
       "src/server/db/r3-workspace-comment.integration.test.ts",
       "src/server/db/r4-rfp-create.integration.test.ts",
       "src/server/db/r4-rfp-approval.integration.test.ts",
+      "src/server/db/r4-rfp-distribution.integration.test.ts",
+      "src/server/db/r4-rfp-clarification.integration.test.ts",
+      "src/server/db/r4-response-ingestion.integration.test.ts",
+      "src/server/db/r4-response-normalization.integration.test.ts",
+      "src/server/db/r4-response-review.integration.test.ts",
+      "src/server/db/r4-response-clarifications.integration.test.ts",
+      "src/server/db/r4-response-failures.integration.test.ts",
+      "src/server/db/r4-communication.integration.test.ts",
+      "src/server/db/r4-document-controls.integration.test.ts",
+      "src/server/db/r4-job-controls.integration.test.ts",
+      "src/server/db/r6-demo-round.integration.test.ts",
+      "src/server/db/r6-proposal.integration.test.ts",
+      "src/server/db/r6-contract-handoff.integration.test.ts",
+      "src/server/db/r7-commission.integration.test.ts",
+      "src/server/db/r7-payment.integration.test.ts",
+      "src/server/db/r7-invoice.integration.test.ts",
+      "src/server/db/r7-dispute.integration.test.ts",
+      "src/server/db/r7-adjustment-handoff.integration.test.ts",
+      "src/server/db/r7-reconciliation.integration.test.ts",
+      "src/server/db/r8-onboarding.integration.test.ts",
+      "src/server/db/r8-work-item.integration.test.ts",
+      "src/server/db/r8-renewal.integration.test.ts",
+      "src/server/db/r8-project-plan.integration.test.ts",
+      "src/server/db/r8-administration-configuration.integration.test.ts",
+      "src/server/db/r8-approval-queue.integration.test.ts",
+      "src/server/db/r8-follow-up-schedule.integration.test.ts",
+      "src/server/db/r2b-vendor-fact-override.integration.test.ts",
+      "src/server/db/r2b-deal.integration.test.ts",
+      "src/server/db/r2b-relationship.integration.test.ts",
+      "src/server/db/r2b-vendor-source.integration.test.ts",
+      "src/server/db/r4-document-search.integration.test.ts",
+      "src/server/db/r4-evaluation-routing.integration.test.ts",
+      "src/server/db/r2b-vendor-acquisition.integration.test.ts",
+      "src/server/db/r4-rfp-amendment.integration.test.ts",
+      "src/server/db/r5-ai-run.integration.test.ts",
+      "src/server/db/r5-ai-evaluation.integration.test.ts",
+      "src/server/db/r9-operational-evidence.integration.test.ts",
+      "src/server/db/r9-deletion-command.integration.test.ts",
       "src/server/db/r3-candidate-transition.integration.test.ts",
       "src/server/db/r3-candidate-add.integration.test.ts",
       "src/server/db/r3-candidate-masking.integration.test.ts",
@@ -206,6 +247,9 @@ let stopActiveChild = () => undefined;
 
 function runChild(environment) {
   const [requestedExecutable, ...args] = command;
+  // The local worker must not expose the development server to the LAN.
+  // Keep the input allowlist exact; callers cannot override this binding.
+  if (isNextDevCommand) args.push("--hostname", "127.0.0.1");
   const executable = requestedExecutable === "node" ? process.execPath : requestedExecutable;
   const child = spawn(executable, args, {
     cwd: projectRoot,

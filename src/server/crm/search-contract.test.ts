@@ -32,6 +32,14 @@ describe("CRM search contract", () => {
     });
   });
 
+  test("accepts CRM statuses present in product, contact, and deal records", () => {
+    expect(parseCrmSearchInput({
+      organizationId,
+      resource: "deal",
+      statuses: ["retired", "inactive", "lead", "selection", "won", "lost"],
+    }).statuses).toEqual(["retired", "inactive", "lead", "selection", "won", "lost"]);
+  });
+
   test("rejects unknown fields and invalid paging", () => {
     expect(() => parseCrmSearchInput({
       organizationId,

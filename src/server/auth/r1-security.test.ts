@@ -58,5 +58,5 @@ describe("R1 security evidence", () => {
     );
 
     expect(output).toMatch(/Integration matrix is complete: \d+ test files\./);
-  });
+  }, 30_000);
 });

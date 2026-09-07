@@ -41,8 +41,10 @@ export const demoRounds = pgTable("demo_rounds", {
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "demo_rounds_deal_scope_fk" }),
   check("demo_rounds_status_ck", sql`${t.status} in (${demoStatuses})`),
   check("demo_rounds_scope_ck", sql`${t.organizationId} = ${t.customerOrganizationId} and ${t.customerOrganizationId} <> ${t.vendorOrganizationId}`),
+  check("demo_rounds_schedule_ck", sql`(${t.status} = 'scheduled' and ${t.scheduledStartAt} is not null and ${t.scheduledEndAt} is not null and ${t.meetingReference} is not null) or (${t.status} <> 'scheduled' and ${t.scheduledStartAt} is null and ${t.scheduledEndAt} is null and ${t.meetingReference} is null)`),
   check("demo_rounds_revision_ck", sql`${t.revision} > 0`),
   check("demo_rounds_time_ck", sql`${t.scheduledEndAt} is null or ${t.scheduledEndAt} > ${t.scheduledStartAt}`),
+  check("demo_rounds_updated_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
 ]);
 
 export const demoRoundHistory = pgTable("demo_round_history", {
@@ -60,6 +62,7 @@ export const demoRoundHistory = pgTable("demo_round_history", {
   index("demo_round_history_scope_time_idx").on(t.organizationId, t.demoId, t.occurredAt),
   foreignKey({ columns: [t.organizationId, t.demoId], foreignColumns: [demoRounds.organizationId, demoRounds.id], name: "demo_round_history_scope_fk" }),
   check("demo_round_history_revision_ck", sql`${t.expectedRevision} > 0`),
+  check("demo_round_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
 ]);
 
 export const demoFeedback = pgTable("demo_feedback", {
@@ -75,6 +78,8 @@ export const demoFeedback = pgTable("demo_feedback", {
   index("demo_feedback_scope_time_idx").on(t.organizationId, t.demoId, t.submittedAt),
   foreignKey({ columns: [t.organizationId, t.demoId], foreignColumns: [demoRounds.organizationId, demoRounds.id], name: "demo_feedback_scope_fk" }),
   check("demo_feedback_score_ck", sql`${t.score} between 1 and 5`),
+  check("demo_feedback_text_ck", sql`length(btrim(${t.feedback})) between 1 and 5000`),
+  check("demo_feedback_refs_ck", sql`jsonb_typeof(${t.evidenceReferences}) = 'array'`),
 ]);
 
 export const proposalVersions = pgTable("proposal_versions", {
@@ -95,6 +100,8 @@ export const proposalVersions = pgTable("proposal_versions", {
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "proposal_versions_deal_scope_fk" }),
   check("proposal_versions_status_ck", sql`${t.status} in (${proposalStatuses})`),
   check("proposal_versions_version_ck", sql`${t.versionNumber} > 0`),
+  check("proposal_versions_refs_ck", sql`jsonb_typeof(${t.sourceReferences}) = 'array' and jsonb_array_length(${t.sourceReferences}) > 0`),
+  check("proposal_versions_pricing_ck", sql`jsonb_typeof(${t.pricing}) = 'object'`),
 ]);
 
 export const proposalComparisons = pgTable("proposal_comparisons", {
@@ -109,7 +116,8 @@ export const proposalComparisons = pgTable("proposal_comparisons", {
 }, (t) => [
   uniqueIndex("proposal_comparisons_organization_id_uq").on(t.organizationId, t.id),
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "proposal_comparisons_deal_scope_fk" }),
-  check("proposal_comparisons_versions_ck", sql`jsonb_typeof(${t.proposalVersionIds}) = 'array'`),
+  check("proposal_comparisons_versions_ck", sql`jsonb_typeof(${t.proposalVersionIds}) = 'array' and jsonb_array_length(${t.proposalVersionIds}) between 2 and 50`),
+  check("proposal_comparisons_approvers_ck", sql`jsonb_typeof(${t.approvedByIdentityIds}) = 'array' and jsonb_array_length(${t.approvedByIdentityIds}) between 1 and 10`),
 ]);
 
 export const contractHandoffs = pgTable("contract_handoffs", {
@@ -131,6 +139,9 @@ export const contractHandoffs = pgTable("contract_handoffs", {
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "contract_handoffs_deal_scope_fk" }),
   check("contract_handoffs_scope_ck", sql`${t.organizationId} = ${t.customerOrganizationId} and ${t.customerOrganizationId} <> ${t.vendorOrganizationId}`),
   check("contract_handoffs_status_ck", sql`${t.status} in (${handoffStatuses})`),
+  check("contract_handoffs_reasons_ck", sql`jsonb_typeof(${t.selectionReasons}) = 'array' and jsonb_array_length(${t.selectionReasons}) between 1 and 10`),
+  check("contract_handoffs_risks_ck", sql`jsonb_typeof(${t.remainingRisks}) = 'array'`),
+  check("contract_handoffs_approvers_ck", sql`jsonb_typeof(${t.approvedByIdentityIds}) = 'array' and jsonb_array_length(${t.approvedByIdentityIds}) between 1 and 10`),
   check("contract_handoffs_revision_ck", sql`${t.revision} > 0`),
 ]);
 
@@ -147,4 +158,5 @@ export const contractHandoffHistory = pgTable("contract_handoff_history", {
 }, (t) => [
   index("contract_handoff_history_scope_time_idx").on(t.organizationId, t.handoffId, t.occurredAt),
   foreignKey({ columns: [t.organizationId, t.handoffId], foreignColumns: [contractHandoffs.organizationId, contractHandoffs.id], name: "contract_handoff_history_scope_fk" }),
+  check("contract_handoff_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
 ]);

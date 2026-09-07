@@ -12,16 +12,34 @@ const windowsWorkerSettings =
       }
     : {};
 
-// Unit / component tests (jsdom). Integration tests that need a live local
-// Supabase run separately via vitest.integration.config.ts.
+// Server contracts do not need a browser. Keep browser globals available for
+// component/client tests without paying jsdom setup cost for every server file.
+// Live Supabase tests remain in vitest.integration.config.ts.
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}"],
-    exclude: ["src/**/*.integration.test.ts", "node_modules/**"],
     ...windowsWorkerSettings,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "server",
+          environment: "node",
+          include: ["src/server/**/*.test.{ts,tsx}"],
+          exclude: ["src/**/*.integration.test.ts", "node_modules/**"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "browser",
+          environment: "jsdom",
+          include: ["src/**/*.test.{ts,tsx}"],
+          exclude: ["src/server/**", "src/**/*.integration.test.ts", "node_modules/**"],
+        },
+      },
+    ],
   },
   resolve: {
     alias: {

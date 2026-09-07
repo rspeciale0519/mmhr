@@ -1,10 +1,5 @@
 name: CI
 
-# Integration tests (src/**/*.integration.test.ts) are NOT run here: they need a
-# live Supabase stack. They run locally before every checkpoint. Spinning up
-# Supabase in CI lands in Phase 2, alongside the RLS policy test matrix that
-# makes it worth the minutes.
-
 on:
   pull_request:
   push:
@@ -12,6 +7,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  integration:
+    uses: ./.github/workflows/integration.yml
+    permissions:
+      contents: read
+
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -37,9 +37,8 @@ jobs:
           path: scripts/r9-release-evidence.json
           if-no-files-found: error
 
-      - name: Dependency audit (advisory)
+      - name: Dependency audit
         run: npm run check:dependency-audit
-        continue-on-error: true
 
       - name: Secret scan
         run: npm run check:secrets

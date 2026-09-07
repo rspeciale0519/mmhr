@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await createLead(input as never);
+    const result = await createLead(input);
     return Response.json(
       result.outcomeCode === "idempotency_conflict"
         ? { accepted: false, error: "request_not_accepted" }

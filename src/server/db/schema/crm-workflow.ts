@@ -2,8 +2,10 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  foreignKey,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -12,6 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { identities, orgs } from "./identity";
+import { products, vendorProfiles } from "./crm";
 
 export const deals = pgTable("deals", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -31,6 +34,7 @@ export const deals = pgTable("deals", {
 }, (t) => [
   uniqueIndex("deals_organization_id_id_uq").on(t.organizationId, t.id),
   index("deals_organization_stage_status_idx").on(t.organizationId, t.stage, t.status),
+  foreignKey({ columns: [t.vendorOrganizationId, t.productId], foreignColumns: [products.organizationId, products.id], name: "deals_product_vendor_scope_fk" }).onDelete("restrict"),
   check("deals_stage_ck", sql`${t.stage} in ('lead', 'discovery', 'evaluation', 'proposal', 'selection', 'contracting', 'won', 'lost', 'archived')`),
   check("deals_status_ck", sql`${t.status} in ('open', 'won', 'lost', 'archived')`),
   check("deals_stage_status_ck", sql`(${t.stage} in ('lead', 'discovery', 'evaluation', 'proposal', 'selection', 'contracting') and ${t.status} = 'open') or (${t.stage} = 'won' and ${t.status} = 'won') or (${t.stage} = 'lost' and ${t.status} = 'lost') or (${t.stage} = 'archived' and ${t.status} = 'archived')`),
@@ -55,6 +59,7 @@ export const dealStageHistory = pgTable("deal_stage_history", {
   correlationId: uuid("correlation_id").notNull(),
 }, (t) => [
   index("deal_stage_history_deal_time_idx").on(t.organizationId, t.dealId, t.occurredAt),
+  foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "deal_stage_history_deal_scope_fk" }).onDelete("restrict"),
   check("deal_stage_history_revision_ck", sql`${t.expectedRevision} > 0`),
   check("deal_stage_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
 ]);
@@ -79,6 +84,8 @@ export const renewals = pgTable("renewals", {
 }, (t) => [
   uniqueIndex("renewals_organization_id_id_uq").on(t.organizationId, t.id),
   index("renewals_organization_status_action_idx").on(t.organizationId, t.status, t.nextActionAt),
+  foreignKey({ columns: [t.organizationId, t.sourceDealId], foreignColumns: [deals.organizationId, deals.id], name: "renewals_source_deal_scope_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.organizationId, t.linkedFollowOnDealId], foreignColumns: [deals.organizationId, deals.id], name: "renewals_follow_on_deal_scope_fk" }).onDelete("restrict"),
   check("renewals_dates_ck", sql`${t.contractEndAt} >= ${t.contractStartAt}`),
   check("renewals_window_ck", sql`${t.renewalWindowEndAt} >= ${t.renewalWindowStartAt} and ${t.renewalWindowStartAt} >= ${t.contractStartAt} and ${t.renewalWindowEndAt} <= ${t.contractEndAt}`),
   check("renewals_status_ck", sql`${t.status} in ('upcoming', 'in_review', 'at_risk', 'renewed', 'replaced', 'expanded', 'cancelled')`),
@@ -98,12 +105,23 @@ export const vendorSources = pgTable("vendor_sources", {
   capturedAt: timestamp("captured_at", { withTimezone: true }).notNull(),
   active: boolean("active").notNull().default(true),
   createdByIdentityId: uuid("created_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  ownerIdentityId: uuid("owner_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  captureMethod: text("capture_method").notNull().default("manual"),
+  cadenceDays: integer("cadence_days").notNull().default(30),
+  reviewRequired: boolean("review_required").notNull().default(true),
+  revision: integer("revision").notNull().default(1),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("vendor_sources_organization_id_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "vendor_sources_vendor_scope_fk" }).onDelete("restrict"),
   check("vendor_sources_uri_ck", sql`${t.uri} ~ '^https://'`),
   check("vendor_sources_type_ck", sql`${t.sourceType} in ('vendor_owned', 'licensed', 'manual')`),
   check("vendor_sources_license_ck", sql`${t.licenseNote} is null or length(${t.licenseNote}) <= 500`),
+  check("vendor_sources_capture_method_ck", sql`${t.captureMethod} in ('api', 'web', 'document', 'email', 'manual', 'other')`),
+  check("vendor_sources_cadence_ck", sql`${t.cadenceDays} between 1 and 3650`),
+  check("vendor_sources_revision_ck", sql`${t.revision} > 0`),
+  check("vendor_sources_updated_at_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
 ]);
 
 export const vendorFacts = pgTable("vendor_facts", {
@@ -120,9 +138,12 @@ export const vendorFacts = pgTable("vendor_facts", {
 }, (t) => [
   uniqueIndex("vendor_facts_organization_id_id_uq").on(t.organizationId, t.id),
   uniqueIndex("vendor_facts_organization_field_uq").on(t.organizationId, t.vendorProfileId, t.fieldKey).where(sql`${t.status} <> 'archived'`),
+  foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "vendor_facts_vendor_scope_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.organizationId, t.vendorProfileId, t.productId], foreignColumns: [products.organizationId, products.vendorProfileId, products.id], name: "vendor_facts_product_scope_fk" }).onDelete("restrict"),
   check("vendor_facts_field_key_ck", sql`${t.fieldKey} ~ '^[a-z][a-z0-9_]{0,99}$'`),
   check("vendor_facts_value_ck", sql`length(btrim(${t.value})) between 1 and 2000`),
   check("vendor_facts_status_ck", sql`${t.status} in ('draft', 'published', 'archived')`),
+  check("vendor_facts_product_vendor_ck", sql`${t.productId} is null or ${t.vendorProfileId} is not null`),
 ]);
 
 export const vendorEvidenceVersions = pgTable("vendor_evidence_versions", {
@@ -138,6 +159,8 @@ export const vendorEvidenceVersions = pgTable("vendor_evidence_versions", {
 }, (t) => [
   uniqueIndex("vendor_evidence_organization_fact_version_uq").on(t.organizationId, t.factId, t.version),
   uniqueIndex("vendor_evidence_organization_id_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.factId], foreignColumns: [vendorFacts.organizationId, vendorFacts.id], name: "vendor_evidence_fact_scope_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.organizationId, t.sourceId], foreignColumns: [vendorSources.organizationId, vendorSources.id], name: "vendor_evidence_source_scope_fk" }).onDelete("restrict"),
   check("vendor_evidence_version_ck", sql`${t.version} > 0`),
   check("vendor_evidence_hash_ck", sql`${t.contentHash} ~ '^[a-f0-9]{64}$'`),
   check("vendor_evidence_freshness_ck", sql`${t.freshUntil} >= ${t.capturedAt}`),
@@ -154,6 +177,8 @@ export const vendorFactReviews = pgTable("vendor_fact_reviews", {
   reason: text("reason"),
 }, (t) => [
   uniqueIndex("vendor_fact_reviews_organization_id_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("vendor_fact_reviews_organization_evidence_uq").on(t.organizationId, t.evidenceId),
+  foreignKey({ columns: [t.organizationId, t.evidenceId], foreignColumns: [vendorEvidenceVersions.organizationId, vendorEvidenceVersions.id], name: "vendor_fact_reviews_evidence_scope_fk" }).onDelete("restrict"),
   check("vendor_fact_reviews_decision_ck", sql`${t.decision} in ('approved', 'rejected')`),
   check("vendor_fact_reviews_reason_ck", sql`${t.reason} is null or length(${t.reason}) <= 500`),
 ]);
@@ -162,6 +187,7 @@ export const vendorFactOverrides = pgTable("vendor_fact_overrides", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
   factId: uuid("fact_id").notNull(),
+  sourceId: uuid("source_id"),
   value: text("value").notNull(),
   approvedByIdentityId: uuid("approved_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
   approvedAt: timestamp("approved_at", { withTimezone: true }).notNull(),
@@ -169,9 +195,42 @@ export const vendorFactOverrides = pgTable("vendor_fact_overrides", {
   reason: text("reason").notNull(),
 }, (t) => [
   uniqueIndex("vendor_fact_overrides_organization_id_id_uq").on(t.organizationId, t.id),
+  index("vendor_fact_overrides_source_idx").on(t.organizationId, t.sourceId),
+  foreignKey({ columns: [t.organizationId, t.factId], foreignColumns: [vendorFacts.organizationId, vendorFacts.id], name: "vendor_fact_overrides_fact_scope_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.organizationId, t.sourceId], foreignColumns: [vendorSources.organizationId, vendorSources.id], name: "vendor_fact_overrides_source_scope_fk" }).onDelete("restrict"),
   check("vendor_fact_overrides_value_ck", sql`length(btrim(${t.value})) between 1 and 2000`),
   check("vendor_fact_overrides_dates_ck", sql`${t.expiresAt} >= ${t.approvedAt}`),
   check("vendor_fact_overrides_reason_ck", sql`length(btrim(${t.reason})) between 1 and 500`),
+]);
+
+export const vendorAcquisitionRuns = pgTable("vendor_acquisition_runs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  sourceId: uuid("source_id").notNull(),
+  mode: text("mode").notNull(),
+  adapterId: text("adapter_id"),
+  status: text("status").notNull().default("queued"),
+  artifactReferences: jsonb("artifact_references").notNull().default([]),
+  failureCode: text("failure_code"),
+  requestedByIdentityId: uuid("requested_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  startedAt: timestamp("started_at", { withTimezone: true }),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  revision: integer("revision").notNull().default(1),
+  correlationId: uuid("correlation_id").notNull().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("vendor_acquisition_runs_organization_id_id_uq").on(t.organizationId, t.id),
+  index("vendor_acquisition_runs_source_status_idx").on(t.organizationId, t.sourceId, t.status),
+  foreignKey({ columns: [t.organizationId, t.sourceId], foreignColumns: [vendorSources.organizationId, vendorSources.id], name: "vendor_acquisition_runs_source_scope_fk" }).onDelete("restrict"),
+  check("vendor_acquisition_runs_mode_ck", sql`${t.mode} in ('manual', 'automated')`),
+  check("vendor_acquisition_runs_status_ck", sql`${t.status} in ('queued', 'running', 'succeeded', 'failed', 'needs_review')`),
+  check("vendor_acquisition_runs_adapter_ck", sql`(${t.mode} = 'manual' and ${t.adapterId} is null) or (${t.mode} = 'automated' and ${t.adapterId} is not null and length(btrim(${t.adapterId})) between 1 and 128)`),
+  check("vendor_acquisition_runs_artifacts_ck", sql`jsonb_typeof(${t.artifactReferences}) = 'array' and jsonb_array_length(${t.artifactReferences}) <= 50`),
+  check("vendor_acquisition_runs_failure_ck", sql`${t.failureCode} is null or ${t.failureCode} in ('provider_unavailable', 'invalid_response', 'manual_required')`),
+  check("vendor_acquisition_runs_revision_ck", sql`${t.revision} > 0`),
+  check("vendor_acquisition_runs_timestamps_ck", sql`${t.completedAt} is null or ${t.startedAt} is not null and ${t.completedAt} >= ${t.startedAt}`),
+  check("vendor_acquisition_runs_updated_at_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
 ]);
 
 export type CrmWorkflowTable =
@@ -182,4 +241,5 @@ export type CrmWorkflowTable =
   | typeof vendorFacts
   | typeof vendorEvidenceVersions
   | typeof vendorFactReviews
-  | typeof vendorFactOverrides;
+  | typeof vendorFactOverrides
+  | typeof vendorAcquisitionRuns;

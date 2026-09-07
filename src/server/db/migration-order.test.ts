@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { describe, expect, test } from "vitest";
 
+import { applicationMigrationCount } from "./test/application-schema-inventory";
+
 const migrationsDirectory = join(process.cwd(), "drizzle");
 
 describe("migration ordering", () => {
@@ -21,7 +23,13 @@ describe("migration ordering", () => {
       .sort();
     const indices = names.map((name) => Number(name.slice(0, 4)));
 
+    expect(names).toHaveLength(applicationMigrationCount);
     expect(new Set(indices).size).toBe(indices.length);
     expect(indices).toEqual(indices.map((_, index) => index));
+
+    const journal = JSON.parse(
+      readFileSync(join(migrationsDirectory, "meta", "_journal.json"), "utf8"),
+    ) as { entries: { tag?: string }[] };
+    expect(journal.entries.map((entry) => `${entry.tag}.sql`)).toEqual(names);
   });
 });

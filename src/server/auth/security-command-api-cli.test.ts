@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, test } from "vitest";
 
-import { assertScratchCliVersions, disableScratchSchemaCache, resolveScratchGoCompanion } from "./security-command-api-cli";
+import { assertScratchCliVersions, disableScratchSchemaCache, disableScratchService, resolveScratchGoCompanion } from "./security-command-api-cli";
 
 function files(executables: string[], targets: Record<string, string> = {}, texts: Record<string, string> = {}) {
   return {
@@ -20,7 +20,7 @@ describe("installed Supabase companion selection", () => {
       platform: "linux", searchPath: "/usr/local/bin:/usr/bin",
       files: files(["/usr/local/bin/supabase", "/opt/supabase/supabase-go"], { "/usr/local/bin/supabase": "/opt/supabase/supabase" }),
     });
-    expect(actual).toEqual({ shellExecutable: "/usr/local/bin/supabase", goExecutable: "/opt/supabase/supabase-go" });
+    expect(actual).toEqual({ shellExecutable: "/opt/supabase/supabase", goExecutable: "/opt/supabase/supabase-go" });
   });
 
   test("resolves an installed Scoop shim without executing its contents", async () => {
@@ -72,6 +72,19 @@ describe("installed Supabase companion selection", () => {
   test.each(["[auth]\nenabled = true", "[experimental.pgdelta]\n# no switch", "[experimental.pgdelta]\nenabled = true\nenabled = false"])(
     "refuses an absent or ambiguous scratch cache switch (%#)", (config) => {
       expect(() => disableScratchSchemaCache(config)).toThrow("not found exactly once");
+    },
+  );
+
+  test("disables one optional scratch service without changing another section", () => {
+    const original = "[realtime]\r\nenabled = true\r\n[studio]\r\nenabled = true\r\n";
+    expect(disableScratchService(original, "realtime")).toBe(
+      "[realtime]\r\nenabled = false\r\n[studio]\r\nenabled = true\r\n",
+    );
+  });
+
+  test.each(["[studio]\nenabled = true", "[realtime]\n# no switch", "[realtime]\nenabled = true\nenabled = false"])(
+    "refuses an absent or ambiguous scratch service switch (%#)", (config) => {
+      expect(() => disableScratchService(config, "realtime")).toThrow("not found exactly once");
     },
   );
 });

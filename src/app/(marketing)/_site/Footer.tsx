@@ -21,7 +21,7 @@ export function Footer() {
 
           {FOOTER_COLUMNS.map((col) => (
             <div className="pu-fcol" key={col.heading}>
-              <h4>{col.heading}</h4>
+              <h2>{col.heading}</h2>
               <ul>
                 {col.links.map((link) => (
                   <li key={link.href}>

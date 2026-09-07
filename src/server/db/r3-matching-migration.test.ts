@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const migration = readFileSync(join(process.cwd(), "drizzle", "0040_r3_deterministic_matching.sql"), "utf8");
+const schema = readFileSync(join(process.cwd(), "src", "server", "db", "schema", "r3-matching.ts"), "utf8");
 
 describe("R3 deterministic matching migration", () => {
   test("defines approved rule versions and scoped run snapshots", () => {
@@ -25,5 +26,10 @@ describe("R3 deterministic matching migration", () => {
     expect(migration).toContain("vf.status='published'");
     expect(migration).toContain("deterministic_score=score");
     expect(migration).toContain("scoring_configuration_version=v_rule_version");
+  });
+  test("keeps Drizzle rule and run constraints aligned", () => {
+    for (const name of ["matching_rule_sets_organization_id_uq", "matching_rule_sets_scope_version_uq", "matching_rule_sets_version_ck", "matching_rule_sets_status_ck", "matching_rule_sets_rules_ck", "matching_rule_sets_approval_ck", "matching_runs_intake_scope_fk", "matching_runs_rule_scope_fk", "matching_runs_rule_version_ck", "matching_runs_count_ck", "matching_runs_snapshot_ck", "matching_runs_intake_time_idx"]) {
+      expect(schema).toContain(name);
+    }
   });
 });

@@ -263,9 +263,9 @@ AI can draft explanations, but it cannot calculate or change eligibility or scor
 
 **FR-RFP-04 — Clarification.** Track customer questions, answers, changes, decisions, and approval after MMHR review.
 
-**FR-RFP-05 — Versions (Open).** Preserve a common base.
+**FR-RFP-05 — Versions (Decided).** Preserve one common RFP base for every vendor.
 
-Support vendor-specific amendments only after the product owner closes the related decision.
+MMHR supports additive, vendor-specific amendments after product-owner approval. Each amendment is immutable content with its own version, vendor scope, and approval evidence. An amendment cannot replace or mutate the common base.
 
 **FR-RFP-06 — Distribution.** Record recipients, version, delivery state, deadlines, reminders, and acknowledgements.
 

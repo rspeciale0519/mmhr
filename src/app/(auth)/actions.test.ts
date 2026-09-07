@@ -94,6 +94,17 @@ describe("auth Server Actions", () => {
     expect(signOutRequest).toHaveBeenCalledTimes(1);
   });
 
+  test.each(["returned", "thrown", "missing"])("does not report successful sign-out after a %s provider failure", async (failure) => {
+    vi.mocked(headers).mockResolvedValue(new Headers({ origin: "http://localhost:3000" }) as never);
+    const request = vi.fn();
+    if (failure === "thrown") request.mockRejectedValue(new Error("private provider details"));
+    else request.mockResolvedValue(failure === "missing" ? undefined : { error: new Error("private provider details") });
+    vi.mocked(createClient).mockResolvedValue({ auth: { signOut: request } } as never);
+    await expect(signOut()).rejects.toThrow("Sign-out could not be confirmed. Please try again.");
+    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   test("shows confirmation guidance when sign-up creates no session", async () => {
     const signUpRequest = vi.fn().mockResolvedValue({
       data: { session: null, user: { id: "local-user" } },
@@ -204,6 +215,39 @@ describe("auth Server Actions", () => {
     expect(signInRequest).toHaveBeenCalledWith({
       email: "member@example.test",
       password: "eight123",
+    });
+  });
+
+  test("redacts sign-in provider errors", async () => {
+    const signInRequest = vi.fn().mockResolvedValue({
+      error: new Error("user enumeration and provider detail"),
+    });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: signInRequest },
+    } as never);
+
+    await expect(signIn(null, authForm())).resolves.toEqual({
+      error: "We could not sign you in. Check your email and password, then try again.",
+    });
+  });
+
+  test("redacts sign-up provider errors", async () => {
+    const signUpRequest = vi.fn().mockResolvedValue({
+      data: { session: null, user: null },
+      error: new Error("provider internals and account state"),
+    });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await expect(signUp(null, authForm())).resolves.toEqual({
+      error: "We could not complete registration. Please try again later.",
     });
   });
 

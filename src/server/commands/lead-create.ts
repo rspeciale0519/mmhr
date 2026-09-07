@@ -84,7 +84,7 @@ type LeadCreateOptions = { supabase?: RequestSupabaseClient };
  * The database function owns normalization, idempotency, audit, and isolation.
  */
 export async function createLead(
-  input: LeadCreateInput,
+  input: unknown,
   options: LeadCreateOptions = {},
 ): Promise<LeadCreateResult> {
   const parsed = leadCreateInputSchema.safeParse(input);

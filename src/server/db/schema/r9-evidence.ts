@@ -12,12 +12,13 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { orgs } from "./identity";
+import { identities, orgs } from "./identity";
 
 export const deletionRequests = pgTable("deletion_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
   subjectId: uuid("subject_id").notNull(),
+  requestedByIdentityId: uuid("requested_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
   requestedAt: timestamp("requested_at", { withTimezone: true }).notNull(),
   dueAt: timestamp("due_at", { withTimezone: true }).notNull(),
   legalHold: boolean("legal_hold").notNull().default(false),
@@ -28,6 +29,7 @@ export const deletionRequests = pgTable("deletion_requests", {
   uniqueIndex("deletion_requests_organization_id_uq").on(t.organizationId, t.id),
   index("deletion_requests_due_status_idx").on(t.organizationId, t.status, t.dueAt),
   check("deletion_requests_status_ck", sql`${t.status} in ('requested', 'approved', 'held', 'rejected', 'completed')`),
+  check("deletion_requests_due_ck", sql`${t.dueAt} >= ${t.requestedAt} and ${t.dueAt} <= ${t.requestedAt} + interval '30 days'`),
   check("deletion_requests_retention_ck", sql`${t.retentionUntil} is null or ${t.retentionUntil} >= ${t.requestedAt}`),
 ]);
 
@@ -43,6 +45,7 @@ export const deletionDecisions = pgTable("deletion_decisions", {
   uniqueIndex("deletion_decisions_request_uq").on(t.organizationId, t.requestId),
   foreignKey({ columns: [t.organizationId, t.requestId], foreignColumns: [deletionRequests.organizationId, deletionRequests.id], name: "deletion_decisions_scope_fk" }),
   check("deletion_decisions_decision_ck", sql`${t.decision} in ('approved', 'held', 'rejected')`),
+  check("deletion_decisions_reference_ck", sql`${t.auditReference} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$'`),
 ]);
 
 export const availabilityObservations = pgTable("availability_observations", {
@@ -61,6 +64,7 @@ export const availabilityObservations = pgTable("availability_observations", {
   check("availability_observations_duration_ck", sql`${t.durationSeconds} between 1 and 86400`),
   check("availability_observations_outcome_ck", sql`${t.outcome} in ('available', 'unavailable')`),
   check("availability_observations_source_ck", sql`${t.source} in ('synthetic', 'user')`),
+  check("availability_observations_service_ck", sql`${t.serviceId} ~ '^[A-Za-z0-9][A-Za-z0-9._:/-]{0,119}$'`),
 ]);
 
 export const performanceMeasurements = pgTable("performance_measurements", {
@@ -75,6 +79,7 @@ export const performanceMeasurements = pgTable("performance_measurements", {
 }, (t) => [
   uniqueIndex("performance_measurements_organization_id_uq").on(t.organizationId, t.id),
   uniqueIndex("performance_measurements_route_time_uq").on(t.organizationId, t.route, t.measuredAt),
+  check("performance_measurements_route_ck", sql`${t.route} ~ '^/(|[a-z0-9][a-z0-9/_-]*)$'`),
   check("performance_measurements_sample_ck", sql`${t.sampleCount} between 1 and 100000`),
   check("performance_measurements_lcp_ck", sql`${t.lcpP75Ms} between 0 and 60000`),
   check("performance_measurements_inp_ck", sql`${t.inpP75Ms} between 0 and 60000`),

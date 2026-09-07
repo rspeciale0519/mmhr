@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 
 const migration = readFileSync("drizzle/0030_r2b_crm_duplicates.sql", "utf8");
+const schema = readFileSync("src/server/db/schema/crm-duplicate.ts", "utf8");
 
 describe("R2B duplicate migration review", () => {
   test("creates review-only scoped candidates", () => {
@@ -31,4 +32,5 @@ describe("R2B duplicate migration review", () => {
     expect(migration).not.toContain("DELETE FROM public.crm_duplicate_candidates");
     expect(migration).not.toContain("UPDATE public.crm_duplicate_candidates");
   });
+  test("keeps candidate key validation aligned", () => { expect(schema).toContain("crm_duplicate_candidates_candidate_key_ck"); });
 });

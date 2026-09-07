@@ -1,0 +1,10 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { AuthorizationError, requirePermission } from "@/server/auth/authorization";
+import { distributeRfpVersion, rfpDistributionCommandSchema } from "./rfp-distribution";
+
+vi.mock("@/server/auth/authorization", async () => { const actual = await vi.importActual<typeof import("@/server/auth/authorization")>("@/server/auth/authorization"); return { ...actual, requirePermission: vi.fn() }; });
+const ids = { rfpId: "11111111-1111-4111-8111-111111111111", organizationId: "22222222-2222-4222-8222-222222222222", actorIdentityId: "33333333-3333-4333-8333-333333333333", correlationId: "44444444-4444-4444-8444-444444444444", idempotencyKey: "55555555-5555-4555-8555-555555555555" };
+const recipientId = "66666666-6666-4666-8666-666666666666"; const vendorProfileId = "77777777-7777-4777-8777-777777777777";
+const base = { ...ids, version: 1, recipients: [{ recipientId, vendorProfileId, deadlineAt: "2030-01-01T00:00:00Z", reminderAt: "2029-12-25T00:00:00Z", deliveryReference: "delivery:one" }] };
+const rpc = vi.fn(); const context = { supabase: { rpc } as never, identityId: ids.actorIdentityId, scope: { kind: "organization", organizationId: ids.organizationId }, assurance: "aal2", correlationId: ids.correlationId } as const;
+describe("RFP distribution command", () => { beforeEach(() => { rpc.mockReset(); vi.mocked(requirePermission).mockReset().mockResolvedValue(context); }); test("requires unique recipients and bounded delivery references", () => { expect(rfpDistributionCommandSchema.safeParse({ ...base, recipients: [{ ...base.recipients[0], deliveryReference: "" }] }).success).toBe(false); expect(rfpDistributionCommandSchema.safeParse({ ...base, recipients: [base.recipients[0], base.recipients[0]] }).success).toBe(false); }); test("rejects actor mismatch before RPC", async () => { await expect(distributeRfpVersion({ ...base, actorIdentityId: ids.organizationId })).rejects.toBeInstanceOf(AuthorizationError); expect(rpc).not.toHaveBeenCalled(); }); });

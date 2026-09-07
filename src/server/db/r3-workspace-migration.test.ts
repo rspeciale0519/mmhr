@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const migration = readFileSync(join(process.cwd(), "drizzle", "0018_r3_workspace_persistence.sql"), "utf8");
+const schema = readFileSync(join(process.cwd(), "src", "server", "db", "schema", "r3-workspace.ts"), "utf8");
 
 describe("R3 workspace migration review", () => {
   test("creates workspaces, snapshots, participants, and comments", () => {
@@ -50,5 +51,11 @@ describe("R3 workspace migration review", () => {
     expect(migration).toContain("workspace_comments_workspace_scope_fk");
     expect(migration).toContain("workspace_comments_visibility_ck");
     expect(migration).toContain("R3 immutable workspace comments; customer views must filter internal visibility");
+  });
+
+  test("keeps Drizzle workspace scope, array, and lifecycle constraints aligned", () => {
+    for (const name of ["workspaces_intake_scope_fk", "workspace_snapshots_workspace_scope_fk", "workspace_snapshots_arrays_ck", "workspace_participants_workspace_scope_fk", "workspace_participants_timestamps_ck", "workspace_comments_workspace_scope_fk"]) {
+      expect(schema).toContain(name);
+    }
   });
 });

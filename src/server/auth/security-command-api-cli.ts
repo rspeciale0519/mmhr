@@ -56,7 +56,9 @@ export async function resolveScratchGoCompanion(options: {
   if (paths.dirname(goExecutable) !== paths.dirname(resolved) || paths.basename(goExecutable) !== companionName) {
     throw new Error("The Supabase Go companion does not belong to the selected installation");
   }
-  return { shellExecutable: selected, goExecutable };
+  // Launch the resolved binary rather than a package-manager shim. The shim
+  // can replace Docker environment handling and bypass the per-run socket.
+  return { shellExecutable: resolved, goExecutable };
 }
 
 export function assertScratchCliVersions(shellOutput: string, companionOutput: string) {
@@ -82,5 +84,25 @@ export function disableScratchSchemaCache(config: string) {
     return line.replace(/\b(?:true|false)\b/, "false");
   }).join("\n");
   if (sections !== 1 || switches !== 1) throw new Error("The scratch pg-delta cache setting was not found exactly once");
+  return result;
+}
+
+/** Disable one optional service in an isolated scratch configuration. */
+export function disableScratchService(config: string, service: string) {
+  if (!/^[a-z][a-z0-9_.-]*$/.test(service)) throw new Error("Invalid scratch service name");
+  let inSection = false;
+  let sections = 0;
+  let switches = 0;
+  const result = config.split("\n").map((line) => {
+    const header = line.match(/^\s*\[([^\]]+)\]\s*(?:#.*)?\r?$/);
+    if (header) {
+      inSection = header[1] === service;
+      if (inSection) sections++;
+    }
+    if (!inSection || !/^\s*enabled\s*=\s*(?:true|false)\s*(?:#.*)?\r?$/.test(line)) return line;
+    switches++;
+    return line.replace(/\b(?:true|false)\b/, "false");
+  }).join("\n");
+  if (sections !== 1 || switches !== 1) throw new Error(`Scratch service ${service} setting was not found exactly once`);
   return result;
 }

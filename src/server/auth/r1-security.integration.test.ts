@@ -1,6 +1,8 @@
 import postgres from "postgres";
 import { afterAll, describe, expect, test } from "vitest";
 
+import { applicationTables } from "@/server/db/test/application-schema-inventory";
+
 const migrationUrl = process.env.TEST_MIGRATION_DATABASE_URL;
 
 if (!migrationUrl) {
@@ -8,33 +10,6 @@ if (!migrationUrl) {
 }
 
 const owner = postgres(migrationUrl, { max: 1, prepare: true });
-const applicationTables = [
-  "admin_delegation_grants",
-  "audit_events",
-  "audit_log",
-  "contacts",
-  "customer_profiles",
-  "identities",
-  "identity_admin_intents",
-  "identity_recovery_approvals",
-  "identity_recovery_presence",
-  "identity_recovery_requests",
-  "invitations",
-  "leads",
-  "org_members",
-  "orgs",
-  "permission_definitions",
-  "platform_role_assignments",
-  "portal_access_grants",
-  "products",
-  "relationships",
-  "role_definitions",
-  "role_permission_defaults",
-  "security_bootstrap_state",
-  "user_permission_overrides",
-  "vendor_profiles",
-] as const;
-
 describe("R1 local security boundary evidence", () => {
   afterAll(async () => {
     await owner.end();

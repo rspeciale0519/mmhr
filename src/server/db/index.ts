@@ -3,6 +3,7 @@ import postgres from "postgres";
 
 import * as audit from "./schema/audit";
 import * as aiRun from "./schema/ai-run";
+import * as aiEvaluation from "./schema/ai-evaluation";
 import * as crm from "./schema/crm";
 import * as crmActivity from "./schema/crm-activity";
 import * as crmExport from "./schema/crm-export";
@@ -14,6 +15,8 @@ import * as identityAdmin from "./schema/identity-admin";
 import * as leads from "./schema/leads";
 import * as permissions from "./schema/permissions";
 import * as r3Intake from "./schema/r3-intake";
+import * as r3Matching from "./schema/r3-matching";
+import * as r3Evaluation from "./schema/r3-evaluation";
 import * as r3Scorecard from "./schema/r3-scorecard";
 import * as r3Workspace from "./schema/r3-workspace";
 import * as r6Workflow from "./schema/r6-workflow";
@@ -24,6 +27,7 @@ import * as r9Evidence from "./schema/r9-evidence";
 export const schema = {
   ...audit,
   ...aiRun,
+  ...aiEvaluation,
   ...crm,
   ...crmActivity,
   ...crmExport,
@@ -35,6 +39,8 @@ export const schema = {
   ...leads,
   ...permissions,
   ...r3Intake,
+  ...r3Matching,
+  ...r3Evaluation,
   ...r3Scorecard,
   ...r3Workspace,
   ...r6Workflow,
@@ -57,6 +63,7 @@ export const db = drizzle(client, { schema });
 
 export * from "./schema/audit";
 export * from "./schema/ai-run";
+export * from "./schema/ai-evaluation";
 export * from "./schema/crm";
 export * from "./schema/crm-activity";
 export * from "./schema/crm-export";
@@ -68,6 +75,8 @@ export * from "./schema/identity-admin";
 export * from "./schema/leads";
 export * from "./schema/permissions";
 export * from "./schema/r3-intake";
+export * from "./schema/r3-matching";
+export * from "./schema/r3-evaluation";
 export * from "./schema/r3-scorecard";
 export * from "./schema/r3-workspace";
 export * from "./schema/r6-workflow";

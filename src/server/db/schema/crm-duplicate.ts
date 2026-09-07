@@ -29,6 +29,7 @@ export const crmDuplicateCandidates = pgTable(
   (t) => [
     uniqueIndex("crm_duplicate_candidates_scope_uq").on(t.organizationId, t.candidateKey),
     index("crm_duplicate_candidates_review_idx").on(t.organizationId, t.resource, t.state, t.detectedAt),
+    check("crm_duplicate_candidates_candidate_key_ck", sql`${t.candidateKey} ~ '^[a-z][a-z0-9_.:-]{1,255}$'`),
     check("crm_duplicate_candidates_resource_ck", sql`${t.resource} in ('customer','vendor','product','contact','deal')`),
     check("crm_duplicate_candidates_distinct_ck", sql`${t.leftRecordId} <> ${t.rightRecordId}`),
     check("crm_duplicate_candidates_signal_ck", sql`${t.signal} = 'normalized_key'`),

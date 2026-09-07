@@ -463,14 +463,17 @@ Current GitHub Actions runs:
 - `npm test`
 - `npm run build`
 
-Current CI does not start Supabase or run integration tests.
+The shared integration workflow starts the local Supabase services, applies
+Drizzle migrations, and runs the integration suite. PR CI and the manual
+production gate call this workflow. Remote execution remains unverified.
 
 CI validates and archives `scripts/r9-release-evidence.json`. The release
 command remains fail-closed until every required record has real evidence.
 
-CI also runs `npm run check:dependency-audit` as an advisory report. The
-current dependency baseline has 36 high-severity findings, so this step does
-not yet block merges. Make it blocking after dependency remediation.
+CI and the production gate now run `npm run check:dependency-audit` as a
+required check. It covers production and development dependencies and blocks
+on high or critical findings. The updated lockfile has zero findings as of
+2026-09-05; installation and runtime validation must also pass before merge.
 
 Run `npm run test:integration` locally for database, authentication, RLS, migration, and query changes.
 
@@ -485,7 +488,7 @@ Planned CI additions are:
 - Critical browser journeys
 - Accessibility checks
 - Marketing performance budgets
-- Dependency scanning (currently advisory until remediation)
+- Further dependency policy checks beyond the required npm advisory audit
 - High-confidence repository secret scanning
 - Deployment approval gates
 

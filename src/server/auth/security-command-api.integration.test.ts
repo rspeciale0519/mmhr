@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 
 import { changeIdentityStatus, changeMembershipRole, changeMembershipStatus } from "@/server/commands/security";
 import { authorizePermission } from "./authorization";
+import { appRouter } from "@/server/trpc/root";
 import {
   apiCommandMetadata, createSecurityCommandApiFixtures, elevatedClient, verifiedApiClaims,
   type SecurityCommandApiFixtures,
@@ -111,6 +112,15 @@ describe("R1.4 security commands through real disposable Auth sessions", () => {
     const input = { ...apiCommandMetadata(), organizationId, membershipId: targetMembershipId, roleKey: "contributor" as const };
     const receipt = await changeMembershipRole(input, { supabase: client });
     expect(await changeMembershipRole(input, { supabase: client })).toEqual(receipt);
+    // Exercise the application entry point with real verified provider claims.
+    const claims = await verifiedApiClaims(client, "aal2");
+    const origin = "https://mmhr.example";
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", origin);
+    try {
+      const caller = appRouter.createCaller({ user: { id: claims.subjectId }, supabase: client,
+        transport: { method: "POST", origin } });
+      expect(await caller.memberships.changeRole(input)).toEqual(receipt);
+    } finally { vi.unstubAllEnvs(); }
     expect(receipt.action).toBe("membership.role.change");
     const [member] = await owner`SELECT role, role_key FROM public.org_members WHERE id = ${targetMembershipId}::uuid`;
     expect(member).toEqual({ role: "contributor", role_key: "contributor" });
@@ -122,6 +132,9 @@ describe("R1.4 security commands through real disposable Auth sessions", () => {
       actor_identity_id: organizationAdmin.identityId, organization_id: organizationId,
       before_summary: { stable_key: "viewer" }, after_summary: { stable_key: "contributor" },
     });
+    const [auditCount] = await owner`SELECT count(*)::integer AS count FROM public.audit_events
+      WHERE idempotency_key = ${input.idempotencyKey}`;
+    expect(auditCount!.count).toBe(1);
   });
 
   test("suspends and restores one membership without changing its role", async () => {

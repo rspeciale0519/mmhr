@@ -1,0 +1,3 @@
+import { readFileSync } from "node:fs"; import { join } from "node:path"; import { describe, expect, test } from "vitest";
+const migration = readFileSync(join(process.cwd(), "drizzle", "0061_r4_document_controls.sql"), "utf8");
+describe("R4 document controls migration", () => { test("enforces quarantine metadata and scanning", () => { expect(migration).toContain("quarantine://"); expect(migration).toContain("workflow_document_versions_scan_ck"); expect(migration).toContain("byte_size BETWEEN 1 AND 26214400"); }); test("uses audited replay-safe command", () => { expect(migration).toContain("mmhr_record_workflow_document"); expect(migration).toContain("r1_checked_receipt"); expect(migration).toContain("r1_finish_security_command"); }); });

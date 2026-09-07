@@ -321,14 +321,32 @@ describe("R1 authorization inventory", () => {
     expect(matrix).toContain(renderEntryPointInventoryTable());
   });
 
-  test("has no tRPC mutation before permission and origin controls", () => {
-    const routerSource = walk(
-      path.join(root, "src", "server", "trpc", "routers"),
-    )
-      .filter(isSourceFile)
-      .map((file) => readFileSync(file, "utf8"))
-      .join("\n");
-
-    expect(routerSource).not.toMatch(/\.mutation\s*\(/);
+  test("requires a permission builder for every application tRPC mutation", () => {
+    const files = walk(path.join(root, "src", "server", "trpc", "routers")).filter(isSourceFile);
+    for (const file of files) {
+      const source = parseSource(file);
+      function visit(node: ts.Node) {
+        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)
+          && node.expression.name.text === "mutation") {
+          const builder = node.expression.expression;
+          expect(ts.isCallExpression(builder), toProjectPath(file)).toBe(true);
+          if (!ts.isCallExpression(builder)) return;
+          expect(builder.expression.getText(source)).toBe("permissionProcedure");
+          const options = builder.arguments[0];
+          expect(options && ts.isObjectLiteralExpression(options)).toBe(true);
+          if (!options || !ts.isObjectLiteralExpression(options)) return;
+          const keys = options.properties.map((property) => propertyName(property.name));
+          expect(keys).toEqual(expect.arrayContaining(["permission", "input", "resolveScope"]));
+          const imports = source.statements.filter(ts.isImportDeclaration);
+          expect(imports.some((statement) => statement.moduleSpecifier.getText(source) === '"../trpc"'
+            && statement.importClause?.namedBindings
+            && ts.isNamedImports(statement.importClause.namedBindings)
+            && statement.importClause.namedBindings.elements.some((element) =>
+              element.name.text === "permissionProcedure" && !element.propertyName))).toBe(true);
+        }
+        ts.forEachChild(node, visit);
+      }
+      visit(source);
+    }
   });
 });

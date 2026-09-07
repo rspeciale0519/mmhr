@@ -28,7 +28,7 @@ export function Nav({
           <span className="pu-mark" aria-hidden="true" />
           MatchMaker HR
         </Link>
-        <nav className="pu-links">
+        <nav className="pu-links" aria-label="Primary navigation">
           {PRIMARY_NAV.map((item) => (
             <Link key={item.href} href={item.href}>
               {item.label}

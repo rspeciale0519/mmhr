@@ -26,7 +26,7 @@ export default function CaseStudiesPage() {
               <Link className="pu-pcard" href={`/case-studies/${c.slug}`} key={c.slug}>
                 <div className="pu-case-n">{c.stat}</div>
                 <div className="pu-case-nl">{c.statLabel}</div>
-                <h3>{c.title}</h3>
+                <h2>{c.title}</h2>
                 <p>{c.summary}</p>
                 <div className="pu-pcard-more">Read the case →</div>
               </Link>

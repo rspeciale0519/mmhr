@@ -176,3 +176,196 @@ Added a server-only `AiService` contract with capability and data-class checks,
 schema validation, safe provider failure states, prompt-injection denial, and
 mandatory human review metadata. Focused tests and type checking passed.
 Database run storage, approval records, and provider evaluation remain open.
+
+## [2026-09-04] fix | Restore Docker and guarded recovery API
+- Archived two stale generated Docker socket directories and restored the Linux engine.
+- Flushed guarded Docker wait headers before streaming the delayed response body.
+- Passed both real recovery-MFA API cases with exact disposable cleanup.
+- Passed focused guard tests, type checking, lint, matrix, secret, and production-build checks.
+- Kept aggregate integration, target evidence, Git delivery, and production release open.
+
+## [2026-09-04] test | Pass complete local integration and unit gates
+- Centralized the 108-table and 93-migration test inventory.
+- Kept `mmhr_create_lead` as the one approved anonymous public function.
+- Passed 82 integration files with 678 tests and 271 unit files with 2,739 tests.
+- Removed eight orphaned scratch volumes and 58 validated generated temporary directories.
+- Kept target evidence, Git delivery, and production release open.
+
+## [2026-09-05] fix | Dependency, CI, and finance authorization corrections
+- Full dependency audit reports zero vulnerabilities after compatible updates and tested overrides.
+- Reusable CI starts required local services and blocks on security audit failure.
+- Finance migration 0093 preserves role authority and blocks external workspace-only writes.
+- Six isolated finance integration files pass; local migration applied.
+- Retired 135 verified local diagnostic assignments with audit entries and no record deletion.
+- Broader verification, domain authorization review, functional interfaces, and release remain open.
+
+## [2026-09-05] fix | Require audited MMHR RFP approval
+- Confirmed and corrected external workspace-only RFP approval.
+- Added explicit internal AAL2 approval and distribution permissions.
+- Passed five approval and six distribution cases, including preserved legacy history.
+- Preserved all 273 unit files and 2,750 passing tests after separating environments.
+- Reduced measured full unit runtime from 1,066 to 412 seconds.
+- Kept the new shared migration, aggregate verification, remote delivery, and release open.
+
+## [2026-09-05] test | Verify RFP approval boundaries
+- Passed 2,752 unit tests and the 63-route production build.
+- Passed six approval and seven distribution integration tests.
+- Verified external override denial and private, exactly scoped approval evidence.
+- Found workspace-only amendment approval; correction remains open.
+- Set the requested 30-minute progress updates without closing the goal.
+
+## [2026-09-05] fix | Require MMHR amendment approval
+- Added migration 0095 with action-specific authorization and exact base evidence.
+- Preserved old amendment versions and immutable audit history.
+- Passed nine integration and eight focused unit tests, type checking, and lint.
+- Shared migrations, full integration, remote delivery, and production remain open.
+- Amendment upgrade rehearsal passed: ten integration tests preserve old content and audit records while denying legacy approval replay.
+
+## [2026-09-05] feat | Connect invitation application procedures
+- Added caller-only reads and permission-controlled create, resend, and revoke.
+- Bound actor identity to server authorization and kept exact-origin mutation checks.
+- Passed 66 focused tests, type checking, and lint.
+- Full checks, lifecycle integration, rendered administration, and release remain open.
+
+## [2026-09-05] fix | Repair invitation SQL lifecycle
+- Corrected ambiguous variable naming and invalid audit summary keys in migration 0096.
+- Kept audit validation unchanged and preserved existing records.
+- Passed six isolated lifecycle tests, type checking, focused lint, and the 83-file integration matrix.
+- Fresh full checks and shared migrations remain pending.
+
+## [2026-09-05] fix | Enforce live invitation identity state
+- Passed ten invitation tests for pending reads, provider/session denial, and lifecycle replay.
+- Passed all 2,765 unit tests and the 63-route build.
+- Applied pending migrations to the validated local stack only.
+- Started clean full integration verification; production remains incomplete.
+
+## [2026-09-05] test | Extend invitation expiry and provider checks
+- Passed 13 isolated invitation tests, type checking, and focused lint.
+- Verified exact expiry, one audit event, replay, and deleted/anonymous provider denial.
+- Corrected finance test scope; fresh integration evidence remains pending.
+- Full integration session 34031 remains live. No database migrations changed.
+
+## [2026-09-05] feature | Connect invitation creation screen
+- Added the guarded creation page and permission-aware workspace navigation.
+- Passed 23 focused tests, type checking, full lint, and scoped whitespace checks.
+- Kept existing interface tokens, accessible controls, retry keys, and safe error feedback.
+- Build and full integration sessions remain live; signed-in browser evidence remains open.
+
+## [2026-09-05] fix | Correct page identity binding and pending acceptance
+- Kept provider subjects separate from application identity IDs in page guards.
+- Replaced the active-only acceptance read with verified provider data and the existing caller-bound SQL command.
+- Passed 115 focused tests, eight action tests, type checking, and scoped whitespace checks.
+- Full unit/build and integration verification remain live; pending MFA and browser evidence remain open.
+
+## [2026-09-05] feature | Add authorized organization selection action
+- Added exact-origin, current-permission checks before writing the hardened selection cookie.
+- Passed 15 focused tests, type checking, focused lint, and whitespace checks.
+- Organization listing and navigation remain unfinished. Full unit/build and integration runs remain live.
+
+## [2026-09-05] feature | Connect caller-authorized workspace list
+- Added filtered workspace forms, redacted-name handling, empty/error states, and home navigation.
+- Passed 43 focused checks, type checking, focused lint, and whitespace checks.
+- Prior full suite passed 2,781 tests and 64 routes. Fresh build and integration remain live.
+- Signed-in browser verification and full production delivery remain open.
+
+## [2026-09-05] fix | Pin guarded development server to loopback
+- Kept the exact command allowlist and added the fixed Next hostname argument.
+- Five tests, syntax, focused lint, and the integration inventory passed.
+- Verified the ready development server and OS listener at 127.0.0.1:3018.
+- Type and whitespace checks also passed. Browser evidence remains open; integration remains live.
+
+## [2026-09-05] fix | Accept the real pending-access identity response
+- Corrected strict extra-field rejection and passed 31 focused parser/guard tests.
+- Verified anonymous workspace redirection in the in-app browser.
+- Docker services are healthy; the full integration run continues creating rehearsal containers.
+- Signed-in browser checks and the pending-state database read boundary remain open.
+
+## [2026-09-05] fix | Preserve invitation acceptance retry identity
+- Reused the immutable invitation ID with caller/command-scoped database receipts.
+- Passed 26 focused tests, type checking, and whitespace checks.
+- Duplicate invitation fields fail before provider access. Live response-loss evidence remains open.
+
+## [2026-09-05] fix | Align workspace navigation with portal permissions
+- Reused route permission constants and independently gated each portal/invitation link.
+- Added clear no-access guidance and passed 28 focused tests.
+- Signed-in rendered checks and invitation administration remain open.
+
+## [2026-09-05] verification | Revalidate suites and browser authority
+- Full unit/build 58712 and integration 34031 remain live.
+- Browser authentication submission was rejected by approval review; explicit local-test approval is requested.
+- Retained sign-in tab 3. No authentication workaround or process restart occurred.
+
+## [2026-09-05] verification | Prove stable invitation acceptance replay
+- All 13 isolated PostgreSQL invitation tests passed.
+- Replay produced one membership, audit event, and receipt; another caller could not reuse the key.
+- Full unit/build and integration suites remain active. Browser authentication awaits approval.
+
+## [2026-09-05] fix | Exclude unreviewed invitation data
+- Reproduced two read-policy failures, then passed all 15 isolated tests with additive migration 0097.
+- Passed five migration checks, type checking, and lint; applied 0097 locally.
+- Full unit/build passed 2,821 tests and 65 routes. Full integration passed 82/83 files with one old finance expectation failure.
+- Fresh real-token permission suite 18020 passed all 33 tests. No production change occurred.
+
+## [2026-09-05] fix | Provide caller-only pending setup state
+- Added and locally applied migration 0098 without broadening protected identity reads.
+- Passed 10 isolated database tests, 33 focused tests, four inventory checks, type/lint, and 65 build routes.
+- All 33 real-token permission tests passed, including pending setup with denied workspace access.
+- Browser interaction, registration synchronization, administration, and production delivery remain open.
+
+## [2026-09-05] feature | Verify scoped invitation administration read
+- Added migration 0099 and a strict permission-bound paginated read adapter; applied locally.
+- Passed all 18 isolated invitation tests, 21 focused unit/inventory/migration checks, type checking, and focused lint.
+- Corrected a fixture that violated last-administrator protection; retained the denial as a regression assertion.
+- Administration UI wiring, full fresh integration, browser approval, remote delivery, and production remain open.
+
+## [2026-09-05] feature | Connect invitation administration UI
+- Added scoped invitation list, pagination, empty/error/loading states, and confirmed audited resend/revoke controls.
+- Passed 25 UI/home tests, 15 inventory/router checks, type checking, and focused lint.
+- Verified anonymous loading then sign-in redirect in the in-app browser; signed-in checks await approval.
+- Build 86953 passed with 66 routes. Full lint passed; unit suite 85198 is live. No production action occurred.
+
+## [2026-09-05] feature | Expose scoped membership commands
+- Added separate role, status, and revoke router operations using existing audited commands.
+- Passed 27 router tests, 70 command/inventory tests, type checking, focused lint, and a 66-route build.
+- Passed all 10 disposable real-token API tests again in 99479, including exact audit-count verification.
+- Full unit 85198 passed 2,855 tests across 282 files before these router changes. Member UI and production remain open.
+
+## [2026-09-05] fix | Restrict and paginate member reads
+- Reproduced unreviewed-target disclosure; fixed it in additive migration 0100 and added bounded member reads.
+- Passed six isolated database tests and 25 adapter/migration/inventory checks, type checking, and focused lint.
+- Applied locally; real-token compatibility suite 6135 passed all 33 tests. Inventory is 101 migrations and 85 integration files.
+- Member screens, fresh full integration, browser approval, remote delivery, and production remain open.
+
+## [2026-09-05] feature | Connect member administration screen
+- Added /members with paginated reads and confirmed role, status, and revoke controls.
+- Passed 27 UI/home tests, 20 router/inventory tests, type checking, and focused lint.
+- Verified anonymous loading then sign-in redirect. Signed-in evidence remains approval-gated.
+- Build 47981 passed with 67 routes. Full lint/unit 75646 and integration 42302 are live. No production action occurred.
+
+## [2026-09-05] fix | Match member role controls to active status
+- Removed suspended-member role actions while retaining authorized restoration and revocation.
+- Passed 21 member tests, type checking, focused lint, and the 67-route build 72701.
+- Full unit 75646 and integration 42302 remain live. Strict R9 release check failed with all 12 categories open, as expected.
+
+## [2026-09-05] verification | Prepared identity synchronization boundary
+- Added missing-provider-response rejection and registered the unused adapter boundary.
+- Passed 28 focused tests, lint, and type checking. The synchronization RPC and sign-in wiring remain absent.
+- Full lint/unit 75646 passed 287 files and 2,909 tests. Integration 42302 remains live with unchanged migration inventory.
+
+## [2026-09-05] fix | Reject unconfirmed sign-out
+- Reproduced three sign-out failure cases, then passed all 27 authentication/home tests.
+- Focused lint, type checking, and whitespace checks pass. Build 42911 and integration 42302 remain live.
+- Preserved sign-out scope and exact-origin checks. No production or database change occurred.
+
+## [2026-09-05] checkpoint | Stop development for product clarification
+- Organization endpoint checks passed: 35 router tests, 23 inventory/router tests, type checking, lint, and 67-route build.
+- Preserved all local edits without commit, push, or deployment. Organization UI and real router evidence remain open.
+- Paused the progress heartbeat. User requests product discussion before further development; automatic goal continuations must not resume implementation.
+- Existing integration 42302 may finish naturally. No replacement suite or new feature should start during the discussion.
+
+## [2026-09-07] checkpoint | Prepare reviewed GitHub backup
+- Created checkpoint/pre-workflow-review-2026-09-07 from the unchanged feature HEAD.
+- Passed type checking, lint, 2,957 unit tests, build, secret scanning, dependency audit, and whitespace checks.
+- Recorded the clarified workflow and open requirements in docs/CHECKPOINT-2026-09-07.md.
+- Excluded local settings and hooks. Integration and signed-in browser success remain unverified.
+- Commit/push verification belongs to this task; development, merges, and releases remain stopped.

@@ -148,7 +148,8 @@ These results apply to this local branch. They do not prove remote checks, stagi
 
 This package does not activate routes, privileged mutations, recovery, bootstrap, or worker commands.
 
-The separate stable-identity correction at `dbac05f` remains a merge prerequisite. Its remote push is blocked by auto-review.
+The stable-identity correction from `dbac05f` is applied and locally verified on
+this branch. Its remote merge remains a release prerequisite.
 
 The remaining R1.4 work includes audited security commands, separate delegation ceilings, effective-administrator invariants, identity adapters, and leased worker dispatch.
 
@@ -157,3 +158,31 @@ Before mutation access opens, narrow platform allows to platform scope as record
 The atomic two-identity bootstrap and complete recovery protocol also remain required.
 
 Permission evaluation success alone does not prove command authorization or R1 completion.
+
+## September 5 Domain Authorization Corrections
+
+Migration `0093_r7-finance-authorization.sql` adds internal, organization-scoped
+`finance.manage`. Migration `0094_r4-mmhr-rfp-authorization.sql` adds
+`rfp.approve` and `rfp.distribute` with the same internal AAL2 requirement.
+Only Super Admin defaults include these permissions. Other internal users need
+an explicit authorized grant. External workspace access does not grant them.
+
+RFP distribution requires an immutable `rfp.mmhr_approve` audit event from the
+corrected approval command. The event must match the RFP version, organization,
+and recorded reviewer. Older approval records remain intact but cannot authorize
+a new distribution. An authorized, distinct MMHR reviewer can review an older
+approved version again with a new idempotency key. Existing distributed history
+remains unchanged.
+
+The migrations preserve prior role defaults and link immutable activation
+authority. Emergency containment revokes the affected public RPC execute grants.
+Recovery uses a reviewed forward correction, not workspace-only authorization.
+Local focused evidence does not establish staging or production readiness.
+
+Migration `0095_r4-amendment-authorization.sql` extends `rfp.approve` to amendment
+approval. Draft creation retains its existing workspace permission. Approval
+requires a distinct internal AAL2 reviewer and exact MMHR approval evidence for
+the common base. Invalid or missing actions fail before permission selection.
+New approval events use `rfp.amendment.mmhr_approve`. Legacy approval receipts
+cannot represent new MMHR review. Preserve legacy approved versions and create
+a new amendment version when new approval is required. No migration sends content.

@@ -5,6 +5,7 @@ import {
   insertLegacyAuthUser,
   type RehearsalContext,
 } from "./r1-migration-rehearsal";
+import { anonymousPublicFunctions } from "./test/application-schema-inventory";
 
 type ContainmentFunction = { name: string; signature: string; acl: string | null; authenticated_execute: boolean; anon_execute: boolean };
 type ContainmentTable = { name: string; acl: string | null; rls: boolean; force_rls: boolean; column_acl: unknown; authenticated_access: boolean; anon_access: boolean };
@@ -41,7 +42,11 @@ export async function verifyEmergencyContainment(context: RehearsalContext, expe
   const before = await containmentSnapshot(context.client);
   expect(before.functions.length).toBeGreaterThan(0);
   expect(before.functions.some((row) => row.authenticated_execute)).toBe(true);
-  expect(before.functions.every((row) => !row.anon_execute)).toBe(true);
+  expect(
+    before.functions
+      .filter((row) => row.anon_execute)
+      .map(({ name, signature }) => ({ name, signature })),
+  ).toEqual(anonymousPublicFunctions);
   expect(before.tables.map((row) => row.name)).toEqual(expectedTables);
   expect(before.tables.every((row) => row.rls && !row.authenticated_access && !row.anon_access)).toBe(true);
 

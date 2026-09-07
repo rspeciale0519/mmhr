@@ -10,6 +10,9 @@ import type { ScratchNetwork } from "./security-command-api-isolation";
 
 const authHeader = "x-mmhr-scratch-guard";
 const maxBodyBytes = 4 * 1024 * 1024;
+// Docker's container wait endpoint can remain open while Supabase completes
+// helper initialization. Keep the proxy bounded, but longer than startup.
+const upstreamTimeoutMs = 600_000;
 const safeError = (response: ServerResponse, status: number) => {
   if (response.headersSent) { response.destroy(); return; }
   response.writeHead(status, { "content-type": "application/json", connection: "close" });
@@ -80,12 +83,15 @@ export async function startScratchDockerGuard(options: {
         const upstream = send({
           socketPath: upstreamSocket, path: target, method, agent: false,
           headers: {
-            host: "docker", connection: "close", "content-length": decision.body.length,
+            host: "docker", connection: "keep-alive", "content-length": decision.body.length,
             "content-type": incoming.headers["content-type"] ?? "application/json",
             "user-agent": incoming.headers["user-agent"] ?? "MMHR scratch guard",
           },
         }, (response) => {
-          if (method === "GET" && target.includes(options.network.projectId) && target.includes("/containers/") &&
+          // The policy already validates every container reference and project
+          // filter before forwarding. Count approved container reads even when
+          // the CLI URL encodes the project label or uses an API version prefix.
+          if (method === "GET" && target.includes("/containers/") &&
             [200, 404].includes(response.statusCode ?? 0)) scopedReads++;
           void (async () => {
             try {
@@ -98,6 +104,9 @@ export async function startScratchDockerGuard(options: {
                 return;
               }
               outgoing.writeHead(response.statusCode ?? 502, response.headers);
+              // Docker's wait endpoint sends headers before its body. The Go
+              // client must receive them before it starts the watched container.
+              outgoing.flushHeaders();
               response.once("error", () => { safeError(outgoing, 502); resolve(); });
               response.once("end", resolve);
               response.pipe(outgoing);
@@ -108,7 +117,7 @@ export async function startScratchDockerGuard(options: {
             }
           })();
         });
-        upstream.setTimeout(120_000, () => upstream.destroy());
+        upstream.setTimeout(upstreamTimeoutMs, () => upstream.destroy());
         upstream.once("error", () => { safeError(outgoing, 502); resolve(); });
         outgoing.once("close", () => { upstream.destroy(); resolve(); });
         upstream.end(decision.body);
@@ -124,7 +133,51 @@ export async function startScratchDockerGuard(options: {
   server.headersTimeout = 5_000;
   server.keepAliveTimeout = 1_000;
   // The startup contract uses normal HTTP responses. Do not proxy arbitrary tunnels.
-  server.on("upgrade", (_request, socket) => { denied("upgrade"); socket.destroy(); });
+  server.on("upgrade", (incoming, socket, head) => {
+    if (!authenticated(incoming)) { denied("authentication"); socket.destroy(); return; }
+    if (!writesEnabled) { denied("preflight_write"); socket.destroy(); return; }
+    const target = incoming.url ?? "/";
+    try {
+      // Validate the same narrow attach route as normal Docker requests.
+      policy.evaluate({ method: incoming.method ?? "GET", target, body: Buffer.alloc(0) });
+    } catch (error) {
+      denied(error instanceof DockerGuardDenied ? error.code : "invalid_upgrade");
+      socket.destroy();
+      return;
+    }
+    const upstream = send({
+      socketPath: upstreamSocket, path: target, method: incoming.method ?? "POST", agent: false,
+      headers: {
+        host: "docker", connection: "Upgrade",
+        upgrade: incoming.headers.upgrade ?? "tcp",
+        "content-length": "0", "user-agent": incoming.headers["user-agent"] ?? "MMHR scratch guard",
+      },
+    }, (response) => {
+      // Docker attach must negotiate an upgrade. A normal response is not a
+      // usable tunnel, so close it without forwarding provider diagnostics.
+      response.resume();
+      socket.destroy();
+    });
+    upstream.once("upgrade", (response, upstreamSocket, upstreamHead) => {
+      const lines = [`HTTP/1.1 ${response.statusCode ?? 101} ${response.statusMessage ?? "Switching Protocols"}`];
+      for (const [key, value] of Object.entries(response.headers)) {
+        if (value === undefined) continue;
+        const values = Array.isArray(value) ? value : [value];
+        for (const item of values) lines.push(`${key}: ${item}`);
+      }
+      lines.push("", "");
+      socket.write(lines.join("\r\n"));
+      if (head.length) upstreamSocket.write(head);
+      if (upstreamHead.length) socket.write(upstreamHead);
+      socket.pipe(upstreamSocket);
+      upstreamSocket.pipe(socket);
+      socket.once("close", () => upstreamSocket.destroy());
+      upstreamSocket.once("close", () => socket.destroy());
+    });
+    upstream.once("error", () => socket.destroy());
+    socket.once("error", () => upstream.destroy());
+    upstream.end();
+  });
   server.on("connect", (_request, socket) => { denied("connect"); socket.destroy(); });
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);

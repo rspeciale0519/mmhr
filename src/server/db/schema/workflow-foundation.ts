@@ -13,6 +13,8 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { identities, orgs } from "./identity";
+import { vendorProfiles } from "./crm";
+import { deals } from "./crm-workflow";
 import { intakes } from "./r3-intake";
 
 const auditColumns = () => ({
@@ -50,6 +52,40 @@ export const rfpVersions = pgTable(
   ],
 );
 
+export const rfpAmendments = pgTable(
+  "rfp_amendments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    rfpId: uuid("rfp_id").notNull(),
+    baseRfpVersionId: uuid("base_rfp_version_id").notNull(),
+    vendorProfileId: uuid("vendor_profile_id").notNull(),
+    version: integer("version").notNull(),
+    status: text("status").notNull().default("draft"),
+    title: text("title").notNull(),
+    items: jsonb("items").notNull(),
+    createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+    approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvalReference: text("approval_reference"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("rfp_amendments_organization_id_uq").on(t.organizationId, t.id),
+    uniqueIndex("rfp_amendments_version_uq").on(t.organizationId, t.rfpId, t.vendorProfileId, t.version),
+    index("rfp_amendments_base_status_idx").on(t.organizationId, t.baseRfpVersionId, t.status),
+    foreignKey({ columns: [t.organizationId, t.baseRfpVersionId], foreignColumns: [rfpVersions.organizationId, rfpVersions.id], name: "rfp_amendments_base_version_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "rfp_amendments_vendor_scope_fk" }).onDelete("restrict"),
+    check("rfp_amendments_version_ck", sql`${t.version} > 0`),
+    check("rfp_amendments_status_ck", sql`${t.status} in ('draft', 'review', 'approved', 'archived')`),
+    check("rfp_amendments_title_ck", sql`length(btrim(${t.title})) between 1 and 200`),
+    check("rfp_amendments_items_ck", sql`jsonb_typeof(${t.items}) = 'array' and jsonb_array_length(${t.items}) between 1 and 50`),
+    check("rfp_amendments_approval_ck", sql`(${t.status} <> 'approved' and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.status} = 'approved' and ${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null and ${t.approvalReference} is not null)`),
+    check("rfp_amendments_reference_ck", sql`${t.approvalReference} is null or ${t.approvalReference} ~ '^approval:[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$'`),
+  ],
+);
+
 export const rfpRecipients = pgTable(
   "rfp_recipients",
   {
@@ -60,12 +96,60 @@ export const rfpRecipients = pgTable(
     state: text("state").notNull().default("pending"),
     sentAt: timestamp("sent_at", { withTimezone: true }),
     respondedAt: timestamp("responded_at", { withTimezone: true }),
+    deadlineAt: timestamp("deadline_at", { withTimezone: true }),
+    reminderAt: timestamp("reminder_at", { withTimezone: true }),
+    acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }),
+    deliveryReference: text("delivery_reference"),
   },
   (t) => [
     uniqueIndex("rfp_recipients_version_vendor_uq").on(t.rfpVersionId, t.vendorProfileId),
     index("rfp_recipients_organization_state_idx").on(t.organizationId, t.state),
     foreignKey({ columns: [t.organizationId, t.rfpVersionId], foreignColumns: [rfpVersions.organizationId, rfpVersions.id], name: "rfp_recipients_version_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "rfp_recipients_vendor_scope_fk" }).onDelete("restrict"),
     check("rfp_recipients_state_ck", sql`${t.state} in ('pending', 'distributed', 'acknowledged', 'responded', 'withdrawn')`),
+    check("rfp_recipients_delivery_dates_ck", sql`${t.reminderAt} is null or ${t.deadlineAt} is null or ${t.reminderAt} <= ${t.deadlineAt}`),
+    check("rfp_recipients_delivery_reference_ck", sql`${t.deliveryReference} is null or length(btrim(${t.deliveryReference})) between 1 and 300`),
+  ],
+);
+
+export const rfpClarifications = pgTable(
+  "rfp_clarifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    rfpVersionId: uuid("rfp_version_id").notNull(),
+    question: text("question").notNull(),
+    answer: text("answer"),
+    changeSummary: text("change_summary"),
+    decision: text("decision").notNull().default("pending"),
+    status: text("status").notNull().default("pending"),
+    askedByIdentityId: uuid("asked_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+    answeredByIdentityId: uuid("answered_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    askedAt: timestamp("asked_at", { withTimezone: true }).notNull().defaultNow(),
+    answeredAt: timestamp("answered_at", { withTimezone: true }),
+    responseNormalizationId: uuid("response_normalization_id"),
+    deadlineAt: timestamp("deadline_at", { withTimezone: true }),
+    responseReference: text("response_reference"),
+    approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvalReference: text("approval_reference"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("rfp_clarifications_organization_id_uq").on(t.organizationId, t.id),
+    index("rfp_clarifications_version_status_idx").on(t.organizationId, t.rfpVersionId, t.status),
+    index("rfp_clarifications_response_idx").on(t.organizationId, t.responseNormalizationId, t.status),
+    foreignKey({ columns: [t.organizationId, t.rfpVersionId], foreignColumns: [rfpVersions.organizationId, rfpVersions.id], name: "rfp_clarifications_version_scope_fk" }).onDelete("restrict"),
+    check("rfp_clarifications_decision_ck", sql`${t.decision} in ('pending', 'accepted', 'rejected', 'deferred')`),
+    check("rfp_clarifications_status_ck", sql`${t.status} in ('pending', 'answered', 'approved', 'rejected')`),
+    check("rfp_clarifications_question_ck", sql`length(btrim(${t.question})) between 1 and 5000`),
+    check("rfp_clarifications_answer_ck", sql`${t.answer} is null or length(btrim(${t.answer})) between 1 and 5000`),
+    check("rfp_clarifications_change_ck", sql`${t.changeSummary} is null or length(btrim(${t.changeSummary})) between 1 and 5000`),
+    check("rfp_clarifications_approval_ck", sql`(${t.status} <> 'approved' and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.status} = 'approved' and ${t.answer} is not null and ${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null and ${t.approvalReference} is not null)`),
+    check("rfp_clarifications_reference_ck", sql`${t.approvalReference} is null or ${t.approvalReference} ~ '^approval:[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$'`),
+    check("rfp_clarifications_response_reference_ck", sql`${t.responseReference} is null or length(btrim(${t.responseReference})) between 1 and 500`),
+    check("rfp_clarifications_deadline_ck", sql`${t.deadlineAt} is null or ${t.deadlineAt} >= ${t.askedAt}`),
   ],
 );
 
@@ -86,11 +170,85 @@ export const inboundEmailEvents = pgTable(
     receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
     signature: text("signature").notNull(),
     processedAt: timestamp("processed_at", { withTimezone: true }),
+    rfpVersionId: uuid("rfp_version_id"),
+    vendorProfileId: uuid("vendor_profile_id"),
+    associationState: text("association_state").notNull().default("associated"),
   },
   (t) => [
     uniqueIndex("inbound_email_provider_event_uq").on(t.providerEventId),
+    uniqueIndex("inbound_email_organization_id_id_uq").on(t.organizationId, t.id),
     index("inbound_email_organization_received_idx").on(t.organizationId, t.receivedAt),
+    index("inbound_email_organization_association_idx").on(t.organizationId, t.rfpVersionId, t.vendorProfileId),
+    foreignKey({ columns: [t.organizationId, t.rfpVersionId], foreignColumns: [rfpVersions.organizationId, rfpVersions.id], name: "inbound_email_rfp_version_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "inbound_email_vendor_scope_fk" }).onDelete("restrict"),
     check("inbound_email_body_hash_ck", sql`${t.rawBodyHash} ~ '^[0-9a-fA-F]{64}$'`),
+    check("inbound_email_association_state_ck", sql`${t.associationState} in ('associated', 'needs_attention', 'failed')`),
+  ],
+);
+
+export const rfpResponseNormalizations = pgTable(
+  "rfp_response_normalizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    inboundEventId: uuid("inbound_event_id").notNull(),
+    rfpVersionId: uuid("rfp_version_id").notNull(),
+    vendorProfileId: uuid("vendor_profile_id").notNull(),
+    supportedRequirements: jsonb("supported_requirements").notNull().default([]),
+    unsupportedRequirements: jsonb("unsupported_requirements").notNull().default([]),
+    caveats: jsonb("caveats").notNull().default([]),
+    dependencies: jsonb("dependencies").notNull().default([]),
+    commitments: jsonb("commitments").notNull().default([]),
+    implementationDetails: jsonb("implementation_details").notNull().default([]),
+    missingAnswers: jsonb("missing_answers").notNull().default([]),
+    proposedFollowUps: jsonb("proposed_follow_ups").notNull().default([]),
+    state: text("state").notNull().default("pending"),
+    createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+    reviewedByIdentityId: uuid("reviewed_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    approvedByIdentityId: uuid("approved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvalReference: text("approval_reference"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("rfp_response_normalizations_organization_id_uq").on(t.organizationId, t.id),
+    index("rfp_response_normalizations_event_idx").on(t.organizationId, t.inboundEventId),
+    foreignKey({ columns: [t.organizationId, t.inboundEventId], foreignColumns: [inboundEmailEvents.organizationId, inboundEmailEvents.id], name: "rfp_response_normalizations_event_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.rfpVersionId], foreignColumns: [rfpVersions.organizationId, rfpVersions.id], name: "rfp_response_normalizations_version_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.vendorProfileId], foreignColumns: [vendorProfiles.organizationId, vendorProfiles.id], name: "rfp_response_normalizations_vendor_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.reviewedByIdentityId], foreignColumns: [identities.id], name: "rfp_response_normalizations_reviewed_identity_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.approvedByIdentityId], foreignColumns: [identities.id], name: "rfp_response_normalizations_approved_identity_fk" }).onDelete("restrict"),
+    check("rfp_response_normalizations_state_ck", sql`${t.state} in ('pending', 'reviewed', 'approved', 'rejected')`),
+    check("rfp_response_normalizations_approval_reference_ck", sql`${t.approvalReference} is null or ${t.approvalReference} ~ '^approval:[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$'`),
+    check("rfp_response_normalizations_arrays_ck", sql`jsonb_typeof(${t.supportedRequirements}) = 'array' and jsonb_typeof(${t.unsupportedRequirements}) = 'array' and jsonb_typeof(${t.caveats}) = 'array' and jsonb_typeof(${t.dependencies}) = 'array' and jsonb_typeof(${t.commitments}) = 'array' and jsonb_typeof(${t.implementationDetails}) = 'array' and jsonb_typeof(${t.missingAnswers}) = 'array' and jsonb_typeof(${t.proposedFollowUps}) = 'array'`),
+    check("rfp_response_normalizations_count_ck", sql`jsonb_array_length(${t.supportedRequirements}) <= 100 and jsonb_array_length(${t.unsupportedRequirements}) <= 100 and jsonb_array_length(${t.caveats}) <= 100 and jsonb_array_length(${t.dependencies}) <= 100 and jsonb_array_length(${t.commitments}) <= 100 and jsonb_array_length(${t.implementationDetails}) <= 100 and jsonb_array_length(${t.missingAnswers}) <= 100 and jsonb_array_length(${t.proposedFollowUps}) <= 100`),
+    check("rfp_response_normalizations_review_state_ck", sql`(${t.state} = 'pending' and ${t.reviewedByIdentityId} is null and ${t.reviewedAt} is null and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.state} = 'reviewed' and ${t.reviewedByIdentityId} is not null and ${t.reviewedAt} is not null and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null) or (${t.state} = 'approved' and ${t.reviewedByIdentityId} is not null and ${t.reviewedAt} is not null and ${t.approvedByIdentityId} is not null and ${t.approvedAt} is not null and ${t.approvalReference} is not null) or (${t.state} = 'rejected' and ${t.reviewedByIdentityId} is not null and ${t.reviewedAt} is not null and ${t.approvedByIdentityId} is null and ${t.approvedAt} is null and ${t.approvalReference} is null)`),
+  ],
+);
+
+export const rfpResponseFailures = pgTable(
+  "rfp_response_failures",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    eventId: uuid("event_id"),
+    normalizationId: uuid("normalization_id"),
+    failureCode: text("failure_code").notNull(),
+    failureDetail: text("failure_detail").notNull(),
+    retryAt: timestamp("retry_at", { withTimezone: true }),
+    state: text("state").notNull().default("failed"),
+    createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("rfp_response_failures_organization_id_uq").on(t.organizationId, t.id),
+    index("rfp_response_failures_event_idx").on(t.organizationId, t.eventId, t.createdAt),
+    foreignKey({ columns: [t.organizationId, t.eventId], foreignColumns: [inboundEmailEvents.organizationId, inboundEmailEvents.id], name: "rfp_response_failures_event_scope_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [t.organizationId, t.normalizationId], foreignColumns: [rfpResponseNormalizations.organizationId, rfpResponseNormalizations.id], name: "rfp_response_failures_normalization_scope_fk" }).onDelete("restrict"),
+    check("rfp_response_failures_code_ck", sql`${t.failureCode} ~ '^[a-z][a-z0-9_]{0,63}$'`),
+    check("rfp_response_failures_detail_ck", sql`length(btrim(${t.failureDetail})) between 1 and 1000`),
+    check("rfp_response_failures_state_ck", sql`${t.state} = 'failed'`),
   ],
 );
 
@@ -123,16 +281,27 @@ export const workflowDocumentVersions = pgTable(
     state: text("state").notNull().default("ready"),
     sha256: text("sha256").notNull(),
     storageReference: text("storage_reference").notNull(),
+    contentType: text("content_type").notNull().default("text/plain"),
+    byteSize: integer("byte_size").notNull().default(0),
+    scanState: text("scan_state").notNull().default("pending"),
+    metadata: jsonb("metadata").notNull().default({}),
+    approvedExtractedContent: text("approved_extracted_content"),
     createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     uniqueIndex("workflow_document_versions_document_version_uq").on(t.documentId, t.version),
     index("workflow_document_versions_organization_state_idx").on(t.organizationId, t.state),
+    index("workflow_document_versions_search_idx").on(t.organizationId, t.state, t.scanState, t.documentId),
     foreignKey({ columns: [t.organizationId, t.documentId], foreignColumns: [workflowDocuments.organizationId, workflowDocuments.id], name: "workflow_document_versions_document_scope_fk" }).onDelete("restrict"),
     check("workflow_document_versions_state_ck", sql`${t.state} in ('ready', 'approved', 'superseded')`),
     check("workflow_document_versions_version_ck", sql`${t.version} > 0`),
     check("workflow_document_versions_hash_ck", sql`${t.sha256} ~ '^[0-9a-fA-F]{64}$'`),
+    check("workflow_document_versions_content_type_ck", sql`${t.contentType} in ('application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv', 'text/plain')`),
+    check("workflow_document_versions_size_ck", sql`${t.byteSize} between 1 and 26214400`),
+    check("workflow_document_versions_scan_ck", sql`${t.scanState} in ('pending', 'clean', 'quarantined', 'failed')`),
+    check("workflow_document_versions_metadata_ck", sql`jsonb_typeof(${t.metadata}) = 'object'`),
+    check("workflow_document_versions_extracted_content_ck", sql`${t.approvedExtractedContent} is null or length(${t.approvedExtractedContent}) <= 1000000`),
   ],
 );
 
@@ -159,6 +328,32 @@ export const workflowCommunications = pgTable(
     check("workflow_communications_channel_ck", sql`${t.channel} = 'email'`),
     check("workflow_communications_direction_ck", sql`${t.direction} in ('outbound', 'inbound')`),
     check("workflow_communications_delivery_ck", sql`${t.deliveryState} in ('queued', 'sent', 'delivered', 'failed', 'bounced', 'complained', 'opted_out')`),
+  ],
+);
+
+export const evaluationCommunicationRoutes = pgTable(
+  "evaluation_communication_routes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+    dealId: uuid("deal_id").notNull(),
+    route: text("route").notNull().default("mmhr"),
+    state: text("state").notNull().default("active"),
+    revision: integer("revision").notNull().default(1),
+    decidedByIdentityId: uuid("decided_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...auditColumns(),
+  },
+  (t) => [
+    uniqueIndex("evaluation_communication_routes_organization_id_id_uq").on(t.organizationId, t.id),
+    uniqueIndex("evaluation_communication_routes_deal_uq").on(t.organizationId, t.dealId),
+    index("evaluation_communication_routes_state_idx").on(t.organizationId, t.state, t.route),
+    foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "evaluation_communication_routes_deal_scope_fk" }).onDelete("restrict"),
+    check("evaluation_communication_routes_route_ck", sql`${t.route} in ('mmhr', 'direct')`),
+    check("evaluation_communication_routes_state_ck", sql`${t.state} in ('active', 'finalized')`),
+    check("evaluation_communication_routes_revision_ck", sql`${t.revision} > 0`),
+    check("evaluation_communication_routes_updated_at_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
+    check("evaluation_communication_routes_decision_ck", sql`(${t.state} = 'active' and ${t.route} = 'mmhr' and ${t.decidedByIdentityId} is null and ${t.decidedAt} is null) or (${t.state} = 'finalized' and ${t.route} = 'direct' and ${t.decidedByIdentityId} is not null and ${t.decidedAt} is not null)`),
   ],
 );
 

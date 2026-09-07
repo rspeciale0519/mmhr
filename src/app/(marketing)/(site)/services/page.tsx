@@ -69,7 +69,7 @@ export default function ServicesPage() {
                 <div className="pu-cell-k">{s.k}</div>
                 <h3>{s.h}</h3>
                 <p>{s.p}</p>
-                <p style={{ marginTop: 12, fontSize: 13, opacity: 0.78 }}>{s.for}</p>
+                <p className="pu-cell-note">{s.for}</p>
               </div>
             ))}
           </div>

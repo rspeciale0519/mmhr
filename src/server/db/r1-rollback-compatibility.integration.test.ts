@@ -12,6 +12,7 @@ import {
   startRehearsal,
   stopRehearsal,
 } from "./r1-migration-rehearsal";
+import { applicationMigrationCount } from "./test/application-schema-inventory";
 
 describe("R1.4 read-only application rollback compatibility", () => {
   let context: RehearsalContext | undefined;
@@ -62,6 +63,6 @@ describe("R1.4 read-only application rollback compatibility", () => {
       SELECT count(*)::integer AS count
       FROM drizzle.__drizzle_migrations
     `;
-    expect(history!.count).toBe(27);
+    expect(history!.count).toBe(applicationMigrationCount);
   });
 });

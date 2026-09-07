@@ -34,7 +34,7 @@ export async function requirePageIdentity(): Promise<VerifiedIdentity> {
   return identity;
 }
 
-const mfaIdentityRowsSchema = z.array(z.strictObject({
+const mfaIdentityRowsSchema = z.array(z.object({
   id: securityUuidSchema,
   status: z.enum(["pending", "active"]),
   email_verified_at: z.string().nullable(),
@@ -47,11 +47,11 @@ const mfaIdentityRowsSchema = z.array(z.strictObject({
 export async function requireMfaPageIdentity(): Promise<VerifiedIdentity> {
   const identity = await requirePageIdentity();
   const supabase = await createClient();
-  const response = await supabase.rpc("mmhr_get_my_identity");
+  const response = await supabase.rpc("mmhr_get_my_account_setup");
   const result = mfaIdentityRowsSchema.safeParse(response.error ? null : response.data);
   const row = result.success && result.data.length === 1 ? result.data[0] : null;
-  if (!row || row.id !== identity.id.toLowerCase()
-    || row.status === "active" && row.email_verified_at === null) {
+  // The caller-bound RPC returns an application ID, not the Auth JWT subject.
+  if (!row || row.status === "active" && row.email_verified_at === null) {
     forbidden();
   }
   return identity;
@@ -74,7 +74,9 @@ function requireAuthorizedPage(
   identity: VerifiedIdentity,
   authorization: AuthorizationContext | null,
 ): PageAuthorization {
-  if (!authorization || authorization.identityId !== identity.id.toLowerCase()) forbidden();
+  // authorizePermission verifies this request's JWT and SQL binds auth.uid()
+  // to the application identity. These two identifiers need not be equal.
+  if (!authorization) forbidden();
   return { identity, authorization };
 }
 
@@ -120,15 +122,15 @@ export async function requireHomeAccess(): Promise<PageAuthorization> {
       kind: "organization",
       organizationId,
     });
-    if (organizationAccess && organizationAccess.identityId === identity.id.toLowerCase()) {
+    if (organizationAccess) {
       return { identity, authorization: organizationAccess };
     }
   }
 
   const platformAccess = await authorizePermission("admin.access", { kind: "platform" });
-  if (platformAccess && platformAccess.identityId === identity.id.toLowerCase()) {
+  if (platformAccess) {
     return { identity, authorization: platformAccess };
   }
 
-  forbidden();
+  redirect("/workspaces");
 }

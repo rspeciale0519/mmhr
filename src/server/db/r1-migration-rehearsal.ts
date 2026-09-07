@@ -22,7 +22,7 @@ import {
   verifyScratchNetworkIfPresent, resolveLocalDockerEndpoint, type ScratchNetwork,
 } from "@/server/auth/security-command-api-isolation";
 import { startScratchDockerGuard } from "@/server/auth/security-command-api-docker-guard";
-import { assertScratchCliVersions, disableScratchSchemaCache, resolveScratchGoCompanion } from "@/server/auth/security-command-api-cli";
+import { assertScratchCliVersions, disableScratchSchemaCache, disableScratchService, resolveScratchGoCompanion } from "@/server/auth/security-command-api-cli";
 
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -110,9 +110,14 @@ async function runLocalCli(
   executableOverride?: string,
 ) {
   const executable = executableOverride ?? (process.platform === "win32" ? `${tool}.exe` : tool);
+  const environment = { ...supabaseCliEnvironment(workdir), ...childEnvironment };
+  // An empty or inherited Docker context takes precedence over DOCKER_HOST in
+  // the Docker client. Remove it when the caller deliberately supplies the
+  // per-run guarded socket so the CLI cannot bypass the IPC policy.
+  if (childEnvironment.DOCKER_CONTEXT === undefined) delete environment.DOCKER_CONTEXT;
   const child = spawn(executable, args, {
     cwd: projectRoot,
-    env: { ...supabaseCliEnvironment(workdir), ...childEnvironment },
+    env: environment,
     shell: false,
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
@@ -218,6 +223,9 @@ async function buildScratchConfig(projectId: string, apiEnabled: boolean) {
     // The optional pg-delta catalog exporter mounts its workdir read/write.
     // These tests apply Drizzle migrations directly and need no diff cache.
     config = disableScratchSchemaCache(config);
+    // The installed CLI has started Realtime despite --exclude in prior runs.
+    // Disable it in the disposable config as a second, local-only boundary.
+    config = disableScratchService(config, "realtime");
   }
   return { config, ports };
 }
@@ -286,7 +294,9 @@ export async function startRehearsal(label: string, options: { api?: boolean } =
       runLocalCli("supabase", ["--version"], projectRoot, 15_000, {}, companion.goExecutable),
     ]);
     assertScratchCliVersions(versions[0], versions[1]);
-    supabaseExecutable = companion.goExecutable;
+    // The paired Go binary is used only for version attestation. The shell
+    // binary owns the local lifecycle commands (`start`, `status`, `stop`).
+    supabaseExecutable = companion.shellExecutable;
   }
   const projectId = `mmhr-r1-${safeLabel}-${randomBytes(4).toString("hex")}`;
   const scratchRoot = await mkdtemp(path.join(tmpdir(), "mmhr-r1-"));
@@ -321,6 +331,16 @@ export async function startRehearsal(label: string, options: { api?: boolean } =
             creationGuard.environment, supabaseExecutable);
         } catch { absent = true; }
         if (!absent) throw new Error("The disposable scratch project unexpectedly already exists");
+        // Recent Supabase CLI versions can answer `status` without a Docker
+        // container-list request. Make the guarded, project-filtered read
+        // explicit before enabling any write operation.
+        await runLocalCli(
+          "docker",
+          ["ps", "--filter", `label=com.supabase.cli.project=${projectId}`, "--format", "{{.ID}}"],
+          scratchRoot,
+          30_000,
+          creationGuard.environment,
+        );
         creationGuard.enableWritesAfterRoutingProbe();
       }
       await runSupabase(
@@ -351,8 +371,19 @@ export async function startRehearsal(label: string, options: { api?: boolean } =
         }
       }
     } catch (error) {
-      const codes = creationGuard?.counts().denialCodes ?? [];
+      const observed = creationGuard?.counts();
+      const codes = observed?.denialCodes ?? [];
       if (codes.length) throw new Error(`Scratch Docker startup failed for ${projectId} (${codes.join(", ")})`, { cause: error });
+      if (observed) {
+        const counters = {
+          createdContainers: observed.createdContainers,
+          adjustedBindings: observed.adjustedBindings,
+          scopedReads: observed.scopedReads,
+          deniedRequests: observed.deniedRequests,
+          lastDenial: observed.lastDenial,
+        };
+        throw new Error(`Scratch Docker startup failed for ${projectId} (${JSON.stringify(counters)})`, { cause: error });
+      }
       throw error;
     } finally {
       if (creationGuard) await creationGuard.close();
@@ -396,7 +427,7 @@ export async function startRehearsal(label: string, options: { api?: boolean } =
       }
     }
     try {
-      await stopScratchProject(projectId, scratchRoot, ports, configDigest, network, supabaseExecutable);
+      await stopScratchProject(projectId, scratchRoot, ports, configDigest, network);
     } catch (cleanupError) {
       errors.push(cleanupError);
     }
@@ -444,6 +475,27 @@ export async function applyBaselineMigration(context: RehearsalContext) {
   await migrate(context.db, { migrationsFolder: baselineRoot });
 }
 
+export async function applyMigrationsBeforeRfpAuthorization(context: RehearsalContext) {
+  const prefixRoot = path.join(context.scratchRoot, "pre-rfp-authorization-drizzle");
+  const journal = JSON.parse(await readFile(
+    path.join(projectRoot, "drizzle", "meta", "_journal.json"), "utf8",
+  )) as { version: string; dialect: string; entries: { tag: string }[] };
+  const boundary = journal.entries.findIndex((entry) => entry.tag === "0094_r4-mmhr-rfp-authorization");
+  if (boundary !== 94 || journal.entries[93]?.tag !== "0093_r7-finance-authorization") {
+    throw new Error("The RFP authorization rehearsal prefix is not the reviewed sequence");
+  }
+  const prefix = journal.entries.slice(0, boundary);
+  if (prefix.some((entry) => !/^\d{4}_[a-z0-9_-]+$/.test(entry.tag))) {
+    throw new Error("The RFP authorization rehearsal contains an invalid migration tag");
+  }
+  await mkdir(path.join(prefixRoot, "meta"), { recursive: true });
+  for (const entry of prefix) {
+    await copyFile(path.join(projectRoot, "drizzle", `${entry.tag}.sql`), path.join(prefixRoot, `${entry.tag}.sql`));
+  }
+  await writeFile(path.join(prefixRoot, "meta", "_journal.json"), JSON.stringify({ ...journal, entries: prefix }), "utf8");
+  await migrate(context.db, { migrationsFolder: prefixRoot });
+}
+
 export async function applyMigrationsBeforePermissions(context: RehearsalContext) {
   const prefixRoot = path.join(context.scratchRoot, "pre-permission-drizzle");
   const prefixMeta = path.join(prefixRoot, "meta");
@@ -470,7 +522,6 @@ export async function applyMigrationsBeforePermissions(context: RehearsalContext
 async function stopScratchProject(
   projectId: string, scratchRoot: string, ports: ScratchPorts, configDigest: string,
   network: ScratchNetwork | null,
-  supabaseExecutable?: string,
 ) {
   const resolvedRoot = path.resolve(scratchRoot);
   const resolvedTemp = `${path.resolve(tmpdir())}${path.sep}`;
@@ -508,7 +559,9 @@ async function stopScratchProject(
     resolvedRoot,
     120_000,
     undefined,
-    supabaseExecutable,
+    // The Go companion is required for guarded API startup, but it does not
+    // expose the lifecycle `stop` command. Cleanup must use the shell CLI.
+    undefined,
   );
   if (network) await removeScratchNetwork(network, scratchDocker(resolvedRoot));
   await rm(resolvedRoot, { recursive: true, force: true });
@@ -522,8 +575,7 @@ export async function stopRehearsal(context: RehearsalContext) {
     errors.push(error);
   }
   try {
-    await stopScratchProject(context.projectId, context.scratchRoot, context.ports, context.configDigest, context.network,
-      context.supabaseExecutable);
+    await stopScratchProject(context.projectId, context.scratchRoot, context.ports, context.configDigest, context.network);
   } catch (error) {
     errors.push(error);
   }

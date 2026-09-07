@@ -8,6 +8,7 @@ import {
 } from "@/server/auth/authorization";
 import {
   acceptInvitation,
+  acceptCallerInvitation,
   createInvitation,
   executeInvitationDatabaseCommand,
   expireInvitation,
@@ -77,6 +78,22 @@ describe("invitation database command boundary", () => {
   beforeEach(() => {
     vi.mocked(requirePermission).mockReset().mockResolvedValue(context);
     rpc.mockReset().mockResolvedValue({ data: result, error: null });
+  });
+
+  test("accepts the current caller without an application identity supplied by the action", async () => {
+    const input = { invitationId, verifiedEmail: "person@example.com", correlationId, idempotencyKey };
+    await expect(acceptCallerInvitation(input, { supabase })).resolves.toEqual(result);
+    expect(requirePermission).not.toHaveBeenCalled();
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_accept_invitation", {
+      invitation_id: invitationId, verified_email: "person@example.com",
+      correlation_id: correlationId, idempotency_key: idempotencyKey,
+    });
+  });
+
+  test("rejects a forged actor on the caller acceptance interface", async () => {
+    await expect(acceptCallerInvitation({ ...commandInputs.accept }, { supabase }))
+      .rejects.toMatchObject({ code: "INVALID_INPUT" });
+    expect(rpc).not.toHaveBeenCalled();
   });
 
   test("calls the reviewed create RPC after exact organization authorization", async () => {

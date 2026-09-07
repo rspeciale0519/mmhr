@@ -35,7 +35,9 @@ export const commissionStructures = pgTable("commission_structures", {
   index("commission_structures_vendor_effective_idx").on(t.organizationId, t.vendorOrganizationId, t.effectiveFrom),
   check("commission_structures_scope_ck", sql`${t.organizationId} <> ${t.vendorOrganizationId}`),
   check("commission_structures_type_ck", sql`${t.calculationType} in ('contract_value_rate', 'flat_amount')`),
+  check("commission_structures_amount_ck", sql`(${t.calculationType} = 'contract_value_rate' and ${t.rateBasisPoints} between 0 and 10000 and ${t.flatAmountMinorUnits} is null) or (${t.calculationType} = 'flat_amount' and ${t.rateBasisPoints} is null and ${t.flatAmountMinorUnits} >= 0)`),
   check("commission_structures_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
+  check("commission_structures_dates_ck", sql`${t.effectiveTo} is null or ${t.effectiveTo} >= ${t.effectiveFrom}`),
   check("commission_structures_revision_ck", sql`${t.revision} > 0`),
 ]);
 
@@ -57,10 +59,12 @@ export const commissionEvents = pgTable("commission_events", {
 }, (t) => [
   uniqueIndex("commission_events_organization_id_uq").on(t.organizationId, t.id),
   uniqueIndex("commission_events_idempotency_uq").on(t.organizationId, t.idempotencyKey),
+  uniqueIndex("commission_events_contract_uq").on(t.organizationId, t.contractId),
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "commission_events_deal_scope_fk" }),
   foreignKey({ columns: [t.organizationId, t.structureId], foreignColumns: [commissionStructures.organizationId, commissionStructures.id], name: "commission_events_structure_scope_fk" }),
   check("commission_events_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
   check("commission_events_amount_ck", sql`${t.contractValueMinorUnits} >= 0 and ${t.commissionAmountMinorUnits} >= 0`),
+  check("commission_events_state_ck", sql`${t.state} in ('pending_review', 'approved', 'invoiced', 'partially_paid', 'paid', 'disputed', 'adjusted', 'voided', 'written_off')`),
   check("commission_events_revision_ck", sql`${t.calculationRevision} > 0`),
 ]);
 
@@ -77,6 +81,7 @@ export const commissionEventHistory = pgTable("commission_event_history", {
 }, (t) => [
   index("commission_event_history_scope_time_idx").on(t.organizationId, t.commissionEventId, t.occurredAt),
   foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "commission_event_history_scope_fk" }),
+  check("commission_event_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
 ]);
 
 export const commissionPayments = pgTable("commission_payments", {
@@ -115,7 +120,9 @@ export const financeInvoices = pgTable("finance_invoices", {
   check("finance_invoices_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
   check("finance_invoices_amount_ck", sql`${t.amountMinorUnits} >= 0`),
   check("finance_invoices_status_ck", sql`${t.status} in ('draft', 'ready', 'issued', 'voided')`),
+  check("finance_invoices_issue_ck", sql`${t.status} <> 'issued' or (${t.invoiceNumber} is not null and ${t.issueDate} is not null and ${t.dueDate} is not null)`),
   check("finance_invoices_dates_ck", sql`${t.dueDate} is null or ${t.issueDate} is null or ${t.dueDate} >= ${t.issueDate}`),
+  check("finance_invoices_refs_ck", sql`jsonb_typeof(${t.supportingDocumentReferences}) = 'array'`),
 ]);
 
 export const financeDisputes = pgTable("finance_disputes", {
@@ -135,6 +142,8 @@ export const financeDisputes = pgTable("finance_disputes", {
   foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_disputes_scope_fk" }),
   check("finance_disputes_reason_code_ck", sql`${t.reasonCode} in ('amount', 'eligibility', 'duplicate', 'payment', 'other')`),
   check("finance_disputes_status_ck", sql`${t.status} in ('open', 'resolved', 'rejected')`),
+  check("finance_disputes_resolution_ck", sql`(${t.status} = 'open' and ${t.resolvedByIdentityId} is null and ${t.resolvedAt} is null and ${t.resolution} is null) or (${t.status} <> 'open' and ${t.resolvedByIdentityId} is not null and ${t.resolvedAt} is not null and ${t.resolution} is not null)`),
+  check("finance_disputes_time_ck", sql`${t.resolvedAt} is null or ${t.resolvedAt} >= ${t.openedAt}`),
 ]);
 
 export const financeAdjustments = pgTable("finance_adjustments", {
@@ -152,6 +161,7 @@ export const financeAdjustments = pgTable("finance_adjustments", {
   foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_adjustments_scope_fk" }),
   check("finance_adjustments_direction_ck", sql`${t.direction} in ('increase', 'decrease')`),
   check("finance_adjustments_amount_ck", sql`${t.amountMinorUnits} > 0`),
+  check("finance_adjustments_time_ck", sql`${t.approvedAt} >= ${t.createdAt}`),
 ]);
 
 export const financeHandoffs = pgTable("finance_handoffs", {
@@ -165,5 +175,19 @@ export const financeHandoffs = pgTable("finance_handoffs", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("finance_handoffs_organization_id_uq").on(t.organizationId, t.id),
-  check("finance_handoffs_source_ck", sql`jsonb_typeof(${t.sourceEventIds}) = 'array'`),
+  check("finance_handoffs_source_ck", sql`jsonb_typeof(${t.sourceEventIds}) = 'array' and jsonb_array_length(${t.sourceEventIds}) between 1 and 10000`),
+]);
+
+export const financeReconciliationReports = pgTable("finance_reconciliation_reports", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+  periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+  reportRows: jsonb("report_rows").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("finance_reconciliation_reports_organization_id_uq").on(t.organizationId, t.id),
+  check("finance_reconciliation_reports_period_ck", sql`${t.periodEnd} > ${t.periodStart}`),
+  check("finance_reconciliation_reports_rows_ck", sql`jsonb_typeof(${t.reportRows}) = 'array' and jsonb_array_length(${t.reportRows}) between 1 and 10000`),
 ]);

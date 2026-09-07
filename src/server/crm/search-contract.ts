@@ -21,6 +21,8 @@ export const crmSearchStatuses = [
   "paused",
   "closed",
   "draft",
+  "retired",
+  "inactive",
   "lead",
   "discovery",
   "qualified",

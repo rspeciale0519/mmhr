@@ -117,6 +117,10 @@
   color: var(--muted);
   margin: 0;
 }
+.pu-cell-note {
+  margin-top: 12px !important;
+  font-size: 13px !important;
+}
 .pu-cell-k {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -146,6 +150,7 @@
   flex-direction: column;
   gap: 10px;
 }
+.pu-pcard h2,
 .pu-pcard h3 {
   font-size: 17px;
   font-weight: 650;
@@ -433,6 +438,12 @@ a.pu-solid,
 a.pu-ghost {
   padding: 10px 18px;
   font-size: 14px;
+}
+a.pu-solid {
+  color: var(--accent-on);
+}
+a.pu-ghost {
+  color: var(--ink);
 }
 a.pu-lg {
   padding: 13px 24px;

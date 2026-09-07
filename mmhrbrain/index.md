@@ -11,6 +11,10 @@ Catalog of the mmhr brain. SessionStart reads this.
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
+- [[journal/2026-09-07]] — reviewed checkpoint branch, clarified customer workflow, and 2,957 passing unit tests; development remains stopped.
+- [[journal/2026-09-05]] — removed dependency vulnerabilities, corrected CI startup, and added finance authorization with local migration evidence; broader verification remains open.
+- [[journal/2026-09-04]] — repaired Docker Desktop, passed all 82 integration files and 2,739 unit tests, and removed validated scratch artifacts.
+- [[journal/2026-09-03]] — added durable R9 deletion and operational evidence commands, verified preview protection, diagnosed disposable Docker startup, and validated guarded Docker compatibility; release evidence remains open.
 - [[journal/2026-09-01]] — added R5 AI routing, provider-neutral AI run records, R6 demo, proposal, and contract-handoff persistence, R7 finance persistence, R8 customer-success and operations persistence, R9 deletion and operational evidence persistence, R3 immutable intake, scorecards, workspace persistence, and workspace controls, R2B CRM entity, deal, activity, and task controls, R4 deny-first workflow persistence, R2A lead-command raw-access closure, R2B deal and vendor-evidence persistence, R3 scorecard persistence, and static migration reviews; 2,332 local tests and build pass, target evidence remains open.
 - [[journal/2026-08-31]] — added R1.8 local security evidence and matrix checks; integration remains environment-gated.
 - [[journal/2026-08-31]] — added R2A through R9 foundations, invitation lifecycle contracts, AI run records, release evidence references, CRM command validation, and newsletter consent handling; full integration remains environment-gated.

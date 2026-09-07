@@ -1,0 +1,16 @@
+import "server-only";
+import { z } from "zod";
+import { AuthorizationError, requirePermission, type AuthorizationOptions } from "@/server/auth/authorization";
+
+const uuid = z.uuid().transform((value) => value.toLowerCase());
+const base = { organizationId: uuid, actorIdentityId: uuid, relationshipId: uuid, correlationId: uuid, idempotencyKey: uuid };
+const endpoint = { subjectOrganizationId: uuid.nullable(), subjectContactId: uuid.nullable(), relatedOrganizationId: uuid.nullable(), relatedContactId: uuid.nullable() };
+export const relationshipCommandSchema = z.discriminatedUnion("action", [
+  z.strictObject({ ...base, action: z.literal("create"), relationshipType: z.enum(["customer_vendor", "customer_contact", "vendor_contact", "partner", "other"]), ...endpoint, ownerIdentityId: uuid.nullable(), influence: z.enum(["unknown", "low", "medium", "high"]), preference: z.string().trim().max(500).nullable() }).superRefine((value, context) => { if ((value.subjectOrganizationId === null) === (value.subjectContactId === null)) context.addIssue({ code: "custom", path: ["subjectOrganizationId"], message: "Choose one subject endpoint" }); if ((value.relatedOrganizationId === null) === (value.relatedContactId === null)) context.addIssue({ code: "custom", path: ["relatedOrganizationId"], message: "Choose one related endpoint" }); }),
+  z.strictObject({ ...base, action: z.literal("update"), expectedRevision: z.number().int().positive(), influence: z.enum(["unknown", "low", "medium", "high"]).optional(), preference: z.string().trim().max(500).nullable().optional(), status: z.enum(["active", "paused", "ended", "archived"]).optional() }),
+]);
+const resultSchema = z.strictObject({ relationshipId: uuid, organizationId: uuid, influence: z.string().optional(), status: z.string().optional(), revision: z.number().int().positive().optional(), outcomeCode: z.enum(["recorded", "replayed"]), correlationId: uuid });
+export async function recordRelationship(input: unknown, options: AuthorizationOptions = {}) {
+  const command = relationshipCommandSchema.safeParse(input); if (!command.success) throw new Error("Invalid relationship input");
+  try { const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.data.organizationId }, options); if (context.scope.kind !== "organization" || context.scope.organizationId !== command.data.organizationId || context.identityId !== command.data.actorIdentityId) throw new AuthorizationError(); const response = await context.supabase.rpc("mmhr_record_relationship", { payload: command.data, correlation_id: command.data.correlationId, idempotency_key: command.data.idempotencyKey }); if (response.error) throw new Error("Relationship unavailable"); const result = resultSchema.safeParse(response.data); if (!result.success || result.data.organizationId !== command.data.organizationId || result.data.relationshipId !== command.data.relationshipId || result.data.correlationId !== command.data.correlationId) throw new Error("Invalid relationship result"); return result.data; } catch (error) { if (error instanceof AuthorizationError) throw error; if (error instanceof Error && (error.message === "Relationship unavailable" || error.message === "Invalid relationship result")) throw error; throw new Error("Relationship unavailable"); }
+}

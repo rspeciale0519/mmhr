@@ -40,4 +40,9 @@ describe("performance evidence contract", () => {
     const row = measurement("/");
     expect(() => summarizePerformance([row, { ...row, measurementId: randomUUID() }], "2026-08-31T23:00:00.000Z", ["/"])).toThrow("Duplicate performance route");
   });
+
+  test("rejects fractional percentile values that cannot persist as integer milliseconds", () => {
+    expect(() => summarizePerformance([measurement("/", { lcpP75Ms: 1800.5 })], "2026-08-31T23:00:00.000Z", ["/"])).toThrow("Invalid performance measurement");
+    expect(() => summarizePerformance([measurement("/", { inpP75Ms: 120.5 })], "2026-08-31T23:00:00.000Z", ["/"])).toThrow("Invalid performance measurement");
+  });
 });

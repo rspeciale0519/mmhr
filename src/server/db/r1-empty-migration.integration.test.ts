@@ -14,95 +14,7 @@ import {
   verifyRoleDefaultPrecedence,
   verifyWorkspaceDefinitionGate,
 } from "./r1-permission-rehearsal-cases";
-
-const expectedTables = [
-  "admin_delegation_grants",
-  "ai_run_history",
-  "ai_runs",
-  "audit_events",
-  "audit_log",
-  "availability_observations",
-  "commission_event_history",
-  "commission_events",
-  "commission_payments",
-  "commission_structures",
-  "contacts",
-  "contract_handoff_history",
-  "contract_handoffs",
-  "crm_activities",
-  "crm_task_state_history",
-  "crm_tasks",
-  "customer_profiles",
-  "deal_stage_history",
-  "deals",
-  "deletion_decisions",
-  "deletion_requests",
-  "demo_feedback",
-  "demo_round_history",
-  "demo_rounds",
-  "evaluation_candidates",
-  "finance_adjustments",
-  "finance_disputes",
-  "finance_handoffs",
-  "finance_invoices",
-  "identities",
-  "identity_admin_intents",
-  "identity_intent_attempts",
-  "identity_recovery_approvals",
-  "identity_recovery_presence",
-  "identity_recovery_requests",
-  "inbound_email_events",
-  "intake_requirements",
-  "intakes",
-  "invitations",
-  "leads",
-  "onboarding_history",
-  "onboarding_plans",
-  "org_members",
-  "orgs",
-  "performance_measurements",
-  "permission_authority_sources",
-  "permission_definitions",
-  "permission_deny_removals",
-  "platform_role_assignments",
-  "portal_access_grants",
-  "products",
-  "project_plan_templates",
-  "project_plans",
-  "proposal_comparisons",
-  "proposal_versions",
-  "relationships",
-  "renewals",
-  "rfp_recipients",
-  "rfp_versions",
-  "role_authority_records",
-  "role_definitions",
-  "role_permission_defaults",
-  "role_revocation_authorities",
-  "scorecard_criteria",
-  "scorecard_entries",
-  "scorecard_entry_history",
-  "scorecards",
-  "security_bootstrap_state",
-  "security_command_receipts",
-  "user_permission_overrides",
-  "vendor_evidence_versions",
-  "vendor_fact_overrides",
-  "vendor_fact_reviews",
-  "vendor_facts",
-  "vendor_profiles",
-  "vendor_sources",
-  "work_items",
-  "workflow_communications",
-  "workflow_document_versions",
-  "workflow_documents",
-  "workflow_job_attempts",
-  "workflow_jobs",
-  "workspace_comments",
-  "workspace_participants",
-  "workspace_snapshots",
-  "workspaces",
-];
+import { applicationTables as expectedTables } from "./test/application-schema-inventory";
 
 describe("R1.4 empty database migration", () => {
   let context: RehearsalContext | undefined;
@@ -157,7 +69,7 @@ describe("R1.4 empty database migration", () => {
       { stable_key: "staff", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "super_admin",
-        version: 2,
+        version: 4,
         kind: "platform",
         state: "active",
       },
@@ -175,6 +87,27 @@ describe("R1.4 empty database migration", () => {
       WHERE role.version = 1
     `;
     expect(previousDefaults[0]!.count).toBe(0);
+    const [financeUpgrade] = await context!.client<{
+      prior_state: string; prior_defaults: number; finance_defaults: number; linked_authorities: number;
+    }[]>`
+      SELECT prior.state AS prior_state,
+        (SELECT count(*)::integer FROM role_permission_defaults d
+          WHERE d.role_definition_id = prior.id) AS prior_defaults,
+        (SELECT count(*)::integer FROM role_permission_defaults d
+          WHERE d.role_definition_id = active.id AND d.permission_key = 'finance.manage'
+            AND d.effect = 'allow') AS finance_defaults,
+        (SELECT count(*)::integer FROM role_authority_records current_authority
+          JOIN role_authority_records prior_authority
+            ON prior_authority.id = current_authority.previous_authority_id
+          WHERE current_authority.role_definition_id = active.id
+            AND current_authority.record_kind = 'role_activation'
+            AND prior_authority.role_definition_id = prior.id) AS linked_authorities
+      FROM role_definitions prior JOIN role_definitions active
+        ON active.stable_key = prior.stable_key AND active.version = 3
+      WHERE prior.stable_key = 'super_admin' AND prior.version = 2
+    `;
+    expect(financeUpgrade).toEqual({ prior_state: "approved", prior_defaults: 30,
+      finance_defaults: 1, linked_authorities: 1 });
   });
 
   test("records the R1 migration audit events", async () => {
@@ -186,14 +119,14 @@ describe("R1.4 empty database migration", () => {
     `;
 
     expect(events).toEqual([
-      { action: "permission_registry.sync", count: 1 },
+      { action: "permission_registry.sync", count: 3 },
       { action: "r1.2_schema.add", count: 1 },
       { action: "r1.3_access.add", count: 1 },
       { action: "r1.4_permissions.add", count: 1 },
       { action: "role_authority.backfill", count: 1 },
       { action: "role_authority.expand", count: 1 },
-      { action: "role_version.activate", count: 12 },
-      { action: "role_version.deactivate", count: 6 },
+      { action: "role_version.activate", count: 14 },
+      { action: "role_version.deactivate", count: 8 },
     ]);
   });
 

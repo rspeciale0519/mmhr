@@ -22,16 +22,20 @@ sources:
 The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.8 records the R0 control record and R1 owner
-approvals. Current source and tests provide verified R1.4 and early R1.5 evidence.
+recovery controls. Version 1.10 records the R0 control record, R1 owner
+approvals, and the resolved RFP amendment decision. Current source and tests
+provide verified R1 through R9 foundation evidence; target release evidence
+remains open.
 
 ## Baseline
 
-- 5 requirements are Implemented.
-- 22 requirements are Partial.
-- 119 requirements are Missing.
+- 6 requirements are Implemented.
+- 141 requirements are Partial.
+- 0 requirements are Missing.
 - FR-IAM-08 is Deferred.
-- FR-RFP-05 is Open.
+
+FR-RFP-05 is implemented with a common base and additive immutable vendor
+amendments. The production release remains blocked by missing target evidence.
 
 See the roadmap traceability matrix for evidence paths and classifications.
 
