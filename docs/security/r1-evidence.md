@@ -22,7 +22,7 @@ phone evidence, or recovery approvals.
 | Recovery and MFA reset controls | `src/server/db/r1-recovery-mfa.integration.test.ts`, `src/server/db/r1-recovery-mfa-api.integration.test.ts`, recovery command tests |
 | Restricted identity worker | `src/server/db/r1-identity-worker.integration.test.ts`, `scripts/r1-with-local-worker.mjs` |
 | Caller identity synchronization | `src/server/commands/identity-synchronization.ts`, `drizzle/0101_r1_customer_registration.sql`, adapter and migration-boundary tests; database integration evidence remains open |
-| Private customer workspace setup | `src/server/commands/customer-registration.ts`, `src/server/db/r1-customer-registration.integration.test.ts`, `drizzle/0101_r1_customer_registration.sql`; 38 registration/synchronization cases collected, none verified against the database; runtime wiring remains disabled |
+| Private customer workspace setup | `src/server/commands/customer-registration.ts`, `src/server/db/r1-customer-registration.integration.test.ts`, `drizzle/0101_r1_customer_registration.sql`; 38 registration/synchronization cases collected; Auth action wiring is prepared locally through `src/server/auth/account-setup.ts`; real database and browser verification remains required before release |
 | Source and import boundaries | `src/server/auth/security-source-contract.test.ts`, `src/server/auth/authorization-boundaries.test.ts` |
 | CRM contact, product, and search boundaries | `src/server/commands/crm-database.ts`, `src/server/commands/crm-search-database.ts`, CRM migration and isolation tests |
 | CRM export approvals | `src/server/commands/crm-export-database.ts`, `drizzle/0029_r2b_crm_exports.sql`, CRM export migration and isolation tests |

@@ -24,7 +24,7 @@ const resultSchema = z.strictObject({
 /**
  * Server composition only. The database must derive subject and verified email
  * from its live Auth records, never from caller-supplied identity fields.
- * Do not wire into sign-in until its additive RPC and integration tests exist.
+ * Auth actions compose this with customer setup; release requires live RPC evidence.
  */
 export async function synchronizeCallerIdentity(options: AuthorizationOptions = {}) {
   const correlation = securityUuidSchema.safeParse(options.correlationId ?? randomUUID());

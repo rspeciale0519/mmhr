@@ -34,8 +34,8 @@ export default async function PendingAccessPage() {
       </h1>
       <p className="text-sm" role="status" aria-live="polite">
         {needsEmailVerification
-          ? "Check your email for a confirmation link, then return here."
-          : "Your account is verified. An administrator must grant workspace access before you can continue."}
+          ? "Check your email for a confirmation link. Then sign in again."
+          : "Your email is verified, but workspace access is not ready. Sign in again to retry account setup, or review your invitations."}
       </p>
       {!needsEmailVerification ? (
         <Link className="text-sm underline" href="/invitations/accept">

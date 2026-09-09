@@ -2,6 +2,38 @@
 Updated: 2026-09-08
 
 ## Current focus
+September 8, 23:06: committed database and fixture repairs as 9d1abba.
+Independent SQL review found no remaining defect. It withdrew the speculative
+legacy-receipt concern because strict audit checks prevent such receipts.
+The staged database package passed the secret scan for 1,051 tracked files.
+Prepare the separate Auth composition/evidence commit and push for new CI.
+
+September 8, 23:04 result: full unit 27488 passes 310 files and 3,298 tests.
+Type checking, full lint and the 67-route build pass. No local test remains running.
+Prepare separate CI/database repair and Auth composition commits, then push for
+fresh complete CI. The prior remote failure is not resolved until new tests pass.
+
+September 8, 23:03: CI 34301817813 finished with failure at 0011ad8:
+84 integration files and 812 tests passed; six files and 13 tests failed.
+Standard checks passed. Job logs are available through gh api with escape output;
+gh run view --log cannot write its local CLI cache in this sandbox.
+Prepared additive migration 0107 to fix identity synchronization audit summaries
+without changing the safety validator. Outcomes now use immutable action suffixes;
+receipt replay preserves the public DTO and original status. No cloud application yet.
+Three agents corrected inventory order, correlation/identity fixtures, retained
+history cleanup, an actually-authorized denial fixture and trigger error codes.
+39 registration cases now include real sequential synchronization/workspace setup.
+Prepared Auth action wiring, failure cleanup, explicit uncertainty, strict cookie
+writes and updated pending-access guidance. Independent Auth review found no defect.
+The cookie and thrown-provider regressions failed before their fixes and now pass.
+Focused Auth run 49878 passed 112 tests; final migration checks pass six tests.
+Type, full lint and build 55534 pass (67 routes). Full unit 27488 is running.
+Browser still shows release blocks; actual Auth and workspace UI remains unverified.
+The prior requirement view is committed as 09c6b35. Current Auth/CI fixes are local.
+Next: finish review and full units, commit scoped fixes, push and obtain new-head CI.
+Keep local hooks/settings excluded. No merge, bootstrap or production action occurred.
+See docs/security/r1-account-setup.md. Goal remains active; this turn made progress.
+
 September 8, 22:42 result: full unit 62065 passes 305 files and 3,263 tests.
 All local standard gates and 149 focused checks pass for the requirement view.
 The staged secret scan passes for 1,047 files. Prepare its reviewed local commit.

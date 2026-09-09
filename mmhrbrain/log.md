@@ -513,3 +513,13 @@ Database run storage, approval records, and provider evaluation remain open.
 - Browser checks confirm only the release block, not authenticated screen behavior.
 - Keep the new package local until current remote integration findings are collected. No release or merge occurred.
 - Final full unit 62065 passes 305 files and 3,263 tests. Staged secret scan passes for 1,047 files.
+
+## [2026-09-08] fix | Prepare account setup and repair CI database failures
+- Requirement view committed as 09c6b35. Auth setup now composes verified identity and private workspace commands locally.
+- Strict cookie writes and explicit cleanup uncertainty preserve failure boundaries. Independent Auth review passes.
+- CI 34301817813 failed 13 integration tests; 812 passed. Standard checks passed at 0011ad8.
+- Additive migration 0107 fixes the audit writer without widening safe summaries or changing historical records.
+- Corrected inventory ordering and invalid test fixtures. Changed integration cases collect, but require new live execution.
+- Type, lint, 67-route build and focused checks pass. Full unit 27488 remains active.
+- Keep release controls closed. Commit and push only reviewed fixes, then obtain complete new-head CI.
+- Full unit 27488 passes 310 files and 3,298 tests. All local standard gates pass; remote database repair remains unverified.

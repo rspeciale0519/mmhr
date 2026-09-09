@@ -5,6 +5,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createClient } from "@/lib/supabase/server";
 import { createLead, LeadCreateError } from "@/server/commands/lead-create";
+import { completeAccountSetup } from "@/server/auth/account-setup";
+
+vi.mock("@/server/auth/account-setup", async (original) => ({
+  ...await original<typeof import("@/server/auth/account-setup")>(), completeAccountSetup: vi.fn(),
+}));
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
@@ -47,6 +52,7 @@ describe("auth Server Actions", () => {
     vi.mocked(redirect).mockReset();
     vi.mocked(headers).mockReset();
     vi.mocked(createClient).mockReset();
+    vi.mocked(completeAccountSetup).mockReset().mockResolvedValue(undefined);
     vi.mocked(createLead).mockReset().mockResolvedValue({
       leadId: "11111111-1111-4111-8111-111111111111",
       status: "new",
@@ -92,6 +98,7 @@ describe("auth Server Actions", () => {
     await signOut();
 
     expect(signOutRequest).toHaveBeenCalledTimes(1);
+    expect(createClient).toHaveBeenCalledExactlyOnceWith({ requireCookieWrites: true });
   });
 
   test.each(["returned", "thrown", "missing"])("does not report successful sign-out after a %s provider failure", async (failure) => {
@@ -293,6 +300,17 @@ describe("auth Server Actions", () => {
     await expect(signIn(null, authForm())).resolves.toEqual({
       error: "We could not sign you in. Check your email and password, then try again.",
     });
+  });
+
+  test("redacts thrown sign-in provider errors", async () => {
+    vi.mocked(headers).mockResolvedValue(new Headers({ origin: "http://localhost:3000" }) as never);
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: vi.fn().mockRejectedValue(new Error("private provider details")) },
+    } as never);
+    await expect(signIn(null, authForm())).resolves.toEqual({
+      error: "We could not sign you in. Check your email and password, then try again.",
+    });
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   test("redacts sign-up provider errors", async () => {

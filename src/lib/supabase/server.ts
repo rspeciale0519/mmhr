@@ -7,8 +7,9 @@ import { cookies } from "next/headers";
  * Server Components cannot write cookies, so `setAll` may throw there; the
  * middleware refreshes the session instead, which makes that throw safe to
  * swallow (see src/middleware.ts).
+ * Auth actions require cookie writes and must opt into strict failure reporting.
  */
-export async function createClient() {
+export async function createClient({ requireCookieWrites = false }: { requireCookieWrites?: boolean } = {}) {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -24,7 +25,8 @@ export async function createClient() {
             for (const { name, value, options } of cookiesToSet) {
               cookieStore.set(name, value, options);
             }
-          } catch {
+          } catch (error) {
+            if (requireCookieWrites) throw error;
             // Called from a Server Component. The middleware owns session
             // refresh, so nothing is lost.
           }

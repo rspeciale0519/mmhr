@@ -385,8 +385,8 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     access: "public",
     permission: "none",
     scope: "none",
-    dataPath: "Supabase Auth identity creation",
-    denialEvidence: "exact-origin guard and direct-action tests",
+    dataPath: "lead capture and Auth creation; verified-session caller synchronization and private customer setup",
+    denialEvidence: "exact-origin, direct-action and setup failure tests; live workflow verification pending",
   },
   {
     key: "src/app/(auth)/actions.ts#signIn",
@@ -395,8 +395,8 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     access: "public",
     permission: "none",
     scope: "none",
-    dataPath: "Supabase Auth session creation",
-    denialEvidence: "exact-origin guard and direct-action tests",
+    dataPath: "Auth session creation; caller-bound identity synchronization and private customer setup",
+    denialEvidence: "exact-origin, direct-action and setup failure tests; live workflow verification pending",
   },
   {
     key: "src/app/(auth)/actions.ts#signOut",
@@ -736,7 +736,7 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     permission: "verified matching provider subject and confirmed non-anonymous account",
     scope: "caller identity only; no membership or permission grants",
     dataPath: "server-only adapter; caller-bound fixed RPC; integration evidence pending",
-    denialEvidence: "identity-synchronization.test.ts; runtime wiring remains gated on database evidence",
+    denialEvidence: "identity-synchronization and account-setup tests; release remains gated on database evidence",
   },
   {
     key: "src/server/commands/organization-member-read.ts#command",

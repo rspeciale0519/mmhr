@@ -46,6 +46,8 @@ test("shows access guidance for a verified active identity", async () => {
 
   const page = await PendingAccessPage();
   expect(page).toMatchObject({ type: "main" });
+  expect(renderToStaticMarkup(page)).toContain("Sign in again to retry account setup");
+  expect(renderToStaticMarkup(page)).not.toContain("administrator must grant");
   const children = Array.isArray(page.props.children) ? page.props.children : [page.props.children];
   expect(children.some((child: { props?: { children?: unknown } } | null) => child?.props?.children === "Review pending invitations")).toBe(true);
 });
