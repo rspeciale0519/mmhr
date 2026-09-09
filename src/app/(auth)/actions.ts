@@ -64,10 +64,10 @@ export async function signUp(
     return { error: "We could not complete registration. Please try again later." };
   }
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const response = await supabase.auth.signUp({ email, password });
 
-  if (error) return { error: signUpFailureMessage };
-  if (!data.session) {
+  if (!response || response.error || !response.data?.user) return { error: signUpFailureMessage };
+  if (!response.data.session) {
     return {
       success: "Check your email to confirm your account. Then sign in.",
     };
@@ -86,9 +86,11 @@ export async function signIn(
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const response = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) return { error: signInFailureMessage };
+  if (!response || response.error || !response.data?.user || !response.data.session) {
+    return { error: signInFailureMessage };
+  }
 
   revalidatePath("/", "layout");
   redirect("/home");

@@ -124,6 +124,25 @@ describe("auth Server Actions", () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  test("rejects a sign-up response with no user and no provider error", async () => {
+    const signUpRequest = vi.fn().mockResolvedValue({
+      data: { session: null, user: null },
+      error: null,
+    });
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signUp: signUpRequest },
+    } as never);
+
+    await expect(signUp(null, authForm())).resolves.toEqual({
+      error: "We could not complete registration. Please try again later.",
+    });
+    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   test("rejects a sign-up password shorter than 12 characters before the provider call", async () => {
     const form = authForm();
     form.set("password", "short-pass");
@@ -218,7 +237,10 @@ describe("auth Server Actions", () => {
   );
 
   test("keeps sign-in provider behavior for an eight-character password", async () => {
-    const signInRequest = vi.fn().mockResolvedValue({ error: null });
+    const signInRequest = vi.fn().mockResolvedValue({
+      data: { session: { access_token: "test-token" }, user: { id: "local-user" } },
+      error: null,
+    });
     const form = authForm();
     form.set("password", "eight123");
     vi.mocked(headers).mockResolvedValue(
@@ -234,6 +256,27 @@ describe("auth Server Actions", () => {
       email: "member@example.test",
       password: "eight123",
     });
+  });
+
+  test.each([
+    undefined,
+    { data: null, error: null },
+    { data: { session: null, user: { id: "local-user" } }, error: null },
+    { data: { session: { access_token: "test-token" }, user: null }, error: null },
+  ])("rejects a sign-in response without both a user and session %#", async (response) => {
+    const signInRequest = vi.fn().mockResolvedValue(response);
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ origin: "http://localhost:3000" }) as never,
+    );
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { signInWithPassword: signInRequest },
+    } as never);
+
+    await expect(signIn(null, authForm())).resolves.toEqual({
+      error: "We could not sign you in. Check your email and password, then try again.",
+    });
+    expect(revalidatePath).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   test("redacts sign-in provider errors", async () => {

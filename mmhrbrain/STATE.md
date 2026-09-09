@@ -2,6 +2,51 @@
 Updated: 2026-09-08
 
 ## Current focus
+September 8, 22:21: full local unit 63733 passes 304 files and 3,245 tests.
+The Auth result guard is ready for a separate reviewed commit with these notes.
+Do not push another head until current CI run 34301817813 finishes; collect its
+database findings first. New-head CI will still be required before any merge.
+The checkpoint remains unchanged at a1b2ee3112f1d766f0ce82d24607d6571c8c5ee6.
+
+September 8, 22:18 local fix: reproduced and corrected empty Auth success results
+in actions.ts. Sign-up requires a user; sign-in requires a user and session.
+This does not authorize access or replace verified-claim and permission checks.
+No customer setup or identity synchronization is wired yet.
+The agent's 27 action tests and type check pass. Parent run 67887 passes 94
+focused security tests, full lint and the 67-route build. Independent review
+found no material defect. Full local unit 63733 remains running.
+The two action files remain uncommitted while current remote integration runs.
+Browser tab1 now shows the live GitHub integration log. It is making progress;
+the observed migration-failure recovery file passed two tests, not the full suite.
+
+September 8, 22:11 verification: CI job checks completed successfully, including
+full unit tests and the production build. The integration job is still running.
+Supabase startup, Drizzle migration application and its matrix check passed.
+The run does not expose logs until completion; do not invent remote test counts.
+Watch session 70596 follows run 34301817813 at 30-second intervals.
+The next audited package is sign-in/immediate-session sign-up wiring for caller
+identity synchronization and customer setup, after database evidence passes.
+Require both adapters to succeed before redirect; preserve sessionless confirmation
+guidance and existing permission checks. Missing Auth user data must fail generically.
+The pending-access page still incorrectly says every user needs administrator access.
+Read the actual sources before implementing the audit recommendation.
+
+September 8, 22:09 verification: remote preview shows the expected release block
+without console warnings/errors. CodeRabbit Free only provides summaries and
+skipped this draft; no external code review or paid upgrade is claimed.
+CI run 34301817813 is now running unit and integration tests with no failed step.
+The local Docker failure does not prevent this disposable remote verification.
+
+September 8, 22:06 delivery update: pushed the verification branch and opened
+draft PR #10: https://github.com/rspeciale0519/mmhr/pull/10 (base develop).
+Remote HEAD matches 0011ad89168517b37014dd4fbd5e241361dbec17.
+Commits a80b643 and 0011ad8 preserve workflow preparation and public corrections.
+CI run 34301817813 started its disposable integration job; standard checks are queued.
+Vercel preview is pending. A bot status is not proof of an independent review.
+Inspect actual reviews and CI results. Nothing merged or released to production.
+Keep these follow-up evidence notes local until the next reviewed commit, to
+avoid restarting the current CI run for a documentation-only status update.
+
 September 8, 22:03 update: public and gallery correction checks pass 49 tests.
 Full unit 4939 passed 3,239 tests and failed one documentation assertion.
 The evidence edit omitted the recorded Docker pipe error; restored it with

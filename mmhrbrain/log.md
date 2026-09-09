@@ -489,3 +489,17 @@ Database run storage, approval records, and provider evaluation remain open.
 - Full unit 4939 passed 3,239 tests and failed one omitted-error documentation assertion.
 - Restored the recorded Docker error; all seven focused security-evidence tests pass afterward.
 - Remote unit/database verification and public claim approval remain open. No production action occurred.
+
+## [2026-09-08] delivery | Open draft verification PR 10
+- Pushed codex/full-delivery-verification at 0011ad89168517b37014dd4fbd5e241361dbec17; the remote SHA matches.
+- Draft PR https://github.com/rspeciale0519/mmhr/pull/10 targets develop and preserves the checkpoint.
+- CI run 34301817813 started disposable integration verification. Standard checks and preview remain pending.
+- No merge or production release occurred. Keep release gates closed and inspect actual checks and reviews.
+
+## [2026-09-08] fix | Reject empty Auth provider success results
+- The debugger regression reproduced sign-up success without a returned user.
+- Sign-up now requires a user; sign-in requires both user and session. Existing permission checks remain unchanged.
+- Full local unit 63733 passes 304 files and 3,245 tests; 94 focused checks, type, lint and build pass.
+- Independent review found no material defect. No customer setup or identity synchronization is wired yet.
+- Current remote standard checks and migration application pass at 0011ad8; integration remains running.
+- Hold the next push until that run finishes. Verify the subsequent head before any merge or release.
