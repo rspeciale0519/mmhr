@@ -2,6 +2,62 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 04:29: publication package0114-0117 has passed full unit10092
+(334 files/3,768 tests), type/full lint92315, build10641 (67 routes), final
+fixture lint/type/collection43397, inventory97 and the1,128-file secret scan.
+Independent security and fixture reviews found no remaining concrete defect.
+Exactly36 package files are staged; hooks and local settings remain excluded.
+Commit this package locally after restaging these evidence updates. Preserve
+CI34327707906 at49add22: standard checks and migration0113 application pass;
+integration remains running. This run does not test publication0114-0117.
+Elevated guarded local integration34292 timed out in setup after240s and skipped
+all four then-current cases. Five cases now collect, including concurrency.
+No new SQL or concurrency execution is claimed. Scoped Docker inventory also
+did not respond; cancelled only that read-only CLI session98924. No Docker reset,
+container removal, data deletion, cloud migration, merge or release occurred.
+Audit passes the high-severity gate but has two moderate Vitest findings.
+Official advisory and npm metadata verify patch4.1.11; apply it as a separate
+dependency fix after this commit. Then build atomic up-to-five option selection
+and connected customer/staff screens. The full goal and supplement stay active
+without scope changes. No local validation session remains active.
+
+September 9, 04:13: CI34322766689 ended with standard checks passing and
+94 files/895 integration tests passing; two vendor-scope fixture cases failed.
+Both lacked required active-organization administrators. Fixed fixtures without
+changing runtime authority; committed49add22 and pushed it withb256162.
+Fresh CI34327707906 at49add22 is running and covers0112/0113. Preserve it.
+Publication0114-0117 remains local. Full unit34956 passed333 files/3,766 tests
+but failed one missing-entry inventory test. Added the six entry points and
+matching matrix rows; focused inventory passes. Fresh full unit11959 runs.
+Latest type passed; full lint/inventory92315 runs. Earlier build24972 passed.
+Corrected numeric round-trip precision and failed-statement savepoint handling.
+Expanded publication database fixture collects four cases but has not executed.
+Independent final SQL and fixture reviews continue. No merge or release.
+The entire goal and supplement need no change. Full goal remains active.
+
+September 9, 03:54: reviewed the full active goal and saved supplement. No goal
+change is needed. Built publication authority, immutable records, input capture,
+deterministic evaluation, prepare/publish/revoke operations and separate masked
+customer/internal reads in 0114-0117. Added command adapters and the evaluations
+tRPC router. No customer selection or staff review screen is claimed.
+Type/full lint18560 and build24972 pass with67 routes. Latest focused33 pass.
+Full unit34956 and final type42179 run. Independent SQL review and fixture
+corrections continue. Inventory97 passes; public tables114 and migrations118.
+Focused integration failed Docker/config access during setup and skipped3 cases;
+the expanded fixture has not executed. Preserve CI34322766689 at663b4e6 before
+pushing b256162. No new package commit, cloud migration, merge or release.
+Full goal remains active. Next finish reviews/gates, deliver the verified package,
+then complete the usable all-options review and up-to-five selection workflow.
+
+September 9, 03:18 delivery: committed17 reviewed files asb256162493262033be8a17dc23e230c789e505c1.
+Secret scan passes1,106 tracked files. Full unit327/3,663, type, lint, build and
+final fixture checks pass. No local validation session remains active.
+One local commit awaits CI34322766689 at663b4e6, which covers0111, not0112/0113.
+Preserve that database run before pushingb256162. Unrelated hooks/settings stay
+excluded. Next build the immutable all-options publication and up-to-five
+selection workflow using the new approved-input helper; do not replace the goal
+with legacy matching compatibility. No merge or release. Full goal active.
+
 September 9, 03:15: committed fixture corrections as663b4e69eb54b8be01ae4af636508cd968ccaae6
 and pushed it with95a176b. Fresh CI34322766689 at663b4e6 runs standard job102372957308
 and integration102372957814. Preserve this first0111 execution before another push.

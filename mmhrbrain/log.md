@@ -608,3 +608,14 @@ Database run storage, approval records, and provider evaluation remain open.
 - Full unit12713 passes327 files/3,663 tests. Type, lint, build34010, final fixture10553, inventory96 and independent review pass.
 - Four new database cases collect. Local setup failed on sandbox Docker/config access; all four were skipped.
 - Prepare exact package staging, scan and local commit. All-options publication and customer selection remain open. Full goal stays active.
+- Committed17 reviewed files asb256162 after the1,106-file scan and cached diff check passed. One local commit awaits CI34322766689 before push; no local gate remains active.
+
+## [2026-09-09] implementation | Reviewed all-options publication
+- Full goal and supplement reviewed without scope changes. Added0114-0117, command adapters and evaluations router.
+- Type, full lint, build67 routes, focused33 and inventory97 pass. Full unit34956 and final type42179 run.
+- Local integration setup failed Docker access and skipped3 cases. Expanded fixtures and independent SQL reviews remain pending.
+- Preserve CI34322766689 before push. Complete review/selection screens and remaining R0-R9 work. Full goal stays active.
+- At04:13, CI34322766689 ended with94 files/895 integration tests passing and two administrator-fixture failures. Fixed and pushed49add22 withb256162; fresh CI34327707906 runs.
+- Full unit34956 had one missing-entry inventory failure after3,766 passes. Fixed inventory and started full11959. Corrected numeric precision and savepoint handling; final reviews remain active.
+- At04:29, full unit10092 passes334 files/3,768 tests. Final type/lint, build10641, inventory97, five-case collection43397 and1,128-file secret scan pass. Stage36 files for local commit.
+- Elevated local setup34292 timed out and skipped four cases. Concurrency remains unexecuted. Preserve CI34327707906 at49add22; it covers0113, not publication. Next separate Vitest4.1.11 security update, then masked option selection and screens.

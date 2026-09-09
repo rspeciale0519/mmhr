@@ -57,13 +57,13 @@ describe("R1.4 real-token permission evaluation", () => {
 
   afterAll(() => fixtures.close(), 60_000);
 
-  test("database definitions match all 36 registry keys and metadata exactly", async () => {
+  test("database definitions match all 37 registry keys and metadata exactly", async () => {
     const definitions = await owner`
       SELECT key, kind, platform_scope, organization_scope, minimum_assurance,
         internal_only, required_portal, description, active, retired_at
       FROM public.permission_definitions ORDER BY key
     `;
-    expect(permissionKeys).toHaveLength(36);
+    expect(permissionKeys).toHaveLength(37);
     const expected = permissionKeys.map((key) => {
       const definition = permissionRegistry[key];
       return {
@@ -90,7 +90,8 @@ describe("R1.4 real-token permission evaluation", () => {
           { stable_key: stableKey, version: 4, state: "approved" },
           { stable_key: stableKey, version: 5, state: "approved" },
           { stable_key: stableKey, version: 6, state: "approved" },
-          { stable_key: stableKey, version: 7, state: "active" },
+          { stable_key: stableKey, version: 7, state: "approved" },
+          { stable_key: stableKey, version: 8, state: "active" },
         ];
       }
       if (stableKey === "organization_admin" || stableKey === "contributor") {
@@ -116,7 +117,7 @@ describe("R1.4 real-token permission evaluation", () => {
     const expected = Object.entries(rolePermissionDefaults).flatMap(([role, keys]) =>
       keys.map((permission) => ({ stable_key: role, permission_key: permission, effect: "allow" })),
     ).sort((a, b) => a.stable_key.localeCompare(b.stable_key) || a.permission_key.localeCompare(b.permission_key));
-    expect(expected).toHaveLength(72);
+    expect(expected).toHaveLength(73);
     expect([...defaults]).toEqual(expected);
     const prior = await owner`
       SELECT permission.id FROM public.role_permission_defaults permission

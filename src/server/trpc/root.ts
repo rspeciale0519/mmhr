@@ -4,6 +4,7 @@ import { invitationsRouter } from "./routers/invitations";
 import { membershipsRouter } from "./routers/memberships";
 import { organizationsRouter } from "./routers/organizations";
 import { intakesRouter } from "./routers/intakes";
+import { evaluationsRouter } from "./routers/evaluations";
 
 export const appRouter = router({
   health: healthRouter,
@@ -11,6 +12,7 @@ export const appRouter = router({
   memberships: membershipsRouter,
   organizations: organizationsRouter,
   intakes: intakesRouter,
+  evaluations: evaluationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

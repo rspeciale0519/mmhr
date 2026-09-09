@@ -332,6 +332,11 @@ describe("R1.3 request-scoped grants and RLS", () => {
       "mmhr_get_my_invitations",
       "mmhr_get_organization",
       "mmhr_get_organization_members",
+      "mmhr_prepare_evaluation_publication",
+      "mmhr_publish_evaluation_publication",
+      "mmhr_revoke_evaluation_publication",
+      "mmhr_review_evaluation_publication",
+      "mmhr_get_evaluation_publication",
     ];
     expect(functions.length).toBeGreaterThanOrEqual(requiredFunctions.length);
     expect(functions.map((fn) => fn.proname)).toEqual(expect.arrayContaining(requiredFunctions));

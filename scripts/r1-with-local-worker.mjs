@@ -109,6 +109,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r3-candidate-vendor-scope.integration.test.ts",
     "src/server/db/r3-candidate-vendor-backfill.integration.test.ts",
     "src/server/db/r3-approved-vendor-inputs.integration.test.ts",
+    "src/server/db/r3-evaluation-publication.integration.test.ts",
       "src/server/db/r3-matching.integration.test.ts",
       "src/server/db/r3-comparison-export.integration.test.ts",
       "src/server/db/r3-duplicate-product.integration.test.ts",
