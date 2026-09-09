@@ -87,3 +87,12 @@ Legacy matching still uses its existing formula and workspace permission; this p
 Legacy five-row assessments and retained scores cannot prove that all approved options are available.
 The new customer list must use the approved input boundary directly and must not expose legacy raw product-ID contracts.
 These open requirements prevent R3 or release completion claims.
+
+## September 9 CI fixture correction
+
+CI34327707906 at `49add22` passed 900 integration tests and failed one matching case.
+An earlier scope test left an active vendor organization without an active organization administrator.
+The later audited matching command correctly rejected that invalid administration state.
+The fixture now gives that organization an administrator before it creates the vendor profile.
+No production permission, audit, or capacity rule changed.
+Focused lint, type checking, and test collection pass. A new CI run must verify database execution.

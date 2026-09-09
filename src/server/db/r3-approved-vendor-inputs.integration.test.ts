@@ -345,6 +345,7 @@ describe("R3 approved vendor input resolver and matching consumption", () => {
         VALUES (${`Other vendor ${randomUUID()}`}, 'vendor', 'active', ${BEFORE}::timestamptz, false)
         RETURNING id
       `;
+      await createMembership(sql, otherOrganization!.id, fixture.organizationAdmin, "organization_admin");
       const [otherProfile] = await sql<{ id: string }[]>`
         INSERT INTO public.vendor_profiles (organization_id, status, approved_at, approved_by_identity_id)
         VALUES (${otherOrganization!.id}::uuid, 'active', ${BEFORE}::timestamptz, ${fixture.pair[0].identityId}::uuid)
