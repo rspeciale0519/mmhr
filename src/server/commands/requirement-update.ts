@@ -15,6 +15,10 @@ export async function updateIntakeRequirement(input: unknown, options: Authoriza
   try {
     const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.organizationId }, options);
     if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) throw new AuthorizationError();
+    const admin = await requirePermission("admin.access", { kind: "platform" }, {
+      supabase: context.supabase, correlationId: command.correlationId,
+    });
+    if (admin.identityId !== context.identityId) throw new AuthorizationError();
     const response = await context.supabase.rpc("mmhr_update_intake_requirement", {
       payload: command, correlation_id: command.correlationId, idempotency_key: command.idempotencyKey,
     });

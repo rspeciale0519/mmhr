@@ -16,6 +16,10 @@ export async function createIntakeRequirement(input: unknown, options: Authoriza
     if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) {
       throw new AuthorizationError();
     }
+    const admin = await requirePermission("admin.access", { kind: "platform" }, {
+      supabase: context.supabase, correlationId: command.correlationId,
+    });
+    if (admin.identityId !== context.identityId) throw new AuthorizationError();
     const response = await context.supabase.rpc("mmhr_create_intake_requirement", {
       payload: command, correlation_id: command.correlationId, idempotency_key: command.idempotencyKey,
     });

@@ -551,3 +551,11 @@ Database run storage, approval records, and provider evaluation remain open.
 - The incomplete optional read-wrapper draft is preserved in session scratch; no new read migration is integrated.
 - CI34308802670 runs atcd1772e. Preserve its result before another push. See journal/2026-09-09.md.
 - Final full unit58223 passes 314 files /3,423 tests. All relevant local standard gates pass; prepare the focused reviewed UI commit.
+- Committed UI/evidence asf791eb3 after a passing staged secret scan for1,068 files. Keep active CI34308802670 intact before pushing this head.
+
+## [2026-09-09] implementation | Prepare customer requirement saving
+- Full goal and supplement reviewed without changes. Added scoped customer requirement saving with migration0109 and preserved legacy internal AAL2 restrictions.
+- Focused145 and command31 tests, type, full lint,67-route build and92-file integration inventory pass. New24 database cases collect; actual execution remains pending.
+- CI34308802670 ended with844 passes and3 outdated assertion failures. Exact corrections include current role versions, migration audit counts and safe intake audit summaries.
+- Independent review confirmed the corrections and found no remaining SQL or TypeScript defect. Full unit34037 remains active; see journal/2026-09-09.md.
+- Final unit34037 passes317 files/3,471 tests. Final fixture type/lint and staged secret scan1,076 pass. Prepare the reviewed package commit and fresh CI.

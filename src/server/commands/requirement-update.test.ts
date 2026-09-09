@@ -96,6 +96,15 @@ describe("requirement metadata update command", () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
+  test("requires platform administration in addition to workspace access", async () => {
+    vi.mocked(requirePermission).mockReset().mockResolvedValueOnce(context).mockRejectedValueOnce(new AuthorizationError());
+    await expect(invoke()).rejects.toBeInstanceOf(AuthorizationError);
+    expect(rpc).not.toHaveBeenCalled();
+    expect(requirePermission).toHaveBeenNthCalledWith(2, "admin.access", { kind: "platform" }, {
+      supabase: context.supabase, correlationId: ids.correlationId,
+    });
+  });
+
   test("passes only the exact scoped write and maps an update result", async () => {
     rpc.mockResolvedValue({ data: result(), error: null });
     await expect(invoke()).resolves.toEqual(result());

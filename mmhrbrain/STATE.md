@@ -2,6 +2,39 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 00:41 result: full unit34037 passes317 files/3,471 tests in408.46s.
+Final fixture type/lint63762 passes. All local standard gates are complete.
+Staged secret scan passes1,076 files and linked document paths exist.
+Independent review confirms exact CI expectation repairs, without weaker checks.
+Commit the reviewed27-file package, then push for fresh CI. No merge yet.
+
+September 9, 00:39: reviewed the full goal and supplement; no changes needed.
+Customer requirement backend0109 is ready for final checks, with explicit AAL1
+action and customer portal authority, caller-owned creates, metadata-preserving
+updates, lifecycle and revision guards, immutable history, audit and receipts.
+Legacy create/update now require internal platform admin.access under the lock.
+Independent SQL and TypeScript reviews found no remaining implementation defect.
+Focused145 and command31 tests pass; type, full lint and build75331 pass67 routes.
+Full unit34037 is running. Final fixture type/lint63762 is running.
+New24 integration cases collect; inventory92 is complete. No local DB execution.
+CI34308802670 atcd1772e is TERMINAL FAILURE:89 files/844 tests pass,2 files/3 tests
+fail only on old active roles, migration audit counts and intake audit summaries.
+Prepared exact expectation corrections, including current0109 roles4/4/6 and
+sync5/activate20/deactivate14 events. No security check was weakened.
+Review also corrected new-test metadata, duplicate grant and wrong-actor fixtures.
+Next: finish gates, stage/scan/commit the scoped backend and push for new CI.
+The previous UI commitf791eb3 remains local. No merge or production action.
+
+September 9, 00:16 delivery: committed the reviewed UI/evidence package asf791eb3.
+The branch is one commit ahead of origin. Staged secret scan passes1,068 files.
+Only local hooks/settings remain excluded; new status notes stay local.
+Current CI34308802670 still tests backendcd1772e: checks102330946102 pass and
+integration102330946248 is running. Do not push until this run completes.
+Next: inspect that database result, then push the reviewed UI head for complete CI.
+Continue the customer workflow with explicit customer requirement entry and
+evaluation wiring after inspecting canonical requirements and existing commands.
+The goal remains active and unchanged. No merge or production release occurred.
+
 September 9, 00:14 result: full unit58223 passes314 files /3,423 tests.
 Final build23727 passes67 routes; type, full lint, final focused lint/form checks,
 integration inventory and diff checks pass. No local gate remains running.

@@ -77,6 +77,13 @@ All21 new integration cases collect; database execution remains unverified.
 No screen changes or browser verification are included yet.
 The prior pushed head is still in database CI; it cannot prove this local package.
 
+The subsequent [CI run at cd1772e](https://github.com/rspeciale0519/mmhr/actions/runs/34308802670) passed standard checks and 844 database tests.
+It failed three assertions: old active-role versions, old migration audit counts, and an old customer intake audit shape.
+Twenty of the 21 customer draft cases passed, including authorization, rollback, history immutability and concurrent writes.
+The save case reached its final audit assertion after its persistence, replay, revision and history assertions passed.
+The corrected test requires exact `{version: 1}` summaries and retains detailed history assertions.
+Fresh CI remains required. This is not a complete integration pass or a release approval.
+
 Sources: [approved R1 plan](../../.codex/plans/module-r1-secure-platform-base.md),
 [full goal supplement](../../.codex/plans/goal-full-project-completion.md),
 [previous save guards](r3-intake-save.md), and [authorization matrix](r1-authorization-matrix.md).

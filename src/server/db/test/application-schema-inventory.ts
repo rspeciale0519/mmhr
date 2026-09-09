@@ -112,7 +112,7 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 109;
+export const applicationMigrationCount = 110;
 
 export const anonymousPublicFunctions = [
   {

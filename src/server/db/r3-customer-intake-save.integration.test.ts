@@ -165,10 +165,10 @@ describe("R3 customer draft intake save RPC", () => {
         ORDER BY occurred_at
       `;
       expect(audits).toEqual([
-        { action: "customer.intake.save", before_summary: null,
-          after_summary: { revision: 1, status: "draft" }, correlation_id: correlationId },
-        { action: "customer.intake.save", before_summary: { revision: 1, status: "draft" },
-          after_summary: { revision: 2, status: "in_progress" }, correlation_id: expect.any(String) },
+        { action: "customer.intake.save", before_summary: { version: 1 },
+          after_summary: { version: 1 }, correlation_id: correlationId },
+        { action: "customer.intake.save", before_summary: { version: 1 },
+          after_summary: { version: 1 }, correlation_id: expect.any(String) },
       ]);
     });
   }, 120_000);

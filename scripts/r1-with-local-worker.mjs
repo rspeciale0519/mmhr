@@ -104,6 +104,7 @@ const rehearsalFiles = new Set(
       "src/server/db/r3-comparison.integration.test.ts",
     "src/server/db/r3-intake-save.integration.test.ts",
     "src/server/db/r3-customer-intake-save.integration.test.ts",
+    "src/server/db/r3-customer-requirement-save.integration.test.ts",
       "src/server/db/r3-matching.integration.test.ts",
       "src/server/db/r3-comparison-export.integration.test.ts",
       "src/server/db/r3-duplicate-product.integration.test.ts",

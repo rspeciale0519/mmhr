@@ -39,6 +39,7 @@ export const permissionKeys = [
   "rfp.approve",
   "rfp.distribute",
   "intake.draft.save",
+  "intake.requirement.save",
 ] as const;
 
 export type PermissionKey = (typeof permissionKeys)[number];
@@ -225,6 +226,11 @@ export const permissionRegistry = {
     minimumAssurance: "aal1", internalOnly: false, requiredPortal: "customer",
     description: "Save draft intake answers in an authorized customer portal.",
   },
+  "intake.requirement.save": {
+    kind: "action", platformScope: false, organizationScope: true,
+    minimumAssurance: "aal1", internalOnly: false, requiredPortal: "customer",
+    description: "Save intake requirements in an authorized customer portal.",
+  },
 } as const satisfies Record<PermissionKey, PermissionDefinition>;
 
 export const permissionScopeSchema = z.discriminatedUnion("kind", [
@@ -301,6 +307,7 @@ export const rolePermissionDefaults = {
     "rfp.approve",
     "rfp.distribute",
     "intake.draft.save",
+    "intake.requirement.save",
   ],
   admin: [
     "workspace.access",
@@ -328,6 +335,7 @@ export const rolePermissionDefaults = {
     "member.role.update",
     "audit.view",
     "intake.draft.save",
+    "intake.requirement.save",
   ],
   contributor: [
     "workspace.access",
@@ -336,6 +344,7 @@ export const rolePermissionDefaults = {
     "org.name.read",
     "member.role.read",
     "intake.draft.save",
+    "intake.requirement.save",
   ],
   viewer: [
     "workspace.access",

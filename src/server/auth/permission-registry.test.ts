@@ -28,13 +28,14 @@ const expectedKeys = [
   "finance.manage",
   "rfp.approve", "rfp.distribute",
   "intake.draft.save",
+  "intake.requirement.save",
 ];
 
 describe("R1 permission registry", () => {
-  test("defines exactly the 34 current permissions", () => {
+  test("defines exactly the 35 current permissions", () => {
     expect(permissionKeys).toEqual(expectedKeys);
     expect(Object.keys(permissionRegistry)).toEqual(expectedKeys);
-    expect(new Set(permissionKeys).size).toBe(34);
+    expect(new Set(permissionKeys).size).toBe(35);
     for (const key of expectedKeys) {
       expect(isPermissionKey(key)).toBe(true);
       expect(permissionKeySchema.parse(key)).toBe(key);
@@ -94,6 +95,7 @@ describe("R1 permission registry", () => {
     ["rfp.approve", "action", false, true, "aal2", true, null],
     ["rfp.distribute", "action", false, true, "aal2", true, null],
     ["intake.draft.save", "action", false, true, "aal1", false, "customer"],
+    ["intake.requirement.save", "action", false, true, "aal1", false, "customer"],
   ] as const)("declares scope, assurance, and boundaries for %s", (
     key, kind, platformScope, organizationScope, minimumAssurance, internalOnly, requiredPortal,
   ) => {
@@ -147,12 +149,12 @@ describe("R1 permission registry", () => {
     expect(rolePermissionDefaults.organization_admin).toEqual([
       "workspace.access", "portal.customer.access", "portal.vendor.access", "org.members.view",
       "org.members.invite", "org.members.change_role", "org.members.revoke", "org.members.status.change",
-      "org.name.read", "member.role.read", "member.role.update", "audit.view", "intake.draft.save",
+      "org.name.read", "member.role.read", "member.role.update", "audit.view", "intake.draft.save", "intake.requirement.save",
     ]);
     const externalReads = [
       "workspace.access", "portal.customer.access", "portal.vendor.access", "org.name.read", "member.role.read",
     ];
-    expect(rolePermissionDefaults.contributor).toEqual([...externalReads, "intake.draft.save"]);
+    expect(rolePermissionDefaults.contributor).toEqual([...externalReads, "intake.draft.save", "intake.requirement.save"]);
     expect(rolePermissionDefaults.viewer).toEqual(externalReads);
     expect(Object.keys(rolePermissionDefaults)).toEqual([
       "super_admin", "admin", "staff", "organization_admin", "contributor", "viewer",
