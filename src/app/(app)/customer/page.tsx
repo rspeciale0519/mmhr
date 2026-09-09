@@ -9,6 +9,7 @@ import { CustomerFrame, IntakeDetails, IntakeList, IntakeNotice } from "./intake
 import { SavedRequirements } from "./requirement-views";
 import { CustomerIntakeForm } from "./intake-form";
 import { CustomerRequirementForm } from "./requirement-form";
+import { CustomerIntakeSubmit } from "./intake-submit";
 
 const querySchema = z.object({
   intake: securityUuidSchema.optional(),
@@ -52,6 +53,7 @@ export default async function CustomerHome({ searchParams }: {
     | { kind: "error" };
   let canSave = false;
   let canSaveRequirement = false;
+  let canSubmit = false;
   try {
     const options = { supabase: authorization.supabase };
     const saveAuthorization = await authorizePermission("intake.draft.save", authorization.scope, options);
@@ -61,6 +63,11 @@ export default async function CustomerHome({ searchParams }: {
       const requirementAuthorization = await authorizePermission("intake.requirement.save", authorization.scope, options);
       canSaveRequirement = requirementAuthorization !== null && requirementAuthorization.identityId === authorization.identityId &&
         requirementAuthorization.scope.kind === "organization" && requirementAuthorization.scope.organizationId === organizationId;
+    }
+    if (query.data.intake && !query.data.edit && !query.data.newRequirement && !query.data.editRequirement) {
+      const submissionAuthorization = await authorizePermission("intake.submit", authorization.scope, options);
+      canSubmit = submissionAuthorization !== null && submissionAuthorization.identityId === authorization.identityId &&
+        submissionAuthorization.scope.kind === "organization" && submissionAuthorization.scope.organizationId === organizationId;
     }
     if (((query.data.new || query.data.edit) && !canSave) ||
         ((query.data.newRequirement || query.data.editRequirement) && !canSaveRequirement)) {
@@ -108,6 +115,11 @@ export default async function CustomerHome({ searchParams }: {
         <SavedRequirements intakeId={result.intake.intakeId} page={result.requirements}
           hasCursor={query.data.requirementsAfter !== undefined} afterId={query.data.requirementsAfter}
           canEdit={canSaveRequirement && (result.intake.status === "draft" || result.intake.status === "in_progress")} />
+        {canSubmit && (result.intake.status === "draft" || result.intake.status === "in_progress") &&
+          result.intake.revision < 2_147_483_647 &&
+          <CustomerIntakeSubmit organizationId={organizationId} intakeId={result.intake.intakeId}
+            expectedRevision={result.intake.revision}
+            key={`${organizationId}:${result.intake.intakeId}:${result.intake.revision}`} />}
       </>
         : result.kind === "list" ? <IntakeList page={result.page} hasCursor={query.data.after !== undefined} canCreate={canSave} />
           : result.kind === "form" ? <CustomerIntakeForm organizationId={organizationId} intake={result.intake}

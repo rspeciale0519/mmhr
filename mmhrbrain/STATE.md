@@ -2,6 +2,40 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 02:05 result: full unit93856 passes324 files/3,638 tests in468.31s.
+Final component/navigation35183 passes38 cases, including three navigation
+cases added during the full run. Current suite has3,641 cases; full exact-head
+execution at that count remains pending. Final type/lint4087 passes. Prepare
+the reviewed13-file UI/evidence commit. Preserve CI34315077521 before push.
+
+September 9, 02:04: reviewed the full active goal and its saved supplement. No
+goal change is needed. Customer submission confirmation is implemented with
+separate action authority, explicit saved-state acknowledgement and exact retries.
+Focused188 and final component/navigation38 pass. Type, full lint, build46081
+with67 routes and inventory93 pass. Full unit93856 and final test type/lint4087
+are running. Isolated browser checks pass desktop,375px and768px layouts,
+confirmation, cancel, pending, rejection, uncertain retry and navigation failure.
+No live authenticated workflow or0110 database execution is claimed.
+CI34315077521 still testsab1ec96; preserve its integration run before pushing.
+Next finish current gates, review/scan/commit the UI package, then repair the
+customer/vendor scope bridge needed for all approved masked options. Confirmed
+scope defects: candidate product FK0013, matching vendor fact lookups0040,
+deal product lookup0080 and RFP recipient scope0053/0094. The deal product FK
+in0016 is already correct and must not be changed. The new publication/selection
+contract remains under design; do not create options that cannot reach existing
+candidate workflows. Preserve up to five initial selections, not five displayed
+options. No merge, cloud migration or release occurred. Full goal stays active.
+
+September 9, 01:45 delivery: committed21 reviewed submission backend files as
+1703c6b072954eb9e181df32015dadeefb8f0bbb. One local commit awaits push.
+Current CI34315077521 still testsab1ec96: standard checks pass and integration
+is running. Preserve that run before pushing1703c6b. No merge or release.
+Only unrelated hooks/settings remain excluded; new delivery notes stay local.
+Next implement customer submission confirmation using the strict backend, with
+safe rejection/uncertain retry handling and clear saved-state disclosure. Then
+finish all approved masked options and initial contender selection. Actual0110
+database execution and live workflow evidence remain open. Full goal stays active.
+
 September 9, 01:44 result: final fixture lint/type79404 passes. No local gate
 remains active. All reviewed changes are ready for the submission package commit.
 

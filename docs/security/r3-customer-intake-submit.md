@@ -56,7 +56,7 @@ A new request cannot resubmit a locked intake. A reused key with different input
 The main risks are submitting a stale intake, losing submitted requirement evidence, duplicate writes and wrong-organization access.
 Exact revision checks, current authorization, immutable snapshots and same-transaction receipts address those risks.
 The API submits the saved state at its lock boundary; it does not claim that a stale browser has reviewed every latest child revision.
-The future confirmation screen must make that saved-state behavior clear.
+The [customer confirmation screen](r3-customer-submission-ui.md) makes that saved-state behavior clear.
 
 Generate migration metadata with the installed Drizzle generator, then review the custom SQL.
 Rehearse all migrations and run the new integration tests before staging or production application.
@@ -75,7 +75,7 @@ Keep submitted records, role versions, history, audit and receipts. Do not roll 
 - Review also replaced a valid unknown UUID with malformed input in the syntax-rejection case and added revision boundary inputs.
 - Full unit5732 passes 322 files and 3,603 tests in 400.41 seconds.
 - Final fixture type checking and focused lint pass. Legacy, archive and overflow fixtures now establish their intended preconditions.
-- No rendered screen changes in this backend package; authenticated submission UI remains open.
+- This backend package had no rendered changes. The [later UI package](r3-customer-submission-ui.md) connects confirmation; authenticated workflow verification remains open.
 
 Earlier backend CI34312014214 at `04cf396` passed 92 files and 871 integration tests.
 CI34315077521 now tests the pushed requirement form at `ab1ec96`.

@@ -16,6 +16,12 @@ vi.mock("./intake-form", () => ({
       data-intake={intake?.intakeId} data-revision={intake?.revision} />,
 }));
 vi.mock("./requirement-form", () => ({ CustomerRequirementForm: () => <form aria-label="Customer requirement form" /> }));
+vi.mock("./intake-submit", () => ({
+  CustomerIntakeSubmit: ({ organizationId, intakeId, expectedRevision }: {
+    organizationId: string; intakeId: string; expectedRevision: number;
+  }) => <div data-testid="customer-intake-submit" data-organization={organizationId}
+    data-intake={intakeId} data-revision={expectedRevision} />,
+}));
 vi.mock("@/server/commands/intake-read", async (original) => ({
   ...await original<typeof import("@/server/commands/intake-read")>(),
   getIntake: vi.fn(), getIntakesPage: vi.fn(),

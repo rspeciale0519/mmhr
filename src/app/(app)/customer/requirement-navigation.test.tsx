@@ -31,6 +31,9 @@ vi.mock("./requirement-form", () => ({
     data-organization={organizationId} data-intake={intakeId}
     data-requirement={requirement?.requirementId} data-return-href={returnHref} />,
 }));
+vi.mock("./intake-submit", () => ({
+  CustomerIntakeSubmit: () => <div data-testid="customer-intake-submit" />,
+}));
 vi.mock("next/navigation", () => ({ forbidden: () => { throw new Error("Forbidden"); } }));
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
