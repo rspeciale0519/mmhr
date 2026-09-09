@@ -108,8 +108,8 @@ export default function Console() {
             </button>
           </form>
           <p className="co-micro">
-            Free. The vendor pays our commission — the same rate whichever one
-            you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
 
           {/* SIGNATURE — the console tile wall */}
@@ -289,8 +289,8 @@ export default function Console() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="co-fcol">

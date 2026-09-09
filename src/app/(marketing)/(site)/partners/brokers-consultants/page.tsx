@@ -1,18 +1,17 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "For brokers & consultants — MatchMaker HR",
-  description:
-    "Refer HRIS selection work to a specialist team, or use our verified pricing data inside your own advisory engagements.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/partners/brokers-consultants",
+  "For brokers & consultants — MatchMaker HR",
+  "Refer HRIS selection work to a specialist team, or use our verified pricing data inside your own advisory engagements.",
+);
 
 const WAYS = [
   {
     k: "01",
     h: "Refer the selection",
-    p: "Hand the HRIS evaluation to us and stay in the loop. Your client pays nothing, and you keep the relationship you already have with them.",
+    p: "Hand the HRIS evaluation to us and stay in the loop. Your client does not pay MMHR a fee, and you keep the relationship you already have with them.",
   },
   {
     k: "02",
@@ -40,7 +39,7 @@ export default function BrokersConsultantsPage() {
           <SectionHead
             eyebrow="Three ways in"
             title="How partners work with us"
-            sub="Pick whichever fits your practice. None of them cost your client anything."
+            sub="Pick whichever fits your practice. None require your client to pay MMHR a fee."
           />
           <div className="pu-g3">
             {WAYS.map((w) => (
@@ -64,10 +63,10 @@ export default function BrokersConsultantsPage() {
               relationship rather than ours.
             </p>
             <p>
-              Our commission is a flat rate across every vendor, so there is no
-              mechanism by which referring a client to us produces a bigger
-              purchase than they needed. That is the property worth checking in any
-              referral partner, including this one — the{" "}
+              Providers may use different commission or referral arrangements. We
+              disclose the relevant arrangement, and our recommendations follow
+              the client&rsquo;s requirements and verified data. That is the property
+              worth checking in any referral partner, including this one — the{" "}
               <a href="/transparency">full disclosure is here</a>.
             </p>
           </div>

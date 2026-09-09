@@ -62,6 +62,7 @@ Keep all records and immutable history. Do not relax RLS or grant direct table a
 - Final focused run 98053 passed 77 tests, type checking and focused lint after the error-message correction.
 - Full unit run 33155 passed 302 files and 3,217 tests.
 - Build 63432 passed with 67 routes before the final generic error-message correction.
+- Final build 59165 passed 67 routes after the correction. Type checking and full lint 84986 also passed.
 - Drizzle generated `0106_r3_requirement_read.sql` and metadata; the ledger check passed without a database connection.
 - The application inventory now contains 107 migrations and 90 integration test files.
 - Eight database cases initially collected without hooks. Collection does not prove SQL execution.
@@ -74,4 +75,5 @@ Docker remains unavailable. No migration was applied locally or in the cloud.
 GitHub's existing pull request CI runs disposable Supabase and is the next verification path.
 The preserved checkpoint remains at `a1b2ee3112f1d766f0ce82d24607d6571c8c5ee6`.
 The separate `codex/full-delivery-verification` branch retains its 103 commits beyond the freshly fetched `develop` reference.
+Commit `a80b643` records the reviewed workflow package above the checkpoint.
 This branch is for verification, not production release. All release gates remain in force.

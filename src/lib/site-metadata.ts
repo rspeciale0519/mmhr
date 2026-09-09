@@ -1,18 +1,44 @@
+import type { Metadata } from "next";
+
+import { brand } from "@/lib/brand";
 import { canonicalOrigin } from "@/server/identity/validation";
 
-export function getSiteSocialMetadata(name: string, description: string) {
+export function getSiteSocialMetadata(
+  name: string,
+  description: string,
+  siteName = name,
+) {
   return {
     openGraph: {
       type: "website" as const,
       title: name,
       description,
-      siteName: name,
+      siteName,
     },
     twitter: {
       card: "summary" as const,
       title: name,
       description,
     },
+  };
+}
+
+export function getMarketingPageMetadata(
+  pathname: string,
+  title: string,
+  description: string,
+): Metadata {
+  const social = getSiteSocialMetadata(title, description, brand.name);
+
+  return {
+    title,
+    description,
+    alternates: { canonical: pathname },
+    openGraph: {
+      ...social.openGraph,
+      url: pathname,
+    },
+    twitter: social.twitter,
   };
 }
 

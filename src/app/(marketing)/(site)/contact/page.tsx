@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { PageHero, SectionHead } from "../../_site/PageParts";
 import ContactForm from "./contact-form";
 
-export const metadata: Metadata = {
-  title: "Contact — MatchMaker HR",
-  description:
-    "Talk to an HRIS advisor, send a proposal for benchmarking, or ask a question about the broker model.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/contact",
+  "Contact — MatchMaker HR",
+  "Talk to an HRIS advisor, send a proposal for benchmarking, or ask a question about the broker model.",
+);
 
 const REASONS = [
   {
@@ -23,7 +22,7 @@ const REASONS = [
   {
     k: "ASK ABOUT THE MODEL",
     h: "You want to check our incentives",
-    p: "Reasonable. Ask us anything about the commission, the flat rate, or the CBIZ Centrally HR affiliation.",
+    p: "Reasonable. Ask us about provider commission or referral arrangements, or the CBIZ Centrally HR affiliation.",
   },
 ];
 

@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "How we make money — MatchMaker HR",
-  description:
-    "Full disclosure of the commission model, the flat cross-vendor rate, and our reseller affiliation with CBIZ Centrally HR.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/transparency",
+  "How we make money — MatchMaker HR",
+  "Full disclosure of provider commission or referral arrangements and our reseller affiliation with CBIZ Centrally HR.",
+);
 
 export default function TransparencyPage() {
   return (
@@ -22,23 +21,19 @@ export default function TransparencyPage() {
           <div className="pu-prose">
             <h2>Who pays us</h2>
             <p>
-              The vendor you select pays us a commission. You pay nothing — not a
-              fee, not a subscription, and nothing added to the price the vendor
-              quotes you.
+              The provider you select pays us under a commission or referral
+              arrangement. Customers do not pay MMHR a fee or subscription.
             </p>
 
-            <h2>The rate is the same for every vendor</h2>
+            <h2>Provider arrangements can differ</h2>
             <p>
-              This is the part that matters. Our commission is the{" "}
-              <strong>identical rate regardless of which system you choose</strong>.
-              Recommending an expensive system over a cheap one, or one brand over
-              another, cannot increase what we earn.
+              The arrangement can differ by provider. We disclose the relevant
+              arrangement, and recommendations follow your requirements and
+              verified data.
             </p>
             <p>
-              That is a deliberate structural choice rather than a promise about
-              our character. A percentage-of-contract model would pay us more when
-              you spend more; a vendor-specific model would pay us more for
-              steering. We use neither.
+              Payment terms do not set rankings or scores. Ask us about the
+              arrangement for any provider you are considering.
             </p>
 
             <h2>We resell one system, and we say so</h2>
@@ -77,10 +72,7 @@ export default function TransparencyPage() {
             <ul>
               <li>Sell your contact details as leads.</li>
               <li>Accept payment for placement, ranking or visibility.</li>
-              <li>
-                Take a different rate from one vendor than another, which would
-                reintroduce the exact incentive this model exists to remove.
-              </li>
+              <li>Change rankings because a provider pays us.</li>
             </ul>
           </div>
         </div>

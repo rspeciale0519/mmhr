@@ -479,3 +479,13 @@ Database run storage, approval records, and provider evaluation remain open.
 - Preserved the checkpoint and created codex/full-delivery-verification at the same HEAD.
 - Fresh origin/develop remains 103 commits behind the checkpoint. Draft PR preparation is in progress.
 - Correct unsupported equal-rate claims before committing. No push, merge or production action yet.
+
+## [2026-09-08] verification | Commit workflow preparation and correct public claims
+- Commit a80b643 preserves the reviewed customer/lead workflow package on the verification branch.
+- Removed only a verified stale empty Git lock after fresh process and timestamp checks.
+- Corrected unsupported equal-rate claims in marketing, Pulse and retained gallery text without removing designs.
+- Public and release-control focused checks pass 49 tests; the staged secret scan passes for 1,044 files.
+- Build 59165 and type/full lint 84986 pass. Both Pulse routes retain the production release block.
+- Full unit 4939 passed 3,239 tests and failed one omitted-error documentation assertion.
+- Restored the recorded Docker error; all seven focused security-evidence tests pass afterward.
+- Remote unit/database verification and public claim approval remain open. No production action occurred.

@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "HR service partner finder — MatchMaker HR",
-  description:
-    "Find implementation partners, benefits brokers, payroll bureaux and fractional HR support, filtered by system and region.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/resources/partner-finder",
+  "HR service partner finder — MatchMaker HR",
+  "Find implementation partners, benefits brokers, payroll bureaux and fractional HR support, filtered by system and region.",
+);
 
 const CATEGORIES = [
   {
@@ -66,9 +65,9 @@ export default function PartnerFinderPage() {
               on their website.
             </p>
             <p>
-              We take no commission on implementation work. If a partner is wrong
-              for your project, an advisor will say so — the same as with the
-              systems themselves.
+              Ask us about any referral arrangement before you proceed. If a
+              partner is wrong for your project, an advisor will say so — the same
+              as with the systems themselves.
             </p>
           </div>
         </div>

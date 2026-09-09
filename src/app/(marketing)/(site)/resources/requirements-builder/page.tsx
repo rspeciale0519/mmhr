@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Requirements Builder — MatchMaker HR",
-  description:
-    "Tag around 200 HRIS capabilities as must-have, nice-to-have or irrelevant. Drives every match score, and exports for your RFP.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/resources/requirements-builder",
+  "Requirements Builder — MatchMaker HR",
+  "Tag around 200 HRIS capabilities as must-have, nice-to-have or irrelevant. Drives every match score, and exports for your RFP.",
+);
 
 const STEPS = [
   {

@@ -62,8 +62,8 @@ export default function Dossier() {
             </button>
           </form>
           <p className="do-fine">
-            Free. Every vendor pays us the same rate — including the one we
-            resell.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
         </div>
 
@@ -311,8 +311,8 @@ export default function Dossier() {
             <div>
               <div className="do-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="do-fc">

@@ -105,7 +105,7 @@ export default function Blueprint() {
               </button>
             </form>
             <p className="d3-fine">
-              NO FEE · NO COMMITMENT · SAME COMMISSION FROM EVERY VENDOR
+              NO BUYER FEE · PROVIDER COMMISSION OR REFERRAL FEE
             </p>
           </div>
 
@@ -137,8 +137,8 @@ export default function Blueprint() {
         <section className="d3-band">
           <h2 className="d3-h2">Specification</h2>
           <p>
-            We are paid a commission by the vendor you choose &mdash; the same
-            rate from every vendor on the list, published on our pricing page.
+            We are paid a commission or referral fee by the provider you choose.
+            Terms can vary by provider and are disclosed before you decide.
           </p>
           <div className="d3-specs">
             <div className="d3-spec">

@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Advisory services — MatchMaker HR",
-  description:
-    "What a dedicated HRIS advisor does: requirements facilitation, shortlist review, demo support, proposal benchmarking and negotiation guidance.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/services",
+  "Advisory services — MatchMaker HR",
+  "What a dedicated HRIS advisor does: requirements facilitation, shortlist review, demo support, proposal benchmarking and negotiation guidance.",
+);
 
 const SERVICES = [
   {

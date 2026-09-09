@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "For PE & VC firms — MatchMaker HR",
-  description:
-    "HRIS diligence, portfolio-wide benchmarking, and post-close systems consolidation for private equity and venture portfolios.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/partners/pe-vc",
+  "For PE & VC firms — MatchMaker HR",
+  "HRIS diligence, portfolio-wide benchmarking, and post-close systems consolidation for private equity and venture portfolios.",
+);
 
 const OFFERS = [
   {

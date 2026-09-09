@@ -60,8 +60,8 @@ export default function Ledger() {
               </button>
             </form>
             <p className="d4-fine">
-              Free to you. The vendor pays our commission &mdash; the same rate
-              whichever one you choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -108,18 +108,16 @@ export default function Ledger() {
         <section className="d4-band">
           <h2 className="d4-h2">How we&rsquo;re paid</h2>
           <p>
-            The vendor you choose pays us a commission &mdash; the identical rate
-            from every vendor on the list. Steering you cannot make us more
-            money, which is the only reason a promise like this is worth
-            anything.
+            The provider you choose pays us a commission or referral fee when you
+            buy. Terms can vary by provider, so we disclose them before you decide.
           </p>
           <div className="d4-notes">
             <div className="d4-note">
               <div className="d4-note-k">Note 1</div>
-              <h3>Same rate, every vendor</h3>
+              <h3>Provider terms, disclosed</h3>
               <p>
-                Published on our pricing page. If it ever changes, it changes for
-                all of them at once.
+                We explain the applicable commission or referral arrangement before
+                you decide.
               </p>
             </div>
             <div className="d4-note">

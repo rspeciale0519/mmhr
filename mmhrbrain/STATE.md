@@ -2,6 +2,28 @@
 Updated: 2026-09-08
 
 ## Current focus
+September 8, 22:03 update: public and gallery correction checks pass 49 tests.
+Full unit 4939 passed 3,239 tests and failed one documentation assertion.
+The evidence edit omitted the recorded Docker pipe error; restored it with
+historical context. All seven R1 security-evidence tests now pass in fd23cf.
+Also corrected the old CI paragraph to match the existing Supabase workflow.
+No application behavior changed after the passing final build/type/lint.
+Staged public files pass the secret scan for 1,044 tracked files.
+Commit the reviewed public/release-control package and evidence correction,
+then push and open the draft PR. A complete remote unit/database run remains required.
+
+September 8, 21:59 update: committed the reviewed workflow package as a80b643.
+Removed only the empty stale .git/index.lock after verifying its unchanged
+19:40 timestamp and absence of active Git processes. No project records changed.
+Corrected unsupported equal-commission wording across marketing, shared Pulse
+content and the retained gallery. The two new focused suites pass 23 tests.
+Final build 59165 passes 67 routes. Type checking and full lint 84986 pass.
+Full unit rerun 4939 is still running; do not claim its result yet.
+The built-in browser confirms release blocks at / and /designs/pulse on port3007,
+with no console warnings/errors. Actual themes and customer screens remain unverified.
+Public claim approval and the statement inventory need reconciliation before release.
+No public release, PR, push or merge has occurred yet. Keep all release gates closed.
+
 September 8, 21:48 continuation: reviewed the full active goal and supplement.
 No scope change is required. Prepared scoped active-requirement reads, migration
 0106, strict adapters and a read-only tRPC query. Customer screen wiring remains open.

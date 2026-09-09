@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { CASE_STUDIES, POSTS } from "@/app/(marketing)/_site/data";
 import { isPublicReleaseBlocked } from "@/lib/public-release";
 import { getSiteMetadataBase } from "@/lib/site-metadata";
 
@@ -27,6 +28,14 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/transparency",
 ] as const;
 
+export function getPublicSitemapPaths(): string[] {
+  return [
+    ...PUBLIC_SITEMAP_PATHS,
+    ...POSTS.map((post) => `/blog/${post.slug}`),
+    ...CASE_STUDIES.map((study) => `/case-studies/${study.slug}`),
+  ];
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   // A blocked production release must not advertise routes to crawlers.
   if (isPublicReleaseBlocked()) return [];
@@ -34,7 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteMetadataBase();
   if (!base) return [];
 
-  return PUBLIC_SITEMAP_PATHS.map((pathname) => ({
+  return getPublicSitemapPaths().map((pathname) => ({
     url: new URL(pathname, base).toString(),
   }));
 }

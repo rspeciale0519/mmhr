@@ -11,6 +11,7 @@ Catalog of the mmhr brain. SessionStart reads this.
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
+- [[journal/2026-09-08]] — committed workflow package a80b643; corrected public claims; build/type/lint pass; fixed one documentation-test failure before remote verification.
 - [[journal/2026-09-08]] — prepared scoped requirement reads; 3,217 unit tests pass; verification branch preserves the checkpoint for disposable CI.
 - [[journal/2026-09-08]] — connected saved intake list/detail views; 3,155 unit tests pass; production preview confirms the release block, not authenticated workflow completion.
 - [[journal/2026-09-08]] — prepared requirement creation, immutable snapshots and legacy retry compatibility; 3,129 full unit tests pass, database verification remains open.

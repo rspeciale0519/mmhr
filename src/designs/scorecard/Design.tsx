@@ -57,8 +57,8 @@ export default function Scorecard() {
               </button>
             </form>
             <p className="d1-fineprint">
-              Free, and always will be. Vendors pay us the same rate whichever
-              one you choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -110,8 +110,8 @@ export default function Scorecard() {
           <div className="d1-band-head">
             <h2 className="d1-h2">Why this costs you nothing</h2>
             <p>
-              The vendor pays us a commission when you buy &mdash; the same rate
-              from every vendor on the list. We have no reason to steer you.
+              The provider pays us a commission or referral fee when you buy. Terms
+              can vary by provider, and we disclose them before you decide.
             </p>
           </div>
           <div className="d1-grid">

@@ -78,9 +78,9 @@ export default function Grid() {
             <div className="gr-fig">
               <span className="gr-fig-n red">1</span>
               <span className="gr-fig-t">
-                <b>Commission rate</b>
-                The same from every vendor on the list. Steering you cannot pay
-                us more.
+                <b>How we are paid</b>
+                Providers pay a commission or referral fee. Terms can vary by
+                provider, so we disclose them.
               </span>
             </div>
             <div className="gr-fig">
@@ -288,8 +288,8 @@ export default function Grid() {
             <div className="gr-fbrand">
               <div className="gr-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="gr-fc">

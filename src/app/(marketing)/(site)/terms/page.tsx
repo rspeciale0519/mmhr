@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Terms of service — MatchMaker HR",
-  description:
-    "The terms covering use of the MatchMaker HR platform, the vendor data within it, and the advisory services we provide.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/terms",
+  "Terms of service — MatchMaker HR",
+  "The terms covering use of the MatchMaker HR platform, the vendor data within it, and the advisory services we provide.",
+);
 
 export default function TermsPage() {
   return (
@@ -36,11 +35,10 @@ export default function TermsPage() {
 
             <h2>How we are paid</h2>
             <p>
-              The vendor you select pays us a commission, at the same rate
-              regardless of which vendor that is. Nothing is charged to you and
-              nothing is added to the vendor&rsquo;s price. We also resell one
-              system, CBIZ Centrally HR, which is labelled wherever it appears. The
-              full disclosure is on the{" "}
+              The provider you select pays us under a commission or referral
+              arrangement. Customers do not pay MMHR a fee or subscription. We
+              also resell one system, CBIZ Centrally HR, which is labelled wherever
+              it appears. The full disclosure is on the{" "}
               <a href="/transparency">how we make money</a> page.
             </p>
 

@@ -43,7 +43,7 @@ export function SectionHead({
 /** Closing call to action. Every page ends on the same ask. */
 export function CTA({
   title = "See what you should actually be paying",
-  body = "Free to you, always. The vendor pays our commission — the same rate whichever system you choose.",
+  body = "Free to you. Providers pay us under commission or referral arrangements.",
   primary = { label: "Get started", href: "/sign-up" },
   secondary,
 }: {

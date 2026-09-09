@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-
 import { TOOLS, VENDORS } from "@/designs/_content";
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Platform — MatchMaker HR",
-  description:
-    "The marketplace, requirements builder, scorecards, project plans, team collaboration and advisor access that run an HRIS evaluation end to end.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/platform",
+  "Platform — MatchMaker HR",
+  "The marketplace, requirements builder, scorecards, project plans, team collaboration and advisor access that run an HRIS evaluation end to end.",
+);
 
 const CAPABILITIES = [
   {

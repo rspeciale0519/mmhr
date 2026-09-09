@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { FAQS } from "../../_site/data";
 import { CTA, PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "FAQ — MatchMaker HR",
-  description:
-    "Common questions about cost, neutrality, our CBIZ Centrally HR affiliation, where pricing data comes from, and why registration is required.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/faq",
+  "FAQ — MatchMaker HR",
+  "Common questions about cost, neutrality, our CBIZ Centrally HR affiliation, where pricing data comes from, and why registration is required.",
+);
 
 export default function FaqPage() {
   return (

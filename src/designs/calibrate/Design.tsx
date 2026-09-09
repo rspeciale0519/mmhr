@@ -53,8 +53,8 @@ export default function Calibrate() {
               </button>
             </form>
             <p className="ca-fine">
-              Free. The vendor pays our commission — the same rate whichever
-              one you choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -256,8 +256,8 @@ export default function Calibrate() {
             <div className="ca-fbrand">
               <div className="ca-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="ca-fc">

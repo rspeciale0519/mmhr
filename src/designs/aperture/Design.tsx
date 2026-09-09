@@ -58,8 +58,8 @@ export default function Aperture() {
             </button>
           </form>
           <p className="ap-fine">
-            Free. The vendor pays our commission — the same rate whichever one
-            you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
 
           {/* SIGNATURE: the focus card */}
@@ -217,8 +217,8 @@ export default function Aperture() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="ap-fcol">

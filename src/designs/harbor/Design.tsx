@@ -233,8 +233,8 @@ export default function Harbor() {
             <div className="h-eye">Free &amp; trusted</div>
             <h2 className="h-h2">You never pay us a cent</h2>
             <p className="h-sub">
-              We&rsquo;re paid a commission by the vendor you choose — the same
-              rate from every vendor on the list.
+              We&rsquo;re paid a commission or referral fee by the provider you choose.
+              Terms can vary by provider.
             </p>
           </div>
           <div className="h-trust">
@@ -320,8 +320,8 @@ export default function Harbor() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we tell you when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="h-fcol">

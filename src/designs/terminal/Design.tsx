@@ -331,8 +331,8 @@ export default function Terminal() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we tell you when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="t-fcol">

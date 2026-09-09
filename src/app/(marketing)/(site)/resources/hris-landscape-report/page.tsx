@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "HRIS Landscape Report — MatchMaker HR",
-  description:
-    "A market-wide read on HRIS segments, pricing bands, capability depth and consolidation, refreshed from the verification pipeline.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/resources/hris-landscape-report",
+  "HRIS Landscape Report — MatchMaker HR",
+  "A market-wide read on HRIS segments, pricing bands, capability depth and consolidation, refreshed from the verification pipeline.",
+);
 
 const CONTENTS = [
   {

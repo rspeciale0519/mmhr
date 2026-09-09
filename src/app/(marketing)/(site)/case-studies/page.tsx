@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CASE_STUDIES } from "../../_site/data";
 import { CTA, PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Case studies — MatchMaker HR",
-  description:
-    "How buying committees used verified pricing and shared scorecards to shorten evaluations and renegotiate contracts.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/case-studies",
+  "Case studies — MatchMaker HR",
+  "How buying committees used verified pricing and shared scorecards to shorten evaluations and renegotiate contracts.",
+);
 
 export default function CaseStudiesPage() {
   return (

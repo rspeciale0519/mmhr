@@ -42,8 +42,8 @@ export function PulseBody() {
               </button>
             </form>
             <p className="pu-fine">
-              Free. The vendor pays our commission — the same rate whichever one
-              you choose.
+              Free to buyers. Providers pay us under commission or referral
+              arrangements.
             </p>
           </div>
 

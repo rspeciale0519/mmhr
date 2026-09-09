@@ -30,6 +30,7 @@ export const securityReviewSchema = z.strictObject({
 }).superRefine((review, context) => {
   if (new Set(review.reviewerIdentityIds).size !== review.reviewerIdentityIds.length) context.addIssue({ code: "custom", path: ["reviewerIdentityIds"], message: "Reviewers must be unique" });
   if (new Set(review.domains).size !== review.domains.length) context.addIssue({ code: "custom", path: ["domains"], message: "Review domains must be unique" });
+  if (review.passed && securityReviewDomains.some((domain) => !review.domains.includes(domain))) context.addIssue({ code: "custom", path: ["domains"], message: "A passed review must cover every security domain" });
   const findingIds = new Set<string>();
   for (const finding of review.findings) {
     if (findingIds.has(finding.findingId)) context.addIssue({ code: "custom", path: ["findings"], message: "Finding IDs must be unique" });

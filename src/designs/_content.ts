@@ -115,8 +115,8 @@ export const ADVANTAGES = [
 
 export const TRUST = [
   {
-    title: "The same rate, every vendor",
-    body: "Whichever system you pick, we're paid the identical commission. Steering you cannot make us more money.",
+    title: "Provider arrangements are disclosed",
+    body: "Customers do not pay MMHR a fee. Providers pay us under commission or referral arrangements, and recommendations follow your requirements and verified data.",
   },
   {
     title: "No cost, ever, to you",

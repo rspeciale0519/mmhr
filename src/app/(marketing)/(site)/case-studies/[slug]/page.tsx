@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CASE_STUDIES, getCaseStudy } from "../../../_site/data";
 import { CTA } from "../../../_site/PageParts";
 
@@ -16,11 +17,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const study = getCaseStudy(slug);
-  if (!study) return { title: "Case study — MatchMaker HR" };
-  return {
-    title: `${study.title} — MatchMaker HR`,
-    description: study.summary,
-  };
+  if (!study) {
+    return getMarketingPageMetadata(
+      "/case-studies",
+      "Case studies — MatchMaker HR",
+      "How buying committees used verified pricing and shared scorecards to shorten evaluations and renegotiate contracts.",
+    );
+  }
+  return getMarketingPageMetadata(
+    `/case-studies/${slug}`,
+    `${study.title} — MatchMaker HR`,
+    study.summary,
+  );
 }
 
 export default async function CaseStudyPage({

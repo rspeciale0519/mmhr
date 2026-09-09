@@ -64,8 +64,8 @@ export default function Bureau() {
             </button>
           </form>
           <p className="bu-fine">
-            Free to you. Every vendor pays us the same commission — including the
-            one we resell.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
         </div>
 
@@ -313,8 +313,8 @@ export default function Bureau() {
             <div>
               <div className="bu-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="bu-fc">

@@ -319,11 +319,16 @@ passed in that earlier local environment.
 The current inventory reports 107 migrations and 90 integration files.
 The customer-registration and identity-synchronization rehearsal collects 38 cases.
 Docker startup failed and the engine remains unavailable, so these cases cannot execute locally.
+The earlier startup reported missing `npipe:////./pipe/docker_engine`; the safe restart later timed out.
 The earlier integration results above remain historical and do not prove the
 current migration, RLS, audit, or runtime-wiring state.
 
 Full unit run 33155 passed 302 files and 3,217 tests. Type checking and lint pass.
-Build 63432 passed 67 routes before the final requirement-read error text.
+Final build 59165 passed 67 routes after the requirement-read error text.
+Type checking and full lint 84986 also passed. Full unit rerun 4939 passed 3,239 tests
+and failed one documentation assertion after the Docker error text was omitted.
+The recorded error is restored below; focused rerun fd23cf passed all seven security-evidence tests.
+A complete remote rerun is still required.
 The migration ledger check passed. Seven lead-rate integration cases failed
 during Docker startup and did not execute. Migrations 0101 through 0106 remain
 unapplied locally and in the cloud. Existing GitHub CI is the next disposable
@@ -392,12 +397,13 @@ staging, or production behavior.
 
 ## CI and release state
 
-CI now checks the integration matrix inventory before the standard gates. CI
-does not yet start Supabase or run the full integration matrix because the
-approved pinned Supabase setup action is not available.
+CI checks the integration matrix inventory before the standard gates.
+The current reusable integration workflow starts pinned Supabase services,
+applies Drizzle migrations and runs the full integration suite on a disposable runner.
+The verification branch has not yet produced a successful remote run.
 
-R1 is not closed by this record. Browser journeys, approved CI Supabase setup,
-target-environment identity evidence, and later domain coverage remain open.
+R1 is not closed by this record. Browser journeys, successful current CI,
+target-environment identity evidence and later domain coverage remain open.
 Cloud migration, production worker activation, bootstrap, and deployment did
 not occur.
 

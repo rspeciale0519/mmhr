@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { getSiteMetadataBase, getSiteSocialMetadata } from "./site-metadata";
+import {
+  getMarketingPageMetadata,
+  getSiteMetadataBase,
+  getSiteSocialMetadata,
+} from "./site-metadata";
 
 describe("site metadata origin", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -41,6 +45,28 @@ describe("site social metadata", () => {
         title: "MatchMaker HR",
         description: "Buyer-side HRIS brokerage.",
       },
+    });
+  });
+
+  test("keeps canonical and social URLs scoped to each marketing route", () => {
+    const metadata = getMarketingPageMetadata(
+      "/resources/requirements-builder",
+      "Requirements Builder — MatchMaker HR",
+      "Build requirements before vendor demos.",
+    );
+
+    expect(metadata.alternates?.canonical).toBe(
+      "/resources/requirements-builder",
+    );
+    expect(metadata.openGraph).toMatchObject({
+      type: "website",
+      url: "/resources/requirements-builder",
+      title: "Requirements Builder — MatchMaker HR",
+      siteName: "MatchMaker HR",
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary",
+      title: "Requirements Builder — MatchMaker HR",
     });
   });
 });

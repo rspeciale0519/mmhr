@@ -14,8 +14,9 @@ export function Footer() {
               MatchMaker HR
             </div>
             <p>
-              Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-              every vendor — and we say so when we&rsquo;re one of them.
+              Buyer-side HRIS brokerage. Free to buyers. Providers pay us under
+              commission or referral arrangements, and we say so when we&rsquo;re one
+              of them.
             </p>
           </div>
 

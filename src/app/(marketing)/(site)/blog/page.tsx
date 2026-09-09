@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { POSTS } from "../../_site/data";
 import { CTA, PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Blog — MatchMaker HR",
-  description:
-    "Notes on HRIS pricing mechanics, evaluation tactics, and the incentives running underneath the market.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/blog",
+  "Blog — MatchMaker HR",
+  "Notes on HRIS pricing mechanics, evaluation tactics, and the incentives running underneath the market.",
+);
 
 export default function BlogPage() {
   return (
