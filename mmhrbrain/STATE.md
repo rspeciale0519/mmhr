@@ -2,6 +2,26 @@
 Updated: 2026-09-08
 
 ## Current focus
+September 8, 22:42 result: full unit 62065 passes 305 files and 3,263 tests.
+All local standard gates and 149 focused checks pass for the requirement view.
+The staged secret scan passes for 1,047 files. Prepare its reviewed local commit.
+Remote integration 34301817813 is still active; no new-head push or merge yet.
+
+September 8, 22:39: the complete goal and supplement need no changes.
+Connected active requirement reads to the customer intake detail page.
+Both reads use the selected workspace and request client; either known read
+failure hides all details. Cursor validation, safe nested answers and explicit
+read-only scope are tested. No write permission or migration was added.
+Focused run 11356 passes 149 tests, type checking, full lint and the 67-route build.
+Independent review found no remaining security or rendering defect.
+Full unit 62065 is running. Integration inventory passes for 90 files.
+The built-in browser still shows the release block at /customer, with no console
+warnings/errors. Actual authenticated screens remain unverified; no gate was bypassed.
+CI 34301817813 still runs integration at remote head 0011ad8. Do not push until
+its result is collected. Auth guard 0f77ad3 is local only; current UI changes
+remain uncommitted. See docs/security/r3-customer-requirement-view.md.
+Keep local hooks/settings and unrelated src/lib/supabase/server.ts noise excluded.
+
 September 8, 22:21: full local unit 63733 passes 304 files and 3,245 tests.
 The Auth result guard is ready for a separate reviewed commit with these notes.
 Do not push another head until current CI run 34301817813 finishes; collect its

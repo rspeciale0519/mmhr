@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { requirePortalPageAccess } from "@/server/auth/portal/portal-guards";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { getIntake, getIntakesPage, IntakeReadError } from "@/server/commands/intake-read";
+import { getIntakeRequirementsPage, RequirementReadError } from "@/server/commands/requirement-read";
 import CustomerHome from "./page";
 
 vi.mock("@/server/auth/portal/portal-guards", () => ({ requirePortalPageAccess: vi.fn() }));
@@ -11,6 +12,10 @@ vi.mock("@/server/commands/intake-read", async (original) => ({
   getIntake: vi.fn(), getIntakesPage: vi.fn(),
 }));
 vi.mock("next/navigation", () => ({ forbidden: () => { throw new Error("Forbidden"); } }));
+vi.mock("@/server/commands/requirement-read", async (original) => ({
+  ...await original<typeof import("@/server/commands/requirement-read")>(),
+  getIntakeRequirementsPage: vi.fn(),
+}));
 
 const organizationId = "11111111-1111-4111-8111-111111111111";
 const intakeId = "22222222-2222-4222-8222-222222222222";
@@ -30,8 +35,12 @@ beforeEach(() => {
   } as never);
   vi.mocked(getIntakesPage).mockReset().mockResolvedValue({ intakes: [summary], nextCursor: null });
   vi.mocked(getIntake).mockReset().mockResolvedValue({ ...summary, submittedAt: null, data: {} });
+  vi.mocked(getIntakeRequirementsPage).mockReset().mockResolvedValue({ requirements: [], nextCursor: null });
 });
 afterEach(cleanup);
+afterEach(() => {
+  if (!vi.mocked(getIntake).mock.calls.length) expect(getIntakeRequirementsPage).not.toHaveBeenCalled();
+});
 
 test("uses the selected organization and its request client, never URL authority", async () => {
   render(await load({ organizationId: otherId, identityId: otherId, pageSize: "500" }));
@@ -66,6 +75,10 @@ test.each<Query>([
   { intake: "bad" }, { intake: "" }, { after: "bad" }, { after: "" },
   { intake: [intakeId] }, { after: [intakeId, otherId] },
   { intake: intakeId, after: otherId }, { intake: "javascript:alert(1)" },
+  { requirementsAfter: otherId }, { after: intakeId, requirementsAfter: otherId },
+  { intake: intakeId, requirementsAfter: "bad" }, { intake: intakeId, requirementsAfter: "" },
+  { intake: intakeId, requirementsAfter: [otherId] },
+  { intake: intakeId, after: otherId, requirementsAfter: otherId },
 ])("rejects malformed or ambiguous intake navigation: %j", async (query) => {
   render(await load(query));
   expect(screen.getByRole("alert")).toHaveTextContent("link is not valid");
@@ -99,7 +112,10 @@ test("reads one scoped intake and renders all seven saved sections", async () =>
   render(await load({ intake: intakeId, organizationId: otherId }));
   expect(getIntake).toHaveBeenCalledExactlyOnceWith({ organizationId, intakeId }, { supabase });
   expect(getIntakesPage).not.toHaveBeenCalled();
-  expect(screen.getAllByRole("region")).toHaveLength(7);
+  expect(screen.getAllByRole("region")).toHaveLength(8);
+  expect(getIntakeRequirementsPage).toHaveBeenCalledExactlyOnceWith(
+    { organizationId, intakeId, afterId: undefined }, { supabase },
+  );
   const company = within(screen.getByRole("region", { name: "Company context" }));
   expect(company.getByText("0")).toBeInTheDocument();
   expect(company.getByText("No")).toBeInTheDocument();
@@ -111,7 +127,7 @@ test("reads one scoped intake and renders all seven saved sections", async () =>
   const submittedTime = screen.getByText("Sep 8, 2026, 1:00 PM UTC");
   expect(submittedTime).toHaveAttribute("datetime", "2026-09-08T13:00:00Z");
   expect(submittedTime.parentElement).toHaveTextContent("Submitted Sep 8, 2026, 1:00 PM UTC");
-  expect(screen.getByText(/Requirements and customizations are not shown/)).toBeInTheDocument();
+  expect(screen.getByText(/Editing and provider recommendations are not available/)).toBeInTheDocument();
   expect(screen.queryByText(organizationId, { exact: false })).not.toBeInTheDocument();
   expect(screen.queryByText(otherId, { exact: false })).not.toBeInTheDocument();
 });
@@ -168,4 +184,65 @@ test("treats revoked workspace read access as unavailable, not successful portal
 test("does not hide unexpected application defects", async () => {
   vi.mocked(getIntake).mockRejectedValue(new Error("Unexpected defect"));
   await expect(load({ intake: intakeId })).rejects.toThrow("Unexpected defect");
+});
+
+test("reads requirements with a normalized cursor and only the selected workspace authority", async () => {
+  const cursor = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  render(await load({ intake: intakeId, requirementsAfter: cursor.toUpperCase(), organizationId: otherId, pageSize: "500" }));
+  expect(getIntakeRequirementsPage).toHaveBeenCalledExactlyOnceWith(
+    { organizationId, intakeId, afterId: cursor }, { supabase },
+  );
+  expect(getIntakesPage).not.toHaveBeenCalled();
+  expect(vi.mocked(getIntake).mock.invocationCallOrder[0]).toBeLessThan(
+    vi.mocked(getIntakeRequirementsPage).mock.invocationCallOrder[0]!,
+  );
+});
+
+test("connects saved custom answers and pagination to the selected intake detail", async () => {
+  vi.mocked(getIntakeRequirementsPage).mockResolvedValue({ requirements: [{
+    requirementId: otherId, organizationId, intakeId, stableKey: "payroll",
+    label: "Payroll integration", importance: "must", weight: 75, response: "Keep the current payroll system",
+    status: "active", requirementType: "custom", revision: 1,
+    createdAt: summary.createdAt, updatedAt: summary.updatedAt,
+  }], nextCursor: otherId });
+  render(await load({ intake: intakeId, requirementsAfter: intakeId, organizationId: otherId, identityId: otherId }));
+  const requirements = within(screen.getByRole("region", { name: "Active requirements" }));
+  expect(requirements.getByRole("heading", { name: "Payroll integration" })).toBeInTheDocument();
+  expect(requirements.getByText("Custom request")).toBeInTheDocument();
+  expect(requirements.getByText("Keep the current payroll system")).toBeInTheDocument();
+  expect(requirements.getByRole("link", { name: "Next requirements page" })).toHaveAttribute(
+    "href", `/customer?intake=${intakeId}&requirementsAfter=${otherId}`,
+  );
+  expect(requirements.getByRole("link", { name: "Back to first requirements page" })).toHaveAttribute(
+    "href", `/customer?intake=${intakeId}`,
+  );
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
+});
+
+test.each(["REJECTED", "UNAVAILABLE", "INVALID_RESPONSE"] as const)("hides all details after requirement failure %s", async (code) => {
+  vi.mocked(getIntakeRequirementsPage).mockRejectedValue(new RequirementReadError(code));
+  render(await load({ intake: intakeId }));
+  expect(screen.getByRole("alert")).toHaveTextContent("could not load");
+  expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  expect(screen.queryByRole("region")).not.toBeInTheDocument();
+  expect(screen.queryByText(code)).not.toBeInTheDocument();
+});
+
+test("hides earlier intake data when the requirement permission check denies access", async () => {
+  vi.mocked(getIntakeRequirementsPage).mockRejectedValue(new AuthorizationError());
+  render(await load({ intake: intakeId }));
+  expect(screen.getByRole("alert")).toHaveTextContent("your access may have changed");
+  expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  expect(screen.queryByRole("region")).not.toBeInTheDocument();
+});
+
+test("does not read requirements when the parent intake is unavailable", async () => {
+  vi.mocked(getIntake).mockRejectedValue(new IntakeReadError("REJECTED"));
+  render(await load({ intake: intakeId }));
+  expect(getIntakeRequirementsPage).not.toHaveBeenCalled();
+});
+
+test("does not hide unexpected requirement defects", async () => {
+  vi.mocked(getIntakeRequirementsPage).mockRejectedValue(new Error("Unexpected requirement defect"));
+  await expect(load({ intake: intakeId })).rejects.toThrow("Unexpected requirement defect");
 });

@@ -234,8 +234,8 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     access: "privileged",
     permission: "portal.customer.access and workspace.access",
     scope: "selected organization",
-    dataPath: "request-scoped intake list/detail adapters; query IDs never supply organization authority",
-    denialEvidence: "customer page, layout and intake-read tests; live database/browser evidence pending",
+    dataPath: "request-scoped intake and requirement read adapters; query IDs never supply organization authority",
+    denialEvidence: "customer page, layout, intake-read and requirement-read tests; live database/browser evidence pending",
   },
   {
     key: "src/app/(app)/vendor/layout.tsx#default",

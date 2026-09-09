@@ -503,3 +503,13 @@ Database run storage, approval records, and provider evaluation remain open.
 - Independent review found no material defect. No customer setup or identity synchronization is wired yet.
 - Current remote standard checks and migration application pass at 0011ad8; integration remains running.
 - Hold the next push until that run finishes. Verify the subsequent head before any merge or release.
+
+## [2026-09-08] feat | Connect saved customer requirements
+- The complete goal and supplement need no changes. Auth guard 0f77ad3 remains local only.
+- Customer details now read active requirements with scoped pagination and safe saved-answer output.
+- Either known read failure hides both sections. No writes, permissions or migrations changed.
+- Focused run 11356 passes 149 tests, type checking, full lint and the 67-route build.
+- Independent review found no remaining defect. Full unit 62065 and remote integration remain active.
+- Browser checks confirm only the release block, not authenticated screen behavior.
+- Keep the new package local until current remote integration findings are collected. No release or merge occurred.
+- Final full unit 62065 passes 305 files and 3,263 tests. Staged secret scan passes for 1,047 files.

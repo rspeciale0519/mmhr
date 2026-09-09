@@ -7,7 +7,8 @@ Updated: 2026-09-08. Status: prepared, not database-verified or released.
 This package adds `mmhr_get_intake_requirements_page` in migration 0106.
 The request-scoped adapter exposes the read through `intakes.requirements`.
 It supports saved requirement review under FR-INT-02 and FR-EVL-04.
-Customer screen wiring, archived review, ownership display, evidence access and vendor links remain unfinished.
+Customer screen wiring is now prepared; see [customer requirement view](r3-customer-requirement-view.md).
+Live screen verification, archived review, ownership display, evidence access and vendor links remain unfinished.
 
 The RPC returns active requirements for one authorized organization and intake.
 It returns requirement identity, scope, stable key, label, importance, weight,
@@ -71,8 +72,9 @@ Keep all records and immutable history. Do not relax RLS or grant direct table a
 - History assertions now count requirement history rather than intake history.
 - The explicit SQL-null fixture is distinct from JSON null.
 
-Docker remains unavailable. No migration was applied locally or in the cloud.
-GitHub's existing pull request CI runs disposable Supabase and is the next verification path.
+Docker remains unavailable locally. No migration was applied to staging or production.
+CI run 34301817813 passed disposable Supabase startup and Drizzle migration application at commit 0011ad8.
+Its complete integration suite remains running. Migration application alone does not prove read isolation or failure behavior.
 The preserved checkpoint remains at `a1b2ee3112f1d766f0ce82d24607d6571c8c5ee6`.
 The separate `codex/full-delivery-verification` branch retains its 103 commits beyond the freshly fetched `develop` reference.
 Commit `a80b643` records the reviewed workflow package above the checkpoint.

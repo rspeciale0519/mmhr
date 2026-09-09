@@ -130,7 +130,7 @@ export function IntakeDetails({ intake }: { intake: Intake }) {
         {intake.submittedAt && <p className="mt-2 text-sm">Submitted <SavedTime value={intake.submittedAt} /></p>}
       </div>
       <p className="mb-7 rounded-lg bg-muted p-4 text-pretty text-sm leading-6">
-        This view shows saved intake details only. Requirements and customizations are not shown here yet. Editing is not available on this page.
+        This view shows saved intake details and active requirements, including custom requests. Editing and provider recommendations are not available on this page.
       </p>
       <SavedSection title="Company context" value={intake.data.companyContext} />
       <SavedSection title="Current systems" value={intake.data.currentSystems} />

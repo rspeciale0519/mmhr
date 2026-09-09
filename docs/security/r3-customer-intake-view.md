@@ -2,6 +2,9 @@
 
 Updated: 2026-09-08. Status: implemented locally; live workflow verification remains open.
 
+Follow-up: [customer requirement view](r3-customer-requirement-view.md) adds active requirement reads to the detail page.
+The package evidence below records the earlier intake-only implementation.
+
 ## Scope and requirement evidence
 
 The complete active goal and its 3,967-character execution supplement were reviewed.
