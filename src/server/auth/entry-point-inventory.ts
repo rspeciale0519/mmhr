@@ -799,6 +799,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "customer-requirement-save.test.ts; database integration pending",
   },
   {
+    key: "src/server/trpc/routers/intakes.ts#submit",
+    surface: "intakes.submit",
+    kind: "trpc-procedure",
+    access: "privileged",
+    permission: "intake.submit; portal.customer.access; AAL1 or AAL2",
+    scope: "one authorized customer organization and saved intake revision",
+    dataPath: "exact-origin POST; strict revision-only DTO; audited saved-state submission RPC",
+    denialEvidence: "customer-intake-submit.test.ts; database integration pending",
+  },
+  {
     key: "src/server/trpc/routers/intakes.ts#list",
     surface: "intakes.list",
     kind: "trpc-procedure",
@@ -997,6 +1007,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     scope: "one authorized customer organization and draft intake requirement revision",
     dataPath: "strict actor-free answers; fixed RPC; current permissions; preserved metadata and immutable history",
     denialEvidence: "customer-requirement-save.test.ts; customer requirement integration pending",
+  },
+  {
+    key: "src/server/commands/customer-intake-submit.ts#command",
+    surface: "customer saved intake submission boundary",
+    kind: "command",
+    access: "privileged",
+    permission: "intake.submit; portal.customer.access; AAL1 or AAL2",
+    scope: "one authorized customer organization and saved intake revision",
+    dataPath: "strict actor-free request; fixed RPC; current permissions; submitted answer history and audit",
+    denialEvidence: "customer-intake-submit.test.ts; customer submission integration pending",
   },
   {
     key: "src/server/commands/matching.ts#command",

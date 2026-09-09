@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { CustomerIntakeSaveError, customerIntakeSaveSchema, saveCustomerIntake } from "@/server/commands/customer-intake-save";
+import { CustomerIntakeSubmitError, customerIntakeSubmitSchema, submitCustomerIntake } from "@/server/commands/customer-intake-submit";
 import { CustomerRequirementSaveError, customerRequirementSaveSchema, saveCustomerIntakeRequirement } from "@/server/commands/customer-requirement-save";
 import { getIntake, getIntakesPage, IntakeReadError, intakePageInputSchema, intakeReadInputSchema } from "@/server/commands/intake-read";
 import { getIntakeRequirementsPage, RequirementReadError, requirementPageInputSchema } from "@/server/commands/requirement-read";
@@ -25,6 +26,15 @@ export const intakesRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Intake not available" });
         }
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Intake could not be saved" });
+      }
+    }),
+  submit: permissionProcedure({ permission: "intake.submit", input: customerIntakeSubmitSchema, resolveScope })
+    .mutation(async ({ ctx, input }) => {
+      try { return await submitCustomerIntake(input, { supabase: ctx.supabase }); } catch (error) {
+        if (error instanceof AuthorizationError || (error instanceof CustomerIntakeSubmitError && error.code === "REJECTED")) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake submission not available" });
+        }
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Intake could not be submitted" });
       }
     }),
   saveRequirement: permissionProcedure({ permission: "intake.requirement.save", input: customerRequirementSaveSchema, resolveScope })

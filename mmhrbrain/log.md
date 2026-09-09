@@ -567,3 +567,13 @@ Database run storage, approval records, and provider evaluation remain open.
 - Independent review corrected deterministic rejection handling without clearing prior uncertainty. Isolated browser checks pass; real authenticated saving remains unverified.
 - Keep CI34312014214 intact before pushing. Prepare the reviewed UI commit after final gates and scanning. See journal/2026-09-09.md.
 - Final unit62343 passes319 files/3,542 tests. Final build8792 passes67 routes. All local gates pass; prepare exact staging, scan and commit.
+- Committed13 reviewed files asab1ec96 after secret scan1,080 passed. One local commit awaits push after backend CI34312014214 completes. Full goal remains active.
+
+## [2026-09-09] implementation | Add customer submission backend
+- Backend CI34312014214 passes92 files/871 database tests. Pushedab1ec96; fresh CI34315077521 runs, with standard checks passed.
+- Added separate customer submission action and RPC0110, strict adapter/router, immutable submitted-answer references and legacy capture. Focused131, type, full lint, build74595 and inventory93 pass.
+- Full unit5732 runs. New22 database cases collect; three fixture setups are under correction before final review. Local Docker probes returned no usable engine result.
+- Keep goal active. Submission UI and masked-option workflow remain open. See journal/2026-09-09.md.
+- Final unit5732 passes322 files/3,603 tests. Corrected fixture type/lint pass; final review and exact staging/scan remain. No local application gate is running.
+- Final independent review confirms fixture corrections; malformed UUID expectation is repaired with extra revision cases. Secret scan1,088 passes; final fixture lint/type79404 runs before commit.
+- Final fixture lint/type79404 passes. All local gates are complete; prepare the reviewed submission commit.

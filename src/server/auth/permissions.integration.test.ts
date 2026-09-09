@@ -89,7 +89,8 @@ describe("R1.4 real-token permission evaluation", () => {
           { stable_key: stableKey, version: 3, state: "approved" },
           { stable_key: stableKey, version: 4, state: "approved" },
           { stable_key: stableKey, version: 5, state: "approved" },
-          { stable_key: stableKey, version: 6, state: "active" },
+          { stable_key: stableKey, version: 6, state: "approved" },
+          { stable_key: stableKey, version: 7, state: "active" },
         ];
       }
       if (stableKey === "organization_admin" || stableKey === "contributor") {
@@ -97,7 +98,8 @@ describe("R1.4 real-token permission evaluation", () => {
           { stable_key: stableKey, version: 1, state: "approved" },
           { stable_key: stableKey, version: 2, state: "approved" },
           { stable_key: stableKey, version: 3, state: "approved" },
-          { stable_key: stableKey, version: 4, state: "active" },
+          { stable_key: stableKey, version: 4, state: "approved" },
+          { stable_key: stableKey, version: 5, state: "active" },
         ];
       }
       return [
@@ -114,7 +116,7 @@ describe("R1.4 real-token permission evaluation", () => {
     const expected = Object.entries(rolePermissionDefaults).flatMap(([role, keys]) =>
       keys.map((permission) => ({ stable_key: role, permission_key: permission, effect: "allow" })),
     ).sort((a, b) => a.stable_key.localeCompare(b.stable_key) || a.permission_key.localeCompare(b.permission_key));
-    expect(expected).toHaveLength(69);
+    expect(expected).toHaveLength(72);
     expect([...defaults]).toEqual(expected);
     const prior = await owner`
       SELECT permission.id FROM public.role_permission_defaults permission
