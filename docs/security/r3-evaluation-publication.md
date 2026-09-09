@@ -67,10 +67,12 @@ CI34327707906 at49add22 passed standard checks and applied migrations through011
 This CI run does not contain publication migrations0114-0117.
 No staging migration, production migration, or release is claimed here.
 
-The high-severity dependency gate passes, but the audit reports two moderate Vitest findings.
+The initial dependency audit passed its high-severity gate but reported two moderate Vitest findings.
 The [Vitest advisory](https://github.com/advisories/GHSA-82fw-gwwq-j7x9) concerns development-server mock file access.
 This repository does not configure the public mocker plugins or Vitest browser servers.
-Published patch4.1.11 is verified through npm metadata. Apply and validate it separately after the current package checks.
+Published patch4.1.11 is verified through npm metadata and is now installed in a separate dependency change.
+The current audit reports zero vulnerabilities. Patch type, lint, build, inventory and84 focused checks pass.
+Full patch run56923 passes334 files and3,768 tests in501.45 seconds. Independent dependency review found no issue.
 
 Still required: executed database and concurrency checks; staff review screens; customer option screens; up-to-five selection;
 duplicate-product handling; commercial conflict disclosure; approved name disclosure; and the connected RFP workflow.

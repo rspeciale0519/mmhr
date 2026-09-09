@@ -2,6 +2,28 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 04:40: Vitest4.1.11 full unit56923 passes334 files/3,768 tests.
+Type/lint/inventory/build40692 passes67 routes. Audit has zero findings and
+the1,128-file secret scan passes. Independent dependency review finds no issue.
+Commit the six-file dependency/evidence package, then push it with7b5ae49.
+Workflow inspection confirms no concurrency or cancellation setting. There is
+no need to hold new pushes until CI34327707906 completes. Preserve that run
+at49add22 and verify it alongside the new publication run after the push.
+Next implement customer masked comparison and initial selection with persisted
+candidate links, exact publication checks, a five-choice cap and immutable audit.
+Full goal active; database, concurrency and release evidence remain unfinished.
+
+September 9, 04:32 delivery: committed the36-file publication package as7b5ae49.
+It is one commit ahead of origin49add22. Preserve CI34327707906 while its database
+suite runs. No new publication migration has executed successfully.
+Applied verified Vitest4.1.11 security patch with install scripts disabled.
+Only nine development packages changed; production dependencies did not change.
+Dependency audit now reports zero vulnerabilities. Focused15943 passes84 tests.
+Full unit56923 and type/lint/inventory/build40692 run on the new dependency set.
+Only package.json and package-lock.json changed before these memory notes.
+Next finish patch gates and commit separately, then implement initial selection.
+The full goal remains active. Do not merge, release or mark database evidence done.
+
 September 9, 04:29: publication package0114-0117 has passed full unit10092
 (334 files/3,768 tests), type/full lint92315, build10641 (67 routes), final
 fixture lint/type/collection43397, inventory97 and the1,128-file secret scan.

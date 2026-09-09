@@ -619,3 +619,5 @@ Database run storage, approval records, and provider evaluation remain open.
 - Full unit34956 had one missing-entry inventory failure after3,766 passes. Fixed inventory and started full11959. Corrected numeric precision and savepoint handling; final reviews remain active.
 - At04:29, full unit10092 passes334 files/3,768 tests. Final type/lint, build10641, inventory97, five-case collection43397 and1,128-file secret scan pass. Stage36 files for local commit.
 - Elevated local setup34292 timed out and skipped four cases. Concurrency remains unexecuted. Preserve CI34327707906 at49add22; it covers0113, not publication. Next separate Vitest4.1.11 security update, then masked option selection and screens.
+- Committed36-file publication package as7b5ae49. Applied Vitest4.1.11 separately; nine development packages changed, zero audit vulnerabilities and84 focused tests pass. Full56923 and standard gates40692 run.
+- At04:40, full56923 passes334 files/3,768 tests; standard40692 passes67 routes. Independent review and secret scan pass. Commit six-file patch/evidence package and push with7b5ae49; workflows do not cancel existing CI runs on a new push.

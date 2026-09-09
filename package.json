@@ -71,6 +71,6 @@
     "tailwindcss": "^4",
     "trigger.dev": "^4.5.3",
     "typescript": "^5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
