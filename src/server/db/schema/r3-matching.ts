@@ -31,6 +31,7 @@ export const matchingRuns = pgTable("matching_runs", {
   ruleVersion: integer("rule_version").notNull(),
   candidateCount: integer("candidate_count").notNull(),
   candidateSnapshot: jsonb("candidate_snapshot").notNull(),
+  vendorInputSnapshot: jsonb("vendor_input_snapshot").notNull().default([]),
   createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
   correlationId: uuid("correlation_id").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -41,4 +42,5 @@ export const matchingRuns = pgTable("matching_runs", {
   check("matching_runs_rule_version_ck", sql`${t.ruleVersion} > 0`),
   check("matching_runs_count_ck", sql`${t.candidateCount} between 0 and 100`),
   check("matching_runs_snapshot_ck", sql`jsonb_typeof(${t.candidateSnapshot}) = 'array' and jsonb_array_length(${t.candidateSnapshot}) <= 100`),
+  check("matching_runs_vendor_inputs_ck", sql`jsonb_typeof(${t.vendorInputSnapshot}) = 'array' and jsonb_array_length(${t.vendorInputSnapshot}) <= 100 and pg_column_size(${t.vendorInputSnapshot}) <= 4000000`),
 ]);

@@ -600,3 +600,11 @@ Database run storage, approval records, and provider evaluation remain open.
 - CI34318285955 at4abfe42 passesstandardchecks and91 files/889 integration tests;2 files/4 casesfail.
 - Corrected registry36 count, databasetimestampbounds and validrequirementsetup before revocation. Independentreview andfocusedlint/type75594pass.
 - Prepareseparatefixturefixcommit andpushwith95a176b. New0112/0113approved-inputpackage remainslocal andunexecuted. Fullgoalactive.
+- Committed663b4e6 after the1,098-file scan. Verified the existing private GitHub destination after a safety rejection; the same push then succeeded.
+- Both95a176b and663b4e6 are remote. Fresh CI34322766689 tests0111; preserve it before another push.
+
+## [2026-09-09] implementation | Require approved vendor inputs for matching
+- Added resolver0112 and private immutable matching evidence0113. Old runs retain empty evidence; public masked results stay unchanged.
+- Full unit12713 passes327 files/3,663 tests. Type, lint, build34010, final fixture10553, inventory96 and independent review pass.
+- Four new database cases collect. Local setup failed on sandbox Docker/config access; all four were skipped.
+- Prepare exact package staging, scan and local commit. All-options publication and customer selection remain open. Full goal stays active.

@@ -124,6 +124,9 @@ describe("R3 candidate vendor scope", () => {
       const ruleSetId = randomUUID();
       const candidateIds = [randomUUID(), randomUUID()] as const;
       const vendorOrganizationIds = [await createVendorOrganization(sql), await createVendorOrganization(sql)];
+      const approvedEvidenceId = randomUUID();
+      const evidenceCapturedAt = new Date(Date.now() - 60_000).toISOString();
+      const evidenceFreshUntil = new Date(Date.now() + 86_400_000).toISOString();
       await sql`INSERT INTO public.intakes (id, organization_id, status, submitted_at, created_by_identity_id, updated_by_identity_id)
         VALUES (${intakeId}::uuid, ${fixture.organizationId}::uuid, 'submitted', clock_timestamp(), ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)`;
       await sql`INSERT INTO public.intake_requirements (organization_id, intake_id, stable_key, label, importance, weight, response, created_by_identity_id, updated_by_identity_id)
@@ -131,13 +134,24 @@ describe("R3 candidate vendor scope", () => {
           (${fixture.organizationId}::uuid, ${intakeId}::uuid, 'benefits', 'Benefits', 'nice', 5, '"rich"'::jsonb, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)`;
       const products: string[] = [];
       for (let index = 0; index < 2; index += 1) {
+        const approvedAt = evidenceCapturedAt;
         const [vendor] = await sql<{ id: string }[]>`INSERT INTO public.vendor_profiles (organization_id, status, approved_at, approved_by_identity_id, created_by_identity_id, updated_by_identity_id)
-          VALUES (${vendorOrganizationIds[index]!}::uuid, 'active', now(), ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid) RETURNING id`;
+          VALUES (${vendorOrganizationIds[index]!}::uuid, 'active', ${approvedAt}::timestamptz, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid) RETURNING id`;
         const productId = randomUUID(); products.push(productId);
         await sql`INSERT INTO public.products (id, organization_id, vendor_profile_id, stable_key, name, status, created_by_identity_id, updated_by_identity_id)
           VALUES (${productId}::uuid, ${vendorOrganizationIds[index]!}::uuid, ${vendor!.id}::uuid, ${`scope_match_${index}`}, ${`Scope Match ${index}`}, 'active', ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)`;
-        await sql`INSERT INTO public.vendor_facts (organization_id, vendor_profile_id, product_id, field_key, value, observed_at, status, created_by_identity_id)
-          VALUES (${vendorOrganizationIds[index]!}::uuid, ${vendor!.id}::uuid, ${productId}::uuid, 'payroll', 'mid', clock_timestamp(), ${index === 0 ? "published" : "draft"}, ${fixture.pair[0].identityId}::uuid)`;
+        const factId = randomUUID();
+        await sql`INSERT INTO public.vendor_facts (id, organization_id, vendor_profile_id, product_id, field_key, value, observed_at, status, created_by_identity_id)
+          VALUES (${factId}::uuid, ${vendorOrganizationIds[index]!}::uuid, ${vendor!.id}::uuid, ${productId}::uuid, 'payroll', 'mid', ${approvedAt}::timestamptz, ${index === 0 ? "published" : "draft"}, ${fixture.pair[0].identityId}::uuid)`;
+        if (index === 0) {
+          const sourceId = randomUUID();
+          await sql`INSERT INTO public.vendor_sources (id, organization_id, vendor_profile_id, uri, source_type, captured_at, active, created_by_identity_id, owner_identity_id, capture_method, cadence_days, review_required, revision, updated_at)
+            VALUES (${sourceId}::uuid, ${vendorOrganizationIds[index]!}::uuid, ${vendor!.id}::uuid, 'https://vendor.example.invalid/scope-source', 'vendor_owned', ${approvedAt}::timestamptz, true, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid, 'manual', 30, true, 1, clock_timestamp())`;
+          await sql`INSERT INTO public.vendor_evidence_versions (id, organization_id, fact_id, source_id, version, content_hash, captured_at, fresh_until, citation)
+            VALUES (${approvedEvidenceId}::uuid, ${vendorOrganizationIds[index]!}::uuid, ${factId}::uuid, ${sourceId}::uuid, 1, repeat('b', 64), ${approvedAt}::timestamptz, ${evidenceFreshUntil}::timestamptz, 'https://vendor.example.invalid/scope-source#payroll')`;
+          await sql`INSERT INTO public.vendor_fact_reviews (id, organization_id, evidence_id, reviewer_identity_id, decision, decided_at, reason)
+            VALUES (${randomUUID()}::uuid, ${vendorOrganizationIds[index]!}::uuid, ${approvedEvidenceId}::uuid, ${fixture.pair[0].identityId}::uuid, 'approved', ${approvedAt}::timestamptz, 'Reviewed current vendor evidence')`;
+        }
       }
       await sql`INSERT INTO public.evaluation_candidates (id, organization_id, intake_id, vendor_organization_id, product_id, created_by_identity_id, updated_by_identity_id)
         VALUES (${candidateIds[0]}::uuid, ${fixture.organizationId}::uuid, ${intakeId}::uuid, ${vendorOrganizationIds[0]!}::uuid, ${products[0]!}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid),
@@ -167,12 +181,17 @@ describe("R3 candidate vendor scope", () => {
         WHERE command = 'r3.matching.run' AND entity_type = 'matching_run' AND entity_id = ${(computed.matchingRunId as string)}
       `;
       expect(audit!.count).toBe("1");
-      const [snapshot] = await sql<{ candidate_snapshot: unknown }[]>`
-        SELECT candidate_snapshot FROM public.matching_runs WHERE id = ${(computed.matchingRunId as string)}::uuid
+      const [snapshot] = await sql<{ candidate_snapshot: unknown; vendor_input_snapshot: unknown }[]>`
+        SELECT candidate_snapshot, vendor_input_snapshot FROM public.matching_runs WHERE id = ${(computed.matchingRunId as string)}::uuid
       `;
       const snapshotText = JSON.stringify(snapshot!.candidate_snapshot);
+      const privateSnapshotText = JSON.stringify(snapshot!.vendor_input_snapshot);
       expect(snapshotText).not.toContain("productId");
       expect(snapshotText).not.toContain("vendorOrganizationId");
+      expect(privateSnapshotText).toContain(approvedEvidenceId);
+      expect(privateSnapshotText).not.toContain(products[0]!);
+      expect(privateSnapshotText).not.toContain(vendorOrganizationIds[0]!);
+      expect(JSON.stringify(computed)).not.toContain(approvedEvidenceId);
       for (const privateId of [...products, ...vendorOrganizationIds]) {
         expect(snapshotText).not.toContain(privateId);
         expect(JSON.stringify(computed)).not.toContain(privateId);

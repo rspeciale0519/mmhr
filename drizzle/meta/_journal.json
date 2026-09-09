@@ -785,6 +785,20 @@
       "when": 1788934973862,
       "tag": "0111_r3_candidate_vendor_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1788936801136,
+      "tag": "0112_r3_approved_vendor_inputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1788936856672,
+      "tag": "0113_r3_matching_approved_inputs",
+      "breakpoints": true
     }
   ]
 }

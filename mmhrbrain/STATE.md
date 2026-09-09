@@ -2,6 +2,22 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 03:15: committed fixture corrections as663b4e69eb54b8be01ae4af636508cd968ccaae6
+and pushed it with95a176b. Fresh CI34322766689 at663b4e6 runs standard job102372957308
+and integration102372957814. Preserve this first0111 execution before another push.
+Prepared approved-input resolver0112 and matching evidence persistence0113.
+Full unit12713 passes327 files/3,663 tests in522.84s. Type/full lint5799,
+build34010 with67 routes, final fixture lint/type10553, inventory96 and diff pass.
+Independent SQL/fixture reviews found no blocking defect. Four new DB cases
+collect; focused execution failed during sandbox Docker/config setup, all skipped.
+Prepare exact17-file evidence/package staging, secret scan and local commit.
+No local validation session remains active. The migration count is114; public
+application tables remain111. No browser surface changed. No cloud migration,
+merge or release occurred. The complete goal remains active.
+Next: immutable all-options publication with actual rule and requirement
+snapshots, internal approval, paginated masked reads and up-to-five selection.
+Legacy matching and five-row assessments are not that customer workflow.
+
 September 9, 03:10: CI34318285955 at4abfe42 FAILED integration with91 files/889
 tests passed and2 files/4 failed cases. Standard checks passed. Corrected the
 old35-versus36 registry count, timestamp-driver type assertion, and requirement
