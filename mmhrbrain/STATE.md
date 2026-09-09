@@ -1,7 +1,50 @@
 # mmhr brain — STATE
-Updated: 2026-09-08
+Updated: 2026-09-09
 
 ## Current focus
+September 9, 00:14 result: full unit58223 passes314 files /3,423 tests.
+Final build23727 passes67 routes; type, full lint, final focused lint/form checks,
+integration inventory and diff checks pass. No local gate remains running.
+Earlier focused91634 failed only on the unintegrated read-wrapper draft inventory;
+that draft is now outside application inputs and the final full suite passes.
+Prepare the focused UI/evidence commit after staging exact files and scanning.
+CI34308802670 still tests the separately pushed backend; keep its run intact.
+
+September 9, 00:12: customer form and permission-aware new/edit views are ready
+for final verification. Page checks pass 65 tests; form checks pass 14 tests.
+Type, full lint, final 67-route build23727, integration inventory91 and diff checks
+pass. Full unit58223 remains active; do not start a duplicate run.
+The isolated browser preview verifies real component rendering with synthetic
+save/navigation responses, including pending/error/retry/confirmed states and
+375px/768px layouts. Controls are at least44px. No real Auth or DB browser claim.
+Preview33686 runs on3011; browser1/tab2 is marked for handoff. Viewports reset.
+Second independent review found the existing page/read checks meet the approved
+next-request portal revocation contract. The proposed read wrapper is optional
+defense in depth, not a required fix. Its incomplete agent-created draft was moved
+to session scratch/customer-read-review-draft and its generated journal restored.
+No0109 read migration or copied parser is integrated. Original generic reads stay.
+CI34308802670 remains active atcd1772e; standard checks pass, database job pending.
+Keep this run intact before another push. Prepare the reviewed UI commit after
+the full unit result and staged secret scan. No merge or release.
+
+September 8, 23:57: CI34305894008 completed successfully at7ba545f. Standard checks
+and all90 database files /826 integration tests pass. Watch7417 is finished.
+Pushed the reviewed backend commitcd1772e. New CI34308802670 tests that head;
+0108 still needs its result. Keep this run intact before another push.
+Customer new/edit page wiring now passes65 tests. Form corrections remain active.
+Independent review found a portal-revocation gap in workspace-only customer reads.
+The review agent is preparing additive0109 and customer-only read adapters.
+Keep generic internal reads unchanged. Parent owns page wiring, docs and inventories.
+Browser form verification and full UI gates remain open. No merge or release.
+
+September 8, 23:42 delivery: committed the reviewed customer draft package as
+cd1772e. The verification branch is one commit ahead of origin; do not push until
+current CI34305894008 finishes at7ba545f. Local hooks/settings remain excluded.
+The form agent is implementing intake-form.tsx and its tests as a separate package.
+This new component is untracked and not covered by the backend completion checks.
+Next: finish/review the form, connect permission-aware new/edit routes on the
+customer page, test retry behavior and verify the browser without bypassing R0.
+
 September 8, 23:41 result: full rerun30521 passes313 files and3,382 tests.
 Final build88492 passes67 routes after integration fixture compile corrections.
 Type, full lint, focused checks,91-file integration inventory and staged secret

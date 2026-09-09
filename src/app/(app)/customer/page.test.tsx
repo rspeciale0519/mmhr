@@ -1,12 +1,20 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { requirePortalPageAccess } from "@/server/auth/portal/portal-guards";
-import { AuthorizationError } from "@/server/auth/authorization";
+import { AuthorizationError, authorizePermission } from "@/server/auth/authorization";
 import { getIntake, getIntakesPage, IntakeReadError } from "@/server/commands/intake-read";
 import { getIntakeRequirementsPage, RequirementReadError } from "@/server/commands/requirement-read";
 import CustomerHome from "./page";
 
 vi.mock("@/server/auth/portal/portal-guards", () => ({ requirePortalPageAccess: vi.fn() }));
+vi.mock("@/server/auth/authorization", async (original) => ({
+  ...await original<typeof import("@/server/auth/authorization")>(), authorizePermission: vi.fn(),
+}));
+vi.mock("./intake-form", () => ({
+  CustomerIntakeForm: ({ organizationId, intake }: { organizationId: string; intake?: { intakeId: string; revision: number } }) =>
+    <form aria-label="Customer intake form" data-organization={organizationId}
+      data-intake={intake?.intakeId} data-revision={intake?.revision} />,
+}));
 vi.mock("@/server/commands/intake-read", async (original) => ({
   ...await original<typeof import("@/server/commands/intake-read")>(),
   getIntake: vi.fn(), getIntakesPage: vi.fn(),
@@ -29,6 +37,7 @@ type Query = Record<string, string | string[] | undefined>;
 const load = (query: Query = {}) => CustomerHome({ searchParams: Promise.resolve(query) });
 
 beforeEach(() => {
+  vi.mocked(authorizePermission).mockReset().mockResolvedValue(null);
   vi.mocked(requirePortalPageAccess).mockReset().mockResolvedValue({
     identity: { id: otherId },
     authorization: { supabase, scope: { kind: "organization", organizationId }, identityId: intakeId, assurance: "aal1" },
@@ -79,6 +88,10 @@ test.each<Query>([
   { intake: intakeId, requirementsAfter: "bad" }, { intake: intakeId, requirementsAfter: "" },
   { intake: intakeId, requirementsAfter: [otherId] },
   { intake: intakeId, after: otherId, requirementsAfter: otherId },
+  { new: "0" }, { new: ["1"] }, { new: "1", intake: intakeId }, { new: "1", after: otherId },
+  { new: "1", requirementsAfter: otherId }, { new: "1", edit: "1" },
+  { edit: "1" }, { edit: "0", intake: intakeId }, { edit: ["1"], intake: intakeId },
+  { edit: "1", intake: intakeId, after: otherId }, { edit: "1", intake: intakeId, requirementsAfter: otherId },
 ])("rejects malformed or ambiguous intake navigation: %j", async (query) => {
   render(await load(query));
   expect(screen.getByRole("alert")).toHaveTextContent("link is not valid");
@@ -127,7 +140,7 @@ test("reads one scoped intake and renders all seven saved sections", async () =>
   const submittedTime = screen.getByText("Sep 8, 2026, 1:00 PM UTC");
   expect(submittedTime).toHaveAttribute("datetime", "2026-09-08T13:00:00Z");
   expect(submittedTime.parentElement).toHaveTextContent("Submitted Sep 8, 2026, 1:00 PM UTC");
-  expect(screen.getByText(/Editing and provider recommendations are not available/)).toBeInTheDocument();
+  expect(screen.getByText(/Provider recommendations are not available/)).toBeInTheDocument();
   expect(screen.queryByText(organizationId, { exact: false })).not.toBeInTheDocument();
   expect(screen.queryByText(otherId, { exact: false })).not.toBeInTheDocument();
 });
@@ -245,4 +258,85 @@ test("does not read requirements when the parent intake is unavailable", async (
 test("does not hide unexpected requirement defects", async () => {
   vi.mocked(getIntakeRequirementsPage).mockRejectedValue(new Error("Unexpected requirement defect"));
   await expect(load({ intake: intakeId })).rejects.toThrow("Unexpected requirement defect");
+});
+
+function allowDraftSave() {
+  vi.mocked(authorizePermission).mockResolvedValue({
+    supabase, scope: { kind: "organization", organizationId }, identityId: intakeId, assurance: "aal1",
+  } as never);
+}
+
+test("shows the create link only with the scoped draft action", async () => {
+  allowDraftSave();
+  render(await load());
+  expect(authorizePermission).toHaveBeenCalledExactlyOnceWith(
+    "intake.draft.save", { kind: "organization", organizationId }, { supabase },
+  );
+  expect(screen.getByRole("link", { name: "Start an intake" })).toHaveAttribute("href", "/customer?new=1");
+});
+
+test("creates only in the selected authorized workspace without reading unrelated records", async () => {
+  allowDraftSave();
+  render(await load({ new: "1", organizationId: otherId, identityId: otherId }));
+  expect(screen.getByRole("form")).toHaveAttribute("data-organization", organizationId);
+  expect(screen.getByRole("form")).not.toHaveAttribute("data-intake");
+  expect(getIntake).not.toHaveBeenCalled();
+  expect(getIntakesPage).not.toHaveBeenCalled();
+});
+
+test.each([{}, { new: "1" }, { intake: intakeId, edit: "1" }] as Query[])("does not expose changes without action permission: %j", async (query) => {
+  render(await load(query));
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Start an intake" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Edit intake answers" })).not.toBeInTheDocument();
+  if (query.new || query.edit) {
+    expect(screen.getByRole("alert")).toHaveTextContent("form is not available");
+    expect(getIntake).not.toHaveBeenCalled();
+    expect(getIntakesPage).not.toHaveBeenCalled();
+  }
+});
+
+test.each([
+  { identityId: otherId, scope: { kind: "organization", organizationId } },
+  { identityId: intakeId, scope: { kind: "organization", organizationId: otherId } },
+  { identityId: intakeId, scope: { kind: "platform" } },
+])("rejects mismatched draft authorization: %j", async (context) => {
+  vi.mocked(authorizePermission).mockResolvedValue({ ...context, supabase, assurance: "aal1" } as never);
+  render(await load({ new: "1" }));
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent("form is not available");
+});
+
+test.each(["draft", "in_progress"] as const)("loads current scoped answers for editable status %s", async (status) => {
+  allowDraftSave();
+  vi.mocked(getIntake).mockResolvedValue({ ...summary, status, data: {}, submittedAt: null });
+  render(await load({ intake: intakeId, edit: "1" }));
+  expect(getIntake).toHaveBeenCalledExactlyOnceWith({ organizationId, intakeId }, { supabase });
+  expect(screen.getByRole("form")).toHaveAttribute("data-intake", intakeId);
+  expect(screen.getByRole("form")).toHaveAttribute("data-revision", "2");
+  expect(getIntakeRequirementsPage).not.toHaveBeenCalled();
+  expect(getIntakesPage).not.toHaveBeenCalled();
+});
+
+test.each(["submitted", "under_review", "completed", "archived"] as const)("does not edit locked status %s", async (status) => {
+  allowDraftSave();
+  vi.mocked(getIntake).mockResolvedValue({ ...summary, status, data: {}, submittedAt: summary.updatedAt });
+  render(await load({ intake: intakeId, edit: "1" }));
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent("form is not available");
+  expect(getIntakeRequirementsPage).not.toHaveBeenCalled();
+});
+
+test("adds a fixed edit link to an editable detail", async () => {
+  allowDraftSave();
+  render(await load({ intake: intakeId, organizationId: otherId }));
+  expect(screen.getByRole("link", { name: "Edit intake answers" })).toHaveAttribute("href", `/customer?intake=${intakeId}&edit=1`);
+});
+
+test("does not mount an edit form after the authorized read fails", async () => {
+  allowDraftSave();
+  vi.mocked(getIntake).mockRejectedValue(new AuthorizationError());
+  render(await load({ intake: intakeId, edit: "1" }));
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent("could not load");
 });

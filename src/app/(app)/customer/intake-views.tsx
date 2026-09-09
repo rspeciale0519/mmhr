@@ -48,13 +48,15 @@ export function IntakeNotice({ title, description }: { title: string; descriptio
   );
 }
 
-export function IntakeList({ page, hasCursor }: { page: IntakePage; hasCursor: boolean }) {
+export function IntakeList({ page, hasCursor, canCreate = false }: { page: IntakePage; hasCursor: boolean; canCreate?: boolean }) {
   return (
     <section aria-labelledby="saved-intakes">
       <h2 id="saved-intakes" className="text-balance text-xl font-semibold">Saved intakes</h2>
       <p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">
-        You can view saved information here. Intake creation and editing are not available on this page yet.
+        {canCreate ? "Start an intake to record your software needs. You can save it and return later."
+          : "You can view saved information here. Your current access does not allow intake changes."}
       </p>
+      {canCreate && <Link href="/customer?new=1" prefetch={false} className={`${linkStyle} mt-4`}>Start an intake</Link>}
       {page.intakes.length === 0 ? (
         <p role="status" className="mt-6 rounded-lg bg-muted p-6 text-pretty leading-7">
           {hasCursor ? "There are no more saved intakes in this list." : "There are no saved intakes in this workspace."}
@@ -114,7 +116,7 @@ function SavedSection({ title, value }: { title: string; value: string[] | Recor
   );
 }
 
-export function IntakeDetails({ intake }: { intake: Intake }) {
+export function IntakeDetails({ intake, canEdit = false }: { intake: Intake; canEdit?: boolean }) {
   return (
     <article aria-labelledby="intake-details">
       <Link href="/customer" prefetch={false} className={`${linkStyle} mb-6`}>Back to saved intakes</Link>
@@ -130,8 +132,10 @@ export function IntakeDetails({ intake }: { intake: Intake }) {
         {intake.submittedAt && <p className="mt-2 text-sm">Submitted <SavedTime value={intake.submittedAt} /></p>}
       </div>
       <p className="mb-7 rounded-lg bg-muted p-4 text-pretty text-sm leading-6">
-        This view shows saved intake details and active requirements, including custom requests. Editing and provider recommendations are not available on this page.
+        This view shows saved intake details and active requirements, including custom requests. Provider recommendations are not available on this page.
       </p>
+      {canEdit && <Link href={`/customer?intake=${intake.intakeId}&edit=1`} prefetch={false}
+        className={`${linkStyle} mb-5`}>Edit intake answers</Link>}
       <SavedSection title="Company context" value={intake.data.companyContext} />
       <SavedSection title="Current systems" value={intake.data.currentSystems} />
       <SavedSection title="Compliance needs" value={intake.data.complianceNeeds} />

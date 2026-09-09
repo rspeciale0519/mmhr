@@ -534,3 +534,20 @@ Database run storage, approval records, and provider evaluation remain open.
 - See journal/2026-09-08.md and docs/security/r3-customer-draft-save.md. No merge or production action occurred.
 - Final full rerun passes3,382 tests across313 files. Build88492, type, lint and staged secret scan pass.
 - All21 customer draft database cases collect. Remote CI34305894008 remains active at7ba545f; no database result is claimed for0108.
+- Committed the reviewed backend package as cd1772e. Customer form work is separate and unverified; no push or merge yet.
+
+## [2026-09-08] implementation | Customer form wiring and verified prior database run
+- Customer page new/edit access checks pass65 tests; form correction and browser verification remain open.
+- CI34305894008 at7ba545f passes standard checks and90 database files /826 tests.
+- Pushedcd1772e; new CI34308802670 tests the draft-save backend. Keep it intact before another push.
+- Independent review found a customer portal-revocation read gap; additive customer-only read checks are in progress.
+- See journal/2026-09-08.md. No merge, production action or full-goal completion.
+
+## [2026-09-09] implementation | Customer intake form verification
+- New/edit page checks pass 65 tests; final form checks pass 14 tests.
+- Type, full lint, final 67-route build and integration inventory pass. Full unit58223 remains active.
+- Isolated browser checks pass pending, error, retry, confirmation and narrow layout checks; real Auth/database evidence remains open.
+- A second review confirms current reads meet the approved next-request portal revocation contract.
+- The incomplete optional read-wrapper draft is preserved in session scratch; no new read migration is integrated.
+- CI34308802670 runs atcd1772e. Preserve its result before another push. See journal/2026-09-09.md.
+- Final full unit58223 passes 314 files /3,423 tests. All relevant local standard gates pass; prepare the focused reviewed UI commit.
