@@ -42,8 +42,8 @@ describe("R3 scorecard entry RPC", () => {
         VALUES (${productId}::uuid, ${fixture.organizationId}::uuid, ${vendor!.id}::uuid, 'score_product', 'Score Product', 'active', ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
       `;
       await sql`
-        INSERT INTO public.evaluation_candidates (id, organization_id, intake_id, product_id, created_by_identity_id, updated_by_identity_id)
-        VALUES (${candidateId}::uuid, ${fixture.organizationId}::uuid, ${intakeId}::uuid, ${productId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
+        INSERT INTO public.evaluation_candidates (id, organization_id, intake_id, product_id, vendor_organization_id, created_by_identity_id, updated_by_identity_id)
+        VALUES (${candidateId}::uuid, ${fixture.organizationId}::uuid, ${intakeId}::uuid, ${productId}::uuid, ${fixture.organizationId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
       `;
       await sql`
         INSERT INTO public.scorecards (id, organization_id, intake_id, candidate_id, configuration_id, configuration_version)

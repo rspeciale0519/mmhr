@@ -585,3 +585,12 @@ Database run storage, approval records, and provider evaluation remain open.
 - Isolated browser checks pass desktop/mobile/tablet and error/retry states; no live database workflow is claimed. See journal/2026-09-09.md.
 - Scope audit confirms candidate, matching, deal command and RFP recipient gaps. The existing deal product FK is correct. Full goal stays active.
 - Full unit93856 passes324 files/3,638 tests. Final focused38 includes three additional navigation cases; final type/lint4087 passes. Prepare exact13-file staging/scan/commit.
+- Committed4abfe42 after1,092-file secret scan. Two commits await CI34315077521 before push. Exact-current-suite full unit63111 runs; next vendor-scope package is read-only analysis.
+- Final full unit63111 passes324 files/3,641 tests. CI34315077521 passes92 files/871 integration tests; pushed1703c6b and4abfe42. New CI34318285955 runs at4abfe42, including0110. No merge or release.
+
+## [2026-09-09] implementation | Separate candidate customer and provider scope
+- Prepared additive0111, legacy compatibility and five vendor-fact query corrections. Existing intake authority and evidence remain intact.
+- Full unit87722 passes325 files/3,650 tests. Type, lint, build46959, final fixture checks91673 and inventory95 pass.
+- Fixed draft helper type and exact source classification; 51 boundary cases pass. Independent SQL and fixture reviews found no remaining defect.
+- Four new database cases collect but have not executed. Prepare exact staging/scan/local commit; preserve active CI34318285955 before push.
+- All approved masked-option publication and up-to-five selection remain open. No merge, cloud migration or release. See journal/2026-09-09.md.

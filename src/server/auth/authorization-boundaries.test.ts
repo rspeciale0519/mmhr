@@ -6,6 +6,7 @@ import { describe, expect, test } from "vitest";
 const root = process.cwd();
 const poolFile = "src/server/db/index.ts";
 const identityWorkerFile = "src/server/integrations/auth-admin/worker.ts";
+const candidateBackfillTestFile = "src/server/db/r3-candidate-vendor-backfill.integration.test.ts";
 const runtimeConfigFiles = new Set(["sentry.server.config.ts", "sentry.edge.config.ts"]);
 const fixtureFiles = new Set([
   "src/server/db/test/migration-owner.ts",
@@ -221,7 +222,11 @@ function inspectSources(sources: Sources): Violation[] {
         report(node, "test-fixture-import", target);
       }
       const fixedWorkerPoolImport = file === identityWorkerFile && target === poolFile;
-      if (!directDatabaseFiles.has(file) && !fixedWorkerPoolImport &&
+      // This test migrates a validated prefix on the disposable rehearsal DB.
+      // It gains no driver, application pool or credential capability.
+      const fixedBackfillMigratorImport = file === candidateBackfillTestFile &&
+        specifier === "drizzle-orm/postgres-js/migrator";
+      if (!directDatabaseFiles.has(file) && !fixedWorkerPoolImport && !fixedBackfillMigratorImport &&
         (target === poolFile || isDirectDatabaseModule(specifier))) {
         report(node, "direct-database-import", target ?? specifier);
       }
@@ -344,6 +349,31 @@ describe("R1 authorization architecture boundaries", () => {
     expect(inspectSources(sources)).toEqual([
       expect.objectContaining({ file: "src/server/services/index.ts", rule: "direct-database-import" }),
     ]);
+  });
+
+  test("allows only the fixed migrator import in the populated candidate rehearsal", () => {
+    const sources = synthetic('import { migrate } from "drizzle-orm/postgres-js/migrator";', candidateBackfillTestFile);
+    expect(inspectSources(sources)).toEqual([]);
+    sources.set(candidateBackfillTestFile, 'import postgres from "postgres"; import { db } from "@/server/db";');
+    expect(inspectSources(sources)).toEqual([
+      expect.objectContaining({ rule: "direct-database-import", target: "postgres" }),
+      expect.objectContaining({ rule: "direct-database-import", target: poolFile }),
+    ]);
+  });
+
+  test.each(["src/server/db/another-backfill.integration.test.ts", "src/server/commands/candidate-backfill.ts"])(
+    "does not extend the candidate rehearsal migrator capability to %s", (file) => {
+      expect(inspectSources(synthetic('import { migrate } from "drizzle-orm/postgres-js/migrator";', file)))
+        .toEqual([expect.objectContaining({ file, rule: "direct-database-import" })]);
+    },
+  );
+
+  test("keeps candidate rehearsal credentials denied and production imports closed", () => {
+    const sources = synthetic("const url = process.env.MIGRATION_DATABASE_URL;", candidateBackfillTestFile);
+    expect(inspectSources(sources)).toEqual([expect.objectContaining({ rule: "privileged-credential" })]);
+    sources.set(candidateBackfillTestFile, "export {};");
+    sources.set("src/server/commands/example.ts", 'import "../db/r3-candidate-vendor-backfill.integration.test";');
+    expect(inspectSources(sources)).toEqual([expect.objectContaining({ rule: "test-fixture-import" })]);
   });
 
   test("allows only the fixed pool and identity key in the worker composition root", () => {

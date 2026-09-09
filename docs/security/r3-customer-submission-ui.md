@@ -53,7 +53,8 @@ This package adds no migration, dependency, shared style or permission key.
 - `git diff --check`: pass.
 - Full unit run 93856: 324 files and 3,638 tests pass in 468.31 seconds.
 - Three additional navigation cases were added during that run. Final component/navigation run 35183 passes all 38 cases.
-- Final test-file type checking and focused lint 4087 pass. The current suite contains 3,641 cases; a full run at that exact count remains pending.
+- Final test-file type checking and focused lint 4087 pass.
+- Final full run 63111 passes all 324 files and 3,641 tests in 546.59 seconds at source commit `4abfe42`.
 - Independent page review found no material defect. Main review traced the component input and error paths to the existing command.
 
 The built-in browser tested the actual component and shared customer frame through a loopback preview at port 3015.
@@ -67,6 +68,10 @@ The browser returned no warning or error logs during these checks. The tab remai
 The preview uses Arial fallback; actual Geist rendering and authenticated route composition remain unverified.
 Mock transport does not prove real request delivery, authorization, database persistence or refreshed server state.
 The existing application preview remains subject to the release block; this test does not bypass it.
+
+Both submission commits are pushed. Earlier CI34315077521 at `ab1ec96` passed 92 files and 871 integration tests.
+New CI34318285955 at `4abfe42` is running and includes submission migration 0110 for the first time.
+The earlier database pass does not prove the new submission boundary. No merge, cloud migration or release occurred.
 
 ## Interface review
 

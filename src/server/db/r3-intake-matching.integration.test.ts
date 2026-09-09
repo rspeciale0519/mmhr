@@ -72,15 +72,15 @@ describe("R3 intake and matching foundation", () => {
       VALUES (${organization!.id}, ${intake!.id}, 'payroll', 'Payroll', 'must', 100) RETURNING id
     `;
     const [candidate] = await context!.client<{ id: string }[]>`
-      INSERT INTO public.evaluation_candidates (organization_id, intake_id, product_id, deterministic_score, eligibility)
-      VALUES (${organization!.id}, ${intake!.id}, ${product!.id}, 10000, 'eligible') RETURNING id
+      INSERT INTO public.evaluation_candidates (organization_id, intake_id, product_id, vendor_organization_id, deterministic_score, eligibility)
+      VALUES (${organization!.id}, ${intake!.id}, ${product!.id}, ${organization!.id}, 10000, 'eligible') RETURNING id
     `;
 
     expect(requirement?.id).toBeTruthy();
     expect(candidate?.id).toBeTruthy();
     await expect(context!.client`
-      INSERT INTO public.evaluation_candidates (organization_id, intake_id, product_id)
-      VALUES (${vendorOrganization!.id}, ${intake!.id}, ${product!.id})
+      INSERT INTO public.evaluation_candidates (organization_id, intake_id, product_id, vendor_organization_id)
+      VALUES (${vendorOrganization!.id}, ${intake!.id}, ${product!.id}, ${vendorOrganization!.id})
     `).rejects.toThrow();
     await expect(context!.client`
       INSERT INTO public.intake_requirements (organization_id, intake_id, stable_key, label)

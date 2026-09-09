@@ -35,8 +35,8 @@ describe("R3 candidate transition RPC", () => {
         VALUES (${productId}::uuid, ${fixture.organizationId}::uuid, ${vendor!.id}::uuid, 'transition_product', 'Transition Product', 'active', ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
       `;
       await sql`
-        INSERT INTO public.evaluation_candidates (id, organization_id, intake_id, product_id, created_by_identity_id, updated_by_identity_id)
-        VALUES (${candidateId}::uuid, ${fixture.organizationId}::uuid, ${intakeId}::uuid, ${productId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
+        INSERT INTO public.evaluation_candidates (id, organization_id, intake_id, product_id, vendor_organization_id, created_by_identity_id, updated_by_identity_id)
+        VALUES (${candidateId}::uuid, ${fixture.organizationId}::uuid, ${intakeId}::uuid, ${productId}::uuid, ${fixture.organizationId}::uuid, ${fixture.pair[0].identityId}::uuid, ${fixture.pair[0].identityId}::uuid)
       `;
       const transition = async (fromState: string, toState: string, expectedRevision: number, approvalReference: string | null, correlationId = randomUUID(), idempotencyKey = randomUUID()) =>
         asAuthenticated(sql, fixture.pair[0], async (probe) => {

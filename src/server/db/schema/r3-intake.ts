@@ -176,6 +176,7 @@ export const evaluationCandidates = pgTable(
       .references(() => orgs.id, { onDelete: "restrict" }),
     intakeId: uuid("intake_id").notNull(),
     productId: uuid("product_id").notNull(),
+    vendorOrganizationId: uuid("vendor_organization_id").notNull(),
     source: text("source").notNull().default("initial"),
     state: text("state").notNull().default("proposed"),
     eligibility: text("eligibility").notNull().default("unknown"),
@@ -199,9 +200,9 @@ export const evaluationCandidates = pgTable(
       name: "evaluation_candidates_intake_scope_fk",
     }).onDelete("restrict"),
     foreignKey({
-      columns: [t.organizationId, t.productId],
+      columns: [t.vendorOrganizationId, t.productId],
       foreignColumns: [products.organizationId, products.id],
-      name: "evaluation_candidates_product_scope_fk",
+      name: "evaluation_candidates_product_vendor_scope_fk",
     }).onDelete("restrict"),
     check(
       "evaluation_candidates_source_ck",
