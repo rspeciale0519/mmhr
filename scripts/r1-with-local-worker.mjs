@@ -28,6 +28,11 @@ const rehearsalFiles = new Set(
   [
     "src/server/db/r1-empty-migration.integration.test.ts",
     "src/server/db/r1-account-setup.integration.test.ts",
+    "src/server/db/r1-customer-registration.integration.test.ts",
+    "src/server/db/r2a-lead-rate-limit.integration.test.ts",
+    "src/server/db/r3-intake-read.integration.test.ts",
+    "src/server/db/r3-requirement-read.integration.test.ts",
+    "src/server/db/r3-requirement-write.integration.test.ts",
     "src/server/db/r1-invitation-command.integration.test.ts",
     "src/server/db/r1-member-read.integration.test.ts",
     "src/server/db/r1-permission-migration-failure.integration.test.ts",

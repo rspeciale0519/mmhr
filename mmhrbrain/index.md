@@ -11,6 +11,12 @@ Catalog of the mmhr brain. SessionStart reads this.
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
+- [[journal/2026-09-08]] — prepared scoped requirement reads; 3,217 unit tests pass; verification branch preserves the checkpoint for disposable CI.
+- [[journal/2026-09-08]] — connected saved intake list/detail views; 3,155 unit tests pass; production preview confirms the release block, not authenticated workflow completion.
+- [[journal/2026-09-08]] — prepared requirement creation, immutable snapshots and legacy retry compatibility; 3,129 full unit tests pass, database verification remains open.
+- [[journal/2026-09-08]] — prepared scoped intake reads and corrected stored-data compatibility; 58 focused tests pass, database execution remains blocked.
+- [[journal/2026-09-08]] — revised full-goal execution supplement and canonical customer journey; repaired lead result mapping and registration rejection; 2,997 unit tests pass, live database evidence blocked.
+- [[journal/2026-09-08]] — strengthened marketing-content source traceability and R9 review coverage; added route-specific metadata and dynamic sitemap coverage; Docker startup blocks integration verification.
 - [[journal/2026-09-07]] — reviewed checkpoint branch, clarified customer workflow, and 2,957 passing unit tests; development remains stopped.
 - [[journal/2026-09-05]] — removed dependency vulnerabilities, corrected CI startup, and added finance authorization with local migration evidence; broader verification remains open.
 - [[journal/2026-09-04]] — repaired Docker Desktop, passed all 82 integration files and 2,739 unit tests, and removed validated scratch artifacts.

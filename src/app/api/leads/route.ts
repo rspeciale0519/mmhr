@@ -17,6 +17,12 @@ export async function POST(request: Request) {
 
   try {
     const result = await createLead(input);
+    if (result.outcomeCode === "rate_limited") {
+      return Response.json(
+        { accepted: false, error: "rate_limited" },
+        { status: 429, headers: { ...noStore, "Retry-After": "900" } },
+      );
+    }
     return Response.json(
       result.outcomeCode === "idempotency_conflict"
         ? { accepted: false, error: "request_not_accepted" }

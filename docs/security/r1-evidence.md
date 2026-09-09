@@ -1,6 +1,6 @@
 # R1 Security Evidence
 
-Updated: 2026-09-03
+Updated: 2026-09-08
 
 This record summarizes local R1 evidence. It does not prove cloud, staging, or
 production activation. It does not record real administrator credentials,
@@ -21,6 +21,8 @@ phone evidence, or recovery approvals.
 | Security commands, audit, and idempotency | `src/server/auth/security-command-api.integration.test.ts`, `src/server/db/r1-security-command.integration.test.ts` |
 | Recovery and MFA reset controls | `src/server/db/r1-recovery-mfa.integration.test.ts`, `src/server/db/r1-recovery-mfa-api.integration.test.ts`, recovery command tests |
 | Restricted identity worker | `src/server/db/r1-identity-worker.integration.test.ts`, `scripts/r1-with-local-worker.mjs` |
+| Caller identity synchronization | `src/server/commands/identity-synchronization.ts`, `drizzle/0101_r1_customer_registration.sql`, adapter and migration-boundary tests; database integration evidence remains open |
+| Private customer workspace setup | `src/server/commands/customer-registration.ts`, `src/server/db/r1-customer-registration.integration.test.ts`, `drizzle/0101_r1_customer_registration.sql`; 38 registration/synchronization cases collected, none verified against the database; runtime wiring remains disabled |
 | Source and import boundaries | `src/server/auth/security-source-contract.test.ts`, `src/server/auth/authorization-boundaries.test.ts` |
 | CRM contact, product, and search boundaries | `src/server/commands/crm-database.ts`, `src/server/commands/crm-search-database.ts`, CRM migration and isolation tests |
 | CRM export approvals | `src/server/commands/crm-export-database.ts`, `drizzle/0029_r2b_crm_exports.sql`, CRM export migration and isolation tests |
@@ -35,12 +37,12 @@ phone evidence, or recovery approvals.
 | Approval-bound marketing content | `src/server/workflows/marketing-content-contract.ts`, marketing content contract tests |
 | Gated resource access | `src/server/workflows/gated-resource-contract.ts`, gated resource contract tests, lead-create and consent-aware route tests |
 | Evaluation collaboration requests | `src/server/evaluation/collaboration-contract.ts`, collaboration contract tests, workflow communication and follow-up persistence |
-| Availability target contract | `src/server/operations/availability-contract.ts`, availability contract tests, `drizzle/0044_r9_evidence_persistence.sql` |
-| Performance budget contract | `src/server/operations/performance-contract.ts`, performance contract tests, `drizzle/0044_r9_evidence_persistence.sql` |
+| Availability target contract | `src/server/operations/availability-contract.ts`, availability contract tests, `drizzle/0023_r9_evidence_persistence.sql` |
+| Performance budget contract | `src/server/operations/performance-contract.ts`, performance contract tests, `drizzle/0023_r9_evidence_persistence.sql` |
 | Deletion and retention contract | `src/server/privacy/retention-contract.ts`, `src/server/commands/deletion.ts`, retention contract tests, deletion command migration |
 | Recovery evidence contract | `src/server/operations/recovery-readiness.ts`, recovery readiness tests, restore and rollback rehearsal suites |
 | Customer portal resource scope | customer route guards, R3/R6 organization-scoped commands, portal permission integration checks |
-| Public claim quarantine | `docs/security/r0-public-claim-inventory.md`, marketing content approval contract, Pulse public routes |
+| Public claim quarantine | `.codex/plans/module-r0-roadmap-and-public-release-control.md`, marketing content approval contract, Pulse public routes |
 | Authorized document search | `src/server/commands/workflow-document-search.ts`, `drizzle/0083_r4_document_search.sql`, document search migration and authenticated isolation tests |
 | Evaluation communication routing | `src/server/commands/evaluation-route.ts`, `drizzle/0084_r4_evaluation_routing.sql`, evaluation-routing migration and authenticated isolation tests |
 | CRM search, export, duplicate, and renewal controls | `src/server/commands/crm-search-database.ts`, `src/server/commands/crm-export-database.ts`, `src/server/commands/crm-duplicate-database.ts`, audited renewal persistence, and their focused and authenticated isolation suites |
@@ -307,9 +309,26 @@ scan, Drizzle schema check, and diff check passed.
 The ACL repair revokes inherited PUBLIC execution on all public functions and
 grants `mmhr_*` execution only to `authenticated`.
 
-Current branch verification: the latest complete unit suite passed 271 files
-and 2,739 tests. The complete integration suite passed 82 files and 678 tests.
-The empty-database, restore, rollback, and guarded recovery rehearsals passed.
+Historical local verification: an earlier complete unit suite passed 271 files
+and 2,739 tests. An earlier complete integration suite passed 82 files and 678
+tests. The empty-database, restore, rollback, and guarded recovery rehearsals
+passed in that earlier local environment.
+
+## 2026-09-08 current verification boundary
+
+The current inventory reports 107 migrations and 90 integration files.
+The customer-registration and identity-synchronization rehearsal collects 38 cases.
+Docker startup failed and the engine remains unavailable, so these cases cannot execute locally.
+The earlier integration results above remain historical and do not prove the
+current migration, RLS, audit, or runtime-wiring state.
+
+Full unit run 33155 passed 302 files and 3,217 tests. Type checking and lint pass.
+Build 63432 passed 67 routes before the final requirement-read error text.
+The migration ledger check passed. Seven lead-rate integration cases failed
+during Docker startup and did not execute. Migrations 0101 through 0106 remain
+unapplied locally and in the cloud. Existing GitHub CI is the next disposable
+database verification path. See `docs/security/r2a-lead-rate-limit.md` for
+the aggregate write ceiling and the separate per-client protection requirement.
 
 The release manifest remains fail-closed. Target-environment, authenticated
 browser, accessibility, performance, availability, deletion, restore,

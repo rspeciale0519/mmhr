@@ -4,8 +4,8 @@
 
 | Field | Value |
 |---|---|
-| Version | 2.1 |
-| Date | 2026-08-27 |
+| Version | 2.2 |
+| Date | 2026-09-08 |
 | Status | Canonical product baseline |
 | Product owner | Rob Speciale |
 | Architecture authority | [TECH_STACK.md](./TECH_STACK.md) |
@@ -21,7 +21,22 @@ Technical providers and model selections belong in TECH_STACK.md. Product behavi
 
 MMHR is a private operating platform for HR software selection, vendor management, CRM, deal flow, commissions, and customer success.
 
-MMHR staff use the platform with invited customer and vendor users. MMHR does not sell the platform as a general SaaS product.
+MMHR staff use the platform with registered customers and invited vendor users. MMHR does not sell the platform as a general SaaS product.
+
+### Approved Customer Journey
+
+The owner confirmed this journey in the September 7 checkpoint and approved implementation on September 8.
+See [checkpoint clarification](./CHECKPOINT-2026-09-07.md#product-clarification) and the
+[registration policy](../.codex/plans/module-r1-secure-platform-base.md).
+
+Customers create free accounts and enter software needs. Verified customers receive a new private workspace without administration rights or staff approval.
+The initial scorecard shows all vendor options from approved data with provider names masked. The customer selects up to five RFP contenders.
+The customer then uses a representative call or a form to prepare the RFP. MMHR discusses required capabilities and customization requests.
+Provider names become visible after that discussion and before approved RFP submission. MMHR records the disclosure decision.
+MMHR sends the approved RFP to selected providers. Customers compare responses, select a provider and sign a direct contract with that provider.
+Customers never pay MMHR. Providers pay MMHR a commission or referral fee; this does not imply identical rates.
+
+This journey sets delivery priority. All other mandatory requirements remain in scope.
 
 The initial category scope is HR and workforce software. Category expansion requires a separate product decision.
 
@@ -153,6 +168,8 @@ Also maintain partner, resource, transparency, privacy, and terms pages.
 
 **FR-MKT-06 — Lead fields.** Public customer registration must collect full name, company, work email, and direct company phone.
 
+Registration is free. Verified customers receive an isolated private workspace without administration rights, under the approved R1 initialization policy.
+
 **FR-MKT-07 — Email validation.** Public registration must reject known personal email domains. Authorized staff can record a reviewed exception.
 
 **FR-MKT-08 — Gated resources.** Gated resources must use the same identity, consent, and lead-routing rules.
@@ -191,7 +208,9 @@ Also maintain partner, resource, transparency, privacy, and terms pages.
 
 **FR-INT-03 — Initial evaluation.** The system must create an initial masked assessment using approved inputs and vendor data.
 
-**FR-INT-04 — Initial candidates.** The initial evaluation supports up to five candidates.
+**FR-INT-04 — Initial candidates.** The customer can select up to five initial RFP contenders from the masked scorecard.
+
+This cap applies to selections. It must not restrict the number of displayed vendor options from approved data.
 
 After MMHR review, authorized staff or a permitted Customer Organization Admin can add candidates without a fixed funnel limit.
 
@@ -234,6 +253,8 @@ AI can draft explanations, but it cannot calculate or change eligibility or scor
 **FR-MAT-07 — Duplicate products.** Avoid showing duplicate representations of the same underlying product unless the distinction is material and disclosed.
 
 **FR-MAT-08 — Masking.** The product must record when identities are masked, who can unmask them, and why disclosure occurred.
+
+Provider names remain masked until the required MMHR discussion. Record authorized disclosure after that discussion and before RFP submission.
 
 ### 5.5 Vendor Knowledge and Evidence
 

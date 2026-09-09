@@ -42,7 +42,7 @@ export async function signUp(
 
   const supabase = await createClient();
   try {
-    await createLead(
+    const lead = await createLead(
       {
         fullName: String(formData.get("fullName") ?? ""),
         company: String(formData.get("company") ?? ""),
@@ -54,6 +54,9 @@ export async function signUp(
       },
       { supabase },
     );
+    if (lead.outcomeCode !== "created" && lead.outcomeCode !== "replayed") {
+      return { error: signUpFailureMessage };
+    }
   } catch (error) {
     if (error instanceof LeadCreateError && error.code === "INVALID_INPUT") {
       return { error: "Enter a valid work email, company, and direct company phone." };

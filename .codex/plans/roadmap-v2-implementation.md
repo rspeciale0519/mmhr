@@ -338,7 +338,7 @@ Outcome:
 
 - Build saved intake, requirements, candidates, scorecards, collaboration, and workspaces.
 - Keep candidate state separate from deal state.
-- Enforce five candidates only for the initial evaluation.
+- Limit initial RFP contender selections to five. Do not cap displayed masked options at five.
 - Add approved post-review candidate additions.
 - Build deterministic eligibility and scoring.
 - Keep commission data outside eligibility and scoring.

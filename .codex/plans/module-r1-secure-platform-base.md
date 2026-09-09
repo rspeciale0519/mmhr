@@ -538,6 +538,17 @@ Preserve consumed bootstrap state. Require explicit review for any earlier singl
 
 Use a fixed organization-initialization command for pending organizations. Add explicit initialization authority before exposing that command.
 
+September 8 product-owner exception: a verified customer may automatically create one
+new private customer workspace. The fixed caller-only command may activate a new or
+reviewed, otherwise unassigned identity and grant contributor access to that new
+workspace. It cannot claim existing organizations, restore revoked access, clear
+review or containment flags, or grant staff, vendor, or administration authority.
+The caller must have a live verified session; AAL1 is sufficient for this fixed setup.
+Single-customer workspaces without administrative roles do not require a customer
+administrator with MFA. Other organizations and the platform retain existing
+administrator-capacity requirements. Serialize setup and write its audit and receipt
+atomically. Database and real-session evidence are required before enabling this flow.
+
 Require reviewed organization facts and an explicitly approved initial administrator. Do not infer membership creation from `org.status.change` alone.
 
 Create or validate the required membership and durable grants atomically. Activate the organization only when post-change administration checks pass.

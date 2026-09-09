@@ -1,7 +1,7 @@
 # Pre-workflow-review checkpoint
 
 This branch preserves unfinished work. It is not a release or a merge candidate.
-Development remains stopped until the user approves the corrected product workflow.
+The user approved the corrected workflow on September 8. Development has resumed; this checkpoint remains a historical record.
 
 ## Scope
 
@@ -25,12 +25,12 @@ The user confirmed these requirements after development stopped:
 9. Customers never pay MMHR. Providers pay MMHR a commission or referral fee.
 
 The five-choice limit applies to selections, not to the number of displayed options.
-Reconcile the canonical PRD, roadmap, and implementation with these requirements before new development.
+The September 8 PRD and roadmap updates record these requirements. Implementation and live workflow verification remain incomplete.
 This checkpoint does not claim that the current application implements this complete journey.
 
 ## Open work and risks
 
-- Registration lacks the identity synchronization RPC and its wiring.
+- Registration has a prepared identity synchronization RPC and adapter, but runtime wiring waits for database evidence.
 - Organization administration UI and real router integration remain unfinished.
 - Signed-in browser verification remains open.
 - The September 5 full integration session result could not be recovered on September 7.

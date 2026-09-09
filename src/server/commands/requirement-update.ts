@@ -1,8 +1,35 @@
 import "server-only";
 import { z } from "zod";
 import { AuthorizationError, requirePermission, type AuthorizationOptions } from "@/server/auth/authorization";
-const uuid = z.uuid().transform((value) => value.toLowerCase());
-export const requirementUpdateSchema = z.strictObject({ requirementId: uuid, organizationId: uuid, intakeId: uuid, expectedRevision: z.number().int().positive(), stableKey: z.string().trim().toLowerCase().regex(/^[a-z][a-z0-9_]{0,99}$/), label: z.string().trim().min(1).max(200), importance: z.enum(["must", "nice", "not_applicable"]), weight: z.number().int().min(1).max(100), ownerIdentityId: uuid.nullable(), response: z.unknown().nullable(), requirementType: z.enum(["structured", "custom"]), evidenceReferences: z.array(z.string().trim().min(1).max(500)).max(20), vendorResponseLinks: z.array(z.string().url().startsWith("https://").max(263)).max(20), actorIdentityId: uuid, correlationId: uuid, idempotencyKey: uuid });
-const resultSchema = z.strictObject({ requirementId: uuid, organizationId: uuid, intakeId: uuid, revision: z.number().int().positive(), outcomeCode: z.enum(["updated", "replayed"]), correlationId: uuid });
+import { requirementResultFields, requirementWriteFields } from "@/server/matching/requirement-input";
+
+export const requirementUpdateSchema = z.strictObject({ ...requirementWriteFields,
+  expectedRevision: z.number().int().min(1).max(2_147_483_646),
+});
+const resultSchema = z.strictObject({ ...requirementResultFields, outcomeCode: z.enum(["updated", "replayed"]) });
 export type RequirementUpdateResult = z.infer<typeof resultSchema>;
-export async function updateIntakeRequirement(input: unknown, options: AuthorizationOptions = {}): Promise<RequirementUpdateResult> { const parsed = requirementUpdateSchema.safeParse(input); if (!parsed.success) throw new Error("Invalid requirement metadata input"); const command = parsed.data; try { const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.organizationId }, options); if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) throw new AuthorizationError(); const response = await context.supabase.rpc("mmhr_update_intake_requirement", { payload: command, correlation_id: command.correlationId, idempotency_key: command.idempotencyKey }); if (response.error) throw new Error("Requirement update unavailable"); const result = resultSchema.safeParse(response.data); if (!result.success || result.data.requirementId !== command.requirementId || result.data.organizationId !== command.organizationId || result.data.intakeId !== command.intakeId || result.data.correlationId !== command.correlationId) throw new Error("Invalid requirement update response"); return result.data; } catch (error) { if (error instanceof AuthorizationError) throw error; if (error instanceof Error && (error.message === "Requirement update unavailable" || error.message === "Invalid requirement update response")) throw error; throw new Error("Requirement update unavailable"); } }
+export async function updateIntakeRequirement(input: unknown, options: AuthorizationOptions = {}): Promise<RequirementUpdateResult> {
+  const parsed = requirementUpdateSchema.safeParse(input);
+  if (!parsed.success) throw new Error("Invalid requirement metadata input");
+  const command = parsed.data;
+  try {
+    const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.organizationId }, options);
+    if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) throw new AuthorizationError();
+    const response = await context.supabase.rpc("mmhr_update_intake_requirement", {
+      payload: command, correlation_id: command.correlationId, idempotency_key: command.idempotencyKey,
+    });
+    if (!response || response.error) throw new Error("Requirement update unavailable");
+    const result = resultSchema.safeParse(response.data);
+    if (!result.success || result.data.requirementId !== command.requirementId ||
+      result.data.organizationId !== command.organizationId || result.data.intakeId !== command.intakeId ||
+      result.data.correlationId !== command.correlationId ||
+      (result.data.outcomeCode === "updated" ? result.data.revision !== command.expectedRevision + 1 : result.data.revision <= command.expectedRevision)) {
+      throw new Error("Invalid requirement update response");
+    }
+    return result.data;
+  } catch (error) {
+    if (error instanceof AuthorizationError) throw error;
+    if (error instanceof Error && ["Requirement update unavailable", "Invalid requirement update response"].includes(error.message)) throw error;
+    throw new Error("Requirement update unavailable");
+  }
+}

@@ -2,7 +2,7 @@
 
 MMHR is a private operating platform for HR software selection and related customer operations.
 
-MMHR staff use the platform with invited customer and vendor users. MMHR does not sell the platform as a commercial SaaS product.
+MMHR staff use the platform with registered customers and invited vendor users. MMHR does not sell the platform as a commercial SaaS product.
 
 ## Current Status
 
@@ -53,11 +53,11 @@ Feature work requires owning-plan approval from every required owner.
 
 ## End-to-End Workflow
 
-1. Capture the customer organization, stakeholders, current systems, and timing.
-2. Complete discovery and create an initial masked evaluation.
-3. Select up to five initial vendor candidates.
+1. Create a free customer account and an isolated workspace after verified identity, without administration rights.
+2. Capture software needs and show all vendor options from approved data in a masked evaluation.
+3. Select up to five initial RFP contenders; do not cap displayed options at five.
 4. Build the RFP questionnaire and demo plan.
-5. Complete mandatory MMHR review and customer clarification.
+5. Complete mandatory MMHR review and customer clarification, then record provider-name disclosure before RFP submission.
 6. Issue approved RFP versions to vendors.
 7. Accept structured forms, email, and document responses.
 8. Normalize responses with AI assistance and human approval.

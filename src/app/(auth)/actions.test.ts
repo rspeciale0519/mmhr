@@ -199,6 +199,24 @@ describe("auth Server Actions", () => {
     });
   });
 
+  test.each(["rate_limited", "idempotency_conflict", "invalid_input"] as const)(
+    "does not create an Auth account after lead outcome %s", async (outcomeCode) => {
+      vi.mocked(headers).mockResolvedValue(new Headers({ origin: "http://localhost:3000" }) as never);
+      vi.mocked(createLead).mockResolvedValue({
+        leadId: null, status: null, ownerIdentityId: null, outcomeCode,
+        correlationId: "22222222-2222-4222-8222-222222222222",
+      });
+      const signUpRequest = vi.fn().mockResolvedValue({ data: { session: null }, error: null });
+      vi.mocked(createClient).mockResolvedValue({ auth: { signUp: signUpRequest } } as never);
+      await expect(signUp(null, authForm())).resolves.toEqual({
+        error: "We could not complete registration. Please try again later.",
+      });
+      expect(signUpRequest).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+      expect(revalidatePath).not.toHaveBeenCalled();
+    },
+  );
+
   test("keeps sign-in provider behavior for an eight-character password", async () => {
     const signInRequest = vi.fn().mockResolvedValue({ error: null });
     const form = authForm();

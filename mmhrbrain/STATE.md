@@ -1,7 +1,176 @@
 # mmhr brain — STATE
-Updated: 2026-09-07
+Updated: 2026-09-08
 
 ## Current focus
+September 8, 21:48 continuation: reviewed the full active goal and supplement.
+No scope change is required. Prepared scoped active-requirement reads, migration
+0106, strict adapters and a read-only tRPC query. Customer screen wiring remains open.
+The current inventory contains 107 migrations and 90 integration test files.
+Full unit 33155 passes 302 files and 3,217 tests. Final focused checks pass 77 tests;
+type checking and lint pass. Build 63432 passed 67 routes before the final error text.
+Eight requirement-read database cases collect but have not executed.
+Independent review found no read authorization bypass. Fixed its error-text and
+projection-test findings. The debugger review corrected invalid legacy fixtures.
+The checkpoint remains at a1b2ee3112f1d766f0ce82d24607d6571c8c5ee6.
+Created codex/full-delivery-verification without changing the checkpoint or dirty work.
+Fresh origin/develop remains 103 commits behind that checkpoint.
+Prepare a draft PR with customer, lead, public-site and release-control changes;
+use existing disposable GitHub CI as the next database verification path.
+Keep local settings and hooks out of commits. No push, merge or deployment yet.
+All production gates remain closed. See docs/security/r3-requirement-read.md.
+The entries below record historical results, not current inventory totals.
+
+September 8, 21:20 continuation: the full goal and 3,967-character supplement
+need no further changes. Added customer saved-intake list/detail views, bounded
+pagination and loading, empty, invalid-link and read-error states. Page access
+and adapter workspace checks remain separate; query IDs never supply authority.
+No customer writes are enabled. Requirements and customizations remain absent.
+Independent review found no clear authorization bypass. Its test requests were added.
+Final focused tests pass 73 cases. Type, lint and build pass; build has 67 routes.
+Full unit 90113 passes 300 files and 3,155 tests. Final type/lint 17548 also pass.
+Integration inventory passes for 89 files; tracked-file secret scan passes.
+Development startup lacks MIGRATION_DATABASE_URL. The initial port check lacked
+permission; port 3000's system-service listener was not stopped or changed.
+Local production preview runs on 127.0.0.1:3007 in session 71991. Browser tab 1
+shows the release block without console warnings/errors and was retained.
+This does not verify the customer UI or authentication redirects. Do not bypass
+release controls. Database and authenticated browser evidence remain open.
+See `docs/security/r3-customer-intake-view.md`. Continue requirement/customization
+reads, customer write policy, forms and registration wiring. No migration,
+commit, push, merge or production action occurred. The full goal remains active.
+
+September 8, 20:45 continuation: the previous intake-read turn made concrete progress.
+Added requirement creation, strengthened the existing update adapter and prepared
+immutable requirement history with guarded SQL writes. Canonical migration:
+`drizzle/0105_0105_r3_requirement_commands.sql` (generated ledger name retained).
+It is unapplied. The schema inventory now contains 106 migrations and 89 test files.
+Parent review corrected optional retry metadata, active-owner checks, weight100,
+numeric bounds, SQL name collisions, response limits and current history correlation.
+The adapters copy validated response data before asynchronous permission checks.
+Fifty final focused tests and 96 adapter/security checks pass. Type checking, lint,
+Drizzle ledger checks and the 67-route build pass. Sixteen database cases collect;
+Docker's recorded failure still prevents execution. Full unit 43611 passed
+298 files and 3,129 tests before the final SQL-only legacy replay correction.
+Independent review found that old successful update payloads could not replay.
+The public SQL wrapper now checks an exact authorized receipt before new-write
+validation, while preserving strict validation for new writes. Separate review
+found no authentication bypass. Final focused/type/lint checks pass.
+No tests are still running. This remains prepared code, not live workflow closure.
+See `docs/security/r3-requirement-writes.md`. Customer AAL1 write policy,
+requirement reads, customizations, forms and browser/database evidence remain open.
+No migration, commit, push, merge or production action occurred.
+
+September 8, 20:26 continuation: the complete goal and 3,967-character supplement
+were reviewed again. No further scope change is needed. The prior full unit
+rerun 34258 passed 293 files and 3,024 tests.
+Prepared additive migration 0104 and scoped intake list/detail adapters and
+tRPC queries. No write authority, raw grants or stored records changed.
+The migration inventory contains 105 entries; integration inventory has 88 files.
+Independent review found a legacy size mismatch. Read validation now preserves
+valid stored data above the new-write limit, padded text and Unicode characters.
+The debugger review confirmed expected SQL failures use fixture savepoints;
+membership revocation now uses the real command. Eleven database cases collect.
+Fifty-eight final focused tests, type checking and lint pass. Build 43092 passes
+67 routes; the final Unicode-only validation change has focused/type/lint evidence.
+Full unit 16640 passed 296 files and 3,081 tests. The final Unicode regression
+also passes in the separate 58-test focused run.
+Migration 0104 is unapplied. Docker still blocks live database evidence.
+See `docs/security/r3-intake-read.md`. Customer forms, write authentication,
+requirements and customization capture remain open. No Git or production action occurred.
+
+September 8, 20:06 continuation: reviewed intake saving before API exposure.
+Found lifecycle, payload, AAL1-write, resume-read and customization gaps.
+Prepared additive migration 0103 to protect lifecycle and bounded data while
+retaining the existing private audit/history writer and AAL2 command boundary.
+It is NOT applied. The migration inventory now contains 104 entries.
+Reworked the intake adapter; seven final-review regressions failed, then passed.
+Forty focused intake checks, type checking, lint and the 67-route build pass.
+Twelve database cases collect but remain unexecuted because Docker is unavailable.
+Full unit 11539 passed 3,023 tests and failed one boundary check on the prior
+registration test's direct postgres import. Replaced it with the existing
+two-connection rehearsal pool. The 47 boundary checks pass after the repair.
+Full unit rerun 34258 subsequently passed 293 files and 3,024 tests.
+See `docs/security/r3-intake-save.md`. Intake API/UI, scoped resume reads,
+customizations and a reviewed customer-write authentication boundary remain open.
+
+September 8, 19:44 continuation: the reviewed goal supplement remains 3,967 characters.
+Added explicit caller-subject consistency to the unapplied customer setup RPC.
+The new static regression failed before the correction; 53 focused tests now pass.
+Type checking, focused lint and whitespace checks pass for that correction.
+The debugger review confirmed a frozen Docker Desktop UI with no backend.
+Normal restart timed out. A force-close was initially rejected due to possible PID reuse.
+Fresh CIM checks proved the exact executable and creation time. The approved,
+guarded retry closed only that frozen UI, and Docker backend processes started.
+The engine did not answer. Lead rehearsal 63348 timed out during startup after
+240 seconds and skipped all seven tests. No database assertion executed.
+Docker startup 35861 then returned `context deadline exceeded`; recovery failed.
+Do not repeat startup probes or reset Docker data. Customer setup remains unwired.
+Reviewed the independent subagent patch: registration now collects 38 cases,
+including observed concurrent-writer blocking and existing/revoked authority.
+SQL rejection checks use nested savepoints; committed fixtures remain disposable.
+Post-review type checking and lint pass. The final focused batch passes 54 tests.
+The 38 database cases are collected, not executed. The engine-version diagnostic
+was stopped after startup failed; no further restart was attempted.
+
+September 8 resumed goal review: the full completion goal remains active.
+The user requested review and changes before resumption. The revised execution
+supplement is `.codex/plans/goal-full-project-completion.md` (under 4,000 characters).
+It prioritizes complete customer workflows, preserves the checkpoint, and records
+the existing authorization for routine implementation, Git and deployment work.
+Earlier task-specific approval limits and development stops below are historical;
+real release evidence, verified identities and non-destructive recovery remain required.
+The PRD and roadmap now distinguish all displayed masked options from five selections.
+Repaired interrupted Supabase syntax and removed untrusted header forwarding.
+Fixed the lead adapter's SQL column mapping and registration rejection handling.
+Migration 0102 now prepares an aggregate lead-write ceiling with RLS and atomic
+lead/audit rollback. It is NOT applied. Per-client edge protection remains open.
+See `docs/security/r2a-lead-rate-limit.md` for the forward path and recovery risks.
+Focused checks passed 51 tests; type checking, lint, migration ledger check and
+the 67-route build passed. Full unit checks passed 292 files and 2,997 tests.
+The integration inventory covers 87 files; seven new lead cases could not run
+because Docker startup failed. No database assertion passed for migration 0102.
+
+September 8: the user approved implementation of the confirmed ten-step customer
+journey and independent testing. The development stop below is historical.
+The user separately approved automatic private workspace access for verified
+customers, without staff approval or administration rights. The narrow policy
+exception is recorded in the R1 plan's initialization section.
+Prepared migration 0101, customer registration schema/adapter, and regression tests.
+Added the caller-bound identity synchronization RPC with audit and receipt writes;
+runtime wiring remains disabled until database rehearsal evidence passes.
+Corrected two stale R1 evidence references and added a regression check for the
+canonical R0 control record and R9 evidence migration.
+Marked older integration results as historical and recorded the current 86-file
+inventory with the Docker engine blocker, so stale results cannot imply closure.
+Added route-specific canonical, Open Graph, and Twitter metadata across the
+stable marketing routes and dynamic blog and case-study pages, with coverage tests.
+Added dynamic blog and case-study URLs to the public sitemap with route coverage
+tests; public release remains fail-closed until claim and environment evidence passes.
+Added a repository-reference check so every local artifact named by the R1
+evidence record must exist.
+Strengthened R2A marketing-content approval with source reference and capture
+time, and made passed R9 security reviews cover all eight security domains.
+The current lead boundary validates consent, work email, phone, and idempotency,
+but durable public rate limiting and live lead rehearsal remain open.
+Added explicit platform-authority, existing-membership, and adapter-concurrency cases.
+The setup RPC now locks the live Auth user before first-time writes to serialize retries.
+The adapter is NOT wired to registration and the migration is NOT applied locally
+or remotely. Fifteen focused adapter and migration tests pass. Database tests are
+blocked by Docker startup.
+The production build still passes with all 67 routes. An isolated temporary Docker
+configuration removes the local config warning, but the Docker engine pipe remains
+missing. The expanded 30 registration and synchronization integration cases still
+skip before execution.
+The Drizzle migration ledger check passes with a loopback-only placeholder URL.
+The R9 readiness checker validates the manifest and correctly reports all 12
+release checks blocked until real evidence exists.
+Docker's backend log reports an inaccessible sailor-ingest.sock runtime file.
+The crashed Desktop instance was stopped. Backup move and removal of that exact
+socket both failed; no containers or volumes were removed. Windows service startup
+also returned access denied. Do not factory-reset Docker or delete its data.
+See journal/2026-09-08.md. Finish database verification before enabling the new RPC.
+No new commit, push, merge, or production action is authorized by this work record.
+
 September 7 checkpoint task: the user approved a reviewed commit and push to a
 separate checkpoint branch. This does not authorize a merge or renewed development.
 Current branch: checkpoint/pre-workflow-review-2026-09-07, created from the
@@ -10,8 +179,10 @@ See docs/CHECKPOINT-2026-09-07.md for the clarified customer workflow and open w
 The September 5 integration session handle is no longer available. Its final
 result is unverified; references below to a live session are historical.
 Type checking, lint, build (67 pages), secret scan, integration inventory,
-whitespace checks, and dependency audit passed on September 7.
-All 289 unit test files and 2,957 tests passed in 537.20 seconds.
+whitespace checks, and dependency audit passed on September 7. The current
+worktree also passes 291 unit test files and 2,972 tests, plus the 67-route
+production build. The customer-registration integration suite remains blocked
+by Docker startup.
 This record is included in the checkpoint commit. Verify the remote branch SHA
 against local HEAD before treating the GitHub backup as confirmed.
 

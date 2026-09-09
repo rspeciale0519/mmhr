@@ -3,6 +3,8 @@ import {
   check,
   foreignKey,
   index,
+  integer,
+  primaryKey,
   pgTable,
   text,
   timestamp,
@@ -44,4 +46,20 @@ export const leads = pgTable("leads", {
   index("leads_organization_status_idx").on(t.organizationId, t.status),
   check("leads_status_ck", sql`${t.status} in ('new', 'contacted', 'qualified', 'disqualified', 'converted', 'archived')`),
   check("leads_request_digest_ck", sql`${t.requestDigest} is null or ${t.requestDigest} ~ '^[0-9a-f]{64}$'`),
+]);
+
+/**
+ * Aggregate lead-write safety limit. The fixed key contains no client data.
+ * Per-client network protection belongs at the trusted deployment edge.
+ */
+export const leadRateLimits = pgTable("lead_rate_limits", {
+  rateKey: text("rate_key").notNull(),
+  windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull(),
+  requestCount: integer("request_count").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.rateKey, t.windowStartedAt], name: "lead_rate_limits_pk" }),
+  index("lead_rate_limits_window_idx").on(t.windowStartedAt),
+  check("lead_rate_limits_key_ck", sql`${t.rateKey} ~ '^[0-9a-f]{64}$'`),
+  check("lead_rate_limits_count_ck", sql`${t.requestCount} >= 0`),
 ]);

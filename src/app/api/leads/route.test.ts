@@ -77,6 +77,20 @@ describe("public lead route boundary", () => {
     expect(await response.json()).toEqual({ accepted: false, error: "request_not_accepted" });
   });
 
+  test("returns a retry response when the durable limit is reached", async () => {
+    createLead.mockResolvedValue({
+      leadId: null,
+      status: null,
+      ownerIdentityId: null,
+      outcomeCode: "rate_limited",
+      correlationId: "22222222-2222-4222-8222-222222222222",
+    });
+    const response = await POST(request(payload));
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("900");
+    expect(await response.json()).toEqual({ accepted: false, error: "rate_limited" });
+  });
+
   test("maps invalid input and database failures to safe errors", async () => {
     createLead.mockRejectedValueOnce(new LeadCreateError("INVALID_INPUT"));
     expect((await POST(request(payload))).status).toBe(400);

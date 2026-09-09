@@ -1,6 +1,12 @@
 # Log
 Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 
+## [2026-09-08] implementation | Prepare approved customer registration
+- User approved automatic private workspace access for verified customers, without administration rights.
+- Prepared migration 0101 and adapter; neither is connected to runtime registration.
+- Twenty focused tests pass. Database verification is blocked by an inaccessible Docker runtime socket.
+- No migration was applied and no container or volume was removed. See journal/2026-09-08.md.
+
 ## [2026-07-14] init | mmhr brain initialized
 - Vault scaffolded from _brain engine. Knowledge layer = stub.
 
@@ -369,3 +375,107 @@ Database run storage, approval records, and provider evaluation remain open.
 - Recorded the clarified workflow and open requirements in docs/CHECKPOINT-2026-09-07.md.
 - Excluded local settings and hooks. Integration and signed-in browser success remain unverified.
 - Commit/push verification belongs to this task; development, merges, and releases remain stopped.
+
+## [2026-09-08] fix | Correct canonical R1 evidence references
+- Replaced two missing R9 and R0 paths in `docs/security/r1-evidence.md` with the existing canonical artifacts.
+- Added a regression test in `src/server/auth/r1-security.test.ts`; focused security and inventory checks passed 9 tests.
+- Docker remains unavailable, so database rehearsal and runtime wiring stay gated.
+
+## [2026-09-08] fix | Mark historical R1 integration evidence
+- Labeled the earlier 82-file and 678-test integration result as historical.
+- Added the current 86-file inventory and Docker engine boundary to `docs/security/r1-evidence.md`.
+- Added a regression assertion; focused security and inventory checks passed 10 tests.
+
+## [2026-09-08] feature | Add route-specific marketing metadata
+- Added canonical, Open Graph, and Twitter metadata for every stable marketing route and dynamic blog and case-study page.
+- Added metadata helper, route coverage tests, and dynamic fallback metadata.
+- Full unit suite passed 291 files and 2,977 tests; full lint, type checking, and the 67-route production build passed.
+- Database rehearsal and production release evidence remain blocked by the unavailable Docker engine.
+
+## [2026-09-08] fix | Include dynamic public routes in sitemap
+- Added generated blog and case-study paths to the public sitemap.
+- Added sitemap assertions for dynamic entries and route metadata coverage.
+- Sitemap tests, type checking, lint, and the 67-route production build passed.
+
+## [2026-09-08] test | Guard R1 evidence artifact references
+- Added a check that every local path in `docs/security/r1-evidence.md` resolves to an existing artifact.
+- The R1 security test passed 7 tests and focused lint passed.
+
+## [2026-09-08] security | Require complete R9 review domains
+- Passed security reviews now cover authorization, RLS, audit, worker, privacy, dependencies, secrets, and deployment.
+- Partial failed reviews remain valid for tracking unresolved findings.
+- Focused R9 and marketing-content checks passed 14 tests; type checking, lint, and whitespace checks passed.
+
+## [2026-09-08] fix | Require marketing-content source traceability
+- Marketing content now requires a bounded source reference and capture timestamp before approval or publication.
+
+## [2026-09-08] audit | Review R2A lead boundary
+- Confirmed strict work-email, phone, consent, and idempotency validation.
+- Confirmed durable public rate limiting is not yet implemented; no unsafe in-memory substitute was added.
+- Live lead and registration rehearsal remains gated by the unavailable database engine.
+- Missing source reference and capture time have regression tests.
+
+## [2026-09-08] goal | Resume with verified customer workflow priority
+- Reviewed the full active goal and saved `.codex/plans/goal-full-project-completion.md` as its execution supplement, under 4,000 characters.
+- Reconciled the PRD, README and roadmap with approved self-service registration, all masked options and five initial RFP selections.
+- Preserved the checkpoint and all mandatory R0 through R9 scope. Existing goal authorization covers normal project actions; release evidence is still required.
+- Fixed the interrupted Supabase syntax, SQL-result mapping and registration rejection handling. The debugger workflow supplied red-to-green regression evidence.
+- Prepared an aggregate lead-write ceiling with RLS and atomic rejection; per-client network protection remains a separate release requirement.
+- Passed 51 focused tests, 2,997 full unit tests, type checking, lint, the 67-route build, migration ledger validation and the 87-file integration inventory.
+- Both local and elevated integration startup failed because Docker's engine was absent. Seven new cases did not execute; migration 0102 remains unapplied.
+
+## [2026-09-08] security | Review registration and retry safe Docker recovery
+- Added explicit caller-subject consistency in the prepared customer setup RPC, with a red-to-green static regression.
+- The focused identity, registration, lead migration and security inventory checks passed 53 tests. Type checking and focused lint passed.
+- A guarded, approved close of the verified frozen Docker UI allowed backend processes to start without a data reset.
+- The engine remained unresponsive. Lead rehearsal 63348 timed out after 240 seconds and skipped all seven cases.
+- Runtime registration wiring and live database evidence remain open. Do not infer completion from static checks.
+- Reviewed 38 collected registration cases with real independent connections, observed writer blocking, caller mismatch and historical-authority denial checks.
+- Final focused checks pass 54 tests. The post-review full type check and focused lint pass; database execution remains unverified.
+
+## [2026-09-08] fix | Protect intake revisions before customer API wiring
+- Prepared migration 0103 with bounded data, lifecycle guards, applicable-requirement submission checks and private-writer runtime denial.
+- Kept existing AAL2 write authorization and immutable history. Read/resume, customizations and customer-write policy remain open.
+- Reproduced seven adapter defects in final review, then passed 40 focused intake checks, type checking, lint and the 67-route build.
+- Collected 12 real database cases without startup hooks. Docker blocks execution; the migration remains unapplied.
+- Full unit run exposed the registration test's direct database import. The test now uses the existing isolated pool; all 47 boundary checks pass.
+- Full unit rerun 34258 subsequently passed 293 files and 3,024 tests.
+
+## [2026-09-08] feature | Prepare scoped intake reads
+- Reviewed the full goal and supplement. No additional scope change was needed.
+- Added migration 0104, scoped list/detail adapters and read-only tRPC queries without new write authority.
+- Corrected the independent review's stored-data limit finding and preserved padded and Unicode text.
+- Final focused checks passed 58 tests. Type checking, lint and the 67-route build passed.
+- Eleven database cases collect; Docker prevents execution. The migration remains unapplied.
+- Full unit session 16640 passed 296 files and 3,081 tests. The final Unicode regression passes separately.
+- Customer forms, customer-write policy and customizations remain unfinished.
+
+## [2026-09-08] feature | Prepare requirement creation and revision history
+- Added structured/custom requirement creation and strengthened existing metadata updates.
+- Prepared migration 0105 with scoped AAL2 commands, parent-state locks and immutable snapshots.
+- Kept generated ledger name `0105_0105_r3_requirement_commands`; removed the unused agent-authored duplicate draft.
+- Corrected review findings without applying the migration or changing customer authentication policy.
+- Forty-nine focused tests, type checking, lint and the 67-route build pass. Fifteen database cases collect.
+- Full unit 43611 passed 298 files and 3,129 tests. Docker prevents SQL execution.
+- Final review added safe exact legacy update replay before new-write validation; 50 focused tests pass.
+- The final wrapper passed a separate read-only review. Sixteen database cases collect; no test process remains running.
+
+## [2026-09-08] feature | Connect customer saved-intake views
+- Reviewed the full goal and supplement; no scope change was needed.
+- Added authorized saved-intake list/detail reads, bounded pagination and explicit loading/error/empty states.
+- Corrected loading inventory and JSX error-handler findings; kept all write controls absent.
+- Final focused checks pass 73 tests; full unit 90113 passes 300 files and 3,155 tests.
+- Type, lint, the 67-route build, integration inventory and tracked-file secret scan pass.
+- Development startup lacks MIGRATION_DATABASE_URL. Port 3000's system-service listener was untouched.
+- Local production preview on port 3007 shows the release block without console errors.
+- Authenticated browser/database verification remains open. No migration, Git or production action occurred.
+
+## [2026-09-08] feature | Prepare scoped requirement reads and verification branch
+- Added active-only scoped reads with explicit safe projection and legacy data preservation.
+- Prepared migration 0106 and eight collected database cases; no SQL execution is verified.
+- Final focused checks pass 77 tests; full unit 33155 passes 302 files and 3,217 tests.
+- Type, lint and build pass; the build preceded the final generic error text.
+- Inventory checks pass for 107 migrations and 90 integration files.
+- Preserved the checkpoint and created codex/full-delivery-verification at the same HEAD.
+- Fresh origin/develop remains 103 commits behind the checkpoint. Draft PR preparation is in progress.
+- Correct unsupported equal-rate claims before committing. No push, merge or production action yet.

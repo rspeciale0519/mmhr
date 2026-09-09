@@ -64,9 +64,26 @@ export const leadCreateResultSchema = z.strictObject({
   leadId: z.uuid().nullable(),
   status: z.enum(leadStatuses).nullable(),
   ownerIdentityId: z.uuid().nullable(),
-  outcomeCode: z.enum(["created", "replayed", "idempotency_conflict", "invalid_input"]),
+  outcomeCode: z.enum(["created", "replayed", "idempotency_conflict", "invalid_input", "rate_limited"]),
   correlationId: z.uuid(),
-});
+}).refine((value) => {
+  if (value.outcomeCode === "created" || value.outcomeCode === "replayed") {
+    return value.leadId !== null && value.status !== null;
+  }
+  return value.leadId === null && value.status === null && value.ownerIdentityId === null;
+}, { message: "Lead result does not match its outcome" });
+
+// PostgREST preserves RETURNS TABLE column names. Map them explicitly at this boundary.
+const leadDatabaseResultSchema = z.strictObject({
+  lead_id: z.uuid().nullable(),
+  status: z.enum(leadStatuses).nullable(),
+  owner_identity_id: z.uuid().nullable(),
+  outcome_code: z.enum(["created", "replayed", "idempotency_conflict", "invalid_input", "rate_limited"]),
+  correlation_id: z.uuid(),
+}).transform((row) => ({
+  leadId: row.lead_id, status: row.status, ownerIdentityId: row.owner_identity_id,
+  outcomeCode: row.outcome_code, correlationId: row.correlation_id,
+})).pipe(leadCreateResultSchema);
 
 export type LeadCreateResult = z.infer<typeof leadCreateResultSchema>;
 
@@ -111,9 +128,10 @@ export async function createLead(
   } catch {
     throw new LeadCreateError("UNAVAILABLE");
   }
+  if (!response) throw new LeadCreateError("INVALID_RESPONSE");
   if (response.error) throw new LeadCreateError("UNAVAILABLE");
 
-  const rows = z.array(leadCreateResultSchema).length(1).safeParse(response.data);
+  const rows = z.array(leadDatabaseResultSchema).length(1).safeParse(response.data);
   if (!rows.success) throw new LeadCreateError("INVALID_RESPONSE");
   const result = rows.data[0];
   if (result.outcomeCode === "invalid_input") {

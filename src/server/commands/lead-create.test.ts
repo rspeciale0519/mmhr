@@ -8,11 +8,11 @@ import {
 
 const idempotencyKey = "55555555-5555-4555-8555-555555555555";
 const result = {
-  leadId: "11111111-1111-4111-8111-111111111111",
+  lead_id: "11111111-1111-4111-8111-111111111111",
   status: "new",
-  ownerIdentityId: null,
-  outcomeCode: "created",
-  correlationId: "22222222-2222-4222-8222-222222222222",
+  owner_identity_id: null,
+  outcome_code: "created",
+  correlation_id: "22222222-2222-4222-8222-222222222222",
 };
 const input = {
   fullName: "  Alex Example ",
@@ -64,22 +64,51 @@ describe("lead create contract", () => {
     });
   });
 
+  test("maps the actual SQL result columns into the application result", async () => {
+    await expect(createLead(input, { supabase: client() as never })).resolves.toEqual({
+      leadId: result.lead_id, status: "new", ownerIdentityId: null,
+      outcomeCode: "created", correlationId: result.correlation_id,
+    });
+  });
+
   test("returns replay and conflict outcomes from the shared contract", async () => {
-    const replay = client([{ ...result, outcomeCode: "replayed" }]);
+    const replay = client([{ ...result, outcome_code: "replayed" }]);
     await expect(createLead(input, { supabase: replay as never })).resolves.toMatchObject({ outcomeCode: "replayed" });
-    const conflict = client([{ ...result, leadId: null, status: null, outcomeCode: "idempotency_conflict" }]);
+    const conflict = client([{ ...result, lead_id: null, status: null, outcome_code: "idempotency_conflict" }]);
     await expect(createLead(input, { supabase: conflict as never })).resolves.toMatchObject({ outcomeCode: "idempotency_conflict" });
   });
 
   test("maps database validation outcomes to invalid input", async () => {
     const invalid = client([{
       ...result,
-      leadId: null,
+      lead_id: null,
       status: null,
-      outcomeCode: "invalid_input",
+      outcome_code: "invalid_input",
     }]);
     await expect(createLead(input, { supabase: invalid as never }))
       .rejects.toMatchObject({ name: LeadCreateError.name, code: "INVALID_INPUT" });
+  });
+
+  test("returns a redacted rate limit outcome", async () => {
+    const supabase = client([{ ...result, lead_id: null, status: null, outcome_code: "rate_limited" }]);
+    await expect(createLead(input, { supabase: supabase as never })).resolves.toMatchObject({
+      outcomeCode: "rate_limited", leadId: null, ownerIdentityId: null, status: null,
+    });
+  });
+
+  test.each([
+    undefined, null, [], [result, result],
+    [{ ...result, lead_id: null }],
+    [{ ...result, outcome_code: "rate_limited" }],
+    [{ ...result, internal_notes: "private" }],
+  ])("rejects malformed or inconsistent SQL rows %#", async (data) => {
+    const supabase = { rpc: vi.fn().mockResolvedValue({ data, error: null }) };
+    await expect(createLead(input, { supabase: supabase as never })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+  });
+
+  test("classifies a missing RPC envelope", async () => {
+    const supabase = { rpc: vi.fn().mockResolvedValue(undefined) };
+    await expect(createLead(input, { supabase: supabase as never })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
   });
 
   test("classifies invalid input and database failures without exposing details", async () => {

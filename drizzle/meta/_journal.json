@@ -708,6 +708,48 @@
       "when": 1788650352392,
       "tag": "0100_r1-member-read",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788897061120,
+      "tag": "0101_r1_customer_registration",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1788908697292,
+      "tag": "0102_r2a_lead_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1788911618505,
+      "tag": "0103_r3_intake_save_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1788912854022,
+      "tag": "0104_r3_intake_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1788914267943,
+      "tag": "0105_0105_r3_requirement_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1788917231387,
+      "tag": "0106_r3_requirement_read",
+      "breakpoints": true
     }
   ]
 }

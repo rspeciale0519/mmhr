@@ -110,6 +110,7 @@ export const intakeRequirements = pgTable(
     ...auditColumns(),
   },
   (t) => [
+    uniqueIndex("intake_requirements_organization_id_uq").on(t.organizationId, t.id),
     uniqueIndex("intake_requirements_intake_key_uq").on(t.intakeId, t.stableKey),
     index("intake_requirements_organization_idx").on(t.organizationId, t.status),
     foreignKey({
@@ -140,6 +141,31 @@ export const intakeRequirements = pgTable(
     check("intake_requirements_revision_ck", sql`${t.revision} > 0`),
   ],
 );
+
+/** Immutable requirement snapshots. Legacy rows may have no actor or source time. */
+export const intakeRequirementHistory = pgTable("intake_requirement_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  requirementId: uuid("requirement_id").notNull(),
+  revision: integer("revision").notNull(),
+  snapshot: jsonb("snapshot").notNull(),
+  changedByIdentityId: uuid("changed_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  changedAt: timestamp("changed_at", { withTimezone: true }),
+  capturedAt: timestamp("captured_at", { withTimezone: true }).notNull().default(sql`clock_timestamp()`),
+  snapshotSource: text("snapshot_source").notNull().default("recorded"),
+  correlationId: uuid("correlation_id").notNull(),
+}, (t) => [
+  uniqueIndex("intake_requirement_history_revision_uq").on(t.organizationId, t.requirementId, t.revision),
+  index("intake_requirement_history_scope_time_idx").on(t.organizationId, t.requirementId, t.capturedAt),
+  foreignKey({
+    columns: [t.organizationId, t.requirementId],
+    foreignColumns: [intakeRequirements.organizationId, intakeRequirements.id],
+    name: "intake_requirement_history_scope_fk",
+  }).onDelete("restrict"),
+  check("intake_requirement_history_snapshot_ck", sql`jsonb_typeof(${t.snapshot}) = 'object'`),
+  check("intake_requirement_history_revision_ck", sql`${t.revision} > 0`),
+  check("intake_requirement_history_source_ck", sql`${t.snapshotSource} in ('recorded', 'legacy_backfill')`),
+]);
 
 export const evaluationCandidates = pgTable(
   "evaluation_candidates",

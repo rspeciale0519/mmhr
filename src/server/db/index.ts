@@ -5,6 +5,7 @@ import * as audit from "./schema/audit";
 import * as aiRun from "./schema/ai-run";
 import * as aiEvaluation from "./schema/ai-evaluation";
 import * as crm from "./schema/crm";
+import * as customerRegistration from "./schema/customer-registration";
 import * as crmActivity from "./schema/crm-activity";
 import * as crmExport from "./schema/crm-export";
 import * as crmDuplicate from "./schema/crm-duplicate";
@@ -25,6 +26,7 @@ import * as r8Operations from "./schema/r8-operations";
 import * as r9Evidence from "./schema/r9-evidence";
 
 export const schema = {
+  ...customerRegistration,
   ...audit,
   ...aiRun,
   ...aiEvaluation,
