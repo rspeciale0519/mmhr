@@ -24,6 +24,7 @@ describe("R3 candidate vendor scope", () => {
       VALUES (${`Vendor ${randomUUID()}`} , 'vendor', 'active', now(), false)
       RETURNING id
     `;
+    await createMembership(sql, row!.id, fixture.organizationAdmin, "organization_admin");
     return row!.id;
   }
 

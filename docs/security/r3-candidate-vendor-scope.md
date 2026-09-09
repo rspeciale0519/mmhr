@@ -82,3 +82,14 @@ Review and tighten the old workspace-only unmask and RFP amendment authority bef
 Repair the separate RFP recipient scope constraint and the deal command's product lookup.
 The deal product foreign key already uses provider scope and must remain unchanged.
 These remaining requirements prevent any claim that the full R3 workflow or production release is complete.
+
+## First 0111 database execution
+
+CI run 34322766689 at `663b4e6` applied migrations through 0111.
+Standard checks passed. Integration passed 94 files and 895 tests, but two cases failed in the vendor-scope fixture.
+The failure came from `r1_assert_administration_capacity`, not a scope or matching permission bypass.
+The fixture created an active vendor organization without the required verified organization administrator.
+
+The fixture now creates that administrator membership. The approved-input fixture has the same correction and a capacity assertion.
+The runtime security check remains unchanged. A new CI run must verify these corrections.
+The publication workflow remains a separate package under local review.

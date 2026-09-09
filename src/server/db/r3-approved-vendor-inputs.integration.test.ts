@@ -10,6 +10,7 @@ import {
 import {
   asAuthenticated,
   createCommandFixture,
+  createMembership,
   type SecurityCommandFixture,
   type SecuritySql,
 } from "./r1-security-command-fixtures";
@@ -74,6 +75,8 @@ describe("R3 approved vendor input resolver and matching consumption", () => {
       RETURNING id
     `;
     vendorOrganizationId = organization!.id;
+    await createMembership(context.client, vendorOrganizationId, fixture.organizationAdmin, "organization_admin");
+    await context.client`SELECT mmhr_private.r1_assert_administration_capacity(clock_timestamp())`;
     const [profile] = await context.client<{ id: string }[]>`
       INSERT INTO public.vendor_profiles (
         organization_id, status, approved_at, approved_by_identity_id,
