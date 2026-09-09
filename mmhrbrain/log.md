@@ -559,3 +559,11 @@ Database run storage, approval records, and provider evaluation remain open.
 - CI34308802670 ended with844 passes and3 outdated assertion failures. Exact corrections include current role versions, migration audit counts and safe intake audit summaries.
 - Independent review confirmed the corrections and found no remaining SQL or TypeScript defect. Full unit34037 remains active; see journal/2026-09-09.md.
 - Final unit34037 passes317 files/3,471 tests. Final fixture type/lint and staged secret scan1,076 pass. Prepare the reviewed package commit and fresh CI.
+- Committed04cf396 and pushed both customer packages; exact remote head confirmed. Fresh CI34312014214 runs; preserve its result. Checkpoint unchanged. Customer requirement UI remains next.
+
+## [2026-09-09] implementation | Connect customer requirement forms
+- Full goal reviewed without changes. Added separate action-gated new/edit navigation and safe requirement entry with preserved saved answers.
+- Focused138, final form26, navigation44, type, full lint, build14342 and integration inventory92 pass. Full unit62343 and final wording build8792 remain active.
+- Independent review corrected deterministic rejection handling without clearing prior uncertainty. Isolated browser checks pass; real authenticated saving remains unverified.
+- Keep CI34312014214 intact before pushing. Prepare the reviewed UI commit after final gates and scanning. See journal/2026-09-09.md.
+- Final unit62343 passes319 files/3,542 tests. Final build8792 passes67 routes. All local gates pass; prepare exact staging, scan and commit.

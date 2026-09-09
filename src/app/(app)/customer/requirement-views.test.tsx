@@ -126,3 +126,15 @@ test("keeps pagination scoped to the intake and cursor", () => {
   expect(screen.queryByText("11111111-1111-4111-8111-111111111111")).not.toBeInTheDocument();
   expect(screen.queryByText("33333333-3333-4333-8333-333333333333")).not.toBeInTheDocument();
 });
+
+test("shows requirement actions only with permission and retains the current page for editing", () => {
+  const { rerender } = render(<SavedRequirements intakeId={intakeId} hasCursor afterId={nextId}
+    page={page()} canEdit />);
+  expect(screen.getByRole("link", { name: "Add requirement" })).toHaveAttribute("href", `/customer?intake=${intakeId}&newRequirement=1`);
+  expect(screen.getByRole("link", { name: "Edit requirement Payroll platform" })).toHaveAttribute(
+    "href", `/customer?intake=${intakeId}&requirementsAfter=${nextId}&editRequirement=${requirementId}`,
+  );
+  rerender(<SavedRequirements intakeId={intakeId} hasCursor afterId={nextId} page={page()} />);
+  expect(screen.queryByRole("link", { name: "Add requirement" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Edit requirement Payroll platform" })).not.toBeInTheDocument();
+});

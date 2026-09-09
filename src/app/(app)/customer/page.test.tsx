@@ -15,6 +15,7 @@ vi.mock("./intake-form", () => ({
     <form aria-label="Customer intake form" data-organization={organizationId}
       data-intake={intake?.intakeId} data-revision={intake?.revision} />,
 }));
+vi.mock("./requirement-form", () => ({ CustomerRequirementForm: () => <form aria-label="Customer requirement form" /> }));
 vi.mock("@/server/commands/intake-read", async (original) => ({
   ...await original<typeof import("@/server/commands/intake-read")>(),
   getIntake: vi.fn(), getIntakesPage: vi.fn(),

@@ -19,7 +19,7 @@ const typeLabels: Record<Requirement["requirementType"], string> = {
   custom: "Custom request",
 };
 
-function ResponseValue({ value, path = "response" }: { value: Requirement["response"]; path?: string }): ReactNode {
+export function ResponseValue({ value, path = "response" }: { value: Requirement["response"]; path?: string }): ReactNode {
   if (value === null) return <span>No answer saved</span>;
   if (typeof value === "string") {
     if (value.length === 0) return <span>Empty text saved</span>;
@@ -62,7 +62,7 @@ function ResponseValue({ value, path = "response" }: { value: Requirement["respo
   );
 }
 
-function RequirementCard({ requirement }: { requirement: Requirement }) {
+function RequirementCard({ requirement, editHref }: { requirement: Requirement; editHref?: string }) {
   return (
     <article className="border-t py-6" aria-label={requirement.label + " active requirement"}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -88,6 +88,8 @@ function RequirementCard({ requirement }: { requirement: Requirement }) {
           <ResponseValue value={requirement.response} />
         </div>
       </div>
+      {editHref && <Link href={editHref} prefetch={false} className={`${linkStyle} mt-3`}
+        aria-label={`Edit requirement ${requirement.label}`}>Edit requirement</Link>}
     </article>
   );
 }
@@ -96,15 +98,20 @@ export function SavedRequirements({
   intakeId,
   page,
   hasCursor,
+  afterId,
+  canEdit = false,
 }: {
   intakeId: string;
   page: RequirementPage;
   hasCursor: boolean;
+  afterId?: string;
+  canEdit?: boolean;
 }) {
   const intakeHref = "/customer?intake=" + encodeURIComponent(intakeId);
   const nextHref = page.nextCursor
     ? intakeHref + "&requirementsAfter=" + encodeURIComponent(page.nextCursor)
     : null;
+  const currentHref = intakeHref + (afterId ? "&requirementsAfter=" + encodeURIComponent(afterId) : "");
 
   return (
     <section aria-labelledby="saved-requirements" className="mt-10">
@@ -114,6 +121,8 @@ export function SavedRequirements({
       <p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">
         These saved requirements are active for this intake.
       </p>
+      {canEdit && <Link href={intakeHref + "&newRequirement=1"} prefetch={false}
+        className={`${linkStyle} mt-3`}>Add requirement</Link>}
       {page.requirements.length === 0 ? (
         <p role="status" className="mt-6 rounded-lg bg-muted p-6 text-pretty leading-7">
           {hasCursor
@@ -123,7 +132,8 @@ export function SavedRequirements({
       ) : (
         <div className="mt-6">
           {page.requirements.map((requirement) => (
-            <RequirementCard key={requirement.requirementId} requirement={requirement} />
+            <RequirementCard key={requirement.requirementId} requirement={requirement}
+              editHref={canEdit ? currentHref + "&editRequirement=" + encodeURIComponent(requirement.requirementId) : undefined} />
           ))}
         </div>
       )}

@@ -8,6 +8,7 @@ import { getIntakeRequirementsPage, RequirementReadError } from "@/server/comman
 import { CustomerFrame, IntakeDetails, IntakeList, IntakeNotice } from "./intake-views";
 import { SavedRequirements } from "./requirement-views";
 import { CustomerIntakeForm } from "./intake-form";
+import { CustomerRequirementForm } from "./requirement-form";
 
 const querySchema = z.object({
   intake: securityUuidSchema.optional(),
@@ -15,7 +16,13 @@ const querySchema = z.object({
   requirementsAfter: securityUuidSchema.optional(),
   new: z.literal("1").optional(),
   edit: z.literal("1").optional(),
+  newRequirement: z.literal("1").optional(),
+  editRequirement: securityUuidSchema.optional(),
 }).refine((query) => {
+  if (query.newRequirement || query.editRequirement) {
+    return !!query.intake && !query.new && !query.edit && !query.after &&
+      !(query.newRequirement && query.editRequirement) && !(query.newRequirement && query.requirementsAfter);
+  }
   if (query.new) return !query.intake && !query.after && !query.requirementsAfter && !query.edit;
   if (query.edit) return !!query.intake && !query.after && !query.requirementsAfter;
   return !(query.intake && query.after) && (!query.requirementsAfter || !!query.intake);
@@ -39,21 +46,44 @@ export default async function CustomerHome({ searchParams }: {
         requirements: Awaited<ReturnType<typeof getIntakeRequirementsPage>> }
     | { kind: "list"; page: Awaited<ReturnType<typeof getIntakesPage>> }
     | { kind: "form"; intake?: Awaited<ReturnType<typeof getIntake>> }
+    | { kind: "requirementForm"; intakeId: string;
+        requirement?: Awaited<ReturnType<typeof getIntakeRequirementsPage>>["requirements"][number] }
     | { kind: "denied" }
     | { kind: "error" };
   let canSave = false;
+  let canSaveRequirement = false;
   try {
     const options = { supabase: authorization.supabase };
     const saveAuthorization = await authorizePermission("intake.draft.save", authorization.scope, options);
     canSave = saveAuthorization !== null && saveAuthorization.identityId === authorization.identityId &&
       saveAuthorization.scope.kind === "organization" && saveAuthorization.scope.organizationId === organizationId;
-    if ((query.data.new || query.data.edit) && !canSave) {
+    if (query.data.intake && !query.data.edit) {
+      const requirementAuthorization = await authorizePermission("intake.requirement.save", authorization.scope, options);
+      canSaveRequirement = requirementAuthorization !== null && requirementAuthorization.identityId === authorization.identityId &&
+        requirementAuthorization.scope.kind === "organization" && requirementAuthorization.scope.organizationId === organizationId;
+    }
+    if (((query.data.new || query.data.edit) && !canSave) ||
+        ((query.data.newRequirement || query.data.editRequirement) && !canSaveRequirement)) {
       result = { kind: "denied" };
     } else if (query.data.new) {
       result = { kind: "form" };
     } else if (query.data.intake) {
       const intake = await getIntake({ organizationId, intakeId: query.data.intake }, options);
-      if (query.data.edit) {
+      if (query.data.newRequirement || query.data.editRequirement) {
+        if (intake.status !== "draft" && intake.status !== "in_progress") {
+          result = { kind: "denied" };
+        } else if (query.data.newRequirement) {
+          result = { kind: "requirementForm", intakeId: intake.intakeId };
+        } else {
+          const requirements = await getIntakeRequirementsPage({
+            organizationId, intakeId: intake.intakeId, afterId: query.data.requirementsAfter,
+          }, options);
+          // Resolve only within this authorized page. Never scan other records
+          // or accept a query identifier as evidence of ownership.
+          const requirement = requirements.requirements.find((entry) => entry.requirementId === query.data.editRequirement);
+          result = requirement ? { kind: "requirementForm", intakeId: intake.intakeId, requirement } : { kind: "denied" };
+        }
+      } else if (query.data.edit) {
         result = intake.status === "draft" || intake.status === "in_progress"
           ? { kind: "form", intake } : { kind: "denied" };
       } else {
@@ -76,11 +106,16 @@ export default async function CustomerHome({ searchParams }: {
         <IntakeDetails intake={result.intake} canEdit={canSave &&
           (result.intake.status === "draft" || result.intake.status === "in_progress")} />
         <SavedRequirements intakeId={result.intake.intakeId} page={result.requirements}
-          hasCursor={query.data.requirementsAfter !== undefined} />
+          hasCursor={query.data.requirementsAfter !== undefined} afterId={query.data.requirementsAfter}
+          canEdit={canSaveRequirement && (result.intake.status === "draft" || result.intake.status === "in_progress")} />
       </>
         : result.kind === "list" ? <IntakeList page={result.page} hasCursor={query.data.after !== undefined} canCreate={canSave} />
           : result.kind === "form" ? <CustomerIntakeForm organizationId={organizationId} intake={result.intake}
               key={`${organizationId}:${result.intake?.intakeId ?? "new"}:${result.intake?.revision ?? 0}`} />
+          : result.kind === "requirementForm" ? <CustomerRequirementForm organizationId={organizationId}
+              intakeId={result.intakeId} requirement={result.requirement}
+              returnHref={`/customer?intake=${encodeURIComponent(result.intakeId)}${query.data.requirementsAfter ? `&requirementsAfter=${encodeURIComponent(query.data.requirementsAfter)}` : ""}`}
+              key={`${organizationId}:${result.intakeId}:${result.requirement?.requirementId ?? "new"}:${result.requirement?.revision ?? 0}`} />
           : result.kind === "denied" ? <IntakeNotice title="This intake form is not available"
               description="Your access or the intake status does not allow this change. You can return to your saved intakes." />
           : <IntakeNotice title="We could not load your saved intake information"
