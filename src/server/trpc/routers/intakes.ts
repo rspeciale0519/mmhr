@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { AuthorizationError } from "@/server/auth/authorization";
+import { CustomerIntakeSaveError, customerIntakeSaveSchema, saveCustomerIntake } from "@/server/commands/customer-intake-save";
 import { getIntake, getIntakesPage, IntakeReadError, intakePageInputSchema, intakeReadInputSchema } from "@/server/commands/intake-read";
 import { getIntakeRequirementsPage, RequirementReadError, requirementPageInputSchema } from "@/server/commands/requirement-read";
 import { permissionProcedure, router } from "../trpc";
@@ -16,6 +17,15 @@ async function readResult<T>(operation: () => Promise<T>, resource: "intake" | "
 }
 
 export const intakesRouter = router({
+  saveDraft: permissionProcedure({ permission: "intake.draft.save", input: customerIntakeSaveSchema, resolveScope })
+    .mutation(async ({ ctx, input }) => {
+      try { return await saveCustomerIntake(input, { supabase: ctx.supabase }); } catch (error) {
+        if (error instanceof AuthorizationError || (error instanceof CustomerIntakeSaveError && error.code === "REJECTED")) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not available" });
+        }
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Intake could not be saved" });
+      }
+    }),
   requirements: permissionProcedure({ permission: "workspace.access", input: requirementPageInputSchema, resolveScope })
     .query(({ ctx, input }) => readResult(() => getIntakeRequirementsPage(input, { supabase: ctx.supabase }), "requirements")),
   list: permissionProcedure({ permission: "workspace.access", input: intakePageInputSchema, resolveScope })

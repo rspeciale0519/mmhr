@@ -66,6 +66,9 @@ Do not restore unrestricted status changes as a recovery step.
 - Connected customer forms, API calls and browser verification.
 - Real database, staging and production evidence.
 
+The separate [customer draft save package](r3-customer-draft-save.md) now defines the action and assurance boundary.
+Its implementation and verification remain separate from this historical correction record.
+
 The existing one-organization relationship permits multiple intakes with distinct request keys.
 This correction does not introduce an unapproved one-intake-per-organization restriction.
 

@@ -88,5 +88,8 @@ Setup retries preserve existing authority. Cleanup uncertainty is explicit, not 
 - After the build, the built-in browser showed release blocks at sign-in and pending-access with no console warnings or errors.
 
 The preceding customer requirement view was committed as 09c6b35 after 3,263 passing unit tests.
-Commit 9d1abba records the database repair. Auth composition remains local until the next reviewed commit.
+Commit 9d1abba records the database repair. Commit 7ba545f records Auth composition and evidence.
+The pushed head matches 7ba545f4d6ad87135a8f0199ef02b892678f8938.
+[CI run 34305894008](https://github.com/rspeciale0519/mmhr/actions/runs/34305894008) now runs the complete checks for that head.
+Draft PR #10 remains open into develop. The new database result remains pending.
 No merge or production release is approved by these partial results.

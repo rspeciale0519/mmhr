@@ -523,3 +523,14 @@ Database run storage, approval records, and provider evaluation remain open.
 - Type, lint, 67-route build and focused checks pass. Full unit 27488 remains active.
 - Keep release controls closed. Commit and push only reviewed fixes, then obtain complete new-head CI.
 - Full unit 27488 passes 310 files and 3,298 tests. All local standard gates pass; remote database repair remains unverified.
+- Committed database repairs as 9d1abba and Auth composition as 7ba545f; pushed the exact verified head to draft PR #10.
+- Fresh CI34305894008 runs complete checks. Watch session7417 follows it; no merge or production action occurred.
+
+## [2026-09-08] implementation | Prepare customer draft save boundary
+- Full goal review found no required change. Added intake.draft.save and a caller-only customer draft operation.
+- Corrected audit summaries, recovery fencing, immutable history and the legacy AAL2 viewer write bypass.
+- Focused checks pass;109 migrations and91 integration files are inventoried. Full rerun and final build remain pending.
+- Independent source review found no remaining SQL/adapter defect. No new-head database or browser completion is claimed.
+- See journal/2026-09-08.md and docs/security/r3-customer-draft-save.md. No merge or production action occurred.
+- Final full rerun passes3,382 tests across313 files. Build88492, type, lint and staged secret scan pass.
+- All21 customer draft database cases collect. Remote CI34305894008 remains active at7ba545f; no database result is claimed for0108.

@@ -15,7 +15,7 @@ const map = z.record(z.string().trim().min(1).max(100), mapValue).refine(
   "Intake maps may contain at most 50 fields",
 );
 const label = z.string().trim().min(1).max(200);
-const intakeDataSchema = z.strictObject({
+export const intakeDataSchema = z.strictObject({
   companyContext: map.optional(),
   currentSystems: z.array(label).max(50).optional(),
   complianceNeeds: z.array(label).max(50).optional(),
@@ -51,7 +51,7 @@ export const intakeSaveSchema = z.strictObject({
   }
 });
 
-const resultSchema = z.strictObject({
+export const intakeSaveResultSchema = z.strictObject({
   intakeId: uuid,
   organizationId: uuid,
   status: z.enum(["draft", "in_progress", "submitted", "under_review", "completed", "archived"]),
@@ -59,7 +59,7 @@ const resultSchema = z.strictObject({
   outcomeCode: z.enum(["created", "updated", "replayed"]),
   correlationId: uuid,
 });
-export type IntakeSaveResult = z.infer<typeof resultSchema>;
+export type IntakeSaveResult = z.infer<typeof intakeSaveResultSchema>;
 
 export async function saveIntake(input: unknown, options: AuthorizationOptions = {}): Promise<IntakeSaveResult> {
   const parsed = intakeSaveSchema.safeParse(input);
@@ -70,6 +70,11 @@ export async function saveIntake(input: unknown, options: AuthorizationOptions =
     const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.organizationId }, options);
     if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) throw new AuthorizationError();
 
+    // Customer draft saves use their separate action. This legacy path includes
+    // submission and must not let an external viewer turn read access into writes.
+    const administration = await requirePermission("admin.access", { kind: "platform" }, { supabase: context.supabase });
+    if (administration.scope.kind !== "platform" || administration.identityId !== context.identityId) throw new AuthorizationError();
+
     const response = await context.supabase.rpc("mmhr_save_intake", {
       payload: command,
       correlation_id: command.correlationId,
@@ -77,7 +82,7 @@ export async function saveIntake(input: unknown, options: AuthorizationOptions =
     });
     if (!response || response.error) throw new Error("Intake unavailable");
 
-    const result = resultSchema.safeParse(response.data);
+    const result = intakeSaveResultSchema.safeParse(response.data);
     if (!result.success || result.data.organizationId !== command.organizationId ||
       result.data.correlationId !== command.correlationId ||
       (command.intakeId !== null && result.data.intakeId !== command.intakeId)) {

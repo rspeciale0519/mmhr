@@ -2,6 +2,41 @@
 Updated: 2026-09-08
 
 ## Current focus
+September 8, 23:41 result: full rerun30521 passes313 files and3,382 tests.
+Final build88492 passes67 routes after integration fixture compile corrections.
+Type, full lint, focused checks,91-file integration inventory and staged secret
+scan for1,064 files pass. All21 new database cases collect, but have not executed.
+Prepare the reviewed customer draft package commit. Keep current CI34305894008
+running at7ba545f before another push. Form component work remains separate.
+
+September 8, 23:37: reviewed the complete active goal and supplement; no change needed.
+Prepared customer draft saves with intake.draft.save, current customer portal checks,
+caller-derived identity, strict tRPC mutation, and additive migration0108.
+New immutable role versions separate contributor edits from viewer defaults.
+Review fixed invalid audit summaries, the missing recovery fence, and missing
+history immutability triggers. It also closed the legacy AAL2 viewer bypass with
+a same-lock platform admin.access check while keeping internal writer semantics.
+Final independent SQL/adapter review found no remaining defect.
+Inventory is now109 migrations and91 integration files. New DB cases collect;
+actual execution remains pending. Existing CI34305894008 still tests7ba545f.
+Full unit16546 passed3377 and failed the old108 migration count; that check is fixed.
+Rerun30521 is live. Final build71920 caught two integration-test TypeScript errors;
+the test agent is correcting them before a new build. No new commit or push yet.
+Customer form component work is delegated separately; page wiring has not started.
+Keep local hooks/settings excluded. Do not claim this package or R0-R9 complete.
+
+September 8, 23:08 delivery: committed Auth composition as 7ba545f after a staged
+secret scan passed for 1,056 tracked files. Pushed all four new commits to the
+existing verification branch. Remote HEAD exactly matches
+7ba545f4d6ad87135a8f0199ef02b892678f8938. PR #10 remains draft into develop.
+Fresh CI 34305894008 is live: checks job102322380654 and integration job102322380988.
+Watch session7417 follows this run. Old run34301817813 is terminal failure.
+Recorded the repairs and remaining evidence in PR comment5595161930.
+Do not push status-only notes during this new run. No merge or production release.
+The only untracked local files remain settings/hooks; leave them out of commits.
+Next independent audit: customer intake draft creation/saving and its explicit
+AAL1 policy. Do not weaken global AAL2 security-command requirements.
+
 September 8, 23:06: committed database and fixture repairs as 9d1abba.
 Independent SQL review found no remaining defect. It withdrew the speculative
 legacy-receipt concern because strict audit checks prevent such receipts.

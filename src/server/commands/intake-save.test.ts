@@ -53,7 +53,8 @@ const result = (overrides: Record<string, unknown> = {}) => ({
 describe("intake save command", () => {
   beforeEach(() => {
     rpc.mockReset();
-    vi.mocked(requirePermission).mockReset().mockResolvedValue(context);
+    vi.mocked(requirePermission).mockReset().mockImplementation(async (permission) => permission === "admin.access"
+      ? { ...context, scope: { kind: "platform" } } : context);
   });
 
   test("accepts only the canonical bounded intake patch shape", () => {
@@ -75,6 +76,28 @@ describe("intake save command", () => {
 
   test("rejects actor mismatch before RPC", async () => {
     await expect(saveIntake({ ...ids, actorIdentityId: ids.correlationId })).rejects.toBeInstanceOf(AuthorizationError);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  test("requires internal administration as well as the scoped workspace", async () => {
+    rpc.mockResolvedValue({ data: result(), error: null });
+    await saveIntake(ids);
+    expect(requirePermission).toHaveBeenNthCalledWith(1, "workspace.access", context.scope, {});
+    expect(requirePermission).toHaveBeenNthCalledWith(2, "admin.access", { kind: "platform" }, { supabase: context.supabase });
+  });
+
+  test("rejects a viewer with workspace access before calling the legacy writer", async () => {
+    vi.mocked(requirePermission).mockResolvedValueOnce(context).mockRejectedValueOnce(new AuthorizationError());
+    await expect(saveIntake(ids)).rejects.toBeInstanceOf(AuthorizationError);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    { ...context, scope: { kind: "organization" as const, organizationId: ids.organizationId } },
+    { ...context, scope: { kind: "platform" as const }, identityId: ids.correlationId },
+  ])("rejects mismatched administration context %#", async (administration) => {
+    vi.mocked(requirePermission).mockResolvedValueOnce(context).mockResolvedValueOnce(administration);
+    await expect(saveIntake(ids)).rejects.toBeInstanceOf(AuthorizationError);
     expect(rpc).not.toHaveBeenCalled();
   });
 
