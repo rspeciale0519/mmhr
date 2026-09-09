@@ -827,6 +827,34 @@
       "when": 1788939112814,
       "tag": "0117_r3_evaluation_publication_commands",
       "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1788943481370,
+      "tag": "0118_r3_initial_selection_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1788943609066,
+      "tag": "0119_r3_initial_selection_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1788943632384,
+      "tag": "0120_r3_initial_selection_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1788944438616,
+      "tag": "0121_r3_current_evaluation_publication",
+      "breakpoints": true
     }
   ]
 }

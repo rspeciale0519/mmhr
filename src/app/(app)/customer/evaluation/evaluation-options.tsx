@@ -1,0 +1,184 @@
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { TRPCClientError } from "@trpc/client";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/lib/trpc/client";
+import type { EvaluationSelectionRead } from "@/server/commands/evaluation-selection";
+import type { MaskedOption, PublicationRead } from "@/server/matching/option-publication-contract";
+
+type SelectionInput = {
+  organizationId: string; intakeId: string; publicationId: string; expectedDigest: string;
+  optionIds: string[]; correlationId: string; idempotencyKey: string;
+};
+type SaveState = "ready" | "saving" | "uncertain" | "rejected" | "confirmed";
+const buttonClass = "min-h-11 transition-colors";
+const eligibilityLabels = {
+  eligible: "Meets recorded required capabilities",
+  ineligible: "Some required capabilities do not match",
+  unknown: "More approved evidence is needed",
+};
+
+function requestId() {
+  return typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : null;
+}
+
+function OptionEvidence({ option }: { option: MaskedOption }) {
+  return <details className="mt-3 text-sm">
+    <summary className="flex min-h-11 cursor-pointer items-center font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2">View supporting details</summary>
+    <div className="space-y-4 pb-3 leading-6">
+      <div><h4 className="font-semibold">Matching needs</h4>
+        {option.fitReasons.length ? <ul className="list-disc pl-5">{option.fitReasons.map((value, index) => <li className="break-words" key={index}>{value}</li>)}</ul> : <p>No confirmed matching needs.</p>}
+      </div>
+      <div><h4 className="font-semibold">Limits and missing information</h4>
+        {option.limitations.length ? <ul className="list-disc pl-5">{option.limitations.map((value, index) => <li className="break-words" key={index}>{value}</li>)}</ul> : <p>No limits recorded in this comparison.</p>}
+      </div>
+      <p className="text-muted-foreground">Evidence date: {option.evidenceFreshAt ? <time dateTime={option.evidenceFreshAt}>{new Date(option.evidenceFreshAt).toISOString().slice(0, 10)} UTC</time> : "Not available"}.</p>
+    </div>
+  </details>;
+}
+
+export function EvaluationOptions({ publication, history, canSelect }: {
+  publication: PublicationRead; history: EvaluationSelectionRead; canSelect: boolean;
+}) {
+  const trpc = useTRPC();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const select = useMutation(trpc.evaluations.select.mutationOptions({ retry: false }));
+  const [options, setOptions] = useState(publication.options);
+  const [nextOrdinal, setNextOrdinal] = useState(publication.nextOrdinal);
+  const [loading, setLoading] = useState(false);
+  const [pageFailed, setPageFailed] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [reviewing, setReviewing] = useState(false);
+  const [confirmedReview, setConfirmedReview] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("ready");
+  const [message, setMessage] = useState<string | null>(null);
+  const pending = useRef(false);
+  const loadingPage = useRef(false);
+  const attempt = useRef<SelectionInput | null>(null);
+  const uncertain = useRef(false);
+  const alreadySelected = new Set(history.items.filter((item) => item.publicationId === publication.publicationId).map((item) => item.optionId));
+  const remaining = history.remainingInitialChoices;
+  const locked = saveState !== "ready" || pageFailed || reviewing;
+  const refreshHref = `/customer/evaluation?intake=${encodeURIComponent(publication.intakeId)}`;
+
+  async function loadMore() {
+    if (loadingPage.current || nextOrdinal === null || pageFailed || saveState !== "ready" || reviewing) return;
+    const correlationId = requestId();
+    if (!correlationId) { setPageFailed(true); return; }
+    loadingPage.current = true;
+    setLoading(true);
+    try {
+      const page = await queryClient.fetchQuery(trpc.evaluations.get.queryOptions({
+        organizationId: publication.organizationId, intakeId: publication.intakeId,
+        publicationId: publication.publicationId, correlationId, afterOrdinal: nextOrdinal, limit: 25,
+      }, { staleTime: 0, retry: false }));
+      const count = Math.min(25, publication.optionCount - nextOrdinal);
+      if (page.publicationId !== publication.publicationId || page.organizationId !== publication.organizationId ||
+        page.intakeId !== publication.intakeId || page.inputDigest !== publication.inputDigest ||
+        page.optionCount !== publication.optionCount || page.sequence !== publication.sequence || page.state !== "published" ||
+        page.correlationId !== correlationId || page.options.length !== count ||
+        page.options.some((option, index) => option.ordinal !== nextOrdinal + index + 1 || options.some((old) => old.optionId === option.optionId)) ||
+        page.nextOrdinal !== (nextOrdinal + count < publication.optionCount ? nextOrdinal + count : null)) {
+        throw new Error("Comparison page changed");
+      }
+      setOptions((current) => [...current, ...page.options]);
+      setNextOrdinal(page.nextOrdinal);
+    } catch { setPageFailed(true); }
+    finally { loadingPage.current = false; setLoading(false); }
+  }
+
+  function toggleOption(optionId: string) {
+    if (locked || !canSelect || alreadySelected.has(optionId)) return;
+    setSelected((current) => current.includes(optionId) ? current.filter((value) => value !== optionId)
+      : current.length < remaining ? [...current, optionId] : current);
+  }
+
+  async function save(input: SelectionInput) {
+    if (pending.current || saveState === "confirmed") return;
+    pending.current = true;
+    setSaveState("saving");
+    try {
+      await select.mutateAsync(input);
+      setSaveState("confirmed");
+      try { router.refresh(); } catch { /* The confirmed view keeps a reload link. */ }
+    } catch (error) {
+      const code = error instanceof TRPCClientError ? error.data?.code : undefined;
+      const rejected = ["BAD_REQUEST", "NOT_FOUND", "FORBIDDEN", "UNAUTHORIZED"].includes(code ?? "");
+      if (!uncertain.current && rejected) setSaveState("rejected");
+      else { uncertain.current = true; setSaveState("uncertain"); }
+    } finally { pending.current = false; }
+  }
+
+  function saveReviewed() {
+    if (!canSelect || !reviewing || !confirmedReview || saveState !== "ready" || pageFailed || pending.current || loadingPage.current ||
+      selected.length < 1 || selected.length > remaining) return;
+    const correlationId = requestId();
+    const idempotencyKey = requestId();
+    if (!correlationId || !idempotencyKey) { setMessage("This browser cannot create a secure request. Use an updated browser."); return; }
+    const input = { organizationId: publication.organizationId, intakeId: publication.intakeId,
+      publicationId: publication.publicationId, expectedDigest: publication.inputDigest,
+      optionIds: [...selected], correlationId, idempotencyKey };
+    attempt.current = input;
+    void save(input);
+  }
+
+  return <section aria-labelledby="evaluation-options-heading" className="space-y-6">
+    <header>
+      <h2 id="evaluation-options-heading" className="text-balance text-2xl font-semibold tracking-tight">Compare your software options</h2>
+      <p className="mt-3 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">Provider names stay hidden during this comparison. Option numbers identify records. They do not show rank.</p>
+      <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">The match score measures your recorded needs. Evidence coverage is not a prediction of success.</p>
+      <p className="mt-3 text-sm tabular-nums">Showing {options.length} of {publication.optionCount} options. Comparison version {publication.sequence}.</p>
+    </header>
+    {!canSelect && <p role="status" className="rounded-lg bg-muted p-4 text-sm leading-6">You can view this comparison. Your access or intake status does not allow initial choices.</p>}
+    {pageFailed && <div role="alert" className="border-l-2 border-destructive pl-4 text-sm leading-6">
+      <p>We could not load the next options. This comparison or your access may have changed. Choices are disabled.</p>
+      <a href={refreshHref} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">Reload comparison</a>
+    </div>}
+    {options.length === 0 ? <p role="status" className="rounded-lg bg-muted p-5 text-sm leading-6">This approved comparison contains no options. Contact MMHR to review your requirements.</p> : <ul className="divide-y border-y">
+      {options.map((option) => <li key={option.optionId} className="grid gap-4 py-6 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-8">
+        <div className="min-w-0">
+          <h3 className="text-lg font-semibold">{option.maskedLabel}</h3>
+          <p className="mt-1 text-pretty text-sm leading-6 text-muted-foreground">{eligibilityLabels[option.eligibility]}</p>
+          <OptionEvidence option={option} />
+        </div>
+        <div>
+          <dl className="grid grid-cols-2 gap-3 text-sm">
+            <div><dt className="text-muted-foreground">Match score</dt><dd className="mt-1 font-semibold tabular-nums">{(option.deterministicScore / 100).toFixed(1)}%</dd></div>
+            <div><dt className="text-muted-foreground">Evidence coverage</dt><dd className="mt-1 font-semibold tabular-nums">{(option.confidenceBasisPoints / 100).toFixed(1)}%</dd></div>
+          </dl>
+          {alreadySelected.has(option.optionId) ? <p className="mt-4 min-h-11 text-sm font-semibold">Choice saved</p> : canSelect && <label className="mt-3 flex min-h-11 items-center gap-3 rounded-md border px-3 text-sm has-[:checked]:border-foreground has-[:checked]:bg-muted">
+            <input type="checkbox" checked={selected.includes(option.optionId)}
+              disabled={locked || (selected.length >= remaining && !selected.includes(option.optionId))}
+              onChange={() => toggleOption(option.optionId)} className="size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
+            <span>Choose {option.maskedLabel}</span>
+          </label>}
+        </div>
+      </li>)}
+    </ul>}
+    {nextOrdinal !== null && <Button type="button" variant="outline" className={buttonClass}
+      disabled={loading || pageFailed || reviewing || saveState !== "ready"} onClick={() => void loadMore()}>{loading ? "Loading options…" : "Show more options"}</Button>}
+    {canSelect && <section aria-label="Initial choices" className="space-y-4 border-l-2 border-foreground pl-5">
+      {saveState !== "confirmed" && <p className="text-sm font-semibold tabular-nums">{selected.length} {selected.length === 1 ? "new choice" : "new choices"}. {remaining} {remaining === 1 ? "initial choice remains" : "initial choices remain"}.</p>}
+      <p className="max-w-2xl text-pretty text-sm leading-6">You can save up to five initial choices across this intake. Saved choices count even if they are later archived.</p>
+      {saveState === "confirmed" ? <div role="status"><p className="font-semibold">Your choices are saved.</p><a href={refreshHref} className="inline-flex min-h-11 items-center underline underline-offset-4">View saved choices</a></div>
+        : saveState === "rejected" ? <div role="alert"><p className="text-sm leading-6">Your choices were rejected. The comparison, existing choices, or your access may have changed.</p><a href={refreshHref} className="inline-flex min-h-11 items-center underline underline-offset-4">Review current comparison</a></div>
+          : saveState === "uncertain" ? <div role="alert" className="space-y-3"><p className="text-sm leading-6">We could not confirm these choices. They may have been saved. Retry the same request or review saved choices.</p>
+            <Button className={buttonClass} onClick={() => { if (attempt.current) void save(attempt.current); }}>Retry unchanged request</Button>
+            <a href={refreshHref} className="ml-3 inline-flex min-h-11 items-center underline underline-offset-4">Review saved choices</a>
+          </div> : reviewing ? <div className="space-y-4" aria-label="Review initial choices">
+            <h3 className="font-semibold">Review your choices</h3>
+            <ul className="list-disc pl-5 text-sm leading-6">{selected.map((id) => <li key={id}>{options.find((option) => option.optionId === id)?.maskedLabel}</li>)}</ul>
+            <p className="max-w-2xl text-sm leading-6">Saving keeps these choices for MMHR review. It does not contact providers, send an RFP, or create a contract.</p>
+            <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={confirmedReview} disabled={saveState === "saving"} onChange={(event) => setConfirmedReview(event.target.checked)} className="size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2" />Save these initial choices</label>
+            {message && <p role="alert" className="text-sm">{message}</p>}
+            <div className="flex flex-wrap gap-3"><Button className={buttonClass} disabled={!confirmedReview || saveState === "saving" || pageFailed} onClick={saveReviewed}>{saveState === "saving" ? "Saving choices…" : "Save choices"}</Button>
+              <Button variant="outline" className={buttonClass} disabled={saveState === "saving"} onClick={() => { setReviewing(false); setConfirmedReview(false); setMessage(null); }}>Change choices</Button></div>
+          </div> : <Button className={buttonClass} disabled={selected.length === 0 || pageFailed || loading || remaining === 0}
+            onClick={() => { setReviewing(true); setConfirmedReview(false); }}>Review choices</Button>}
+    </section>}
+  </section>;
+}

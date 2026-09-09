@@ -21,6 +21,7 @@ export const evaluationPublications = pgTable("evaluation_publications", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("evaluation_publications_scope_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("evaluation_publications_intake_id_uq").on(t.organizationId, t.intakeId, t.id),
   uniqueIndex("evaluation_publications_sequence_uq").on(t.organizationId, t.intakeId, t.sequence),
   foreignKey({ columns: [t.organizationId, t.intakeId], foreignColumns: [intakes.organizationId, intakes.id], name: "evaluation_publications_intake_scope_fk" }).onDelete("restrict"),
   check("evaluation_publications_revision_ck", sql`${t.sequence} > 0 and ${t.intakeRevision} > 0`),
@@ -48,6 +49,7 @@ export const evaluationPublicationOptions = pgTable("evaluation_publication_opti
   validUntil: timestamp("valid_until", { withTimezone: true }),
 }, (t) => [
   uniqueIndex("evaluation_publication_options_scope_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("evaluation_publication_options_publication_id_uq").on(t.organizationId, t.publicationId, t.id),
   uniqueIndex("evaluation_publication_options_product_uq").on(t.publicationId, t.productId),
   uniqueIndex("evaluation_publication_options_ordinal_uq").on(t.publicationId, t.ordinal),
   foreignKey({ columns: [t.organizationId, t.publicationId], foreignColumns: [evaluationPublications.organizationId, evaluationPublications.id], name: "evaluation_publication_options_publication_scope_fk" }).onDelete("restrict"),

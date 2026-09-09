@@ -621,3 +621,13 @@ Database run storage, approval records, and provider evaluation remain open.
 - Elevated local setup34292 timed out and skipped four cases. Concurrency remains unexecuted. Preserve CI34327707906 at49add22; it covers0113, not publication. Next separate Vitest4.1.11 security update, then masked option selection and screens.
 - Committed36-file publication package as7b5ae49. Applied Vitest4.1.11 separately; nine development packages changed, zero audit vulnerabilities and84 focused tests pass. Full56923 and standard gates40692 run.
 - At04:40, full56923 passes334 files/3,768 tests; standard40692 passes67 routes. Independent review and secret scan pass. Commit six-file patch/evidence package and push with7b5ae49; workflows do not cancel existing CI runs on a new push.
+
+## [2026-09-09] implementation | Customer comparison and initial choices
+- Full goal and supplement reviewed without change. Added0118-0121, immutable selection links and guarded all-options customer screen.
+- Full unit6311 passes344 files/3,911 tests. Type/lint/build89522 passes68 routes; inventory99 passes.
+- Isolated browser checks pass for pagination, review, unchanged retry, success, failure, read-only, empty, mobile and tablet states. No real database or authenticated browser proof.
+- Local integration setup failed Docker access and skipped seven then-current cases. Expanded fixtures and final concurrency review remain pending execution.
+- Committed matching fixture correctionab0f726 afterCI34327707906 passed900 tests and exposed a missing administrator. Publication7b5ae49 and Vitest5d428ea are remote.
+- Prepare exact feature staging and push. CurrentCI34330596999 passes standard checks, applies0117 and continues integration. Full goal active; no merge or release.
+- Final CI result:903/906 integration tests pass across97 files; all five publication cases pass. Fixed stale empty-migration expectations in addition toab0f726.
+- Final148 focused tests, type, lint and1,156-file secret scan pass. Commit the reviewed50-file customer package and push for selection0118-0121 execution. Full goal active.

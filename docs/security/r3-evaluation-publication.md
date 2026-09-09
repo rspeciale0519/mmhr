@@ -63,8 +63,15 @@ That attempt skipped all four then-current cases. The expanded five-case fixture
 The race uses both available pool connections. Baseline assertions run before either transaction starts.
 No publication database or concurrency execution is claimed.
 
-CI34327707906 at49add22 passed standard checks and applied migrations through0113. Its database suite is still running.
-This CI run does not contain publication migrations0114-0117.
+CI34327707906 at49add22 passed standard checks and applied migrations through0113.
+Its database suite passed900 tests and failed one later matching case due to a missing fixture organization administrator.
+The fixture correction is committed as `ab0f726`; runtime authority remains unchanged.
+Publication commit7b5ae49 and dependency commit5d428ea are pushed.
+CI34330596999 at5d428ea passed standard checks and applied migrations through0117.
+It passed903 of906 integration tests across97 files. All five publication cases passed, including concurrency and SQL/TypeScript parity.
+Three failures came from old empty-migration role/audit expectations and the missing fixture administrator.
+The selection package updates the cumulative migration expectations. The administrator fix is inab0f726.
+This run supplies publication database evidence. It does not verify the later selection migrations0118-0121.
 No staging migration, production migration, or release is claimed here.
 
 The initial dependency audit passed its high-severity gate but reported two moderate Vitest findings.
@@ -74,6 +81,7 @@ Published patch4.1.11 is verified through npm metadata and is now installed in a
 The current audit reports zero vulnerabilities. Patch type, lint, build, inventory and84 focused checks pass.
 Full patch run56923 passes334 files and3,768 tests in501.45 seconds. Independent dependency review found no issue.
 
-Still required: executed database and concurrency checks; staff review screens; customer option screens; up-to-five selection;
-duplicate-product handling; commercial conflict disclosure; approved name disclosure; and the connected RFP workflow.
+Customer comparison and initial selection now have a separate implementation and evidence record in [r3-customer-selection.md](r3-customer-selection.md).
+Still required: executed database and concurrency checks; staff review screens; duplicate-product handling;
+commercial conflict disclosure; approved name disclosure; and the connected RFP workflow.
 These items remain part of the full goal. This package does not replace them with legacy five-row assessments.

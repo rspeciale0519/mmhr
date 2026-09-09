@@ -34,6 +34,7 @@ MMHR staff use the platform with registered customers and invited vendor users. 
 - R3 matching rule previews now return an audited digest and bounded rule count within the organization scope.
 - R3 scorecard views now return weighted aggregate scores and organization-scoped individual entries.
 - R3 initial evaluations now create a bounded, masked assessment snapshot from submitted intake candidates.
+- Customer comparison now shows all published options and saves up to five initial choices. See [selection evidence](security/r3-customer-selection.md); database execution remains open.
 - R3 scorecard creation now stores bounded weighted criteria through an audited command.
 - R3 requirement metadata updates now store bounded structured or custom requirement details, evidence references, and vendor response links through an audited command.
 - R3 workspace views now return the latest organization-scoped snapshot for stage, candidates, tasks, approvals, events, and recent activity.

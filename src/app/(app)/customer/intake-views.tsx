@@ -132,8 +132,10 @@ export function IntakeDetails({ intake, canEdit = false }: { intake: Intake; can
         {intake.submittedAt && <p className="mt-2 text-sm">Submitted <SavedTime value={intake.submittedAt} /></p>}
       </div>
       <p className="mb-7 rounded-lg bg-muted p-4 text-pretty text-sm leading-6">
-        This view shows saved intake details and active requirements, including custom requests. Provider recommendations are not available on this page.
+        This view shows saved intake details and active requirements, including custom requests. Open the comparison to view approved options and saved choices.
       </p>
+      <Link href={`/customer/evaluation?intake=${encodeURIComponent(intake.intakeId)}`} prefetch={false}
+        className={`${linkStyle} mb-5`}>View software comparison</Link>
       {canEdit && <Link href={`/customer?intake=${intake.intakeId}&edit=1`} prefetch={false}
         className={`${linkStyle} mb-5`}>Edit intake answers</Link>}
       <SavedSection title="Company context" value={intake.data.companyContext} />

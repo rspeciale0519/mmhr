@@ -2,6 +2,27 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 05:38: reviewed the entire active goal and supplement. No changes needed.
+Built customer all-options comparison, atomic initial choices and current-publication
+discovery in0118-0121 with guarded route, adapters, audit and immutable scoped links.
+Full unit6311 passes344 files/3,911 tests. Type/lint/build89522 passes68 routes.
+Inventory99 passes. Browser preview checks cover all six options, confirmation,
+uncertain retry, pagination failure, read-only, empty, mobile and tablet states.
+Preview uses test transport and fallback font; no authenticated workflow proof.
+Local integration setup failed Docker access and skipped seven then-current tests.
+Expanded fixtures collect; database/concurrency/recovery execution remains open.
+CI34327707906 failed one matching fixture after900 passes. Fixed the missing vendor
+administrator and committedab0f726. Publication7b5ae49 and Vitest5d428ea are remote.
+CI34330596999 at5d428ea passes standard checks and applies0117. It passed903/906
+integration tests across97 files; all five publication cases pass, including race/parity.
+Three failures were missing fixture administration and stale empty-migration role/audit
+expectations. Both are corrected. Final148 focused/type/lint93156 and1,156-file scan pass.
+Final fixture review is complete. Stage exact updates, commit and push for new CI.
+Do not merge or release before required CI and runtime evidence pass.
+Next connect staff review and approved disclosure before RFP submission.
+Full goal active. Preserve checkpoint and unrelated local hooks/settings.
+Evidence: docs/security/r3-customer-selection.md. No goal or scope reduction.
+
 September 9, 04:40: Vitest4.1.11 full unit56923 passes334 files/3,768 tests.
 Type/lint/inventory/build40692 passes67 routes. Audit has zero findings and
 the1,128-file secret scan passes. Independent dependency review finds no issue.

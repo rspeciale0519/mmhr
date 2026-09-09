@@ -147,7 +147,8 @@ test("reads one scoped intake and renders all seven saved sections", async () =>
   const submittedTime = screen.getByText("Sep 8, 2026, 1:00 PM UTC");
   expect(submittedTime).toHaveAttribute("datetime", "2026-09-08T13:00:00Z");
   expect(submittedTime.parentElement).toHaveTextContent("Submitted Sep 8, 2026, 1:00 PM UTC");
-  expect(screen.getByText(/Provider recommendations are not available/)).toBeInTheDocument();
+  expect(screen.getByText(/Open the comparison to view approved options and saved choices/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "View software comparison" })).toHaveAttribute("href", `/customer/evaluation?intake=${intakeId}`);
   expect(screen.queryByText(organizationId, { exact: false })).not.toBeInTheDocument();
   expect(screen.queryByText(otherId, { exact: false })).not.toBeInTheDocument();
 });

@@ -16,6 +16,7 @@ const fixtureFiles = new Set([
   "src/server/db/r1-permission-rehearsal-cases.ts",
   "src/server/db/r1-security-command-fixtures.ts",
   "src/server/db/r3-evaluation-publication-parity.ts",
+  "src/server/db/r3-evaluation-publication-fixtures.ts",
   "src/server/db/r1-security-command-bootstrap-cases.ts",
   "src/server/db/r1-security-command-capacity-cases.ts",
   "src/server/db/r1-security-command-concurrency-cases.ts",
@@ -314,6 +315,7 @@ describe("R1 authorization architecture boundaries", () => {
     'void require.resolve("./permission-test-fixtures");',
     'import "./auth.integration.test";',
     'import "../db/r3-evaluation-publication-parity";',
+    'import "../db/r3-evaluation-publication-fixtures";',
     'import "@/test/setup";',
   ])("detects forbidden fixture imports: %s", (source) => {
     const sources = synthetic(source);

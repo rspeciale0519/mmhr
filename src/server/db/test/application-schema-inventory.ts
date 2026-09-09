@@ -36,6 +36,8 @@ export const applicationTables = [
   "evaluation_communication_routes",
   "evaluation_comparison_export_decisions",
   "evaluation_comparison_exports",
+  "evaluation_initial_selection_items",
+  "evaluation_initial_selections",
   "evaluation_product_duplicate_reviews",
   "evaluation_publication_decisions",
   "evaluation_publication_options",
@@ -115,7 +117,7 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 118;
+export const applicationMigrationCount = 122;
 
 export const anonymousPublicFunctions = [
   {

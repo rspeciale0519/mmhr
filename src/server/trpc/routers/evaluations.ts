@@ -6,13 +6,19 @@ import {
   readEvaluationPublicationSchema, reviewEvaluationPublication, revokeEvaluationPublication,
   revokeEvaluationPublicationSchema,
 } from "@/server/commands/evaluation-publication";
+import {
+  EvaluationSelectionError, selectInitialEvaluationOptions, selectInitialEvaluationOptionsSchema,
+  getInitialEvaluationSelections, getInitialEvaluationSelectionsSchema,
+} from "@/server/commands/evaluation-selection";
 import { permissionProcedure, router } from "../trpc";
+import { currentEvaluationPublicationSchema, getCurrentEvaluationPublication } from "@/server/commands/current-evaluation-publication";
 
 const resolveScope = (input: { organizationId: string }) => ({ kind: "organization" as const, organizationId: input.organizationId });
 
 async function result<T>(operation: () => Promise<T>): Promise<T> {
   try { return await operation(); } catch (error) {
-    if (error instanceof AuthorizationError || (error instanceof EvaluationPublicationError && error.code === "REJECTED")) {
+    if (error instanceof AuthorizationError ||
+      ((error instanceof EvaluationPublicationError || error instanceof EvaluationSelectionError) && error.code === "REJECTED")) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Evaluation is not available" });
     }
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Evaluation request failed" });
@@ -20,6 +26,12 @@ async function result<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 export const evaluationsRouter = router({
+  current: permissionProcedure({ permission: "portal.customer.access", input: currentEvaluationPublicationSchema, resolveScope })
+    .query(({ ctx, input }) => result(() => getCurrentEvaluationPublication(input, { supabase: ctx.supabase }))),
+  select: permissionProcedure({ permission: "evaluation.select", input: selectInitialEvaluationOptionsSchema, resolveScope })
+    .mutation(({ ctx, input }) => result(() => selectInitialEvaluationOptions(input, { supabase: ctx.supabase }))),
+  selections: permissionProcedure({ permission: "portal.customer.access", input: getInitialEvaluationSelectionsSchema, resolveScope })
+    .query(({ ctx, input }) => result(() => getInitialEvaluationSelections(input, { supabase: ctx.supabase }))),
   prepare: permissionProcedure({ permission: "evaluation.publish", input: prepareEvaluationPublicationSchema, resolveScope })
     .mutation(({ ctx, input }) => result(() => prepareEvaluationPublication(input, { supabase: ctx.supabase }))),
   publish: permissionProcedure({ permission: "evaluation.publish", input: publishEvaluationPublicationSchema, resolveScope })

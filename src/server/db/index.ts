@@ -20,6 +20,8 @@ import * as r3Matching from "./schema/r3-matching";
 import * as r3Evaluation from "./schema/r3-evaluation";
 import * as r3Scorecard from "./schema/r3-scorecard";
 import * as r3Workspace from "./schema/r3-workspace";
+import * as r3Publication from "./schema/r3-publication";
+import * as r3Selection from "./schema/r3-selection";
 import * as r6Workflow from "./schema/r6-workflow";
 import * as r7Finance from "./schema/r7-finance";
 import * as r8Operations from "./schema/r8-operations";
@@ -45,6 +47,8 @@ export const schema = {
   ...r3Evaluation,
   ...r3Scorecard,
   ...r3Workspace,
+  ...r3Publication,
+  ...r3Selection,
   ...r6Workflow,
   ...r7Finance,
   ...r8Operations,
@@ -81,6 +85,8 @@ export * from "./schema/r3-matching";
 export * from "./schema/r3-evaluation";
 export * from "./schema/r3-scorecard";
 export * from "./schema/r3-workspace";
+export * from "./schema/r3-publication";
+export * from "./schema/r3-selection";
 export * from "./schema/r6-workflow";
 export * from "./schema/r7-finance";
 export * from "./schema/r8-operations";

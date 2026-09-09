@@ -190,6 +190,7 @@ export const evaluationCandidates = pgTable(
   (t) => [
     uniqueIndex("evaluation_candidates_intake_product_uq").on(t.intakeId, t.productId),
     uniqueIndex("evaluation_candidates_organization_id_id_uq").on(t.organizationId, t.id),
+    uniqueIndex("evaluation_candidates_intake_id_uq").on(t.organizationId, t.intakeId, t.id),
     index("evaluation_candidates_organization_state_idx").on(
       t.organizationId,
       t.state,
