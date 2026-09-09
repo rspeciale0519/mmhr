@@ -1,7 +1,7 @@
 # Customer submission confirmation
 
 Status: implemented; local standard gates, isolated browser checks and focused checks pass.
-Real authenticated submission, migration 0110 execution and production readiness remain unverified.
+Real browser-to-database submission and production readiness remain unverified. Full migration 0110 verification remains open after a failed integration run.
 
 ## Scope and authority
 
@@ -44,6 +44,15 @@ Keep submitted records, history, audit events and receipts.
 This package adds no migration, dependency, shared style or permission key.
 
 ## Verification
+
+CI34318285955 at `4abfe42` applied migration0110 and passed standard checks.
+Integration passed91 files and889 tests; two files and four cases failed.
+One assertion retained the old35-key permission count instead of36.
+One timestamp assertion required a JavaScript Date while the database returned a string.
+Two denial cases attempted requirement saving after revoking the caller's authority.
+The fixtures now check36 complete definitions, database timestamp bounds, and valid saved data before revocation.
+They retain exact metadata comparison, denial codes and zero submission history, audit and receipt assertions.
+Independent review found no weakened security check. A new CI run must verify these corrections.
 
 - `npm test -- src/app/(app)/customer src/server/auth/entry-point-inventory.test.ts`: 10 files, 188 tests pass.
 - Extended submission component tests: 17 pass, including all four rejection codes, spoofed error data and a later replay status.

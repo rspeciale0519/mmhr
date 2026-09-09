@@ -57,13 +57,13 @@ describe("R1.4 real-token permission evaluation", () => {
 
   afterAll(() => fixtures.close(), 60_000);
 
-  test("database definitions match all 35 registry keys and metadata exactly", async () => {
+  test("database definitions match all 36 registry keys and metadata exactly", async () => {
     const definitions = await owner`
       SELECT key, kind, platform_scope, organization_scope, minimum_assurance,
         internal_only, required_portal, description, active, retired_at
       FROM public.permission_definitions ORDER BY key
     `;
-    expect(permissionKeys).toHaveLength(35);
+    expect(permissionKeys).toHaveLength(36);
     const expected = permissionKeys.map((key) => {
       const definition = permissionRegistry[key];
       return {

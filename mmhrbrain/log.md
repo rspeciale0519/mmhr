@@ -594,3 +594,9 @@ Database run storage, approval records, and provider evaluation remain open.
 - Fixed draft helper type and exact source classification; 51 boundary cases pass. Independent SQL and fixture reviews found no remaining defect.
 - Four new database cases collect but have not executed. Prepare exact staging/scan/local commit; preserve active CI34318285955 before push.
 - All approved masked-option publication and up-to-five selection remain open. No merge, cloud migration or release. See journal/2026-09-09.md.
+- Committed26 reviewed files as95a176b after secret scan1,098 and cached diff checks passed. One local commit awaits CI34318285955 before push. No local gate remains active.
+
+## [2026-09-09] verification | Correct submission integration fixture failures
+- CI34318285955 at4abfe42 passesstandardchecks and91 files/889 integration tests;2 files/4 casesfail.
+- Corrected registry36 count, databasetimestampbounds and validrequirementsetup before revocation. Independentreview andfocusedlint/type75594pass.
+- Prepareseparatefixturefixcommit andpushwith95a176b. New0112/0113approved-inputpackage remainslocal andunexecuted. Fullgoalactive.

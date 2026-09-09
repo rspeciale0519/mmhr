@@ -203,14 +203,15 @@ describe("R3 customer intake submit RPC", () => {
         revision: 2, outcomeCode: "updated", correlationId });
       const [intake] = await sql<Record<string, unknown>[]>`
         SELECT status, revision, company_context, current_systems, compliance_needs, budget,
-          timeline, stakeholders, decision_process, submitted_at
+          timeline, stakeholders, decision_process, submitted_at,
+          (submitted_at >= created_at AND submitted_at <= clock_timestamp()) AS valid_submission_time
         FROM public.intakes WHERE id = ${intakeId}::uuid
       `;
       expect(intake).toMatchObject({ status: "submitted", revision: 2,
         company_context: { sector: "services" }, current_systems: ["payroll"],
         compliance_needs: ["soc2"], budget: { range: "mid" }, timeline: { months: 3 },
         stakeholders: ["owner"], decision_process: { process: "committee" } });
-      expect(intake!.submitted_at).toEqual(expect.any(Date));
+      expect(intake!.valid_submission_time).toBe(true);
       const [history] = await sql<{ snapshot: Record<string, unknown> }[]>`
         SELECT snapshot FROM public.intake_history WHERE intake_id = ${intakeId}::uuid AND revision = 2
       `;
@@ -296,6 +297,11 @@ describe("R3 customer intake submit RPC", () => {
       await rollbackCase(context!, async (sql) => {
         let principal = customerContributor;
         let organizationId = fixture.organizationId;
+        // Save a valid request before removing authority. The assertion below
+        // must exercise submission denial, not a failure during fixture setup.
+        const intakeId = await seedIntake(sql, fixture, customerContributor.identityId);
+        const saved = await saveRequirement(sql, customerContributor, requirementPayload(fixture, intakeId));
+        expect(saved).toMatchObject({ intakeId, revision: 1 });
         if (caseName === "viewer") principal = fixture.target;
         if (caseName === "cross-organization") organizationId = randomUUID();
         if (caseName === "revoked") {
@@ -314,10 +320,9 @@ describe("R3 customer intake submit RPC", () => {
           await sql`UPDATE auth.sessions SET not_after = now() - interval '1 minute'
             WHERE id = ${principal.sessionId}::uuid`;
         }
-        const intakeId = await seedIntake(sql, fixture, customerContributor.identityId);
-        if (caseName !== "cross-organization") await saveRequirement(sql, customerContributor, requirementPayload(fixture, intakeId));
         await expect(submitIntake(sql, principal, { ...submitPayload({ ...fixture, organizationId }, intakeId) }))
           .rejects.toMatchObject({ code: "42501" });
+        expect(await submitCounts(sql, intakeId)).toEqual({ history: 0, audits: 0, receipts: 0 });
       });
     },
   );

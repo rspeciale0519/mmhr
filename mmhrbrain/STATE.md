@@ -2,6 +2,26 @@
 Updated: 2026-09-09
 
 ## Current focus
+September 9, 03:10: CI34318285955 at4abfe42 FAILED integration with91 files/889
+tests passed and2 files/4 failed cases. Standard checks passed. Corrected the
+old35-versus36 registry count, timestamp-driver type assertion, and requirement
+setup after membership/portal revocation. Exact metadata and no-write denial
+checks remain. Independent review and focused lint/type75594 pass. Prepare a
+separate fixture-fix commit, then push it with95a176b for fresh0111 evidence.
+Approved vendor input migrations0112/0113 and their tests remain uncommitted.
+Type/full lint5799 and build34010 pass; full unit12713 and finalfixture16576 run.
+New integration setup failed on sandbox Docker/config access;4 cases skipped.
+No SQL execution of0112/0113 is claimed. Full goal remains active.
+
+September 9, 02:49 delivery: committed26 reviewed files as95a176bd3855bc033dbfab3d851898b6c073e597.
+Secret scan passes1,098 tracked files; cached diff check passes. The branch is
+one commit ahead of origin. Preserve CI34318285955 at4abfe42 before pushing;
+it tests0110, not0111. No local verification session remains active.
+Next implement approved masked-option publication and customer selection after
+verifying current rule semantics and evidence approval provenance. Do not reuse
+the five-candidate assessment as an all-options catalogue. Full goal stays active.
+No merge, cloud migration or release occurred. Delivery notes remain local.
+
 September 9, 02:46: prepared candidate vendor-scope compatibility migration0111.
 Full unit87722 passes325 files/3,650 tests in413.24s. Type, full lint, build46959
 with67 routes, final fixture lint/type91673 and integration inventory95 pass.
