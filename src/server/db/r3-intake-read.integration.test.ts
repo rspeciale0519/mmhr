@@ -13,6 +13,7 @@ import {
   changeMembershipStatus,
   commandInput,
   createCommandFixture,
+  createSecurityPrincipal,
   rollbackCase,
   type SecurityCommandFixture,
   type SecurityPrincipal,
@@ -226,12 +227,13 @@ describe("R3 intake read RPCs", () => {
   test("denies unauthorized, cross-organization, missing, and same-organization wrong-intake reads", async () => {
     await rollbackCase(context, async (sql) => {
       const ownIntakeId = await seedIntake(sql, fixture.organizationId, fixture.pair[0].identityId);
+      const unauthorized = await createSecurityPrincipal(sql);
       const [otherOrganization] = await sql<{ id: string }[]>`
         INSERT INTO public.orgs (name, type, status, activated_at, migration_review_required)
         VALUES ('R3 other customer', 'customer', 'active', now(), false) RETURNING id
       `;
       const otherIntakeId = await seedIntake(sql, otherOrganization!.id, fixture.pair[0].identityId);
-      await expect(readPage(sql, fixture.target, fixture.organizationId)).rejects.toMatchObject({ code: "42501" });
+      await expect(readPage(sql, unauthorized, fixture.organizationId)).rejects.toMatchObject({ code: "42501" });
       await expect(readPage(sql, fixture.pair[0], otherOrganization!.id)).rejects.toMatchObject({ code: "42501" });
       await expect(readDetail(sql, fixture.pair[0], fixture.organizationId, randomUUID())).rejects.toMatchObject({ code: "42501" });
       await expect(readDetail(sql, fixture.pair[0], fixture.organizationId, otherIntakeId)).rejects.toMatchObject({ code: "42501" });

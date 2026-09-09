@@ -13,7 +13,6 @@ export const applicationTables = [
   "commission_payments",
   "commission_structures",
   "contacts",
-  "customer_registrations",
   "contract_handoff_history",
   "contract_handoffs",
   "crm_activities",
@@ -23,6 +22,7 @@ export const applicationTables = [
   "crm_task_state_history",
   "crm_tasks",
   "customer_profiles",
+  "customer_registrations",
   "deal_stage_history",
   "deals",
   "deletion_decisions",
@@ -112,7 +112,7 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 107;
+export const applicationMigrationCount = 108;
 
 export const anonymousPublicFunctions = [
   {

@@ -87,11 +87,7 @@ describe("R3 intake and matching foundation", () => {
       VALUES (${organization!.id}, ${intake!.id}, 'payroll', 'Duplicate')
     `).rejects.toThrow();
 
-    await context!.client`DELETE FROM public.evaluation_candidates WHERE id = ${candidate!.id}`;
-    await context!.client`DELETE FROM public.intake_requirements WHERE id = ${requirement!.id}`;
-    await context!.client`DELETE FROM public.intakes WHERE id = ${intake!.id}`;
-    await context!.client`DELETE FROM public.products WHERE id = ${product!.id}`;
-    await context!.client`DELETE FROM public.vendor_profiles WHERE id = ${vendor!.id}`;
-    await context!.client`DELETE FROM public.orgs WHERE id IN (${organization!.id}, ${vendorOrganization!.id})`;
+    // The rehearsal database is discarded after this suite. Requirement history
+    // is append-only, so direct cleanup would violate its retention constraints.
   });
 });

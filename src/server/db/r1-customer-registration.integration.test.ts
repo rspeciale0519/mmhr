@@ -6,7 +6,7 @@ import {
   rollbackCase, waitForGuardWait, type SecurityTransaction,
 } from "./r1-security-command-fixtures";
 
-type WorkspaceResult = { identityId: string; organizationId: string; outcome: string };
+type WorkspaceResult = { identityId: string; organizationId: string; outcome: string; correlationId: string };
 
 describe("self-service customer registration", () => {
   let context: RehearsalContext;
@@ -25,13 +25,14 @@ describe("self-service customer registration", () => {
       // A real AAL1 account has no verified MFA factor.
       await sql`UPDATE auth.sessions SET aal='aal1',factor_id=NULL WHERE id=${customer.sessionId}::uuid`;
       await sql`DELETE FROM auth.mfa_factors WHERE user_id=${customer.subject}::uuid`;
+      const correlationId = randomUUID();
       const call = () => asAuthenticated(sql, customer, async (probe) => {
-        const [row] = await probe`SELECT public.mmhr_start_customer_workspace(${randomUUID()}::uuid) AS result`;
-        return row!.result as { identityId: string; organizationId: string; outcome: string };
+        const [row] = await probe`SELECT public.mmhr_start_customer_workspace(${correlationId}::uuid) AS result`;
+        return row!.result as WorkspaceResult;
       }, "aal1");
       const result = await call();
-      expect(result.outcome).toBe("created");
-      expect(await call()).toMatchObject({ ...result, outcome: "existing" });
+      expect(result).toMatchObject({ outcome: "created", correlationId });
+      expect(await call()).toEqual({ ...result, outcome: "existing" });
       const permission = (key: string, principal = customer) => asAuthenticated(sql, principal,
         (probe) => probe`SELECT * FROM public.mmhr_authorize(${key},${result.organizationId}::uuid)`, "aal1");
       expect(await permission("portal.customer.access")).toHaveLength(1);
@@ -62,8 +63,12 @@ describe("self-service customer registration", () => {
         identityId: customer.identityId, status: "pending", outcome: "synchronized", correlationId,
       });
       expect(await sql`SELECT * FROM public.org_members WHERE identity_id=${customer.identityId}::uuid`).toHaveLength(0);
-      expect(await sql`SELECT * FROM public.audit_events WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`).toHaveLength(1);
-      expect(await sql`SELECT * FROM public.security_command_receipts WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`).toHaveLength(1);
+      expect(await sql`SELECT action, after_summary FROM public.audit_events
+        WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.synchronized", after_summary: { status: "pending" } }]);
+      expect(await sql`SELECT action FROM public.security_command_receipts
+        WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.synchronized" }]);
       const replay = await asAuthenticated(sql, customer, (probe) =>
         probe`SELECT public.mmhr_sync_my_identity(${correlationId}::uuid) AS result`, "aal1");
       expect(replay[0]!.result).toMatchObject({ identityId: customer.identityId, outcome: "synchronized", correlationId });
@@ -71,17 +76,68 @@ describe("self-service customer registration", () => {
     });
   });
 
+  test("replays an unchanged synchronization with its exact audit outcome", async () => {
+    await rollbackCase(context, async (sql) => {
+      const customer = await createSecurityPrincipal(sql);
+      const correlationId = randomUUID();
+      const result = await asAuthenticated(sql, customer, (probe) =>
+        probe`SELECT public.mmhr_sync_my_identity(${correlationId}::uuid) AS result`, "aal1");
+      expect(result[0]!.result).toMatchObject({
+        identityId: customer.identityId, status: "active", outcome: "unchanged", correlationId,
+      });
+      expect(await sql`SELECT action, after_summary FROM public.audit_events
+        WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.unchanged", after_summary: { status: "active" } }]);
+      expect(await sql`SELECT action FROM public.security_command_receipts
+        WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.unchanged" }]);
+      const replay = await asAuthenticated(sql, customer, (probe) =>
+        probe`SELECT public.mmhr_sync_my_identity(${correlationId}::uuid) AS result`, "aal1");
+      expect(replay[0]!.result).toEqual({
+        identityId: customer.identityId, status: "active", outcome: "unchanged", correlationId,
+      });
+      expect(await sql`SELECT count(*)::int AS count FROM public.audit_events
+        WHERE command='identity.synchronize' AND actor_identity_id=${customer.identityId}::uuid`)
+        .toEqual([{ count: 1 }]);
+    });
+  });
+
   test("creates one pending identity for a verified caller without membership", async () => {
     await rollbackCase(context, async (sql) => {
       const customer = await createSecurityPrincipal(sql, "pending");
       await sql`DELETE FROM public.identities WHERE id=${customer.identityId}::uuid`;
+      const correlationId = randomUUID();
       const result = await asAuthenticated(sql, customer, (probe) =>
-        probe`SELECT public.mmhr_sync_my_identity(${randomUUID()}::uuid) AS result`, "aal1");
+        probe`SELECT public.mmhr_sync_my_identity(${correlationId}::uuid) AS result`, "aal1");
       const identityId = result[0]!.result.identityId as string;
-      expect(result[0]!.result).toMatchObject({ status: "pending", outcome: "created" });
+      expect(result[0]!.result).toEqual({ identityId, status: "pending", outcome: "created", correlationId });
       expect(await sql`SELECT auth_user_id,status FROM public.identities WHERE id=${identityId}::uuid`)
         .toEqual([{ auth_user_id: customer.subject, status: "pending" }]);
       expect(await sql`SELECT * FROM public.org_members WHERE identity_id=${identityId}::uuid`).toHaveLength(0);
+      expect(await sql`SELECT action, after_summary FROM public.audit_events
+        WHERE command='identity.synchronize' AND actor_identity_id=${identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.created", after_summary: { status: "pending" } }]);
+      expect(await sql`SELECT action FROM public.security_command_receipts
+        WHERE command='identity.synchronize' AND actor_identity_id=${identityId}::uuid`)
+        .toEqual([{ action: "identity.synchronize.created" }]);
+      const workspace = await asAuthenticated(sql, customer, (probe) =>
+        probe`SELECT public.mmhr_start_customer_workspace(${correlationId}::uuid) AS result`, "aal1");
+      const workspaceResult = workspace[0]!.result as WorkspaceResult;
+      expect(workspaceResult).toMatchObject({ identityId, outcome: "created", correlationId });
+      expect(await sql`SELECT status, activated_at FROM public.identities WHERE id=${identityId}::uuid`)
+        .toSatisfy((rows) => rows.length === 1 && rows[0].status === "active" && rows[0].activated_at !== null);
+      expect(await sql`SELECT role_key, status FROM public.org_members
+        WHERE identity_id=${identityId}::uuid AND org_id=${workspaceResult.organizationId}::uuid`)
+        .toEqual([{ role_key: "contributor", status: "active" }]);
+      expect(await sql`SELECT portal FROM public.portal_access_grants
+        WHERE organization_id=${workspaceResult.organizationId}::uuid AND portal='customer'`)
+        .toEqual([{ portal: "customer" }]);
+      const replay = await asAuthenticated(sql, customer, (probe) =>
+        probe`SELECT public.mmhr_sync_my_identity(${correlationId}::uuid) AS result`, "aal1");
+      expect(replay[0]!.result).toEqual({ identityId, status: "pending", outcome: "created", correlationId });
+      expect(await sql`SELECT count(*)::int AS count FROM public.audit_events
+        WHERE command='identity.synchronize' AND actor_identity_id=${identityId}::uuid`)
+        .toEqual([{ count: 1 }]);
     });
   });
 
@@ -208,7 +264,7 @@ describe("self-service customer registration", () => {
   test.each(["review", "suspended", "archived", "recovery_pending", "email_mismatch"] as const)(
     "denies synchronization for existing %s identity state", async (restriction) => {
       await rollbackCase(context, async (sql) => {
-        const customer = await createSecurityPrincipal(sql, "pending");
+        const customer = await createSecurityPrincipal(sql);
         if (restriction === "review") await sql`UPDATE public.identities SET migration_review_required=true WHERE id=${customer.identityId}::uuid`;
         if (restriction === "email_mismatch") await sql`UPDATE auth.users SET email='mismatch@example.invalid' WHERE id=${customer.subject}::uuid`;
         if (restriction === "suspended" || restriction === "archived" || restriction === "recovery_pending") {

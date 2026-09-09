@@ -334,12 +334,12 @@ describe("R3 intake requirement write RPCs", () => {
       `)).rejects.toMatchObject({ code: "42501" });
       await expect(sql.savepoint((probe) => probe`
         DELETE FROM public.intake_requirement_history WHERE requirement_id = ${requirementId}::uuid
-      `)).rejects.toMatchObject({ code: "42501" });
+      `)).rejects.toMatchObject({ code: "P0001" });
       await expect(sql.savepoint((probe) => probe`
         UPDATE public.intake_requirement_history SET revision = revision + 1
         WHERE requirement_id = ${requirementId}::uuid
-      `)).rejects.toMatchObject({ code: "42501" });
-      await expect(sql.savepoint((probe) => probe`TRUNCATE public.intake_requirement_history`)).rejects.toMatchObject({ code: "42501" });
+      `)).rejects.toMatchObject({ code: "P0001" });
+      await expect(sql.savepoint((probe) => probe`TRUNCATE public.intake_requirement_history`)).rejects.toMatchObject({ code: "P0001" });
       await expect(requirementCounts(sql, fixture.organizationId, requirementId)).resolves.toMatchObject({ history: 1 });
     });
   });
