@@ -5,16 +5,18 @@ import {
   createPublicReleaseBlockResponse,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
+import { isPathInLaunch } from "@/lib/launch-surface";
 import { shouldRejectServerActionRequest } from "@/server/auth/server-action-request";
 
 /**
- * Enforces the temporary public-release quarantine. Then it refreshes the
- * Supabase session and writes rotated cookies onto the response.
+ * Enforces the temporary public-release quarantine and the launch surface
+ * allowlist. Then it refreshes the Supabase session and writes rotated
+ * cookies onto the response.
  *
  * Route protection is deliberately NOT enforced here yet. Customer, vendor,
  * and admin protection belongs with the canonical IAM and RLS implementation.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (isPublicReleaseBlocked()) {
     return createPublicReleaseBlockResponse(
       request.nextUrl.pathname,
@@ -30,6 +32,17 @@ export async function middleware(request: NextRequest) {
         "cache-control": "private, no-store",
       },
     });
+  }
+
+  // Owner decision D2: hidden launch areas look absent, and no session work runs.
+  if (!isPathInLaunch(request.nextUrl.pathname)) {
+    if (request.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "not_found" }, {
+        status: 404,
+        headers: { "cache-control": "private, no-store" },
+      });
+    }
+    return NextResponse.rewrite(new URL("/__not-in-launch", request.url));
   }
 
   // GALLERY_ONLY builds (the public design-review deployment) serve nothing but

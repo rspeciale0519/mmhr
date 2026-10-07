@@ -1,0 +1,85 @@
+-- Owner decision D2 (P0 record Section 5): finance records and private document
+-- storage are outside the MVP launch. Signed-in users lose direct API access to
+-- these 39 functions. The application already hides their screens and procedures.
+-- The functions, tables, and data stay unchanged.
+-- Recovery: run the GRANT statements listed at the end of this file.
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_commission(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_commission_payment(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_invoice(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_commission_dispute(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_finance_adjustment(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_finance_handoff(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_finance_reconciliation(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_search_workflow_documents(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_workflow_document(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_set_workflow_document_search_content(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_reserve_workspace_document(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_complete_workspace_document_upload(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_workspace_documents(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_workspace_document_versions(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_workspace_document_history(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_workspace_document_review(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_issue_workspace_document_access(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_resolve_workspace_document_access(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_workspace_document_review(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_reserve_finance_document(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_complete_finance_document_upload(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_documents(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_document_versions(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_document_history(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_document_review(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_issue_finance_document_access(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_resolve_finance_document_access(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_record_finance_document_review(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_document_sources(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_finance_document_recovery(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_abandon_finance_document_upload(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_managed_finance_command(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_finance_page(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_finance_detail(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_finance_originals(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_managed_invoice_command(jsonb,uuid,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_owners(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_source(jsonb,uuid) FROM authenticated;--> statement-breakpoint
+REVOKE EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_detail(jsonb,uuid) FROM authenticated;
+
+-- Reverse migration, kept for when the owner restores these features:
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_commission(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_commission_payment(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_invoice(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_commission_dispute(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_finance_adjustment(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_finance_handoff(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_finance_reconciliation(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_search_workflow_documents(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_workflow_document(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_set_workflow_document_search_content(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_reserve_workspace_document(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_complete_workspace_document_upload(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_workspace_documents(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_workspace_document_versions(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_workspace_document_history(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_workspace_document_review(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_issue_workspace_document_access(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_resolve_workspace_document_access(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_workspace_document_review(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_reserve_finance_document(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_complete_finance_document_upload(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_documents(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_document_versions(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_document_history(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_document_review(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_issue_finance_document_access(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_resolve_finance_document_access(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_record_finance_document_review(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_document_sources(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_finance_document_recovery(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_abandon_finance_document_upload(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_managed_finance_command(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_finance_page(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_finance_detail(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_finance_originals(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_managed_invoice_command(jsonb,uuid,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_owners(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_source(jsonb,uuid) TO authenticated;
+-- GRANT EXECUTE ON FUNCTION public.mmhr_get_managed_invoice_detail(jsonb,uuid) TO authenticated;

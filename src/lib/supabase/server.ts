@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
  * Supabase client for Server Components, Server Actions, and Route Handlers.
  *
  * Server Components cannot write cookies, so `setAll` may throw there; the
- * middleware refreshes the session instead, which makes that throw safe to
- * swallow (see src/middleware.ts).
+ * proxy refreshes the session instead, which makes that throw safe to
+ * swallow (see src/proxy.ts).
  * Auth actions require cookie writes and must opt into strict failure reporting.
  */
 export async function createClient({ requireCookieWrites = false }: { requireCookieWrites?: boolean } = {}) {
@@ -27,7 +27,7 @@ export async function createClient({ requireCookieWrites = false }: { requireCoo
             }
           } catch (error) {
             if (requireCookieWrites) throw error;
-            // Called from a Server Component. The middleware owns session
+            // Called from a Server Component. The proxy owns session
             // refresh, so nothing is lost.
           }
         },

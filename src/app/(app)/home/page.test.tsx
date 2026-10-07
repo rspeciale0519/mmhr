@@ -36,7 +36,8 @@ test("returns workspace content after permission verification", async () => {
   ).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Customer portal" })).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Vendor portal" })).not.toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Workspace documents" })).toHaveAttribute("href", "/documents");
+  // Owner decision D2 hides private document storage at launch.
+  expect(screen.queryByRole("link", { name: "Workspace documents" })).not.toBeInTheDocument();
   expect(screen.queryByTestId("signed-in-email")).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Invite a member" })).not.toBeInTheDocument();
 });

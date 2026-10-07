@@ -539,15 +539,15 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "does not reveal resource existence",
   },
   {
-    key: "src/middleware.ts#middleware",
+    key: "src/proxy.ts#proxy",
     surface: "all matched requests",
     kind: "middleware",
     access: "framework",
     permission: "none",
     scope: "none",
     dataPath:
-      "R0 release gate, GALLERY_ONLY routing, Server Action validation, session refresh",
-    denialEvidence: "middleware tests; never the authorization boundary",
+      "R0 release gate, launch surface allowlist, GALLERY_ONLY routing, Server Action validation, session refresh",
+    denialEvidence: "proxy tests; never the authorization boundary",
   },
   {
     key: "src/app/api/trpc/[trpc]/route.ts#GET",

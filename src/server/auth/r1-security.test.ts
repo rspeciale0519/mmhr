@@ -45,7 +45,7 @@ describe("R1 security evidence", () => {
     const requestSecuritySources = [
       "src/server/auth/authorization.ts",
       "src/server/auth/page-guards.ts",
-      "src/middleware.ts",
+      "src/proxy.ts",
     ].map(source).join("\n");
     expect(requestSecuritySources).not.toMatch(/\.auth\.getSession\s*\(/);
   });

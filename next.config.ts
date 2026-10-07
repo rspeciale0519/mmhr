@@ -14,6 +14,7 @@ export default withSentryConfig(nextConfig, {
   // local builds skip it rather than failing.
   silent: !process.env.CI,
   telemetry: false,
-  disableLogger: true,
+  // Replaces the deprecated disableLogger option. Turbopack builds ignore it.
+  webpack: { treeshake: { removeDebugLogging: true } },
   widenClientFileUpload: true,
 });

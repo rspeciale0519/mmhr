@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { config, middleware } from "@/middleware";
+import { config, proxy } from "@/proxy";
 
 vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(),
@@ -23,7 +23,7 @@ describe("public-release middleware", () => {
   test.each(["/", "/sign-up", "/admin", "/report.png?download=1"])(
     "blocks the application route %s before session work",
     async (path) => {
-      const response = await middleware(
+      const response = await proxy(
         new NextRequest(`https://mmhr.test${path}`),
       );
 
@@ -35,7 +35,7 @@ describe("public-release middleware", () => {
   );
 
   test("blocks HEAD requests", async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("https://mmhr.test/", { method: "HEAD" }),
     );
 
@@ -46,7 +46,7 @@ describe("public-release middleware", () => {
   test.each(["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])(
     "blocks %s requests before action or session work",
     async (method) => {
-      const response = await middleware(
+      const response = await proxy(
         new NextRequest("https://mmhr.test/", {
           method,
           headers: method === "POST" ? { "next-action": "action-id" } : {},
@@ -63,7 +63,7 @@ describe("public-release middleware", () => {
   );
 
   test("serves robots.txt without starting a session", async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("https://mmhr.test/robots.txt?cache=miss"),
     );
 
@@ -73,7 +73,7 @@ describe("public-release middleware", () => {
   });
 
   test("returns JSON for blocked API routes", async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("https://mmhr.test/api/trpc/example"),
     );
 
@@ -88,7 +88,7 @@ describe("public-release middleware", () => {
     vi.stubEnv("PUBLIC_RELEASE_ENABLED", "1");
     vi.stubEnv("PUBLIC_RELEASE_APPROVAL_ID", "unreviewed-release");
 
-    const response = await middleware(new NextRequest("https://mmhr.test/"));
+    const response = await proxy(new NextRequest("https://mmhr.test/"));
 
     expect(response.status).toBe(503);
     expect(createServerClient).not.toHaveBeenCalled();
@@ -159,7 +159,7 @@ describe("session refresh middleware", () => {
       },
     );
 
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("https://mmhr.test/home", {
         headers: { cookie: "sb-access-token=stale-token" },
       }),
@@ -183,7 +183,7 @@ describe("session refresh middleware", () => {
       auth: { getClaims },
     } as never);
 
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("https://mmhr.test/admin"),
     );
 
@@ -196,7 +196,7 @@ describe("session refresh middleware", () => {
     async (path) => {
       vi.stubEnv("GALLERY_ONLY", "1");
 
-      const response = await middleware(
+      const response = await proxy(
         new NextRequest(`https://mmhr.test${path}`),
       );
 
@@ -242,7 +242,7 @@ describe("Server Action request middleware", () => {
     const requestHeaders = new Headers({ "next-action": "action-id" });
     if (origin) requestHeaders.set("origin", origin);
 
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("http://localhost:3000/sign-in", {
         method,
         headers: requestHeaders,
@@ -255,7 +255,7 @@ describe("Server Action request middleware", () => {
   });
 
   test("passes an exact-origin POST action request", async () => {
-    const response = await middleware(
+    const response = await proxy(
       new NextRequest("http://localhost:3000/sign-in", {
         method: "POST",
         headers: {
@@ -267,5 +267,52 @@ describe("Server Action request middleware", () => {
 
     expect(response.status).toBe(200);
     expect(getClaims).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("launch surface proxy", () => {
+  beforeEach(() => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("GALLERY_ONLY", "0");
+    vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "");
+    vi.mocked(createServerClient).mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test.each(["/admin/finance/invoices", "/documents", "/customer/demos", "/admin/contracts"])(
+    "renders not-found for the hidden page %s without session work",
+    async (path) => {
+      const response = await proxy(new NextRequest(`https://mmhr.test${path}`));
+
+      expect(response.headers.get("x-middleware-rewrite")).toBe("https://mmhr.test/__not-in-launch");
+      expect(createServerClient).not.toHaveBeenCalled();
+    },
+  );
+
+  test.each(["/api/finance/invoices/originals", "/api/documents/access", "/api/trpc/intakes.read,managedFinance.list"])(
+    "returns a private 404 for the hidden API %s",
+    async (path) => {
+      const response = await proxy(new NextRequest(`https://mmhr.test${path}`, { method: "POST" }));
+
+      expect(response.status).toBe(404);
+      expect(response.headers.get("cache-control")).toBe("private, no-store");
+      expect(await response.json()).toEqual({ error: "not_found" });
+      expect(createServerClient).not.toHaveBeenCalled();
+    },
+  );
+
+  test("shows Candidate B pages only when Candidate B is selected", async () => {
+    vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "B");
+    vi.mocked(createServerClient).mockReturnValue({
+      auth: { getClaims: vi.fn().mockResolvedValue({ data: null, error: null }) },
+    } as never);
+
+    const response = await proxy(new NextRequest("https://mmhr.test/customer/demos"));
+
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+    expect(createServerClient).toHaveBeenCalledTimes(1);
   });
 });

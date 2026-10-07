@@ -1,3 +1,4 @@
+import { requireLaunchArea } from "@/lib/launch-surface-guard";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -14,6 +15,7 @@ import { displayProposalTime,ProposalComparison,ProposalQuoteDetails } from "./p
 
 type View="staff"|"customer"|"vendor";
 export async function ProposalWorkspace({view,searchParams}:{view:View;searchParams:Promise<Record<string,string|string[]|undefined>>}){
+  requireLaunchArea("candidate-b");
   if(view==="staff")await requirePagePermission("admin.access",{kind:"platform"});
   const {authorization}=view==="staff"?await requireSelectedOrganizationPermission("rfp.approve"):await requirePortalPageAccess(view);
   if(authorization.scope.kind!=="organization")forbidden();

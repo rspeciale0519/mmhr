@@ -1,10 +1,10 @@
 # MMHR — Current State
 
-Updated: 2026-10-07 13:10 EDT. Branch: `codex/full-delivery-verification`. Last commit 0b552be, pushed.
+Updated: 2026-10-07 17:52 EDT. Branch: `codex/full-delivery-verification`. Last commit ef05d63, pushed; P1 steps 2-4 uncommitted.
 
 ## Scope and authority
 - Latest user direction: working core features first, then high-quality public and logged-in design, then further security and features.
-- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P0 is complete: the owner approved D1-D9 on 2026-10-07. D3, D7 and D8 are applied; D9 is blocked by the auto-mode classifier and waits for the owner. P1 is next.
+- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P0 is complete: the owner approved D1-D9 on 2026-10-07. D3, D7 and D8 are applied; D9 is blocked by the auto-mode classifier and waits for the owner. P1 steps 1 to 4 are done (launch allowlist, migrations 0169-0170); step 5, the shell and design system, is next. Owner rule: no full integration run until go-live on hosted staging.
 - This direction supersedes the October3 full-platform-before-live instruction. Nine older documents now carry dated supersession notices; full rewrites follow launch.
 - Financial-record management and private document storage are outside the requested MVP. Contracts and existing permission controls remain important.
 - Do not resume superseded finance/parser/security expansion. Local migrations and checks are authorized within P0 and later phases.

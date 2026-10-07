@@ -1,3 +1,4 @@
+import { requireLaunchArea } from "@/lib/launch-surface-guard";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { forbidden, notFound } from "next/navigation";
@@ -15,6 +16,7 @@ const membershipsSchema = z.array(z.strictObject({ organization_id: z.uuid(), or
   .refine(rows => new Set(rows.map(row => row.organization_id)).size === rows.length);
 
 export default async function ManagedInvoicePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  requireLaunchArea("finance");
   const { authorization } = await requireSelectedOrganizationPermission("finance.manage");
   if (authorization.scope.kind !== "organization" || authorization.assurance !== "aal2") forbidden();
   const query = querySchema.safeParse(await searchParams);

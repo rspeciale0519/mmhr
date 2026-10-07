@@ -1,5 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+
+// These views belong to Launch Candidate B (owner decision D2).
+beforeEach(() => { vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "B"); });
 import { DemoWorkspace } from "./demo-workspace";
 import DemoError from "./demo-error";
 import DemoLoading from "./demo-loading";

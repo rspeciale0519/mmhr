@@ -457,6 +457,19 @@ The built-in Supabase sender delivers only to project team addresses, has low ra
 10. Show the first visual checkpoint to the owner.
 11. Stand up staging and run the first hosted smoke check (D4, D6), then add the journey tests (D5).
 
+### P1 progress
+
+| Step | Status, October 7 |
+|---|---|
+| 1. Checkpoint commit and push | Done: `0b552be`, then `ef05d63` |
+| 2. Audit fix and launch-scope test failures | Audit fix done. The security-check failure is fixed by migration 0169, which adds explicit deny policies to the two finance document tables; the single-file run passes. The RFP notification baseline fix waits for the pre-launch full run, because that file cannot run alone. D9 waits for the owner. |
+| 3. Local port | Done: 3100 |
+| 4. Launch allowlist, navigation, and database access | Done. `src/lib/launch-surface.ts` drives the proxy, the tRPC route, page guards, and the staff and home links. `MMHR_LAUNCH_CANDIDATE` selects A, the default, or B. Migration 0170 revokes signed-in access to the 39 excluded functions; the reverse grants are in the file. The 13 Candidate B functions stay callable and permission-guarded. `src/middleware.ts` is now `src/proxy.ts`, and the deprecated Sentry option is replaced. |
+| 5 onward | Next: tokens, fonts, theme, components, and the shell |
+
+The newsletter form still shows; it answers "unavailable" until Beehiiv is configured. UX-12 hides it in P4.
+Checks after step 4: type check, lint, unit tests (492 files, 6,372 tests), and the build pass. The database and auth unit tests and the security integration file pass after migration 0170.
+
 ## 10. Change record
 
 | Date | Change |

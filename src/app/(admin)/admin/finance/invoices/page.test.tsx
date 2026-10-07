@@ -1,5 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+
+// Owner decision D2 hides this area at launch; src/lib/launch-surface tests cover that guard.
+vi.mock("@/lib/launch-surface-guard", () => ({ requireLaunchArea: vi.fn() }));
 import ManagedInvoicePage from "./page";
 import ManagedInvoiceError from "./error";
 import ManagedInvoiceLoading from "./loading";

@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+
+// Owner decision D2 hides this area at launch; src/lib/launch-surface tests cover that guard.
+vi.mock("@/lib/launch-surface-guard", () => ({ requireLaunchArea: vi.fn() }));
 import { requireSelectedOrganizationPermission } from "@/server/auth/page-guards";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { getWorkspaceDocumentReview } from "@/server/commands/workspace-document-review";

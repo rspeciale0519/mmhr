@@ -4,6 +4,7 @@ import { authorizePermission } from "@/server/auth/authorization";
 import { portalPermissions } from "@/server/auth/portal/portal-guards";
 import { signOut } from "../../(auth)/actions";
 import Link from "next/link";
+import { isLaunchAreaEnabled } from "@/lib/launch-surface";
 
 /**
  * The home route is a permission-checked router for authorized users.
@@ -30,7 +31,7 @@ export default async function WorkspaceHome() {
       </p>
       {access.authorization.scope.kind === "organization" ? (
           <nav aria-label="Workspace areas" className="flex flex-wrap gap-4 text-sm underline">
-            <Link className="inline-flex min-h-11 items-center" href="/documents">Workspace documents</Link>
+            {isLaunchAreaEnabled("documents") && <Link className="inline-flex min-h-11 items-center" href="/documents">Workspace documents</Link>}
             {customerAccess && <Link className="inline-flex min-h-11 items-center" href="/customer">Customer portal</Link>}
             {vendorAccess && <Link className="inline-flex min-h-11 items-center" href="/vendor">Vendor portal</Link>}
             {invitationAccess && <Link className="inline-flex min-h-11 items-center" href="/invitations/new">Invite a member</Link>}

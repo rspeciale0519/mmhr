@@ -1,3 +1,4 @@
+import { requireLaunchArea } from "@/lib/launch-surface-guard";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -21,6 +22,7 @@ const actions = { reserve: "Upload recorded", uploaded: "Upload completed", scan
   scan_rejected: "Safety check rejected the file", scan_failed: "Safety check failed", review_started: "Document review started", approve: "Document approved", reject: "Document rejected",
   retry: "Processing retry recorded", supersede: "Version replaced" };
 export default async function WorkspaceDocuments({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  requireLaunchArea("documents");
   const { authorization } = await requireSelectedOrganizationPermission("workspace.access");
   if (authorization.scope.kind !== "organization") forbidden();
   const query = querySchema.safeParse(await searchParams);

@@ -26,3 +26,26 @@ test("shows the authorized audit link and preserves existing workflow navigation
 });
 
 afterEach(cleanup);
+
+test("hides finance, document, and Candidate B links at launch (owner decision D2)", async () => {
+  vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "");
+  render(await AdminHome());
+  for (const name of [
+    "Manage private finance documents",
+    "Manage commission agreements and calculations",
+    "View selected workspace documents",
+    "Coordinate customer and vendor demos",
+    "Review proposals and pricing comparisons",
+    "Approve vendor selections and track contract handoffs",
+  ]) expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Manage customer deal follow-up tasks" })).toHaveAttribute("href", "/admin/tasks");
+  vi.unstubAllEnvs();
+});
+
+test("shows Candidate B links only when Candidate B is selected", async () => {
+  vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "B");
+  render(await AdminHome());
+  expect(screen.getByRole("link", { name: "Coordinate customer and vendor demos" })).toHaveAttribute("href", "/admin/demos");
+  expect(screen.queryByRole("link", { name: "Manage private finance documents" })).not.toBeInTheDocument();
+  vi.unstubAllEnvs();
+});

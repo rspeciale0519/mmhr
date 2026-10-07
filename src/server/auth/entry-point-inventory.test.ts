@@ -310,8 +310,8 @@ async function discoveredEntryKeys(): Promise<string[]> {
     ...frameworkHookKeys(files, parse),
     ...commandEntryKeys(files, scripts),
   ];
-  if (files.includes(path.join(root, "src", "middleware.ts"))) {
-    keys.push("src/middleware.ts#middleware");
+  if (files.includes(path.join(root, "src", "proxy.ts"))) {
+    keys.push("src/proxy.ts#proxy");
   }
   return [...new Set(keys)].sort();
 }

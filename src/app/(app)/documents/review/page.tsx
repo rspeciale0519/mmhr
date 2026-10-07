@@ -1,3 +1,4 @@
+import { requireLaunchArea } from "@/lib/launch-surface-guard";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import { WorkspaceDocumentReview } from "@/components/workflow/workspace-documen
 
 const querySchema = z.strictObject({ document: z.uuid().transform(value => value.toLowerCase()), version: z.uuid().transform(value => value.toLowerCase()) });
 export default async function DocumentReviewPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  requireLaunchArea("documents");
   const { authorization } = await requireSelectedOrganizationPermission("rfp.approve");
   if (authorization.scope.kind !== "organization") forbidden();
   const query = querySchema.safeParse(await searchParams);
