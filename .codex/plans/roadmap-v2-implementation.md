@@ -1,16 +1,26 @@
 # MMHR v2 Implementation Roadmap
 
+> **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
+> It replaces the October 3 instruction to complete all mandatory software before live use.
+> Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
+> Financial-record management and private document storage are outside the MVP.
+> Where this document conflicts with the roadmap on launch scope or delivery order, follow the roadmap.
+> Later requirements remain in this roadmap. Launch acceptance follows the MVP roadmap.
+> A full rewrite follows the launch.
+
 ## Document Control
 
 | Field | Value |
 |---|---|
-| Version | 1.10 |
-| Date | 2026-08-31 |
-| Status | Approved roadmap; R0 documentation audit recorded with public release blocked; R1 through R9 foundations verified locally; target-environment evidence and end-to-end workflow completion remain open |
+| Version | 1.13 |
+| Date | 2026-10-03 |
+| Status | Approved full v2 roadmap with an earlier MVP milestone; production release evidence remains incomplete |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
 | R1 full owner approval date | 2026-08-27 |
+| MVP documentation alignment | 2026-09-14; user authorized the authoritative checklist and document reconciliation |
+| MVP launch sequence | [MVP launch checklist](release-mvp-launch-checklist.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
 | Architecture authority | [docs/TECH_STACK.md](../../docs/TECH_STACK.md) |
@@ -30,7 +40,7 @@ Build the complete v2 platform through secure, independently testable releases.
 
 Preserve all canonical requirements. Do not reduce scope to make a partial release appear complete.
 
-The current traceability audit covers 148 requirement identifiers:
+The August 31 historical traceability baseline covers 148 requirement identifiers:
 
 - 132 functional requirements
 - 16 non-functional requirements
@@ -43,6 +53,26 @@ The earlier baseline recorded 5 Implemented, 43 Partial, 98 Missing,
 1 Deferred, and 1 Open before the R1 through R9 foundation work.
 
 The earlier count of 132 covered functional requirements only.
+
+The September 14 amendment adds MVP delivery sequencing. It does not reclassify the baseline implementation counts.
+Use current source and qualifying evidence before treating any baseline status as current.
+
+The [October 3 code audit](../../docs/code-audit-2026-10-03.md) supersedes historical counts as the current requirement assessment.
+Its [requirement matrix](../../docs/code-audit-requirements-2026-10-03.md) maps all 148 requirements to code, remaining work, and acceptance conditions.
+It records five narrow local implementations, 72 connected partial, 43 backend partial, 20 contract-only, seven evidence-open, and one deferred requirement.
+These classifications describe implementation depth. They do not measure effort or release readiness.
+FR-RFP-05 remains backend partial because its amendment commands lack a complete application workflow.
+Keep the historical traceability rows below for their release and ownership mappings.
+Use the current audit for status until newer qualifying evidence supersedes it.
+
+Delivery must close complete business workflows before counting isolated backend modules as delivered features.
+Keep the six MVP phases and all later mandatory v2 requirements.
+Prioritize real comparison acceptance, stable accounts, staff operation, and a real approved vendor handoff.
+Resolve dependency findings and all required release evidence before launch.
+
+The October 3 instruction requires completion of mandatory software and synthetic role testing before real customer use.
+Use the [current execution sequence](build-complete-pilot-workflow.md#full-software-completion-before-live-use).
+The earlier manual MVP remains a historical milestone. It does not authorize an earlier live launch under the current instruction.
 
 ## 2. Status Rules
 
@@ -120,7 +150,22 @@ R2A lead-routing completion depends on the R2B CRM command. R3 depends on R2B.
 | R6 | Build demos, proposals, pricing, selection, and contract handoff | R5 | Product, operations, and security owners |
 | R7 | Build commissions, invoicing, collection, disputes, and finance reconciliation | R6 | Product, finance, and security owners |
 | R8 | Complete onboarding, work queues, administration, reporting, analytics, and operational health | R7 | Product, operations, finance, and security owners |
-| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and [release owners](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) |
+| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates for full v2 | R8 for full v2; the MVP applies the same release evidence categories earlier | Product, security, and [release owners](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) |
+
+### Earlier MVP Launch Milestone
+
+The user requested an MVP that can grow one feature at a time, then authorized documentation alignment on September 14, 2026.
+The [MVP launch checklist](release-mvp-launch-checklist.md) is the authoritative sequence for that earlier milestone.
+
+1. Complete the required R1, R2A, R2B, R3, and R4 portions for registration through approved RFP portal delivery.
+2. Complete the staff operating subset from R8 and document manual handling of later workflow activities.
+3. Pass every required R9 release evidence category and all R0 exit rules before MVP production release.
+4. Continue the remaining v2 software work through the dependencies in the table above.
+
+Full R5–R8 feature completion is not a dependency of the earlier MVP milestone.
+This changes delivery timing, not the mandatory full-product scope or controls on exposed operations.
+MVP evidence does not mark full R4, R8, or R9 modules complete.
+The [retained-work table](release-mvp-launch-checklist.md#retained-later-work) identifies the manual pilot boundaries and later software work.
 
 Each release must build only from an approved module plan.
 
@@ -129,8 +174,9 @@ Each release must build only from an approved module plan.
 | Decision | Current default | Required before |
 |---|---|---|
 | Common RFP with vendor amendments | Resolved: common base plus additive, immutable, vendor-scoped amendments; amendments cannot replace the base | R4 implementation, 2026-09-03 |
-| Exact identity-unmasking rule | No unmasking without recorded internal approval | R3 implementation |
+| Exact identity-unmasking rule | Resolved: required MMHR discussion, then recorded disclosure before RFP submission | Preserve PRD FR-MAT-08 during R3/R4 work |
 | Customer-visible scoring methodology | No public or customer-visible method beyond approved explanations | R3 release |
+| Customer password recovery and confirmation-email replacement | Open recommendations; record the chosen operating method | MVP-04; see the MVP checklist decision table |
 | Public vendor-ranking scope | No public ranking | Any public-ranking work |
 | Impersonation | Deferred and disabled | R8 impersonation work |
 | Category expansion | HR software only | Any new-category work |
@@ -539,6 +585,9 @@ Recovery:
 
 ### R9 — Release Hardening and Production Readiness
 
+Apply all release evidence categories below to the earlier MVP milestone through the [MVP checklist](release-mvp-launch-checklist.md#release-evidence-register).
+Verify the exposed MVP scope before its launch; retain remaining full-product acceptance work under R9.
+
 Outcome:
 
 - Complete critical-workflow interaction performance.
@@ -781,6 +830,7 @@ Every PRD requirement appears exactly once below.
 | Approval | Status | Record |
 |---|---|---|
 | Product-owner roadmap approval | Approved | Rob Speciale, current Codex task, 2026-08-24 |
+| Earlier MVP milestone and authoritative checklist alignment | Documentation alignment authorized | User request, current Codex task, 2026-09-14; no new feature or production approval implied |
 | FR-RFP-05 versioning decision | Approved | Rob Speciale, current Codex task, 2026-09-03; common base plus additive immutable vendor amendments |
 | FR-IAM-10 and FR-IAM-11 roadmap amendment | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Product-owner R1 plan approval | Approved | Rob Speciale, current Codex task, 2026-08-24 |

@@ -5,15 +5,19 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { afterAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { inArray, sql } from "drizzle-orm";
 import postgres from "postgres";
 
-import { db, leads, orgs } from "@/server/db";
+import { createRuntimeDatabase, leads, orgs } from "@/server/db";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "./r1-migration-rehearsal";
 import { applicationTables } from "@/server/db/test/application-schema-inventory";
 import { createTestMigrationOwner } from "@/server/db/test/migration-owner";
 
-const owner = createTestMigrationOwner();
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
+let owner: ReturnType<typeof createTestMigrationOwner>;
+let db: ReturnType<typeof createRuntimeDatabase>;
 const createdLeadIds: string[] = [];
 const createdOrgIds: string[] = [];
 
@@ -32,6 +36,12 @@ function createScramVerifier(password: string) {
 }
 
 describe("R1.2 database boundary", () => {
+  beforeAll(async () => {
+    startup = startRestrictedRehearsal("db");
+    rehearsal = await startup;
+    owner = createTestMigrationOwner(rehearsal);
+    db = createRuntimeDatabase(rehearsal.workerUrl);
+  }, 300000);
   afterAll(async () => {
     try {
       if (createdLeadIds.length > 0) {
@@ -41,9 +51,12 @@ describe("R1.2 database boundary", () => {
         await owner.db.delete(orgs).where(inArray(orgs.id, createdOrgIds));
       }
     } finally {
-      await owner.close();
+      try {
+        await db?.$client.end({ timeout: 5 });
+        await owner?.close();
+      } finally { await (rehearsal ?? await startup)?.close(); }
     }
-  });
+  }, 180000);
 
   test("migration-owner fixtures can prepare local data", async () => {
     const [row] = await owner.db
@@ -223,7 +236,7 @@ describe("R1.2 database boundary", () => {
       )
     `;
 
-    const workerUrl = new URL(process.env.TEST_MIGRATION_DATABASE_URL!);
+    const workerUrl = new URL(rehearsal!.context.databaseUrl);
     workerUrl.username = loginName;
     workerUrl.password = credential;
     const probe = postgres(workerUrl.toString(), {

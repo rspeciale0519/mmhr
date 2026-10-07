@@ -76,6 +76,17 @@ test.each([
   expect(rpc).not.toHaveBeenCalled();
 });
 
+test.each([1, 2])("rejects commercial criteria in new format %i preparations", async (version) => {
+  for (const factKey of ["commercial_relationship", "sponsorship", "advertising", "paid_placement", "partner_status"]) {
+    await expect(prepareEvaluationPublication({
+      ...prepare,
+      configuration: { version, criteria: [{ requirementKey: "payroll", factKey, responsePath: [] }] },
+    })).rejects.toMatchObject({ code: "INVALID_INPUT" });
+  }
+  expect(requirePermission).not.toHaveBeenCalled();
+  expect(rpc).not.toHaveBeenCalled();
+});
+
 test.each([
   { scope: { kind: "organization", organizationId: otherId } }, { correlationId: otherId },
 ])("rejects mismatched primary authority %#", async (patch) => {
@@ -130,7 +141,7 @@ test("reads more than five options using only current customer portal authority"
   await expect(getEvaluationPublication(read)).resolves.toMatchObject({ optionCount: 8 });
   expect(requirePermission).toHaveBeenCalledExactlyOnceWith("portal.customer.access", context.scope, { correlationId });
   expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_get_evaluation_publication", {
-    payload: { organizationId, intakeId, publicationId, afterOrdinal: 0, limit: 25 }, correlation_id: correlationId,
+    payload: { organizationId, intakeId, publicationId, afterOrdinal: 0, limit: 25, detailsVersion: 1 }, correlation_id: correlationId,
   });
 });
 

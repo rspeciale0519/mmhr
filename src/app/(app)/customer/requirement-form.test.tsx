@@ -83,6 +83,59 @@ test("preserves existing complex answers and metadata by default", async () => {
   });
 });
 
+test("saves standard payroll answers with reusable scope keys and no assumed answers", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0]).toMatchObject({ stableKey: "input_payroll", label: "Payroll processing", requirementType: "structured",
+    response: { version: 1, requested: null, country: null, workerType: null, stateScope: null, allowPayrollAddOn: null } });
+});
+
+test("saves typed payroll restrictions without turning a no into an unknown", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Do you need payroll processing?"), { target: { value: "yes" } });
+  fireEvent.change(screen.getByLabelText("Payroll country code"), { target: { value: "us" } });
+  fireEvent.change(screen.getByLabelText("Who will you pay?"), { target: { value: "employee" } });
+  fireEvent.change(screen.getByLabelText("US payroll locations"), { target: { value: "multiple" } });
+  fireEvent.change(screen.getByLabelText("Would you consider a paid payroll add-on?"), { target: { value: "false" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0].response).toEqual({ version: 1, requested: "yes", country: "US", workerType: "employee", stateScope: "multiple", allowPayrollAddOn: false });
+});
+
+test("edits standard payroll answers without changing the stable key or revision", async () => {
+  mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
+  const response = { version: 1, requested: "yes", country: "US", workerType: "employee", stateScope: "single", allowPayrollAddOn: true };
+  renderForm(existingRequirement({ stableKey: "input_payroll", response }));
+  fireEvent.change(screen.getByLabelText("US payroll locations"), { target: { value: "multiple" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0]).toMatchObject({ stableKey: "input_payroll", expectedRevision: 3, response: { ...response, stateScope: "multiple" } });
+});
+
+test("rejects invalid payroll country input without submitting", () => {
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Payroll country code"), { target: { value: "1" } });
+  fireEvent.submit(screen.getByRole("form", { name: "Add intake requirement" }));
+  expect(screen.getByRole("alert")).toHaveTextContent("two-letter country code");
+  expect(mutate).not.toHaveBeenCalled();
+});
+
+test("preserves unrecognized payroll answer fields through the existing editor", async () => {
+  mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
+  const response = { version: 2, country: "US", futureField: "Keep this answer" };
+  renderForm(existingRequirement({ stableKey: "input_payroll", response }));
+  expect(screen.getByText("Keep this answer")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0].response).toEqual(response);
+});
+
 test("requires an explicit replacement before changing a complex answer", async () => {
   mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
   renderForm(existingRequirement());

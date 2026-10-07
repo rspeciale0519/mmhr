@@ -30,10 +30,13 @@ export function PulseBody() {
               when someone remembers to. This is what that looks like: a live
               signal, not a static list.
             </p>
-            <form className="pu-form" action="#">
+            <form className="pu-form" action="/sign-up" method="get">
               <input
                 className="pu-input"
                 type="email"
+                name="email"
+                required
+                maxLength={254}
                 placeholder="Work email"
                 aria-label="Work email"
               />

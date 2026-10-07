@@ -31,14 +31,15 @@ const expectedKeys = [
   "intake.requirement.save",
   "intake.submit",
   "evaluation.publish",
+  "evaluation.disclose",
   "evaluation.select",
 ];
 
 describe("R1 permission registry", () => {
-  test("defines exactly the 38 current permissions", () => {
+  test("defines exactly the 39 current permissions", () => {
     expect(permissionKeys).toEqual(expectedKeys);
     expect(Object.keys(permissionRegistry)).toEqual(expectedKeys);
-    expect(new Set(permissionKeys).size).toBe(38);
+    expect(new Set(permissionKeys).size).toBe(39);
     for (const key of expectedKeys) {
       expect(isPermissionKey(key)).toBe(true);
       expect(permissionKeySchema.parse(key)).toBe(key);
@@ -101,6 +102,7 @@ describe("R1 permission registry", () => {
     ["intake.requirement.save", "action", false, true, "aal1", false, "customer"],
     ["intake.submit", "action", false, true, "aal1", false, "customer"],
     ["evaluation.publish", "action", false, true, "aal2", true, null],
+    ["evaluation.disclose", "action", false, true, "aal2", true, null],
     ["evaluation.select", "action", false, true, "aal1", false, "customer"],
   ] as const)("declares scope, assurance, and boundaries for %s", (
     key, kind, platformScope, organizationScope, minimumAssurance, internalOnly, requiredPortal,
@@ -150,13 +152,16 @@ describe("R1 permission registry", () => {
   test("uses explicit Super Admin defaults and bounded organization defaults", () => {
     expect(rolePermissionDefaults.super_admin).toEqual(expectedKeys);
     expect(rolePermissionDefaults.super_admin).toContain("evaluation.publish");
+    expect(rolePermissionDefaults.super_admin).toContain("evaluation.disclose");
     expect(rolePermissionDefaults.super_admin).toContain("evaluation.select");
     for (const role of ["admin", "staff", "viewer"] as const) {
       expect(rolePermissionDefaults[role]).not.toContain("evaluation.publish");
+      expect(rolePermissionDefaults[role]).not.toContain("evaluation.disclose");
       expect(rolePermissionDefaults[role]).not.toContain("evaluation.select");
     }
     for (const role of ["organization_admin", "contributor"] as const) {
       expect(rolePermissionDefaults[role]).not.toContain("evaluation.publish");
+      expect(rolePermissionDefaults[role]).not.toContain("evaluation.disclose");
       expect(rolePermissionDefaults[role]).toContain("evaluation.select");
     }
     const internalReads = ["workspace.access", "admin.access", "org.name.read", "member.role.read"];

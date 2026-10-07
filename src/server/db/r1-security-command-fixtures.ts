@@ -14,6 +14,7 @@ export type SecurityPrincipal = {
   expiresAt: Date;
 };
 export type BootstrapPair = readonly [SecurityPrincipal, SecurityPrincipal];
+export type SecurityTokenPrincipal = Pick<SecurityPrincipal, "identityId" | "subject" | "sessionId" | "expiresAt">;
 export type ProviderRestriction = "banned" | "deleted" | "anonymous";
 export type SecurityCommandInput = {
   reason: string;
@@ -118,7 +119,7 @@ export async function completeBootstrap(sql: SecuritySql, pair: BootstrapPair) {
 
 export async function asAuthenticated<T>(
   transaction: SecurityTransaction,
-  principal: SecurityPrincipal,
+  principal: SecurityTokenPrincipal,
   callback: (sql: SecurityTransaction) => Promise<T>,
   assurance: "aal1" | "aal2" = "aal2",
 ): Promise<T> {
@@ -127,6 +128,11 @@ export async function asAuthenticated<T>(
       SELECT current_setting('request.jwt.claims', true) AS claims
     `;
     await sql`SET LOCAL ROLE authenticated`;
+    // The database verifies these modeled claims. Use its clock so host/VM
+    // drift cannot turn a valid fixture into a future-issued token.
+    const [clock] = await sql<{ issuedAt: string }[]>`
+      SELECT floor(extract(epoch FROM clock_timestamp()))::text AS "issuedAt"
+    `;
     await sql`SELECT set_config('request.jwt.claims', ${JSON.stringify({
       sub: principal.subject,
       session_id: principal.sessionId,
@@ -134,7 +140,7 @@ export async function asAuthenticated<T>(
       aud: "authenticated",
       aal: assurance,
       exp: Math.floor(principal.expiresAt.getTime() / 1000),
-      iat: Math.floor(Date.now() / 1000),
+      iat: Number(clock!.issuedAt),
     })}, true)`;
     const [role] = await sql<{ role: string }[]>`SELECT current_user AS role`;
     expect(role!.role).toBe("authenticated");
@@ -180,7 +186,7 @@ export async function changeMembershipStatus(
 export async function createMembership(
   sql: SecuritySql,
   organizationId: string,
-  principal: SecurityPrincipal,
+  principal: SecurityTokenPrincipal,
   role: "organization_admin" | "viewer" = "viewer",
 ) {
   const [row] = await sql<{ id: string }[]>`

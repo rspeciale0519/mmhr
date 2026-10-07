@@ -5,8 +5,9 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 <!-- brain:pointer -->
 ## Engineering Memory
 
-- Before new work, read `.brain.json`, `mmhrbrain/STATE.md`, `mmhrbrain/index.md`, and the latest journal entry.
-- Read an applicable file in `mmhrbrain/skills/` when the state lists one.
+- At session start, read `mmhrbrain/STATE.md` once. Use its injected copy when already available.
+- Read the linked journal entry only when the task needs previous implementation or approval details.
+- Use `mmhrbrain/index.md` to find task-relevant knowledge or skills. Do not load the full history by default.
 - State the last recorded work and its location before starting.
 - After substantive work, follow the journal protocol in `mmhrbrain/CLAUDE.md`.
 - Never record secrets or personal data in the brain.
@@ -22,11 +23,30 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 - Read installed versions from `package.json` and `package-lock.json`.
 - `develop` is the default integration branch. `main` is the production release branch.
 - Use current source, tests, manifests, configuration, and CI as repository truth.
-- Read `mmhrbrain/STATE.md` for current status and temporary warnings.
-- Use `docs/README.md` as the project entry point.
+- Use `docs/README.md` when project orientation is needed.
 - Treat `docs/PRD.md` as product authority and `docs/TECH_STACK.md` as architecture authority.
+- Read their relevant sections when the task changes product behavior or architecture.
+- Memory records evidence and open work. It does not override canonical requirements or grant permission.
 - Treat the other planning documents in `docs/` as legacy unless a canonical document names them.
 - Verify old phase status, commands, versions, and tool names before use.
+
+## Task Scope and Completion
+
+- For reviews, inspect and report. Edit only when the user requests changes.
+- For approved changes, continue through implementation, relevant checks, and correction of defects caused by the change.
+- Run safe local checks without repeated approval. Confirm the target and effects before running checks that write data.
+- Local catalog approvals, publication, access changes, and external actions retain their existing authorization requirements.
+- Completion requires the requested result, applicable validation, and a final diff review. Report unresolved checks and required decisions.
+- A prior task's open work is context. Resume it only when the current request authorizes it.
+
+## Skill Selection
+
+- For Python skill validation, use `& 'C:\Users\rob\.codex\venvs\skill-validation\Scripts\python.exe' -X utf8 <validator.py> <skill-directory>`.
+- Follow explicitly requested skills and mandatory tool prerequisites.
+- Otherwise, select the narrowest relevant skill from the current inventory. Load supporting files only as needed.
+- Use the global browser tool order. Do not load several browser skills for the same operation without a specific need.
+- Skill defaults do not authorize Git actions or override project safeguards.
+- In particular, `fullpush` must not stage unrelated work or promote to `main` without explicit authorization for those actions.
 
 ## Architecture and Code
 
@@ -70,6 +90,8 @@ CI runs `npm ci`, type checking, lint, unit tests, and the production build.
 For code or configuration changes, run the smallest relevant check first.
 
 Then run type checking, lint, tests, and builds that cover the changed behavior.
+
+Repeat checks after relevant changes or failures. Do not repeat passed checks without a new reason.
 
 Run all four standard gates before a merge or production release.
 

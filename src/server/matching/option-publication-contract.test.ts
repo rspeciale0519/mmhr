@@ -28,7 +28,89 @@ const input = (fieldKey: string, value: string, suffix: string) => ({
   override_id: null, approved_at: "2026-09-09T02:00:00.000Z",
 });
 
+const unrestrictedScopes = () => input("comparison_fact_scopes", JSON.stringify(Object.fromEntries(
+  ["payroll", "time", "recruiting", "benefits"].map((key) => [key, { version: 1, conditions: [] }]),
+)), "999");
+
+describe("format 2 reviewed configuration scope", () => {
+  const rules = { version: 2, criteria: [{ ...config.criteria[0], responsePath: ["requested"] }, config.criteria[1]] };
+  const scopeInput = () => input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [
+    { kind: "module", requirementKey: "payroll", responsePath: ["moduleIncluded"], allowedValues: [true] },
+  ] } }), "998");
+  const saved = (moduleIncluded?: boolean) => [
+    { ...requirements[0], response: { requested: true, ...(moduleIncluded === undefined ? {} : { moduleIncluded }) } },
+    requirements[1],
+  ];
+
+  test.each([
+    [true, "eligible", 7500, 7500],
+    [false, "ineligible", 0, 7500],
+    [undefined, "unknown", 0, 0],
+  ])("applies confirmed module scope %s to fit and coverage", (answer, eligibility, score, coverage) => {
+    expect(evaluatePublishedOption(saved(answer), rules, [input("payroll", "true", "997"), scopeInput()]))
+      .toMatchObject({ eligibility, deterministicScore: score, confidenceBasisPoints: coverage });
+  });
+
+  test("does not give credit to a capability with no approved scope", () => {
+    expect(evaluatePublishedOption(saved(true), rules, [input("payroll", "true", "997")]))
+      .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+  });
+
+  test("uses scope evidence expiry and rejects duplicate scope records", () => {
+    const scope = { ...scopeInput(), valid_until: "2026-09-10T00:00:00.000Z" };
+    expect(evaluatePublishedOption(saved(true), rules, [input("payroll", "true", "997"), scope]).validUntil)
+      .toBe(scope.valid_until);
+    expect(() => evaluatePublishedOption(saved(true), rules, [scope, scope])).toThrow("duplicate approved fact scopes");
+  });
+});
+
 describe("option publication contract", () => {
+  test.each([
+    { facts: ["true", "true", "true"], score: 10000, coverage: 10000, eligibility: "eligible" },
+    { facts: ["true", null, "true"], score: 7000, coverage: 7000, eligibility: "unknown" },
+    { facts: ["true", "false", "true"], score: 7000, coverage: 10000, eligibility: "ineligible" },
+    { facts: ["true", "true", null], score: 8000, coverage: 8000, eligibility: "eligible" },
+    { facts: [null, null, null], score: 0, coverage: 0, eligibility: "unknown" },
+    { facts: ["true", null, null], score: 5000, coverage: 5000, eligibility: "unknown" },
+    { facts: [null, "false", "true"], score: 2000, coverage: 5000, eligibility: "ineligible" },
+  ])("format 2 follows the proposed weighted missing-data rule: %j", ({ facts, score, coverage, eligibility }) => {
+    const keys = ["payroll", "time", "recruiting"];
+    const weighted = keys.map((key, index) => ({ requirementId: id(String(index + 100)), revision: 1,
+      key, label: key, importance: index < 2 ? "must" : "nice", weight: [5, 3, 2][index], response: true }));
+    const configuration = { version: 2, criteria: keys.map((key) => ({ requirementKey: key, factKey: key, responsePath: [] })) };
+    const inputs = facts.flatMap((value, index) => value === null ? [] : [input(keys[index], value, String(index + 200))]);
+    inputs.push(unrestrictedScopes());
+    const actual = evaluatePublishedOption(weighted, configuration, inputs);
+    expect(actual).toMatchObject({ deterministicScore: score, confidenceBasisPoints: coverage, eligibility });
+    expect(evaluatePublishedOption(weighted, configuration, [...inputs, input("commission_rate", "99", "204")])).toEqual(actual);
+  });
+
+  test("format 2 changes only the missing-required eligibility of the same approved inputs", () => {
+    const optionalInput = input("benefits", "yes", "210");
+    const legacy = evaluatePublishedOption(requirements, config, [optionalInput]);
+    const next = evaluatePublishedOption(requirements, { ...config, version: 2 }, [optionalInput, unrestrictedScopes()]);
+    expect(legacy.eligibility).toBe("ineligible");
+    expect(next).toEqual({ ...legacy, eligibility: "unknown" });
+  });
+
+  test("format 2 handles optional-only requirements and rejects unsupported formats", () => {
+    const optional = requirements.map((requirement) => ({ ...requirement, importance: "nice" }));
+    expect(evaluatePublishedOption(optional, { ...config, version: 2 }, [input("benefits", "no", "211"), unrestrictedScopes()]))
+      .toMatchObject({ eligibility: "eligible", deterministicScore: 0, confidenceBasisPoints: 2500 });
+    expect(evaluatePublishedOption(optional, { ...config, version: 2 }, []))
+      .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+    expect(publicationConfigSchema.safeParse({ ...config, version: 3 }).success).toBe(false);
+    expect(publicationConfigSchema.safeParse({ ...config, version: "2" }).success).toBe(false);
+  });
+
+  test.each(["commission_rate", "payment_status", "commercial_relationship", "sponsorship_tier", "advertising_spend", "paid_placement", "partner_status"])(
+    "format 2 rejects a commercial criterion: %s", (factKey) => {
+      expect(publicationConfigSchema.safeParse({ ...config, version: 2,
+        criteria: [{ ...config.criteria[0], factKey }, config.criteria[1]],
+      }).success).toBe(false);
+    },
+  );
+
   test("accepts strict configuration and rejects duplicate, malformed, and commercial criteria", () => {
     expect(publicationConfigSchema.safeParse(config).success).toBe(true);
     expect(publicationConfigSchema.safeParse({ ...config, extra: true }).success).toBe(false);

@@ -9,6 +9,10 @@ import { EvaluationPublicationError } from "@/server/commands/evaluation-publica
 import { EvaluationSelectionError, getInitialEvaluationSelections } from "@/server/commands/evaluation-selection";
 import CustomerEvaluationPage from "./page";
 import { EvaluationOptions } from "./evaluation-options";
+import { getSubmittedRequirements } from "@/server/commands/submitted-requirements";
+import { RequirementReadError } from "@/server/commands/requirement-read";
+
+vi.mock("@/server/commands/submitted-requirements", () => ({ getSubmittedRequirements: vi.fn() }));
 
 const evaluationProps = vi.hoisted(() => [] as Array<{ canSelect: boolean; publication: { publicationId: string }; history: { initialCandidateCount: number } }>);
 
@@ -65,6 +69,7 @@ const publication = {
 const load = (query: Query = {}) => CustomerEvaluationPage({ searchParams: Promise.resolve(query) });
 
 beforeEach(() => {
+  vi.mocked(getSubmittedRequirements).mockReset().mockResolvedValue({requirements:[],nextCursor:null});
   evaluationProps.length = 0;
   vi.mocked(authorizePermission).mockReset().mockResolvedValue(null);
   vi.mocked(requirePortalPageAccess).mockReset().mockResolvedValue({
@@ -76,6 +81,13 @@ beforeEach(() => {
   vi.mocked(getCurrentEvaluationPublication).mockReset().mockResolvedValue({
     organizationId, intakeId, publication, correlationId,
   });
+});
+
+test.each([new RequirementReadError("UNAVAILABLE"), new AuthorizationError()])("does not show a comparison with incomplete requirement details: %s", async (error) => {
+  vi.mocked(getSubmittedRequirements).mockRejectedValue(error);
+  render(await load({intake:intakeId}));
+  expect(screen.getByText("This comparison is not available")).toBeInTheDocument();
+  expect(screen.queryByTestId("evaluation-options")).not.toBeInTheDocument();
 });
 afterEach(cleanup);
 
@@ -100,8 +112,11 @@ test.each<Query>([
 test("uses the portal organization and request client, never URL authority", async () => {
   render(await load({ intake: intakeId, organizationId: otherId, identityId: otherId }));
   expect(getIntake).toHaveBeenCalledExactlyOnceWith({ organizationId, intakeId }, { supabase });
-  expect(getInitialEvaluationSelections).toHaveBeenCalledExactlyOnceWith(
+  expect(getInitialEvaluationSelections).toHaveBeenNthCalledWith(1,
     { organizationId, intakeId, correlationId: expect.any(String) }, { supabase },
+  );
+  expect(getInitialEvaluationSelections).toHaveBeenNthCalledWith(2,
+    { organizationId, intakeId, correlationId: expect.any(String), selectionPublicationId: expect.any(String) }, { supabase },
   );
   expect(getCurrentEvaluationPublication).toHaveBeenCalledExactlyOnceWith(
     { organizationId, intakeId, correlationId: expect.any(String) }, { supabase },
@@ -140,6 +155,33 @@ test("renders an empty publication state without exposing a selection control", 
   expect(screen.getByRole("status")).toHaveTextContent("approved comparison");
   expect(screen.queryByTestId("evaluation-options")).not.toBeInTheDocument();
   expect(screen.getByText("1 of 5 initial choices used.")).toBeInTheDocument();
+  expect(getSubmittedRequirements).not.toHaveBeenCalled();
+});
+
+test("keeps answered comparison requirements available during staff review", async () => {
+  vi.mocked(getIntake).mockResolvedValue({ ...intake, status: "under_review" });
+  const requirement = {
+    requirementId: otherId, organizationId, intakeId, stableKey: "payroll",
+    label: "US payroll", importance: "must" as const, weight: 5,
+    response: false, status: "active" as const, requirementType: "structured" as const,
+    revision: 1, createdAt: intake.createdAt, updatedAt: intake.updatedAt,
+  };
+  vi.mocked(getSubmittedRequirements).mockResolvedValue({ requirements: [
+    requirement,
+    { ...requirement, stableKey: "headcount", label: "Headcount", importance: "nice", response: 0 },
+    { ...requirement, stableKey: "unanswered", response: null },
+    { ...requirement, stableKey: "excluded", importance: "not_applicable" },
+  ], nextCursor: null });
+  render(await load({ intake: intakeId }));
+  expect(getSubmittedRequirements).toHaveBeenCalledExactlyOnceWith(organizationId, intakeId, { supabase });
+  expect(evaluationProps[0]).toMatchObject({
+    canSelect: false,
+    requirements: [
+      { key: "payroll", label: "US payroll", importance: "must" },
+      { key: "headcount", label: "Headcount", importance: "nice" },
+    ],
+    requirementLabels: { payroll: "US payroll", headcount: "Headcount" },
+  });
 });
 
 test("keeps masked saved history when the current publication is stale or unavailable", async () => {

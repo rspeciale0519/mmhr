@@ -141,6 +141,27 @@ describe("R7 commission contract", () => {
     expect(canFinanciallyCloseCommission("pending_review")).toBe(false);
   });
 
+  test("keeps payment totals exact at the supported integer boundary", () => {
+    const receipts = [payment({ amountMinorUnits: Number.MAX_SAFE_INTEGER - 1 }),
+      payment({ paymentId: invoiceId, amountMinorUnits: 1 })];
+    expect(reconcilePayments(Number.MAX_SAFE_INTEGER, receipts)).toMatchObject({
+      receivedMinorUnits: Number.MAX_SAFE_INTEGER, balanceMinorUnits: 0, state: "paid",
+    });
+    expect(() => reconcilePayments(Number.MAX_SAFE_INTEGER,
+      [receipts[0], payment({ paymentId: invoiceId, amountMinorUnits: 2 })])).toThrow("Payment total exceeds");
+    expect(reconcilePayments(Number.MAX_SAFE_INTEGER,
+      [...receipts, payment({ paymentId: ownerId, amountMinorUnits: Number.MAX_SAFE_INTEGER, state: "reversed" })])
+      .receivedMinorUnits).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  test("rejects an unsupported payment total before reconciling a finance report", () => {
+    const source = event({ commissionAmountMinorUnits: Number.MAX_SAFE_INTEGER });
+    const row = { commissionEventId: eventId, currency: "USD", earnedMinorUnits: Number.MAX_SAFE_INTEGER,
+      invoicedMinorUnits: Number.MAX_SAFE_INTEGER, receivedMinorUnits: Number.MAX_SAFE_INTEGER, balanceMinorUnits: 0 };
+    expect(() => reconcileFinancialReport([source], [payment({ amountMinorUnits: Number.MAX_SAFE_INTEGER }),
+      payment({ paymentId: invoiceId, amountMinorUnits: 1 })], [row])).toThrow("Payment total exceeds");
+  });
+
   test("applies audited forward-only commission state transitions", () => {
     const approved = transitionCommissionEvent(event(), {
       eventId,

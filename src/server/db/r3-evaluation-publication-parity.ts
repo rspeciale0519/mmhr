@@ -124,4 +124,70 @@ export async function assertEvaluationParity(sql: SecurityTransaction) {
       evaluateSql(probe, invalid.requirements, invalid.configuration, invalid.inputs),
     )).rejects.toMatchObject({ code: "22023" });
   }
+  await assertFormatTwoParity(sql);
+}
+
+async function assertFormatTwoParity(sql: SecurityTransaction) {
+  const requirements = [requirement("payroll", "yes", "must", 5),
+    requirement("time", "yes", "must", 3), requirement("recruiting", "yes", "nice", 2)];
+  const configuration: PublicationConfig = { version: 2, criteria: requirements.map((item) => ({
+    requirementKey: item.key, factKey: item.key, responsePath: [],
+  })) };
+  const cases = [
+    { values: ["yes", "yes", "yes"], score: 10000, coverage: 10000, eligibility: "eligible" },
+    { values: ["yes", null, "yes"], score: 7000, coverage: 7000, eligibility: "unknown" },
+    { values: ["yes", "no", "yes"], score: 7000, coverage: 10000, eligibility: "ineligible" },
+    { values: ["yes", "yes", null], score: 8000, coverage: 8000, eligibility: "eligible" },
+    { values: [null, null, null], score: 0, coverage: 0, eligibility: "unknown" },
+    { values: ["yes", null, null], score: 5000, coverage: 5000, eligibility: "unknown" },
+    { values: [null, "no", "yes"], score: 2000, coverage: 5000, eligibility: "ineligible" },
+  ];
+  const scopeInput = input(JSON.stringify(Object.fromEntries(requirements.map((item) =>
+    [item.key, { version: 1, conditions: [] }]))), "comparison_fact_scopes");
+  for (const vector of cases) {
+    const inputs = vector.values.flatMap((value, index) => value === null ? [] : [input(value, requirements[index].key)]);
+    inputs.push(scopeInput);
+    const result = await evaluateSql(sql, requirements, configuration, inputs);
+    expectEvaluationParity(result, evaluatePublishedOption(requirements, configuration, inputs));
+    expect(result).toMatchObject({ eligibility: vector.eligibility,
+      deterministicScore: vector.score, confidenceBasisPoints: vector.coverage });
+    expect(await evaluateSql(sql, requirements, configuration, [...inputs, input("99", "commission_rate")])).toEqual(result);
+  }
+  const partial = [input("yes", "payroll"), input("yes", "recruiting"), scopeInput];
+  const legacy = await evaluateSql(sql, requirements, { ...configuration, version: 1 }, partial);
+  const revised = await evaluateSql(sql, requirements, configuration, partial);
+  expect(legacy.eligibility).toBe("ineligible");
+  expect(revised).toMatchObject({ eligibility: "unknown", deterministicScore: 7000, confidenceBasisPoints: 7000 });
+
+  for (const factKey of ["commercial_relationship", "paid_placement", "sponsorship_tier", "payment_status"]) {
+    await expect(sql.savepoint((probe) => evaluateSql(probe, requirements, {
+      ...configuration, criteria: configuration.criteria.map((criterion, index) => index === 0 ? { ...criterion, factKey } : criterion),
+    }, []))).rejects.toMatchObject({ code: "22023" });
+  }
+  const scopedRules: PublicationConfig = { version: 2,
+    criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["requested"] }] };
+  const scopedEvidence = input(JSON.stringify({ payroll: { version: 1, conditions: [
+    { kind: "module", requirementKey: "payroll", responsePath: ["moduleIncluded"], allowedValues: [true] },
+  ] } }), "comparison_fact_scopes");
+  for (const answer of [true, false, undefined, "true", null, "\t", "\u00a0"]) {
+    const saved = [requirement("payroll", { requested: true, ...(answer === undefined ? {} : { moduleIncluded: answer }) })];
+    const facts = [input("true"), scopedEvidence];
+    const result = await evaluateSql(sql, saved, scopedRules, facts);
+    expectEvaluationParity(result, evaluatePublishedOption(saved, scopedRules, facts));
+    const [details] = await sql<{ result: { features: Array<{ outcome: string }> } }[]>`
+      SELECT mmhr_private.r3_masked_publication_details(${JSON.stringify(scopedRules)}::jsonb,
+        ${JSON.stringify(saved)}::jsonb,${JSON.stringify(facts)}::jsonb,${JSON.stringify(result)}::jsonb) AS result`;
+    expect(details.result.features[0].outcome).toBe(answer === true ? "match"
+      : answer === undefined || answer === null || (typeof answer === "string" && answer.trim() === "") ? "unknown" : "mismatch");
+  }
+  const saved = [requirement("payroll", { requested: true, moduleIncluded: true })];
+  const unscoped = [input("true")];
+  expectEvaluationParity(await evaluateSql(sql, saved, scopedRules, unscoped),
+    evaluatePublishedOption(saved, scopedRules, unscoped));
+  for (const invalidScopes of ["null", "[]", "not-json", JSON.stringify({ payroll: { version: 1, conditions: [
+    { kind: "module", requirementKey: "commission_rate", responsePath: [], allowedValues: [true] },
+  ] } })]) {
+    await expect(sql.savepoint((probe) => evaluateSql(probe, saved, scopedRules,
+      [input("true"), input(invalidScopes, "comparison_fact_scopes")]))).rejects.toMatchObject({ code: "22023" });
+  }
 }

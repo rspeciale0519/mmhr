@@ -4,9 +4,12 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 
 import { permissionKeys, permissionRegistry, rolePermissionDefaults } from "./permission-registry";
 import { createPermissionFixtures, type PermissionPrincipal } from "./permission-test-fixtures";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
-const fixtures = createPermissionFixtures();
-const { owner } = fixtures;
+let fixtures: ReturnType<typeof createPermissionFixtures>;
+let owner: ReturnType<typeof createPermissionFixtures>["owner"];
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
 let superAdmin: PermissionPrincipal;
 let platformAdmin: PermissionPrincipal;
 let staff: PermissionPrincipal;
@@ -33,6 +36,10 @@ function aal2(principal: PermissionPrincipal) {
 
 describe("R1.4 real-token permission evaluation", () => {
   beforeAll(async () => {
+    startup = startRestrictedRehearsal("permission");
+    rehearsal = await startup;
+    fixtures = createPermissionFixtures(rehearsal);
+    owner = fixtures.owner;
     superAdmin = await fixtures.createPrincipal({ platformRole: "super_admin", mfa: true });
     platformAdmin = await fixtures.createPrincipal({ platformRole: "admin", mfa: true });
     staff = await fixtures.createPrincipal({ platformRole: "staff", mfa: true });
@@ -53,17 +60,20 @@ describe("R1.4 real-token permission evaluation", () => {
     await fixtures.addMembership(staff, internalId, "viewer");
     await fixtures.addPortal(customerId, "customer", superAdmin);
     await fixtures.addPortal(vendorId, "vendor", superAdmin);
-  }, 60_000);
+  }, 300_000);
 
-  afterAll(() => fixtures.close(), 60_000);
+  afterAll(async () => {
+    try { await fixtures?.close(); }
+    finally { await (rehearsal ?? await startup)?.close(); }
+  }, 180_000);
 
-  test("database definitions match all 38 registry keys and metadata exactly", async () => {
+  test("database definitions match all 39 registry keys and metadata exactly", async () => {
     const definitions = await owner`
       SELECT key, kind, platform_scope, organization_scope, minimum_assurance,
         internal_only, required_portal, description, active, retired_at
       FROM public.permission_definitions ORDER BY key
     `;
-    expect(permissionKeys).toHaveLength(38);
+    expect(permissionKeys).toHaveLength(39);
     const expected = permissionKeys.map((key) => {
       const definition = permissionRegistry[key];
       return {
@@ -92,7 +102,8 @@ describe("R1.4 real-token permission evaluation", () => {
           { stable_key: stableKey, version: 6, state: "approved" },
           { stable_key: stableKey, version: 7, state: "approved" },
           { stable_key: stableKey, version: 8, state: "approved" },
-          { stable_key: stableKey, version: 9, state: "active" },
+          { stable_key: stableKey, version: 9, state: "approved" },
+          { stable_key: stableKey, version: 10, state: "active" },
         ];
       }
       if (stableKey === "organization_admin" || stableKey === "contributor") {
@@ -119,7 +130,7 @@ describe("R1.4 real-token permission evaluation", () => {
     const expected = Object.entries(rolePermissionDefaults).flatMap(([role, keys]) =>
       keys.map((permission) => ({ stable_key: role, permission_key: permission, effect: "allow" })),
     ).sort((a, b) => a.stable_key.localeCompare(b.stable_key) || a.permission_key.localeCompare(b.permission_key));
-    expect(expected).toHaveLength(76);
+    expect(expected).toHaveLength(77);
     expect([...defaults]).toEqual(expected);
     const prior = await owner`
       SELECT permission.id FROM public.role_permission_defaults permission

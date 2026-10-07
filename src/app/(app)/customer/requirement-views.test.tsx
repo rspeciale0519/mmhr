@@ -33,6 +33,12 @@ const page = (
 
 afterEach(cleanup);
 
+test("keeps staff requirement pagination in the staff workspace", () => {
+  render(<SavedRequirements intakeId={intakeId} page={page([requirement()],nextId)} hasCursor basePath="/admin/evaluations" />);
+  expect(screen.getByRole("link",{name:"Next requirements page"})).toHaveAttribute("href",`/admin/evaluations?intake=${intakeId}&requirementsAfter=${nextId}`);
+  expect(screen.getByRole("link",{name:"Back to first requirements page"})).toHaveAttribute("href",`/admin/evaluations?intake=${intakeId}`);
+});
+
 test("renders active labels and every saved response value as escaped text", () => {
   const { container } = render(
     <SavedRequirements

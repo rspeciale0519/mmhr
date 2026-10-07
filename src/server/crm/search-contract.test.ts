@@ -19,6 +19,14 @@ const result = (recordId: string, overrides: Record<string, unknown> = {}) => ({
 });
 
 describe("CRM search contract", () => {
+  test("retains only a valid product revision for optimistic updates", () => {
+    const id = "00000000-0000-4000-8000-000000000001";
+    const product = result(id, { resource: "product", status: "draft", revision: 3, privateValue: "hidden" });
+    expect(redactCrmSearchResults([product], organizationId, "product")[0]).toMatchObject({ revision: 3 });
+    expect(redactCrmSearchResults([product], organizationId, "product")[0]).not.toHaveProperty("privateValue");
+    expect(() => redactCrmSearchResults([{ ...product, revision: 0 }], organizationId, "product")).toThrow(CrmSearchError);
+    expect(redactCrmSearchResults([result(id, { revision: 3 })], organizationId, "deal")[0]).not.toHaveProperty("revision");
+  });
   test("normalizes scoped input and applies safe defaults", () => {
     expect(parseCrmSearchInput({
       organizationId: organizationId.toUpperCase(),

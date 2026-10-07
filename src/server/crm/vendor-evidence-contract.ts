@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import { factScopeMapSchema } from "@/server/matching/fact-scope";
 
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
@@ -21,6 +22,8 @@ const vendorSourceSchema = z
     licenseNote: z.string().trim().max(500).nullable(),
     capturedAt: timestamp,
     active: z.boolean(),
+    captureMethod: z.enum(["api", "web", "document", "email", "manual", "other"]).optional(),
+    cadenceDays: z.number().int().min(1).max(3650).optional(),
   })
   .strict();
 
@@ -99,6 +102,66 @@ export type VendorFact = z.infer<typeof vendorFactSchema>;
 export type VendorEvidence = z.infer<typeof vendorEvidenceSchema>;
 export type VendorEvidenceApproval = z.infer<typeof vendorEvidenceApprovalSchema>;
 export type VendorFactOverride = z.infer<typeof vendorFactOverrideSchema>;
+
+export const vendorEvidenceRecordSchema = z.strictObject({
+  source: vendorSourceSchema,
+  fact: vendorFactSchema,
+  evidence: vendorEvidenceSchema,
+  expectedEvidenceVersion: z.number().int().min(1).max(2_147_483_646).optional(),
+}).superRefine(({ source, fact, evidence, expectedEvidenceVersion }, context) => {
+  if (expectedEvidenceVersion !== undefined && evidence.version !== expectedEvidenceVersion + 1) {
+    context.addIssue({ code: "custom", path: ["evidence", "version"], message: "Renewal must use the next evidence version" });
+  }
+  if (fact.fieldKey === "comparison_fact_scopes") {
+    let valid = false;
+    try { valid = factScopeMapSchema.safeParse(JSON.parse(fact.value)).success; } catch { /* Invalid JSON is rejected below. */ }
+    if (!valid || fact.productId === null) context.addIssue({ code: "custom", path: ["fact", "value"],
+      message: "Scope evidence requires a product and valid conditions" });
+  }
+  if (source.organizationId !== fact.organizationId || source.organizationId !== evidence.organizationId ||
+    source.vendorProfileId !== fact.vendorProfileId || fact.status !== "draft" ||
+    evidence.factId !== fact.factId || evidence.sourceId !== source.sourceId) {
+    context.addIssue({ code: "custom", message: "Evidence must identify the submitted draft fact and source" });
+  }
+});
+
+export const vendorEvidenceReadInputSchema = z.strictObject({
+  organizationId: uuid.transform((value) => value.toLowerCase()),
+  afterId: uuid.transform((value) => value.toLowerCase()).optional(),
+  limit: z.number().int().min(1).max(50).default(25),
+  registryVersion: z.literal(1).optional(),
+});
+export const vendorEvidencePageSchema = z.strictObject({
+  organizationId: uuid,
+  readAt: timestamp,
+  items: z.array(z.strictObject({
+    productName: z.string().min(1).max(200).nullable(),
+    source: vendorSourceSchema, fact: vendorFactSchema, evidence: vendorEvidenceSchema,
+    review: vendorEvidenceApprovalSchema.nullable(),
+    registry: z.strictObject({
+      ownerIdentityId: uuid.nullable(),
+      captureMethod: z.enum(["api", "web", "document", "email", "manual", "other"]),
+      cadenceDays: z.number().int().min(1).max(3650),
+      reviewRequired: z.boolean(),
+    }).optional(),
+  })).max(50),
+  nextCursor: uuid.nullable(),
+}).superRefine((page, context) => {
+  let previous = "";
+  for (const { source, fact, evidence, review } of page.items) {
+    if (source.organizationId !== page.organizationId || fact.organizationId !== page.organizationId ||
+      evidence.organizationId !== page.organizationId || source.vendorProfileId !== fact.vendorProfileId ||
+      evidence.sourceId !== source.sourceId || evidence.factId !== fact.factId || evidence.evidenceId <= previous ||
+      (review && (review.organizationId !== page.organizationId || review.evidenceId !== evidence.evidenceId))) {
+      context.addIssue({ code: "custom", message: "Evidence page scope or order mismatch" });
+    }
+    previous = evidence.evidenceId;
+  }
+  if (page.nextCursor !== null && page.nextCursor !== previous) {
+    context.addIssue({ code: "custom", message: "Evidence page cursor mismatch" });
+  }
+});
+export type VendorEvidencePage = z.infer<typeof vendorEvidencePageSchema>;
 
 export type PublishedVendorFact = Readonly<{
   factId: string;

@@ -30,17 +30,19 @@ export default async function PendingAccessPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">
-        {needsEmailVerification ? "Confirm your email" : "Access pending"}
+        {needsEmailVerification ? "Confirm your email" : row.status === "pending" ? "Access pending" : "Account access"}
       </h1>
       <p className="text-sm" role="status" aria-live="polite">
         {needsEmailVerification
           ? "Check your email for a confirmation link. Then sign in again."
-          : "Your email is verified, but workspace access is not ready. Sign in again to retry account setup, or review your invitations."}
+          : "Your email is verified. Open your workspaces to check available access, or review your invitations."}
       </p>
       {!needsEmailVerification ? (
-        <Link className="text-sm underline" href="/invitations/accept">
-          Review pending invitations
-        </Link>
+        <div className="flex flex-wrap gap-5">
+          <Link className="inline-flex min-h-11 items-center text-sm underline" href="/workspaces">Open workspaces</Link>
+          <Link className="inline-flex min-h-11 items-center text-sm underline" href="/invitations/accept">Review pending invitations</Link>
+          <Link className="inline-flex min-h-11 items-center text-sm underline" href="/sign-in">Sign in to retry account setup</Link>
+        </div>
       ) : null}
     </main>
   );

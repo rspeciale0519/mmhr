@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   check,
+  date,
   foreignKey,
   bigint,
   index,
@@ -47,31 +48,46 @@ export const commissionEvents = pgTable("commission_events", {
   contractId: uuid("contract_id").notNull(),
   dealId: uuid("deal_id").notNull(),
   vendorOrganizationId: uuid("vendor_organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
-  structureId: uuid("structure_id").notNull(),
+  structureId: uuid("structure_id"),
+  sourceMode: text("source_mode").notNull().default("legacy"),
+  eventRevision: integer("event_revision").notNull().default(1),
+  contractCurrency: text("contract_currency"),
   idempotencyKey: uuid("idempotency_key").notNull(),
   signedAt: timestamp("signed_at", { withTimezone: true }).notNull(),
-  currency: text("currency").notNull(),
-  contractValueMinorUnits: bigint("contract_value_minor_units", { mode: "number" }).notNull(),
-  commissionAmountMinorUnits: bigint("commission_amount_minor_units", { mode: "number" }).notNull(),
+  currency: text("currency"),
+  contractValueMinorUnits: bigint("contract_value_minor_units", { mode: "number" }),
+  commissionAmountMinorUnits: bigint("commission_amount_minor_units", { mode: "number" }),
   calculationRevision: integer("calculation_revision").notNull(),
   state: text("state").notNull().default("pending_review"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("commission_events_organization_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("commission_events_contract_identity_uq").on(t.organizationId, t.id, t.contractId),
   uniqueIndex("commission_events_idempotency_uq").on(t.organizationId, t.idempotencyKey),
   uniqueIndex("commission_events_contract_uq").on(t.organizationId, t.contractId),
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "commission_events_deal_scope_fk" }),
   foreignKey({ columns: [t.organizationId, t.structureId], foreignColumns: [commissionStructures.organizationId, commissionStructures.id], name: "commission_events_structure_scope_fk" }),
   check("commission_events_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
   check("commission_events_amount_ck", sql`${t.contractValueMinorUnits} >= 0 and ${t.commissionAmountMinorUnits} >= 0`),
+  check("commission_events_source_mode_ck", sql`${t.sourceMode} in ('legacy','managed') and ${t.eventRevision} > 0`),
+  check("commission_events_known_money_ck", sql`(${t.sourceMode} = 'legacy' and ${t.structureId} is not null
+      and ${t.currency} is not null and ${t.contractValueMinorUnits} is not null and ${t.commissionAmountMinorUnits} is not null)
+    or (${t.sourceMode} = 'managed'
+      and (${t.commissionAmountMinorUnits} is null or (${t.currency} is not null and ${t.commissionAmountMinorUnits} <= 9007199254740991))
+      and (${t.contractValueMinorUnits} is null or (${t.contractCurrency} is not null and ${t.contractValueMinorUnits} <= 9007199254740991))
+      and (${t.contractCurrency} is null or ${t.contractCurrency} ~ '^[A-Z]{3}$')
+      and (${t.state} = 'pending_review' or (${t.structureId} is not null and ${t.currency} is not null and ${t.commissionAmountMinorUnits} is not null)))`),
   check("commission_events_state_ck", sql`${t.state} in ('pending_review', 'approved', 'invoiced', 'partially_paid', 'paid', 'disputed', 'adjusted', 'voided', 'written_off')`),
-  check("commission_events_revision_ck", sql`${t.calculationRevision} > 0`),
+  check("commission_events_revision_ck", sql`(${t.sourceMode} = 'legacy' and ${t.calculationRevision} > 0)
+    or (${t.sourceMode} = 'managed' and ${t.calculationRevision} >= 0
+      and (${t.state} = 'pending_review' or ${t.calculationRevision} > 0))`),
 ]);
 
 export const commissionEventHistory = pgTable("commission_event_history", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
   commissionEventId: uuid("commission_event_id").notNull(),
+  eventRevision: integer("event_revision"),
   fromState: text("from_state").notNull(),
   toState: text("to_state").notNull(),
   actorIdentityId: uuid("actor_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
@@ -79,6 +95,8 @@ export const commissionEventHistory = pgTable("commission_event_history", {
   occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
   correlationId: uuid("correlation_id").notNull(),
 }, (t) => [
+  uniqueIndex("commission_event_history_managed_revision_uq").on(t.commissionEventId, t.eventRevision),
+  check("commission_event_history_managed_revision_ck", sql`${t.eventRevision} is null or ${t.eventRevision} > 0`),
   index("commission_event_history_scope_time_idx").on(t.organizationId, t.commissionEventId, t.occurredAt),
   foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "commission_event_history_scope_fk" }),
   check("commission_event_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
@@ -101,6 +119,9 @@ export const commissionPayments = pgTable("commission_payments", {
 ]);
 
 export const financeInvoices = pgTable("finance_invoices", {
+  sourceMode: text("source_mode").notNull().default("legacy"),
+  invoiceRevision: integer("invoice_revision").notNull().default(0),
+  currentPreparationId: uuid("current_preparation_id"),
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
   commissionEventId: uuid("commission_event_id").notNull(),
@@ -109,13 +130,16 @@ export const financeInvoices = pgTable("finance_invoices", {
   amountMinorUnits: bigint("amount_minor_units", { mode: "number" }).notNull(),
   status: text("status").notNull().default("draft"),
   invoiceNumber: text("invoice_number"),
-  issueDate: timestamp("issue_date", { withTimezone: true }),
-  dueDate: timestamp("due_date", { withTimezone: true }),
+  issueDate: date("issue_date", { mode: "string" }),
+  dueDate: date("due_date", { mode: "string" }),
   supportingDocumentReferences: jsonb("supporting_document_references").notNull().default([]),
   createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("finance_invoices_organization_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("finance_invoices_event_identity_uq").on(t.organizationId, t.id, t.commissionEventId),
+  uniqueIndex("finance_invoices_managed_active_uq").on(t.organizationId, t.commissionEventId).where(sql`${t.sourceMode} = 'managed' and ${t.status} <> 'voided'`),
+  check("finance_invoices_managed_mode_ck", sql`(${t.sourceMode} = 'legacy' and ${t.invoiceRevision} = 0 and ${t.currentPreparationId} is null) or (${t.sourceMode} = 'managed' and ${t.invoiceRevision} > 0 and ${t.currentPreparationId} is not null)`),
   foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_invoices_scope_fk" }),
   check("finance_invoices_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
   check("finance_invoices_amount_ck", sql`${t.amountMinorUnits} >= 0`),

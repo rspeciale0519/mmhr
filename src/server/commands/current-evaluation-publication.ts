@@ -54,7 +54,7 @@ export async function getCurrentEvaluationPublication(
     if (context.scope.kind !== "organization" || context.scope.organizationId !== parsed.data.organizationId ||
       context.correlationId !== correlationId) throw new AuthorizationError();
     const response = await context.supabase.rpc("mmhr_get_current_evaluation_publication", {
-      payload,
+      payload: { ...payload, detailsVersion: 1 },
       correlation_id: correlationId,
     });
     if (!response || response.error !== null) {

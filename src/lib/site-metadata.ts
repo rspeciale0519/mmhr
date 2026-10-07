@@ -50,7 +50,7 @@ export function getSiteMetadataBase(
   environment?: { NEXT_PUBLIC_APP_URL?: string },
 ): URL | undefined {
   const origin = canonicalOrigin(
-    environment?.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_APP_URL,
+    environment === undefined ? process.env.NEXT_PUBLIC_APP_URL : environment.NEXT_PUBLIC_APP_URL,
   );
   return origin ? new URL(origin) : undefined;
 }

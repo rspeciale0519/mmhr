@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/lib/trpc/client";
 import type { getIntakeRequirementsPage } from "@/server/commands/requirement-read";
 import { ResponseValue } from "./requirement-views";
+import { emptyPayrollAnswer, PayrollAnswerFields, payrollAnswerSchema, type PayrollAnswer } from "./payroll-answer";
 
 type Requirement = Awaited<ReturnType<typeof getIntakeRequirementsPage>>["requirements"][number];
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
@@ -121,6 +122,9 @@ export function CustomerRequirementForm({
   const router = useRouter();
   const save = useMutation(trpc.intakes.saveRequirement.mutationOptions({ retry: false }));
   const existingResponse = requirement?.response ?? null;
+  const savedPayroll = requirement?.stableKey === "input_payroll" ? payrollAnswerSchema.safeParse(existingResponse) : null;
+  const [payrollTemplate, setPayrollTemplate] = useState(Boolean(savedPayroll?.success));
+  const [payrollAnswer, setPayrollAnswer] = useState<PayrollAnswer>(savedPayroll?.success ? savedPayroll.data : emptyPayrollAnswer);
   const initialMode = useMemo(() => modeForResponse(existingResponse), [existingResponse]);
   const [label, setLabel] = useState(requirement?.label ?? "");
   const [importance, setImportance] = useState<"must" | "nice" | "not_applicable">(requirement?.importance ?? "must");
@@ -184,7 +188,9 @@ export function CustomerRequirementForm({
       return;
     }
     const existingError = answerMode === "existing" ? responseValidationError(existingResponse) : null;
-    const response = existingError ? { error: existingError } : answerMode === "existing" ? { response: existingResponse } : buildResponse(answerMode, answerValue);
+    const checkedPayroll = payrollTemplate ? payrollAnswerSchema.safeParse(payrollAnswer) : null;
+    const response: { response?: JsonValue; error?: string } = checkedPayroll ? checkedPayroll.success ? { response: checkedPayroll.data } : { error: "Check the payroll answers. Use a two-letter country code or leave it blank." }
+      : existingError ? { error: existingError } : answerMode === "existing" ? { response: existingResponse } : buildResponse(answerMode, answerValue);
     if (response.error || response.response === undefined) {
       setValidationError(response.error ?? "Choose an answer.");
       return;
@@ -196,11 +202,11 @@ export function CustomerRequirementForm({
       setValidationError("This browser cannot create a secure save request. Use an updated browser and try again.");
       return;
     }
-    const stableKey = requirement?.stableKey ?? `need_${requirementId.replaceAll("-", "")}`;
+    const stableKey = requirement?.stableKey ?? (payrollTemplate ? "input_payroll" : `need_${requirementId.replaceAll("-", "")}`);
     const input: SaveInput = {
       requirementId, organizationId, intakeId, expectedRevision: requirement?.revision ?? 0,
       stableKey, label: trimmedLabel, importance, weight: numericWeight, response: response.response,
-      requirementType, correlationId, idempotencyKey,
+      requirementType: payrollTemplate ? "structured" : requirementType, correlationId, idempotencyKey,
     };
     attempt.current = input;
     await runSave(input);
@@ -218,15 +224,20 @@ export function CustomerRequirementForm({
       {requirement && <p className="font-mono text-xs tabular-nums text-muted-foreground">Revision {requirement.revision}</p>}
     </div>
     <fieldset disabled={save.isPending || locked} className="space-y-6">
+      {!requirement && <label className="block space-y-2 text-sm font-medium">Start with
+        <select aria-label="Requirement template" className={selectClass} value={payrollTemplate ? "payroll" : "custom"}
+          onChange={event => { const payroll = event.target.value === "payroll"; setPayrollTemplate(payroll); if (payroll) setLabel("Payroll processing"); }}>
+          <option value="custom">Your own requirement</option><option value="payroll">Payroll processing</option>
+        </select></label>}
       <label className="block space-y-2 text-sm font-medium">Label<Input aria-label="Requirement label" value={label} maxLength={200} className="min-h-11 text-foreground" onChange={(event) => setLabel(event.target.value)} placeholder="Example: Support two payroll groups" /></label>
       <div className="grid gap-6 sm:grid-cols-2">
         <label className="space-y-2 text-sm font-medium">Importance<select aria-label="Importance" value={importance} className={selectClass} onChange={(event) => setImportance(event.target.value as typeof importance)}><option value="must">Must have</option><option value="nice">Nice to have</option><option value="not_applicable">Not applicable</option></select></label>
-        <label className="space-y-2 text-sm font-medium">Requirement type<select aria-label="Requirement type" value={requirementType} className={selectClass} onChange={(event) => setRequirementType(event.target.value as typeof requirementType)}><option value="custom">Custom request</option><option value="structured">Standard requirement</option></select></label>
+        {!payrollTemplate && <label className="space-y-2 text-sm font-medium">Requirement type<select aria-label="Requirement type" value={requirementType} className={selectClass} onChange={(event) => setRequirementType(event.target.value as typeof requirementType)}><option value="custom">Custom request</option><option value="structured">Standard requirement</option></select></label>}
       </div>
       <label className="block space-y-2 text-sm font-medium">Weight<span className="block text-xs font-normal leading-5 text-muted-foreground">Use a higher weight when this requirement should matter more in the review.</span><Input aria-label="Weight" inputMode="numeric" type="number" min={1} max={100} step={1} value={weight} className="min-h-11 text-foreground" onChange={(event) => setWeight(event.target.value)} /></label>
-      <section className="space-y-3" aria-labelledby="answer-heading"><div><h3 id="answer-heading" className="text-sm font-semibold">Answer</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">Choose a simple answer type. Existing structured answers stay unchanged until you choose to replace them.</p></div>
+      {payrollTemplate ? <PayrollAnswerFields value={payrollAnswer} onChange={setPayrollAnswer}/> : <section className="space-y-3" aria-labelledby="answer-heading"><div><h3 id="answer-heading" className="text-sm font-semibold">Answer</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">Choose a simple answer type. Existing structured answers stay unchanged until you choose to replace them.</p></div>
         {editingComplex && answerMode === "existing" ? <div className="space-y-4 rounded-lg border bg-muted/30 p-4"><p className="text-sm font-medium">Existing answer is preserved</p><div className="max-h-56 overflow-auto rounded-md bg-background p-3 text-xs leading-5 text-muted-foreground"><ResponseValue value={existingResponse} /></div><Button type="button" variant="outline" className={`${formButtonClass} min-h-11`} onClick={() => { setAnswerMode("text"); setAnswerValue(""); setReplacedExisting(true); }}>Replace answer</Button></div> : <div className="space-y-3"><label className="block space-y-2 text-sm font-medium">Answer type<select aria-label="Answer type" value={answerMode} className={selectClass} onChange={(event) => setAnswerMode(event.target.value as AnswerMode)}><option value="none">No answer</option><option value="text">Text</option><option value="number">Number</option><option value="boolean">Yes or no</option></select></label>{answerMode === "text" && <textarea aria-label="Text answer" value={answerValue} maxLength={2_000} className={textareaClass} onChange={(event) => setAnswerValue(event.target.value)} placeholder="Add the answer" />}{answerMode === "number" && <Input aria-label="Number answer" inputMode="decimal" value={answerValue} className="min-h-11 text-foreground" onChange={(event) => setAnswerValue(event.target.value)} placeholder="Add a number" />}{answerMode === "boolean" && <select aria-label="Yes or no answer" value={answerValue === "true" ? "true" : "false"} className={selectClass} onChange={(event) => setAnswerValue(event.target.value)}><option value="true">Yes</option><option value="false">No</option></select>}{editingComplex && replacedExisting && <Button type="button" variant="outline" className={`${formButtonClass} min-h-11`} onClick={() => { setAnswerMode("existing"); setAnswerValue(valueForResponse(existingResponse)); setReplacedExisting(false); }}>Keep saved answer</Button>}</div>}
-      </section>
+      </section>}
     </fieldset>
     {save.isPending && <p role="status" aria-live="polite" className="text-sm text-muted-foreground">Saving requirement…</p>}
     {validationError && <p role="alert" className="border-l-2 border-destructive pl-5 text-sm leading-6">{validationError}</p>}

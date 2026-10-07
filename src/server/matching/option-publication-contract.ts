@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 import { requirementResponseSchema } from "@/server/matching/requirement-input";
+import { maskedPublicationDetailsSchema } from "./masked-publication-details";
+import { evaluateFactScope, factScopeMapSchema } from "./fact-scope";
 
 const uuidSchema = z.uuid().transform((value) => value.toLowerCase());
 const timestampSchema = z.iso.datetime({ offset: true });
@@ -16,11 +18,14 @@ const criterionSchema = z.strictObject({
 });
 
 export const publicationConfigSchema = z.strictObject({
-  version: z.literal(1),
+  version: z.union([z.literal(1), z.literal(2)]),
   criteria: z.array(criterionSchema).min(1).max(2_000),
 }).superRefine((config, context) => {
   const seen = new Set<string>();
   config.criteria.forEach((criterion, index) => {
+    if (config.version === 2 && /^(commercial|sponsorship|advertising|paid_placement|partner_status)/.test(criterion.factKey)) {
+      context.addIssue({ code: "custom", path: ["criteria", index, "factKey"], message: "Commercial fields cannot affect organic ranking" });
+    }
     if (seen.has(criterion.requirementKey)) {
       context.addIssue({ code: "custom", path: ["criteria", index, "requirementKey"], message: "Requirement keys must be unique" });
     }
@@ -66,9 +71,17 @@ export const maskedOptionSchema = z.strictObject({
   limitations: z.array(z.string().min(1).max(200)).max(2_000),
   evidenceFreshAt: timestampSchema.nullable(),
   validUntil: timestampSchema.nullable(),
+  details: maskedPublicationDetailsSchema.optional(),
 }).superRefine((option, context) => {
   if (option.maskedLabel !== `Option ${option.ordinal}`) {
     context.addIssue({ code: "custom", path: ["maskedLabel"], message: "Masked label must match the option ordinal" });
+  }
+  if (option.details) {
+    const knownKeys = new Set([...option.fitReasons, ...option.limitations]);
+    if (option.details.features.length !== knownKeys.size || option.details.features.some((feature) =>
+      !knownKeys.has(feature.requirementKey) || (feature.outcome === "match") !== option.fitReasons.includes(feature.requirementKey))) {
+      context.addIssue({ code: "custom", path: ["details", "features"], message: "Feature details must agree with published results" });
+    }
   }
 });
 
@@ -208,21 +221,33 @@ export function evaluatePublishedOption(
   }
 
   const relevantInputs = parsedInputs.filter((input) => parsedConfig.criteria.some((criterion) => criterion.factKey === input.field_key));
+  const scopeInputs = parsedConfig.version === 2
+    ? parsedInputs.filter((input) => input.field_key === "comparison_fact_scopes") : [];
+  if (scopeInputs.length > 1) fail("duplicate approved fact scopes");
+  const scopes = scopeInputs.length ? factScopeMapSchema.parse(JSON.parse(scopeInputs[0].value)) : {};
   const orderedRequirements = [...parsedRequirements].sort((left, right) => left.key < right.key ? -1 : left.key > right.key ? 1 : 0);
   const totalWeight = parsedRequirements.reduce((sum, requirement) => sum + requirement.weight, 0);
   let satisfiedWeight = 0;
   let coveredWeight = 0;
   const fitReasons: string[] = [];
   const limitations: string[] = [];
+  const knownRequirements = new Set<string>();
 
   for (const requirement of orderedRequirements) {
     const criterion = criteria.get(requirement.key);
     if (!criterion) fail(`missing criterion for ${requirement.key}`);
     const matchingInputs = relevantInputs.filter((input) => input.field_key === criterion.factKey);
-    if (matchingInputs.length > 0) coveredWeight += requirement.weight;
+    const scope = parsedConfig.version === 1 ? "match" : evaluateFactScope(
+      Object.prototype.hasOwnProperty.call(scopes, criterion.factKey) ? scopes[criterion.factKey] : undefined,
+      parsedRequirements,
+    );
+    if (matchingInputs.length > 0 && scope !== "unknown") {
+      coveredWeight += requirement.weight;
+      knownRequirements.add(requirement.key);
+    }
     const response = readScalar(requirement.response, criterion.responsePath);
     if (response === null) fail("response path must resolve to a scalar");
-    const satisfied = matchingInputs.some((input) => serializedScalar(input.value) === serializedScalar(response));
+    const satisfied = scope === "match" && matchingInputs.some((input) => serializedScalar(input.value) === serializedScalar(response));
     if (satisfied) {
       satisfiedWeight += requirement.weight;
       fitReasons.push(requirement.key);
@@ -231,16 +256,22 @@ export function evaluatePublishedOption(
     }
   }
 
-  const noRelevantInputs = relevantInputs.length === 0;
+  const noRelevantInputs = parsedConfig.version === 1 ? relevantInputs.length === 0 : knownRequirements.size === 0;
   const missingMust = orderedRequirements.some((requirement) => requirement.importance === "must" && !fitReasons.includes(requirement.key));
-  const eligibility = noRelevantInputs ? "unknown" : missingMust ? "ineligible" : "eligible";
+  const confirmedMustMismatch = orderedRequirements.some((requirement) => requirement.importance === "must"
+    && knownRequirements.has(requirement.key) && !fitReasons.includes(requirement.key));
+  // Format 1 remains unchanged for historical publications. Format 2 keeps
+  // missing required evidence unknown unless another required fact disproves fit.
+  const eligibility = noRelevantInputs ? "unknown"
+    : parsedConfig.version === 1 ? (missingMust ? "ineligible" : "eligible")
+      : confirmedMustMismatch ? "ineligible" : missingMust ? "unknown" : "eligible";
   return {
     eligibility,
     deterministicScore: Math.round((satisfiedWeight / totalWeight) * 10_000),
     confidenceBasisPoints: Math.round((coveredWeight / totalWeight) * 10_000),
     fitReasons,
     limitations,
-    evidenceFreshAt: oldestTimestamp(relevantInputs, "captured_at"),
-    validUntil: oldestTimestamp(relevantInputs, "valid_until"),
+    evidenceFreshAt: oldestTimestamp([...relevantInputs, ...scopeInputs], "captured_at"),
+    validUntil: oldestTimestamp([...relevantInputs, ...scopeInputs], "valid_until"),
   };
 }

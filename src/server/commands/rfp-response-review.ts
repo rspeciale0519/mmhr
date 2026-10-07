@@ -16,7 +16,7 @@ export async function reviewRfpResponseNormalization(input: unknown, options: Au
   if (!parsed.success) throw new Error("Invalid RFP response review input");
   const command = parsed.data;
   try {
-    const context = await requirePermission("workspace.access", { kind: "organization", organizationId: command.organizationId }, options);
+    const context = await requirePermission("rfp.approve", { kind: "organization", organizationId: command.organizationId }, { ...options, correlationId: command.correlationId });
     if (context.scope.kind !== "organization" || context.scope.organizationId !== command.organizationId || context.identityId !== command.actorIdentityId) throw new AuthorizationError();
     const response = await context.supabase.rpc("mmhr_review_rfp_response_normalization", { payload: command, correlation_id: command.correlationId, idempotency_key: command.idempotencyKey });
     if (response.error) throw new Error("RFP response review unavailable");

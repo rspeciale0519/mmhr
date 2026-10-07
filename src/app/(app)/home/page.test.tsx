@@ -36,7 +36,7 @@ test("returns workspace content after permission verification", async () => {
   ).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Customer portal" })).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Vendor portal" })).not.toBeInTheDocument();
-  expect(screen.getByRole("status")).toHaveTextContent("No workspace areas are available");
+  expect(screen.getByRole("link", { name: "Workspace documents" })).toHaveAttribute("href", "/documents");
   expect(screen.queryByTestId("signed-in-email")).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Invite a member" })).not.toBeInTheDocument();
 });
@@ -77,6 +77,14 @@ test("shows invitation administration separately from creation", async () => {
   expect(screen.queryByRole("link", { name: "Invite a member" })).not.toBeInTheDocument();
 });
 
+test("shows staff administration when a customer workspace is selected", async () => {
+  vi.mocked(authorizePermission).mockImplementation(async (permission) =>
+    permission === "admin.access" ? {} as never : null);
+  render(await WorkspaceHome());
+  expect(screen.getByRole("link", { name: "Administration" })).toHaveAttribute("href", "/admin");
+  expect(screen.queryByRole("link", { name: "Customer portal" })).not.toBeInTheDocument();
+});
+
 test("keeps platform navigation separate from organization permissions", async () => {
   vi.mocked(requireHomeAccess).mockResolvedValue({
     identity: { id: "user-123" }, authorization: { scope: { kind: "platform" } },
@@ -85,6 +93,7 @@ test("keeps platform navigation separate from organization permissions", async (
   expect(screen.getByRole("link", { name: "Administration" })).toHaveAttribute("href", "/admin");
   expect(authorizePermission).not.toHaveBeenCalled();
   expect(screen.queryByRole("navigation", { name: "Workspace areas" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Workspace documents" })).not.toBeInTheDocument();
 });
 
 test("does not return navigation when a permission read fails", async () => {

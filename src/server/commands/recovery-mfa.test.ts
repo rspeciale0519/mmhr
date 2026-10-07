@@ -147,13 +147,13 @@ describe("caller-bound recovery MFA clients", () => {
     { ...claims, iat: now - 0.5 }, { ...claims, iat: claims.exp }, { ...claims, exp: now }, { ...claims, exp: now - 60 },
     { ...claims, exp: undefined }, { ...claims, exp: null }, { ...claims, exp: "9999999999" }, { ...claims, exp: Infinity },
     { ...claims, exp: 1_000_000_000_000 },
-  ])("rejects malformed, stale, or future claims before any RPC: %j", async (value) => {
+  ])("rejects malformed, stale, or future claims before any RPC: case %#", async (value) => {
     getClaims.mockResolvedValue({ data: { claims: value }, error: null });
     for (const entry of cases) await expect(entry.invoke()).rejects.toBeInstanceOf(AuthorizationError);
     expect(rpc).not.toHaveBeenCalled();
   });
   test.each([undefined, null, {}, { data: null, error: null }, { data: { claims }, error: { message: "private token data" } }])
-    ("rejects absent or unverified claims responses: %j", async (response) => {
+    ("rejects absent or unverified claims responses: case %#", async (response) => {
       getClaims.mockResolvedValue(response);
       for (const entry of cases) await expect(entry.invoke()).rejects.toBeInstanceOf(AuthorizationError);
       expect(rpc).not.toHaveBeenCalled();

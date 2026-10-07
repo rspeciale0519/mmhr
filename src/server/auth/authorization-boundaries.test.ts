@@ -1,4 +1,5 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import ts from "typescript";
 import { describe, expect, test } from "vitest";
@@ -198,6 +199,7 @@ function inspectSources(sources: Sources): Violation[] {
     }
     // Track simple aliases without executing source or reading environment values.
     for (let pass = 0; pass <= variables.length; pass++) {
+      const previousAliasCount = environmentNames.size + processNames.size;
       for (const variable of variables) {
         if (!ts.isIdentifier(variable.name) || !variable.initializer) continue;
         if (isEnvironment(variable.initializer)) environmentNames.add(variable.name.text);
@@ -205,6 +207,7 @@ function inspectSources(sources: Sources): Violation[] {
           processNames.add(variable.name.text);
         }
       }
+      if (environmentNames.size + processNames.size === previousAliasCount) break;
     }
     function report(node: ts.Node, rule: string, target: string) {
       const { line } = source.getLineAndCharacterOfPosition(node.getStart(source));
@@ -287,12 +290,29 @@ function synthetic(source: string, file = "src/server/auth/ordinary-service.ts")
 }
 
 describe("R1 authorization architecture boundaries", () => {
-  test("keeps all production sources outside fixture, pool, and service-credential boundaries", () => {
+  test("finds indirect environment access when alias declarations appear in reverse order", () => {
+    expect(inspectSources(synthetic([
+      "const third = second;",
+      "const second = first;",
+      "const first = process.env;",
+      "void third[credentialName];",
+    ].join("\n")))).toEqual(expect.arrayContaining([
+      expect.objectContaining({ rule: "unclassified-credential", target: "non-static environment key" }),
+    ]));
+  });
+  test("keeps all production sources outside fixture, pool, and service-credential boundaries", async () => {
     // The only current source imports outside src are these runtime configs.
     // Scan them too, so moving a forbidden import into one does not hide it.
     const files = [...walk(path.join(root, "src")), ...[...runtimeConfigFiles].map((file) => path.join(root, file))];
-    const sources = new Map(files.filter((file) => codeExtension.test(file))
-      .map((file): [string, string] => [path.relative(root, file).replaceAll("\\", "/"), readFileSync(file, "utf8")]));
+    const codeFiles = files.filter((file) => codeExtension.test(file));
+    const sources: Sources = new Map();
+    // Preserve the complete scan and deterministic order. Bounded parallel reads
+    // avoid one filesystem latency charge for each source on constrained hosts.
+    for (let offset = 0; offset < codeFiles.length; offset += 16) {
+      const group = await Promise.all(codeFiles.slice(offset, offset + 16).map(async (file): Promise<[string, string]> =>
+        [path.relative(root, file).replaceAll("\\", "/"), await readFile(file, "utf8")]));
+      for (const [file, source] of group) sources.set(file, source);
+    }
     expect([...sources.keys()]).toEqual(expect.arrayContaining([
       ...fixtureFiles, ...directDatabaseFiles, ...Object.keys(credentialFiles),
       "src/server/auth/authorization.ts", "src/server/trpc/trpc.ts",

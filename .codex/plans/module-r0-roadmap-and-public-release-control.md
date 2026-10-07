@@ -1,11 +1,19 @@
 # R0 Roadmap and Public-Release Control
 
+> **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
+> It replaces the October 3 instruction to complete all mandatory software before live use.
+> Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
+> Financial-record management and private document storage are outside the MVP.
+> Where this document conflicts with the roadmap on launch scope or delivery order, follow the roadmap.
+> All R0 public-release controls remain in force. The roadmap changes launch scope only.
+> A full rewrite follows the launch.
+
 ## Document Control
 
 | Field | Value |
 |---|---|
-| Version | 0.6 |
-| Date | 2026-08-31 |
+| Version | 0.7 |
+| Date | 2026-09-14 |
 | Status | Documentation audit recorded; policy quarantine active; claim approval and production activation pending |
 | Product owner | Rob Speciale |
 | Parent roadmap | [roadmap-v2-implementation.md](./roadmap-v2-implementation.md) |
@@ -24,6 +32,9 @@ Control records are complete for owners, decisions, exact claim inventory, route
 coverage, the release block, recovery, and linked status. Claim evidence,
 statement approval, deployment aliases, live verification, and production
 approval remain open.
+
+The [MVP launch checklist](release-mvp-launch-checklist.md) defines an earlier product milestone.
+All exit rules in this record still apply. The MVP milestone does not approve claims, expose production routes, or enable indexing.
 
 ## 1. Owner and Decision Register
 
@@ -45,13 +56,16 @@ The product owner owns the current open product decisions in
 
 | Decision | Named owner | Required before |
 |---|---|---|
-| Common RFP plus vendor amendments | Rob Speciale | R4 implementation |
-| Exact identity-unmasking rule | Rob Speciale | R3 implementation |
 | Customer-visible scoring method | Rob Speciale | R3 release |
+| Customer password recovery and confirmation-email replacement methods | Rob Speciale | MVP-04 operating decision |
 | Public vendor-ranking scope | Rob Speciale | Public-ranking work |
 | Impersonation support | Rob Speciale, with security approval | R8 implementation |
 | Category expansion | Rob Speciale | New-category work |
 | Sponsored placement | Rob Speciale | Sponsored-placement work |
+
+The common RFP and amendment decision is recorded in PRD FR-RFP-05.
+The discussion and disclosure rule is recorded in PRD FR-MAT-08.
+These resolved decisions remain required behavior and are no longer open product choices.
 
 ## 2. Active Public-Release Block
 

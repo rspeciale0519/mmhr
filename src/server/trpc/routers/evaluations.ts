@@ -12,13 +12,18 @@ import {
 } from "@/server/commands/evaluation-selection";
 import { permissionProcedure, router } from "../trpc";
 import { currentEvaluationPublicationSchema, getCurrentEvaluationPublication } from "@/server/commands/current-evaluation-publication";
+import {
+  EvaluationDisclosureError, evaluationDisclosureReviewInputSchema, evaluationDisclosuresInputSchema,
+  recordEvaluationDisclosureInputSchema, getEvaluationDisclosureReview, getEvaluationDisclosures,
+  recordEvaluationDisclosure,
+} from "@/server/commands/evaluation-disclosure";
 
 const resolveScope = (input: { organizationId: string }) => ({ kind: "organization" as const, organizationId: input.organizationId });
 
 async function result<T>(operation: () => Promise<T>): Promise<T> {
   try { return await operation(); } catch (error) {
     if (error instanceof AuthorizationError ||
-      ((error instanceof EvaluationPublicationError || error instanceof EvaluationSelectionError) && error.code === "REJECTED")) {
+      ((error instanceof EvaluationPublicationError || error instanceof EvaluationSelectionError || error instanceof EvaluationDisclosureError) && error.code === "REJECTED")) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Evaluation is not available" });
     }
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Evaluation request failed" });
@@ -26,6 +31,12 @@ async function result<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 export const evaluationsRouter = router({
+  disclosureReview: permissionProcedure({ permission: "evaluation.disclose", input: evaluationDisclosureReviewInputSchema, resolveScope })
+    .query(({ ctx, input }) => result(() => getEvaluationDisclosureReview(input, { supabase: ctx.supabase }))),
+  disclosures: permissionProcedure({ permission: "portal.customer.access", input: evaluationDisclosuresInputSchema, resolveScope })
+    .query(({ ctx, input }) => result(() => getEvaluationDisclosures(input, { supabase: ctx.supabase }))),
+  disclose: permissionProcedure({ permission: "evaluation.disclose", input: recordEvaluationDisclosureInputSchema, resolveScope })
+    .mutation(({ ctx, input }) => result(() => recordEvaluationDisclosure(input, { supabase: ctx.supabase }))),
   current: permissionProcedure({ permission: "portal.customer.access", input: currentEvaluationPublicationSchema, resolveScope })
     .query(({ ctx, input }) => result(() => getCurrentEvaluationPublication(input, { supabase: ctx.supabase }))),
   select: permissionProcedure({ permission: "evaluation.select", input: selectInitialEvaluationOptionsSchema, resolveScope })

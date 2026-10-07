@@ -79,13 +79,38 @@ describe("R4 RFP approval RPC", () => {
     });
   }, 120_000);
 
-  test("denies self-approval", async () => {
+  test("denies self-approval when separate approval is on", async () => {
     await rollbackCase(context!, async (sql) => {
+      await sql`UPDATE mmhr_private.rfp_approval_policy SET require_separate_approval=true WHERE singleton`;
       const author = fixture.pair[0];
       await expect(invoke(sql, author, command(await draft(sql), author)))
         .rejects.toMatchObject({ code: "42501" });
     });
   }, 120_000);
+
+  test("allows staff self-approval when off, preserves audit and replay after enabling", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const author = fixture.pair[0];
+      const rfpId = await draft(sql);
+      const payload = command(rfpId, author);
+      await expect(invoke(sql, author, payload)).resolves.toMatchObject({status:"approved", approvedByIdentityId:author.identityId});
+      await sql`UPDATE mmhr_private.rfp_approval_policy SET require_separate_approval=true WHERE singleton`;
+      await expect(invoke(sql, author, payload)).resolves.toMatchObject({outcomeCode:"replayed"});
+      await expect(invoke(sql, author, command(await draft(sql),author))).rejects.toMatchObject({code:"42501"});
+      const [audit]=await sql<{count:number}[]>`SELECT count(*)::integer count FROM public.audit_events WHERE entity_id=${rfpId} AND action='rfp.mmhr_approve'`;
+      expect(audit?.count).toBe(1);
+    });
+  },120_000);
+
+  test("missing policy requires separate approval and authenticated users cannot change it",async()=>{
+    await rollbackCase(context!,async(sql)=>{
+      await expect(asAuthenticated(sql,fixture.pair[0],async(probe)=>{
+        await probe`UPDATE mmhr_private.rfp_approval_policy SET require_separate_approval=false`;
+      })).rejects.toMatchObject({code:"42501"});
+      await sql`DELETE FROM mmhr_private.rfp_approval_policy`;
+      await expect(invoke(sql,fixture.pair[0],command(await draft(sql),fixture.pair[0]))).rejects.toMatchObject({code:"42501"});
+    });
+  },120_000);
 
   test("denies external approval even with an explicit permission override", async () => {
     await rollbackCase(context!, async (sql) => {

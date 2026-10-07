@@ -855,6 +855,335 @@
       "when": 1788944438616,
       "tag": "0121_r3_current_evaluation_publication",
       "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1788944438617,
+      "tag": "0122_r3_disclosure_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1788947876466,
+      "tag": "0123_r3_disclosure_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1788947897276,
+      "tag": "0124_r3_disclosure_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1788947902191,
+      "tag": "0125_r3_disclosure_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1788979742954,
+      "tag": "0126_r3_selection_customer_auth_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1789271181110,
+      "tag": "0127_r3_disclosure_workflow",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1789271865812,
+      "tag": "0128_r4_portal_delivery",
+      "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1789271908187,
+      "tag": "0129_r4_vendor_recipient_scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1789273597800,
+      "tag": "0130_r4_portal_delivery_audit_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1789274638531,
+      "tag": "0131_r4_optional_separate_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1789315906598,
+      "tag": "0132_r3_disclosure_page_filter",
+      "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1789483746224,
+      "tag": "0133_r3_masked_publication_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 134,
+      "version": "7",
+      "when": 1789485614928,
+      "tag": "0134_r3_publication_scoring_format_two",
+      "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1789487359554,
+      "tag": "0135_r3_staff_vendor_evidence_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1789490088350,
+      "tag": "0136_r3_publication_fact_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1789491694294,
+      "tag": "0137_r2b_vendor_evidence_renewal",
+      "breakpoints": true
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1789519717977,
+      "tag": "0138_r2b_evidence_source_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 139,
+      "version": "7",
+      "when": 1789532119208,
+      "tag": "0139_r3_selection_option_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1789534128254,
+      "tag": "0140_r2b_product_review_revision",
+      "breakpoints": true
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1789536825439,
+      "tag": "0141_r2b_vendor_catalog_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1790803665868,
+      "tag": "0142_abandoned_bloodstorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 143,
+      "version": "7",
+      "when": 1790810995367,
+      "tag": "0143_narrow_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1790818879986,
+      "tag": "0144_happy_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1790826587533,
+      "tag": "0145_managed_document_uploads",
+      "breakpoints": true
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1790828097548,
+      "tag": "0146_managed_document_boundaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1790829978947,
+      "tag": "0147_managed_document_worker",
+      "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1790833262462,
+      "tag": "0148_managed_document_reservations",
+      "breakpoints": true
+    },
+    {
+      "idx": 149,
+      "version": "7",
+      "when": 1790835705061,
+      "tag": "0149_managed_document_storage",
+      "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1790837829381,
+      "tag": "0150_managed_document_scan_readers",
+      "breakpoints": true
+    },
+    {
+      "idx": 151,
+      "version": "7",
+      "when": 1790842545063,
+      "tag": "0151_managed_document_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1790848052433,
+      "tag": "0152_managed_document_metadata_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1790874277835,
+      "tag": "0153_r6_portal_proposal_quotes",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1790898465369,
+      "tag": "0154_r6_portal_contract_handoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1790902751576,
+      "tag": "0155_r7_commission_calculation_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1790905184627,
+      "tag": "0156_r4_document_review_and_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1791000961627,
+      "tag": "0157_r7_payment_approval_and_retry_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1791002311168,
+      "tag": "0158_r4_rfp_notification_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1791014335423,
+      "tag": "0159_r8_deal_follow_ups",
+      "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1791035308306,
+      "tag": "0160_r7_finance_source_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1791039324097,
+      "tag": "0161_r7_finance_upload_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1791042763904,
+      "tag": "0162_r7_managed_finance_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1791047312999,
+      "tag": "0163_r8_task_request_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 164,
+      "version": "7",
+      "when": 1791050726234,
+      "tag": "0164_r7_managed_invoice_readiness",
+      "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1791059696279,
+      "tag": "0165_r7_invoice_date_alignment",
+      "breakpoints": true
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1791156664386,
+      "tag": "0166_rfp_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1791156765772,
+      "tag": "0167_staff_audit_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1791178624713,
+      "tag": "0168_rfp_receipt_authorization_time",
+      "breakpoints": true
     }
   ]
 }

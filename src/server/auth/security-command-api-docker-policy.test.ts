@@ -136,3 +136,25 @@ describe("scratch Docker API write policy", () => {
     },
   );
 });
+
+describe("database-only owned project bindings", () => {
+  test.each(["", "0.0.0.0", "::", "127.0.0.1"])("rewrites only the database binding for HostIp %s", host => {
+    const databaseProject = "mmhr-r1-r7invoice-01234567";
+    const databaseName = "supabase_db_" + databaseProject;
+    const databaseScope = { ...scope, network: { ...scope.network,
+      projectId: databaseProject, name: databaseProject + "-loopback" } };
+    const payload = body();
+    payload.Labels["com.supabase.cli.project"] = databaseProject;
+    payload.Labels["com.docker.compose.project"] = databaseProject;
+    payload.HostConfig.NetworkMode = databaseScope.network.name;
+    payload.HostConfig.Binds = [databaseName + ":/var/lib/postgresql/data"];
+    payload.HostConfig.PortBindings["5432/tcp"][0]!.HostIp = host;
+    payload.NetworkingConfig.EndpointsConfig = { [databaseScope.network.name]: { Aliases: ["db"] } };
+    const expected = structuredClone(payload);
+    expected.HostConfig.PortBindings["5432/tcp"][0]!.HostIp = "127.0.0.1";
+    const result = createDockerGuardPolicy(databaseScope).evaluate({ method: "POST",
+      target: "/containers/create?name=" + databaseName, body: Buffer.from(JSON.stringify(payload)) });
+    expect(JSON.parse(result.body.toString())).toEqual(expected);
+    expect(payload.HostConfig.PortBindings["5432/tcp"][0]!.HostIp).toBe(host);
+  });
+});

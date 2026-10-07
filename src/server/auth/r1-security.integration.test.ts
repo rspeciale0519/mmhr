@@ -1,19 +1,21 @@
 import postgres from "postgres";
-import { afterAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
 import { applicationTables } from "@/server/db/test/application-schema-inventory";
 
-const migrationUrl = process.env.TEST_MIGRATION_DATABASE_URL;
-
-if (!migrationUrl) {
-  throw new Error("R1 security integration environment is incomplete");
-}
-
-const owner = postgres(migrationUrl, { max: 1, prepare: true });
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
+let owner: ReturnType<typeof postgres>;
 describe("R1 local security boundary evidence", () => {
+  beforeAll(async () => {
+    startup = startRestrictedRehearsal("security");
+    rehearsal = await startup;
+    owner = rehearsal.context.client;
+  }, 300000);
   afterAll(async () => {
-    await owner.end();
-  });
+    await (rehearsal ?? await startup)?.close();
+  }, 180000);
 
   test("every current application table has RLS, a policy, and no raw runtime read grant", async () => {
     const rows = await owner<{

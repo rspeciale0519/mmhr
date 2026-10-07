@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { getIntakeRequirementsPage } from "@/server/commands/requirement-read";
+import { PayrollAnswerSummary } from "./payroll-answer";
 
 type RequirementPage = Awaited<ReturnType<typeof getIntakeRequirementsPage>>;
 type Requirement = RequirementPage["requirements"][number];
@@ -85,7 +86,9 @@ function RequirementCard({ requirement, editHref }: { requirement: Requirement; 
       <div className="mt-6 rounded-lg bg-muted p-4 text-sm leading-6">
         <h4 className="font-medium">Response</h4>
         <div className="mt-2 min-w-0">
-          <ResponseValue value={requirement.response} />
+          {requirement.stableKey === "input_payroll"
+            ? <PayrollAnswerSummary value={requirement.response} fallback={<ResponseValue value={requirement.response}/>}/>
+            : <ResponseValue value={requirement.response} />}
         </div>
       </div>
       {editHref && <Link href={editHref} prefetch={false} className={`${linkStyle} mt-3`}
@@ -100,14 +103,16 @@ export function SavedRequirements({
   hasCursor,
   afterId,
   canEdit = false,
+  basePath = "/customer",
 }: {
   intakeId: string;
   page: RequirementPage;
   hasCursor: boolean;
   afterId?: string;
   canEdit?: boolean;
+  basePath?: "/customer" | "/admin/evaluations";
 }) {
-  const intakeHref = "/customer?intake=" + encodeURIComponent(intakeId);
+  const intakeHref = basePath + "?intake=" + encodeURIComponent(intakeId);
   const nextHref = page.nextCursor
     ? intakeHref + "&requirementsAfter=" + encodeURIComponent(page.nextCursor)
     : null;

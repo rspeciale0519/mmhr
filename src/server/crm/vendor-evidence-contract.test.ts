@@ -57,6 +57,13 @@ const approval = {
 };
 
 describe("vendor evidence contract", () => {
+  test("accepts bounded source cadence and rejects invalid source metadata", () => {
+    expect(parseVendorSource({ ...source, captureMethod: "manual", cadenceDays: 90 })).toMatchObject({ cadenceDays: 90 });
+    for (const cadenceDays of [0, -1, 1.5, 3651]) {
+      expect(() => parseVendorSource({ ...source, cadenceDays })).toThrow("Invalid vendor source");
+    }
+    expect(() => parseVendorSource({ ...source, captureMethod: "invented" })).toThrow("Invalid vendor source");
+  });
   test("requires HTTPS and rejects unapproved source fields", () => {
     expect(parseVendorSource(source)).toMatchObject({ sourceType: "vendor_owned" });
     expect(() => parseVendorSource({ ...source, uri: "http://vendor.example/pricing" })).toThrow(

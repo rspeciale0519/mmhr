@@ -1,6 +1,12 @@
 # Log
 Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 
+## [2026-09-13] implementation | Verify the local MVP through vendor delivery
+- Native browser verified customer choices, staff disclosure, creator approval, vendor delivery, and customer/vendor reads with synthetic accounts.
+- User-approved local MFA repair completed. Added dev:local startup and corrected workflow navigation and requirement labels.
+- Full unit353/3968, focused119/33, integration4/10/39, type, lint, build70, inventory, and secret scans pass.
+- Local dev and test launcher remain running. Hosted pilot and browser signup/email verification remain open. See journal/2026-09-13.md.
+
 ## [2026-09-08] implementation | Prepare approved customer registration
 - User approved automatic private workspace access for verified customers, without administration rights.
 - Prepared migration 0101 and adapter; neither is connected to runtime registration.
@@ -631,3 +637,385 @@ Database run storage, approval records, and provider evaluation remain open.
 - Prepare exact feature staging and push. CurrentCI34330596999 passes standard checks, applies0117 and continues integration. Full goal active; no merge or release.
 - Final CI result:903/906 integration tests pass across97 files; all five publication cases pass. Fixed stale empty-migration expectations in addition toab0f726.
 - Final148 focused tests, type, lint and1,156-file secret scan pass. Commit the reviewed50-file customer package and push for selection0118-0121 execution. Full goal active.
+- Delivered50-file packagea31b10c and fixtureab0f726 to origin. FreshCI34336673938 tests the exact head; PR10 stays draft. No merge or release. Next staff review and required disclosure before RFP submission.
+- September 9 CI repair: forward0126 preserves staff authentication and fixes customer selection. Guarded local selection8 and publication6 pass; focused static7, type, lint and inventory99 pass. No commit/push/release; disclosure work preserved.
+
+## [2026-09-13] implementation | Optional separate RFP approval
+- Added protected policy0131 and turned separate approval off locally. Approval8, delivery3, focused5, type/lint/build pass.
+- Native component preview uses synthetic data. Full authenticated journey remains open. See journal/2026-09-13.md.
+
+## [2026-09-13] implementation | Continue authenticated workflow verification
+- Customer intake and submission verified in native browser. Staff review pagination and0132 fixed and locally tested.
+- Synthetic MFA factor replacement requires specific approval after automatic review rejection. Full unit69217 still running. See journal/2026-09-13.md.
+
+## [2026-09-13] design | Show five vendor comparison UI options
+- Created an interactive matrix, cards, value map, score breakdown, and decision brief with six fictional masked vendors.
+- Native browser checks pass for five layouts, evidence, pickers, empty selection, selection cap, recovery, and phone widths.
+- Recommended the matrix. No application source changed. See journal/2026-09-13.md for the durable preview pointer.
+
+## [2026-09-14] decision | Approve the MVP comparison matrix
+- The user selected the Comparison matrix and requested documentation.
+- Recorded the design requirements in docs/PRD.md and linked them from docs/README.md.
+- Updated STATE.md. Application implementation remains pending. See journal/2026-09-14.md.
+
+## [2026-09-14] planning | Align the authoritative MVP launch checklist
+- Created .codex/plans/release-mvp-launch-checklist.md with 20 ordered tasks, requirement mappings, dependencies, completion checks, and 12 release-evidence categories.
+- Aligned PRD, roadmap, TECH_STACK, README, local operation, R0, and memory references. Later mandatory v2 work remains in scope.
+- Password recovery and confirmation-email replacement remain open recommendations. Documentation checks pass; no application or production change.
+
+## [2026-09-14] research | Research 50 HRIS providers with payroll options
+- Created docs/hris-payroll-provider-research-2026-09-14.md with 50 provider entries and 161 official-source citations.
+- Prioritized US employers; separated integrated, connected, preparation, configurable, and managed payroll arrangements.
+- Recorded regional limits and renamed products. Linked the document from docs/README.md. Vendor approval and MVP-01 remain open.
+- Documentation structure, source fields, URL syntax, and local links pass. No application or production action.
+
+## [2026-09-14] planning | Group launch tasks into six build phases
+- Created docs/phased-mvp-development.md and linked it to the authoritative launch checklist and project entry point.
+- Mapped all 20 tasks exactly. Phase 1 joins catalog approval, comparison data, and the approved matrix.
+- Connected provider research to MVP-01, MVP-02, MVP-05, and MVP-08. Added the Phase 1 goal prompt for user review.
+- Task mapping, dependencies, 52 local links and anchors, commands, and unchanged release evidence pass documentation checks.
+- Implementation remains unapproved for this request. No task completion, application, Git, or production change.
+
+## [2026-09-14] planning | Shorten the Phase 1 goal prompt
+- Revised docs/phased-mvp-development.md to keep the prompt below 4,000 characters.
+- Verified 3,904 characters with LF and 3,922 with CRLF, including spaces and punctuation.
+- Confirmed one phase per goal and review of each next-phase prompt before execution.
+- File references, sentence limits, phase boundaries, and all 20 task mappings pass. Implementation remains awaiting user review.
+
+## [2026-09-15] implementation | Continue Phase 1 comparison matrix
+- Connected matrix presentation and verified synthetic browser behavior; approved publication details remain incomplete.
+- Full unit3971, final focused46, type, focused lint, inventory100, audit0, and tracked-file secret scan1156 pass.
+- Catalog/scoring approval and real database workflow remain open. See journal/2026-09-15.md.
+
+## [2026-09-15] implementation | Connect masked publication details
+- Prepared migration0133, typed feature and estimate details, and shared staff matrix review.
+- Focused49, type, lint, build70, inventory100/134, and secret scans pass. Full replacement unit38083 is running.
+- Docker blocks integration. Catalog/scoring approval and real workflow remain open. See journal/2026-09-15.md.
+
+## [2026-09-15] implementation | Verify publication criteria guard
+- Focused88, type4632, and focused lint12565 pass. SQL and full workflow remain unverified. See journal/2026-09-15.md.
+
+
+## [2026-09-15] implementation | Add database publication rejection checks
+- Type90681 and lint55550 pass; integration setup fails with nine skipped. Full unit10165 runs. See journal/2026-09-15.md.
+
+
+## [2026-09-15] verification | Verify Phase1 build
+- Full lint97267, build85569 with70 routes, and inventory100 pass. Unit10165 remains running. See journal/2026-09-15.md.
+
+
+## [2026-09-15] implementation | Prepare evidence form validation
+- Focused12, type74236, lint55625 pass. Full10165 remains running with two failures reported; diagnosis pending.
+
+
+## [2026-09-15] implementation | Connect staff evidence API
+- Focused17/type33590/lint78992 pass. Full10165 ended4020 passed/2 failed; stable full rerun required.
+
+
+## [2026-09-15] implementation | Add saved evidence read path
+- Focused28/type37920/lint pass. Migration0135 unexecuted; staff forms and real workflow remain open.
+
+
+## [2026-09-15] implementation | Build staff evidence screen
+- Focused15/UI lint pass; build10447 passes71 before final read-time change. Type7032/unit77847 run. Native synthetic form checks pass; real workflow remains open.
+
+
+## [2026-09-15] verification | Verify current evidence build
+- Build81233/full lint39501/type7032 pass; audit0 and secret scans1156+67 pass. Unit77847 remains running.
+
+
+## [2026-09-15] implementation | Fix structured answer selection
+- Prior full77847 passes4036. Focused9+6, type2992, build94109 and lint75533 pass. Fresh full77234 runs; native synthetic checks pass.
+
+- 2026-09-15 12:26: Full unit77234 passes358 files/4043 tests; inventory100 and tracked scan1156 pass. Phase1 remains incomplete. See journal/2026-09-15.md.
+- 2026-09-15 12:30: Fact-scope foundation passes12 focused tests and lint; publication/SQL integration remains open.
+- 2026-09-15 12:33: Application format2 scope checks pass51 focused tests; SQL parity and staff connection remain unfinished.
+- 2026-09-15 12:39: SQL scope migration0136 prepared; focused53 and lint pass. Integration9 skipped after Docker setup failure; no migration applied.
+- 2026-09-15 12:45: Staff scope capture passes focused11/type/lint and synthetic native checks. Build32550/full80759 remain running.
+- 2026-09-15 12:47: Build32550 passes71 routes; audit0/inventory100/scans1156+77 pass. Full80759 remains live.
+- 2026-09-15 12:59: Full4062 and integration18 pass; local migrations137 applied; actual dev3006 and synthetic launcher active. Real comparison evidence expired; renewal remains.
+- 2026-09-15 13:09: Renewal SQL37168 passes disposable integration;0137 remains unapplied. Staff vendor workspace access and real renewal check remain open.
+- 2026-09-15 13:14: Local migrations138; scope review focused10/type/lint pass. Build5421/full30610 run; synthetic vendor access approval pending.
+
+## [2026-09-15] verify | Phase1 build and scans
+Build98504 passes71 routes; inventory100 and secret scans1156 tracked/84 untracked pass. Full30610 remains live. See journal/2026-09-15.md at13:23. No source or permission changes.
+
+## [2026-09-15] verify | Full suite and renewal browser preview
+Full30610 passes360 files/4067 tests. Native renewal validation and retry pass with mock transport. Latest mobile check remains unverified. Integration9937 running. See journal at13:30.
+
+## [2026-09-15] verify | Approved vendor input integration
+Integration9937 passes4 tests against current migrations. See journal at13:31.
+
+## [2026-09-15] research | Rippling direct source review
+Normal native browser access resolves the product-page evidence gap. Saved docs/rippling-source-review-2026-09-15.md. Approval and customer-specific estimates remain open.
+
+## [2026-09-15] blocked | Phase1 awaits required decisions
+Goal marked blocked after three consecutive approval-blocked turns. Catalog/scoring and local synthetic staff workspace access decisions are required. Full Phase1 scope retained.
+
+## [2026-09-15] approve-and-build | Catalog rules and local test access
+Rob approved both decisions. One synthetic workspace access grant verified in native browser. Actual evidence renewal and review pass. Rules2 activated for new preparations; focused45 tests, type, lint, and build pass. See journal20:22.
+
+## [2026-09-15] verify | Local rules2 publication
+Native staff publication and DB preservation checks pass. Customer login approval remains pending after automatic review rejection. See journal20:35.
+
+## [2026-09-15] research | Concrete eight-product fact packet
+Prepared docs/phase1-vendor-fact-review-2026-09-15.md from official sources. Eight rows and26 local links validated. Facts are pending review; customer sign-in remains separately approval-blocked.
+
+## [2026-09-15] browser | Actual narrow staff matrix
+Native320px check passes305/305 width, keyboard evidence control, sticky labels, and visible matrix masking. See docs/security/phase1-matrix-browser-2026-09-15.md. Customer approval remains pending.
+
+## [2026-09-15] fix | Evidence source ownership and cadence
+Local0138 connects registry metadata. Focused25, integration, type, lint, build, scans, and browser source-save pass. Full unit38069 remains live. See journal21:00 and source-registry migration evidence.
+
+## [2026-09-15] prepare | Local catalog scaffolding preview
+Eight-product setup preview passes with zero existing records. Permission approval pending; no setup execution. Full unit38069 remains live.
+
+## [2026-09-15] verify | Full suite passes
+Full38069 exits0 with360 files/4068 tests. No test process remains live. Customer sign-in and catalog setup approval decisions remain pending.
+2026-09-16: Approved local catalog setup and customer sign-in executed. Cross-version saved-choice UI corrected with0139; focused88/integration8/type/lint/build71 pass; full25014 remains live. Phase1 incomplete. See journal/2026-09-16.md.
+2026-09-16: Full4070 tests pass. Native staff workflow saved8 sourced payroll drafts; read-only DB confirms owners/cadence90/reviews0. Package scope, review and publication remain open.
+
+## [2026-09-16] implementation | Saved payroll scope and catalog controls
+- Standard payroll fields and audited product activation pass full4082, focused, integration, type, lint and build checks.
+- Migration0140 applied locally. New fictional intake submitted; three catalog products active with individual payroll evidence approval.
+- Scope, remaining reviews, real comparison publication and customer choices remain. See journal/2026-09-16.md and dated catalog-controls evidence.
+
+## [2026-09-16] verification | Eight payroll reviews and catalog approval gap
+- Native staff completed all8 product activations/payroll reviews and BambooHR add-on coverage.
+- Preview excludes real products because profile approval is absent. Audited profile review remains to be implemented; no publication or gate bypass occurred.
+- See journal/2026-09-16.md and dated catalog-controls evidence.
+
+## [2026-09-16] implementation | Audited vendor catalog approval
+- Added and locally verified profile approval flow; migration0141 applied after database regression passed.
+- Three local profiles approved through native UI. Automatic review rejected Paycom; specific approval for five remaining profiles is pending.
+- Full4459 remains live. See journal/2026-09-16.md and profile-approval evidence.
+
+## [2026-09-16] verification | Profile approval full suite passes
+- Full4459 passed364 files/4100 tests. No checks remain live; five-profile approval remains pending.
+
+## [2026-09-16] verification | Four-option real catalog preview
+- Native staff preview verifies unknown scope, separate Add-on coverage, mobile scroll, sticky labels, keyboard evidence and masking.
+- Unpublished; five-profile authorization and remaining Phase1 work stay open. See dated preview evidence.
+
+## [2026-09-16] verification | Payroll form and proposed configuration
+- See journal/2026-09-16.md and docs/security/phase1-payroll-browser-scope-2026-09-16.md. Paycom automatic review still requires named confirmation. Phase1 incomplete.
+
+## [2026-09-16] evidence | UKG native payroll draft
+- Saved UKG-02 through native staff UI. Approval rejected; specific question pending. See journal/2026-09-16.md.
+
+## [2026-09-16] documentation | Reconcile Phase1 checklist
+- Current UKG draft verified. Checklist now reflects full4100 and completed payroll browser checks. Approval questions remain pending.
+
+## [2026-09-27] documentation | Simplify project instructions and startup memory
+
+- Shortened STATE.md and preserved its full previous content in archive/STATE-before-2026-09-27.md.
+- Made startup reading task-specific and aligned root instructions through AGENTS.md.
+- Clarified task completion, skill selection, and canonical authority. Safety and release requirements remain in force.
+- See journal/2026-09-27.md for validation and unresolved application work.
+
+## [2026-09-30] audit and documentation | Verify code against all development requirements
+
+- Mapped all 148 requirements to code, tests, implementation depth, and remaining work.
+- Updated PRD, architecture, README, roadmap, launch checklist, and phase guidance without changing application code.
+- Prepared the manual pilot procedure draft; MVP-07 is Partial, with setup and rehearsal still open.
+- Type, lint, 4,100 unit/component tests, build, and 96 isolated database tests passed.
+- Dependency gate failed with 18 high and 12 moderate entries. Full integration configuration and all 12 R9 evidence categories remain open.
+- See journal/2026-09-30.md and docs/code-audit-2026-09-30.md for evidence and limits.
+
+## [2026-09-30] plan | Complete one pilot workflow
+
+- Saved `.codex/plans/build-complete-pilot-workflow.md` at the user's request.
+- Defined six phases, real catalog approval, ordinary role use, participant acceptance, manual rehearsal, release evidence, and recovery.
+- Validated local link targets and plan text. No application checks were required for this documentation-only task.
+- Implementation approval remains pending. Existing launch task statuses remain unchanged.
+
+## [2026-09-30] auth | AgentID local integration; registration pending
+
+- Added disabled sign-in, a PKCE callback, verified email and consent registration, and authorization inventory entries.
+- Type check, lint, production build, 495 authentication tests, and 39 isolated registration tests passed.
+- Browser verified disabled entry points and narrow signup layout; no captured error or warning logs appeared.
+- Target access blocked CLI registration. User-authorized Supabase login awaits browser authentication.
+- Hosted-provider sign-in remains disabled. AgentMail inbox access requires separate API credentials.
+
+## [2026-09-30] verification | AgentMail test inboxes
+
+- Verified API access and message reads for the three user-supplied inboxes.
+- Sent one synthetic message from each inbox to the next inbox. Read all three received messages and matched the unique test reference.
+- All mailbox lookup, send, and received-message read requests returned HTTP 200.
+- Assigned customer, staff, and vendor test roles in inbox order. No application access grants changed.
+- AgentID registration still awaits Supabase browser login. Hosted-provider sign-in remains disabled.
+
+## [2026-09-30] scope | Email testing without Supabase registration
+
+- User clarified that the three inboxes are for email testing through AgentMail.
+- Canceled the waiting Supabase CLI login; command reported `Operation cancelled.`
+- AgentID setup stopped. Local AgentID code remains disabled; no hosted provider or test account was created.
+
+## [2026-09-30] testing | Customer staff and vendor verification
+
+- Local browser workflow passed through RFP delivery using real Auth, MFA, API calls, and persisted synthetic records.
+- Type check, lint, build, 4,174 unit tests, and 871 tests across 95 disposable integration files passed.
+- Five shared suites remain blocked by Windows port reservations. Normal MMHR data volumes remain saved; normal containers remain stopped.
+- Homepage Get access failed; signup input reset, access messages, and incomplete later workflows remain open.
+- Dependency audit and all 12 R9 evidence categories remain blocked. Disposable test environments were cleaned up.
+- See [the test report](../docs/temp/e2e-role-verification-2026-09-30.md) and [journal](journal/2026-09-30.md).
+
+## [2026-09-30] implementation | Portal reply workflow; full task active
+
+- Vendor reply, independent staff approval, and customer approved-response reads passed local browser checks.
+- Acquisition, signup retention, staff navigation, access text, and blank-intake guidance have verified local fixes.
+- Type check, lint, build, focused tests, and populated migration checks passed. Broader unit and compatibility reruns remain open.
+- Clarifications and later product workflows remain unfinished. No real data, hosted migration, Git write, or production action occurred.
+- See [portal response controls](../docs/security/r4-portal-responses.md) and [journal](journal/2026-09-30.md).
+
+## [2026-09-30] implementation | Clarifications verified in the browser; full task active
+
+- Staff questions, vendor answers, linked revisions, independent decisions, and approved customer reads passed local browser checks.
+- The final customer identifier correction needs a database rerun. The repaired Auth suite passed six tests.
+- Four isolated security suites and broader application gates remain open. Full unit and worker startup time limits remain unresolved.
+- Email, uploads, and later business workflows remain unfinished. Release and real-data approvals remain separate.
+- See [clarification controls](../docs/security/r4-portal-clarifications.md) and [journal](journal/2026-09-30.md).
+
+## [2026-09-30] implementation | Demo workflow verified; private document work active
+
+- Demo planning, both availability forms, confirmation, schedule changes, completed outcomes, and history passed local role browser checks.
+- The final clarification privacy test and 27-test genuine Auth workflow suite passed.
+- Full units passed 4,270 tests. The earlier five isolated suites passed 60 tests; the latest complete integration run remains open.
+- Document adapters passed 55 focused tests. Storage RLS, actual scanning, jobs, and upload screens remain unfinished.
+- Type/lint/build passed for demos. Document type/lint passed; later build remains in progress.
+- See [demo controls](../docs/security/r6-demo-coordination.md), [document work](../docs/security/r4-private-document-work.md), and [journal](journal/2026-09-30.md).
+
+## [2026-10-01] implementation | Private document safety and leased worker checkpoint
+
+- Genuine scanner: three synthetic checks passed with current signatures and automatic fixture cleanup.
+- Upload boundaries: eight checks passed. Dedicated worker: eleven checks passed, including real-clock fencing after a lock wait.
+- All 148 migrations applied. Eleven empty-database checks passed across the 147-table inventory.
+- Focused document units: six files and 86 tests passed after the provider compatibility exports.
+- Final gates after those exports remain open. The complete 104-file integration run remains unverified.
+- Storage policies, upload commands, application screens, reviewed processing, and signed access remain unfinished.
+- See [document work](../docs/security/r4-private-document-work.md) and [journal](journal/2026-10-01.md).
+
+## [2026-10-01 02:49] implementation | Genuine private uploads and scan queue
+
+- Eleven reservation database, five genuine Auth, and ten genuine Storage checks passed.
+- All 150 migrations applied; eleven empty-database checks passed across 147 public tables.
+- Thirty-nine focused checks and current type/lint gates passed. The Storage checkpoint build passed.
+- Original objects remain private and immutable. Audit failure rolls back queue creation and retains the original for safe retry.
+- Restricted processor reads, combined scanner flow, review, access, and role screens remain open.
+- The full 107-file integration command and all 12 R9 categories remain unverified or blocked.
+- See [document work](../docs/security/r4-private-document-work.md) and [journal](journal/2026-10-01.md).
+
+## [2026-10-01 03:54] implementation | Lease-bound reads and genuine scan sweep
+
+- Ten combined Auth/Storage/database/ClamAV checks passed, including a harmless antivirus Word package and real lease expiry.
+- The final guarded worker passed twelve database checks. Eight upload boundary checks passed again.
+- All 151 migrations applied; eleven empty-database checks passed across 147 public tables.
+- Forty sweep/worker and 61 fixture/architecture/inventory checks passed. Security exceptions remain unchanged.
+- The first full unit run failed two boundary/inventory checks and one Windows thread startup. Corrections and the missed 26-test component check passed; a fresh full run remains active.
+- Document content stays unapproved after clean scanning. Role screens, extraction, review, authorized access, and scheduled operation remain open.
+- See [document work](../docs/security/r4-private-document-work.md) and [journal](journal/2026-10-01.md).
+2026-10-01 05:37 — Scoped document metadata/version/history role screens passed ten manual browser checks, ten database checks, and eight genuine Auth checks. All 152 migrations applied to an empty owned database. Type checking, lint, build, matrix inventory, and secret scans passed. Latest complete unit attempt failed one Windows worker startup; its omitted file passed separately and a fresh complete run remains active. Parser/security dependency approvals and full document workflows remain open. See journal/2026-10-01.md.
+2026-10-01 07:10 — Private filename search passed 153 focused, thirteen database, nine genuine Auth, and eleven browser checks. Fresh launcher sessions passed four role/search checks without stale refresh errors. Upload implementation passed twelve genuine Auth/Storage checks; scanner/browser/build/full-unit verification continues. An overlapping complete unit run failed changed inventory and one Windows worker startup; corrected inventory/component checks passed separately. All dependencies, release evidence, and remaining workflows retain their approval and completion limits. See journal/2026-10-01.md.
+2026-10-01 15:00 — Structured portal proposals passed nine database, five genuine Auth, 94 focused, 19 final UI, 54 boundary, and seventeen manual browser checks. Original exact prices and independently approved comparisons preserve historical sources. Type and build passed. The complete unit attempt passed 4,666 tests and failed one misplaced-helper boundary check; the helper moved into the existing test folder and a stable complete rerun is active. The full 112-file isolated integration run is also active. Upload MIME/scanner checks passed; actual upload browser interaction and full document controls remain open. See journal/2026-10-01.md.
+2026-10-01 17:37 — Contract inputs, request commands, transport, role screens, and draft SQL passed ten isolated database and 149 focused checks. Full lint passed. Genuine Auth approval hit a statement timeout; its repair, root migration, browser evidence, and corrected type/build gates remain open. Direct synthetic AgentMail delivery and reply checks passed; application delivery remains unfinished. The earlier complete unit baseline passed 406 files and 4,667 tests. See journal/2026-10-01.md.
+2026-10-01 18:31 — Four genuine contract Auth checks passed, including unchanged-limit rollback and exact retry. Seventeen time and eleven form regressions passed. Manual customer selection, staff approval/introduction/signing, vendor privacy/history, and narrow history checks passed. Current type and lint passed after owned browser cleanup and generated type cache removal. Build, complete unit gates, root migration, remaining browser cases, CRM stage coordination, and the full integration result remain open. See journal/2026-10-01.md.
+2026-10-01 19:11 — Corrected 23 missing contract authorization inventory entries; fresh four-file regression passed 56 tests. Current type, lint, and build passed. Finance passed 15 checked-sum tests and seven draft SQL rounding checks. Contract CRM stage draft passed thirteen database checks; final verified legacy authority and signed Auth verification remain active. The earlier full unit attempt failed inventory and one worker startup; stable complete rerun remains active. Full integration remains incomplete after 66 suites and two earlier failures. See journal/2026-10-01.md and docs/security/r7-finance-calculation-2026-10-01.md.
+2026-10-01 20:10 — Registered contract migration 0154 and 114-file integration matrix. Thirteen registered SQL and five signed Auth checks passed. Current type and focused lint passed. Historical staff restriction verification remains active. Complete integration failed two checks; complete units and browser-only thread runs failed worker startup. Fork-mode comparison and database-clock regression remain active. Browser CDP focus recovery still failed. No cloud migration, deployment, Git write, or real customer use occurred. See journal/2026-10-01.md and docs/security/r6-contract-portal.md.
+`2026-10-01 20:59` — Registered contract verification: 411 files/4,771 unit tests, 54 boundary checks, 11 empty, 10 restricted, 2 historical, 97 identity checks passed. Three-role browser proof retains contracting/open; original full integration failed. Build active; finance registration next. No Git/cloud/production action.
+2026-10-01 23:58 — Finance calculation migration passed 8 new and 5 existing checks. Document review/access passed 17 genuine Auth/Storage, 13 combined scanner, 248 focused, and 45 search regression checks. Type/lint/build passed. Three-role browser evidence covers decisions, approved customer access, vendor isolation, histories, and search; file opening remains unverified. Full units failed one startup after 4,868 checks passed. Corrected vendor and browser fixtures remain active. Plan v1.18; no Git/cloud/production action. See journal/2026-10-01.md and docs/security/r4-document-review-access.md.
+# October 2 checkpoint
+
+- 10:23 — Browser uploads passed for synthetic customer and vendor sessions. Finance command bindings passed fifty focused checks, type checking, and lint. See [journal](journal/2026-10-02.md). Complete unit/build checks remain active or pending; full feature delivery remains unfinished.
+2026-10-02 10:46 — Upload retry passed for synthetic customer and vendor sessions. Fifty finance command tests and two existing SQL checks passed. Fresh complete units passed 418 files and 4,940 tests; type checking, lint, build, whitespace, document links, and secret scans passed. Full feature delivery remains unfinished. See journal/2026-10-02.md and docs/security/r7-finance-command-bindings-2026-10-02.md.
+2026-10-03 00:49 — Updated all 148 requirement rows and canonical completion sequence. Payment approval and original retry correction passed forty payment SQL, twenty invoice SQL, and fifty mocked command checks. Contract composed test passed thirteen SQL checks after measured aggregate budget correction. Full frozen integration retains failure; genuine Auth finance, outbox, and broader current gates continue. Dependency and parser approvals remain pending. No Git, cloud, saved database migration, provider, or production action. See journal/2026-10-03.md.
+2026-10-03 01:54 — Finance passed 64 SQL and 35 genuine Auth checks. Disabled synthetic email passed 50 checks; staff notification controls passed component checks. Full unit and build gates failed; focused corrections passed, broad reruns remain required. Outbox24-case and browser acceptance remain active or pending. Finance source and approval plan is ready. No external or Git action. See journal/2026-10-03.md.
+2026-10-03 03:07 — Notification SQL/Auth passed 24 checks after guarded helper correction and cleanup. Sixty-two boundary checks, type checking, full lint, guarded production build, and 26 previously omitted component checks passed. Full units remain active; browser and complete integration acceptance remain open. Task and calculation drafts stay in scratch. No external, package, saved migration, production, or Git action. See journal/2026-10-03.md.
+2026-10-03 03:40 — First staff notification browser checks passed with owned teardown; exact retry awaits a fresh fixture. Four unchanged inventory checks and 28 finance input-boundary checks passed. The frozen integration snapshot has four failures, including a missing operational SQL input. Complete candidate acceptance remains open. Source drafts stay in scratch. No provider dispatch, package, saved migration, production, or Git action. See journal/2026-10-03.md.
+2026-10-03 04:35 — Task screens, commands, and migration 0159 connect locally. Type checking, focused lint, seventy-six relevant unit checks, and fourteen entry-point checks passed. Frozen integration completed with 1,101 passing checks and four failures; owned cleanup remains active. Two browser fixtures retained bounded evidence; exact button replay remains unproved. Finance drafts require independent corrections. No external, package, saved migration, production, or Git action. See journal/2026-10-03.md.
+2026-10-03 10:06 — Finance document type checks,88units and17inventory checks passed. Task signed Auth passed7checks and failed26. Baseline owned cleanup and hashes passed. Migration0160 contains the reviewed demo privacy correction; actual SQL/Storage verification remains open. No saved migration, package, provider, production, or Git action. See journal/2026-10-03.md.
+2026-10-03 11:26 — Finance screens and upload recovery each passed seventy relevant checks, full types, and focused lint. Task timing passed four selected cases; complete36-case current162-migration proof remains active. RecoverySQL/Auth/Storage/browser remain pending. Commercial54-check drafts stay scratch. No saved/cloud migration, package, provider, production, or Git action. See journal/2026-10-03.md.
+2026-10-03 12:11 — Task proof passed 36 genuine signed checks with hashes and owned cleanup. Managed finance contracts, commands, reads, router, and reviewed migration 0162 are present. Focused 107 checks, full types, and lint passed. SQL text checks passed; actual execution remains open. Finance document fixtures retain 44 skipped, two passed/42 failed, and ten passed/34 failed. Exact first-review diagnostics continue. No saved/cloud migration, package, provider, production, permission deployment, or Git action. See journal/2026-10-03.md.
+2026-10-03 12:32 — Commercial screens passed 111 focused checks, full types, and lint. Inventory has 364 entries. Genuine 500-character review passed after SQL regex correction. Following reservation still hits eight-second SQL limit; phase diagnostics continue. Independent task history digest gap correction and managed Auth drafts remain active. No saved/cloud migration, package, provider, production, permission deployment, or Git action. See journal/2026-10-03.md.
+2026-10-03 13:18 — Generated task migration0163 binds exact requests and effects; ten actual Auth regressions register. Managed Auth suite adds29cases. Current364entries/164migrations/121integration files. Full types, full lint,51focused checks,8patch checks,secret scans and120links passed. Finance capacity/JIT failures and first statistics harness failure remain retained; corrected profiler and invoice drafts are active. No saved/cloud migration, package, provider, production, permission activation, or Git action. See journal/2026-10-03.md.
+2026-10-03 13:41 — Historical task fixture selection passed 37 checks, full types and focused lint. Integration inventory now has 122 files. Genuine pre-additive task verification is queued. Statistics role and socket-smoke failures remain retained; managed 163 positive proof has priority. AgentMail process key remains absent. Package approval requested under AGENTS.md. No saved/cloud migration, package, provider, production, permission activation, or Git action. See journal/2026-10-03.md.
+2026-10-03 14:35 EDT — Managed approval2PASS, measured capacity1PASS, invoice backend158PASS; UI stale-form correction and genuine acceptance remain active. No commits.
+2026-10-03 15:05 EDT — UIv2/page/expiry correction integrated;29UI/21page/81transport/types/lint pass. Actual0164 failed42601; corrected owned retry active. Full18Auth/R8/differential/browser remain open. No commits.
+2026-10-03 15:35 EDT — Corrected invoice migration loaded; first source read1FAIL/17SKIP, hashes/cleanup passed. Fullunits5790PASS/2FAIL in1072.94s; all frozen inputs unchanged. Safe source diagnostic has clearance. No commits.
+2026-10-03 15:51 EDT — Actual42703 vendor lookup fixed;67focused checks andfullstrict3599files/focusedlint pass. Verified12extra boundaries integrated;30Authcases registered. Corrected selected2owned run active; no commits.
+2026-10-03 16:20 EDT — Canonical42501 diagnostic retained1FAIL/29SKIP97.46s with unchanged snapshots/hashes and owned cleanup. UTC calendar date correction preserves legacyDATE and exact managed times; fulltypes/full lint PASS. Corrected first-only genuine run queued; Drizzle alignment remains open. No commits.
+2026-10-03 16:30 EDT — Genuine firstinvoice1PASS/29SKIP104.83s proves independent approval/issue, exact UTC instants, calendar attacks and unchanged retries. All1517source/39metadata/62brain hashes andownedcleanup PASS. Drizzle date alignment/full30/browser remain open. No commits.
+2026-10-03 16:44 EDT — Drizzle legacyDATEstring model/auto-generated0165metadata integrated with assertion-only SQL. RoundtripPASS8.76s/all296source-history+39metadata unchanged; fulltype/lint/matrix123PASS. Actual preservation/schema attacks/fullsuite remainopen. No commits.
+2026-10-03 17:00 EDT — FourDATEcodec/preservation/schema-attack regressions integrated; strict1047files/0diagnostics/root13guards/fulltypes/fulllint PASS. Original30assertions/deadlines unchanged. Full34exactcapture1520files/166migrations/39metadata ready with0overrides; actualexecution next. No commits.
+2026-10-03 17:16 EDT — Full34:6PASS/28FAIL/no skips245.51s. Complete firstinvoice/rawproperties/all4DATE cases passed. Retry classification and16source/11dependent setup failures under diagnosis. All source/dependency/memory hashes andownedcleanup passed. No commits.
+2026-10-03 17:51 EDT — Ten reviewed invoice/isolation/browser-fixture changes integrated after29guards. Rootfulltypes/fulllint/matrix123PASS; drafts148isolation/14browserPASS. Oldlegacy20PASS/1FAIL with wildcardDB is unaccepted; ownedcleanup cleared. Freshloopbacklegacy21 cleared, correctedfull34/browser remain unverified. No commits.
+2026-10-03 18:06 EDT — Originallegacy21PASS111.01s/acceptedrunner121.079s; exactloopbackDB/noAPI/source1520/deps39/reviewed10/ownedcleanupPASS. Earlier21PASS/unknownobserverFAIL retainedunaccepted. Sourcecredentialscan1711/0findings;7docfiles132linksPASS. Correctedgenuine34/browser remains open. No commits.
+2026-10-03 19:43 EDT — Invoice33PASS/1FAIL with unchanged source/evidence and owned cleanup; forgery TypeError remains unresolved. User approved both package packets; scratch resolution active. Collection133focused checks passed after chronology correction; runtime remains disabled. Old browser copy cancelled safely. No commits.
+2026-10-03 20:17 EDT — Approved ci retry/version13/native7 PASS; full audit11HIGH/0critical remains failed. Current type/lint/matrix123 and focused137 PASS. Synthetic Drizzle JSON reproduction proves raw-object Buffer error; genuine invoice probe remains pending. Collection SQL source-only review passed; both authority bridges remain false. No commits.
+2026-10-03 20:51 EDT — Genuine diagnostic confirmed JSON encoding failure at history_receipt;1FAIL/33filtered retained. Owned cleanup confirmed separately after denied listener probe. Root corrected3test parameters. Scratch schema type/generation and exact105statement reordering passed; no SQL applied. Complete34 and release gates remain open. No commits.
+2026-10-03 21:03 EDT — Parser V8 strict/lint and46simulated checks PASS;21real-format and isolated runtime unrun. Invoice reverse3parameter proof restores complete baseline bytes. Fresh34capture pending; no commits.
+2026-10-03 22:46 EDT — Corrected genuine invoice34PASS/0FAIL/0SKIP/acceptedtrue/cleanuptrue3680.809s. All source/dependency/evidence guards pass. BraceV5 runtime released; parser53/nativebackend/collection/UI remain drafts. Independent units runner defects need V2 before execution. No commits or production actions.
+2026-10-03 23:14 EDT — Brace security checks passed; archive preparation and native inventory failed. Full units V2 source review passed. See journal/2026-10-03.md.
+2026-10-03 23:55 EDT — Full units5936PASS/1FAIL; migration inventory165→166 correction passed15focused tests. Complete corrected gates remain required. See journal/2026-10-03.md. No commits.
+2026-10-04 00:10 EDT — V6 offline archives and independent12-body proof PASS; installation unapproved. Native read diagnostic timed out; backend type host failed. See journal/2026-10-04.md. No commits.
+2026-10-04 00:28 EDT — Backend V3.3 strict types/lint/29simulated cases passed. The final timed-out inventory diagnostic retained4884hashes; it remains failed. No commits.
+2026-10-04 02:02 EDT — Integrated33parser files, five verifier files, and two notices. Actual root109parser and30worker cases passed. Full application types/lint passed. Execution stays disabled.
+2026-10-04 02:02 EDT — Exact additional braces decision saved. Offline1328-record graph review and relocated metadata passed. Installation approval is pending; audit retains11HIGH entries. No Git or production action.
+2026-10-04 02:16 EDT — Complete472-file suite passed6076/6076tests in688.182s. Exact source and tracked parent checks passed. Build, browser, integration, security, and release work remain open.
+2026-10-04 04:23 EDT — Current types/lint and clean telemetry-disabled build PASS;49noticefiles/46texts retained. Release lock11HTTP/sixbrowser routes passed with owned cleanup. Full unitsV5 timed out at1500s,410reportedfiles/no complete report; remains failed. See journal/2026-10-04.md. No commits or production actions.
+2026-10-04 07:00 EDT — Inactive bounded executor integrated;156focused/fulltypes/lint PASS. Clean build V6 PASS510.650s/93pages. Pure PostgreSQL50cases+invalidcast/ACL/cleanup PASS. Full units6069/474 passed but worker startup failed; isolated52PASS does not clear full gate. Stream and owned rehearsal remain drafts. See journal/2026-10-04.md. No commits or production actions.
+2026-10-04 07:35 EDT — Integrated six inactive stream files after exact draft strict/lint/84tests PASS. Earlier3warning lint failure is retained. Both prior files are backed up. Current root gates/build and genuine Auth/Storage remain required. Source capture and fixture drivers remain unrun. No commits or production actions.
+2026-10-04 08:25 EDT — Current root focused 84, types, and lint passed. Full units failed: 6,117 cases passed, 52 absent after startup failure. Build refresh stopped before writes at generated junction inventory. See journal/2026-10-04.md. No commits or production actions.
+2026-10-04 09:40 EDT — Current isolated build PASS323.365s/93pages; startup diagnostic83PASS does not clear full-suite failure. Exact CLI version admission PASS. Receipt backward-state defect needs correction; generation and genuine collection remain unrun. See journal/2026-10-04.md. No commits or production actions.
+2026-10-04 19:58 EDT — Recovered prior chat; stable titles146x2, audit70, email88, receipt71, corrected fulltypes PASS. Generated0166/0167 unrun; audit execution revoked. Preserved startup/type/lint failures. Full delivery remains active. See journal/2026-10-04.md and docs/security/session-recovery-2026-10-04.md. No commits.
+- 20:39 EDT — Approved braces local installation passed; focused compatibility/security/consumer checks passed,45reference failures retained. See journal/2026-10-04.md and the exact package decision. Full task remains active.
+- 22:33 EDT — Genuine receipt collection46cases passed without body execution. Authorization retry29/31 passed; two fixture defects require correction. Owned Docker resources, observed processes, markers, and ports are absent. History/audit and full delivery remain open. See journal/2026-10-04.md.
+- 23:13 EDT — Corrected genuine authorization31/31 passed; history13/15 remains failed. Exact cleanup passed. Audit owner correction integrated; history readiness cancellation remains under repair. Onboarding v4/UI remain scratch. Existing local Docker is Linux x86_64/cgroupv2; Buildx unavailable. See journal/2026-10-04.md.
+- 23:41 EDT — Complete receipt genuine46/46 passed with exact roster and source guards. Owned resources, recorded processes, markers, and ports are absent. Audit genuine checks and onboarding recovery remain next. See journal/2026-10-04.md.
+- 23:53 EDT — Genuine audit32/32 passed with exact roster and source guards. Owned resources, recorded processes, markers, and ports are absent. Fresh full units and remaining onboarding/reminder work continue. See journal/2026-10-04.md.
+- 2026-10-05 01:27 EDT — Full unit collection failed before acceptance; underlying errors/events were not saved. Four recorded processes and direct children are absent. Receipt timing correction and20additive cases remain scratch. Onboarding V7 passes static review; runtime acceptance remains open. Durable recovery, reminders, customer success and finance closure continue. See journal/2026-10-05.md. No commits or external action.
+- 2026-10-05 02:03 EDT — Receipt forward0168 and20additive cases integrated; original46bodies preserved. Selector/control33 andfocused lint pass with1753source pins. Earlier generation/ignore-dependent guard failures remain preserved. Collector diagnostic positive4pending andnegative errors retained; nine observed processes/directchildren absent. Full types andgenuine66remain pending. See journal/2026-10-05.md. No SQL applied, grants, commits or external action.
+- 2026-10-05 02:25 EDT — Receipt corrected control14, focused lint andfull types passed with1753unchanged source pins. Earlier full type failure remains preserved. READ COMMITTED visibility needs an explicit boundary and actual API isolation measurement. Genuine acceptance and full delivery remain open. See journal/2026-10-05.md. No SQL applied, grants, commits or external action.
+- 2026-10-05 02:46 EDT — Receipt isolation boundary andAPI probe integrated;33focused cases,lint andfull types passed. Ten added rollback cases expand genuine roster to76. Complete source/dependency capture remains pending. See journal/2026-10-05.md. No SQL applied, grants, commits or external action.
+- 2026-10-05 04:44 EDT — Receipt V2 collected76pending cases and full byte guards passed, but10expected formatter names failed exact comparison. Frozen V6 corrects expected names; config preflight passed. Independent review, accepted collection and genuine tests remain open. See journal/2026-10-05.md. No SQL applied, grants, commits or external action.
+- 2026-10-05 06:05 EDT — Receipt V6 exact76collection and full byte/link guards passed. Recorded collection processes and direct children are absent. Genuine setup failed on sandbox Docker access;61cases skipped,history unrun,final guards pending. V7 retry preserves canonical worker and console JSON report;independent review remains open. Finance and CSM scratch work continues. See journal/2026-10-05.md. No Git, production or provider activation.
+- 2026-10-05 07:16 EDT: Receipt V8 56pass/5fixture failures; full guards and exact cleanup passed. Fixture correction integrated. Bounded unit collector V5 exact16 passed. Finance and CSM successors remain unrun. See journal/2026-10-05.md.
+- 2026-10-05 08:00 EDT: Fixture33focused checks,lint andtypes passed with1753pins. Reviewed V9fresh snapshot prepared;collection/full guards are active. Finance command/read/admission successors remain unrun. Effective-ledger binding corrections andactual adapters are in progress. See journal/2026-10-05.md. Full delivery remains incomplete.
+- 2026-10-05 09:27 EDT: V9exact76collection andcomplete byte/link guards passed. Four recorded processes/directchildren/markers absent13:12UTC. Genuine launcher83558 remains active. Finance/CSMsource andruntime work continue. See journal/2026-10-05.md. Full delivery remains incomplete.
+- 2026-10-05 10:13 EDT: Receipt Auth61 passed with full guards. History and cleanup remain open. Finance source reviews passed; 48 pure cases are prepared and unrun. See journal/2026-10-05.md.
+- 2026-10-05 10:49 EDT: Receipt 76 and isolated finance 48 plus types passed. Owned cleanup passed. Full delivery remains incomplete. See journal/2026-10-05.md.
+- 2026-10-05 11:34 EDT: Composed types and focused lint passed. All 55 isolated finance result cases and strict types passed. Owned schema generation passed. Generated ordering needs correction. Full delivery remains incomplete. See journal/2026-10-05.md.
+
+2026-10-05 11:51 EDT — Collection baseline102 cases passed; actual scoped process cleanup passed. Closed upload and database authority remain open. No Git writes.
+2026-10-05 12:49 EDT — Browser25 and document bridge99 plus strict types passed. Actual two-tab cancellation and owned cleanup passed. Finance/CSM source and complete delivery remain open. See journal/2026-10-05.md.
+2026-10-05 13:20 EDT — Download95, financial136 and strict types passed. Complete46-schema types and owned generation passed. SQL/catalog, application wiring and complete delivery remain open. See journal/2026-10-05.md.
+2026-10-05 13:50 EDT — Independent SQL order and single-DDL reviews passed. Complete169-migration/72-part source assembly is saved. SQL and full delivery remain open. See journal/2026-10-05.md.
+2026-10-05 14:35 EDT — Current composed gates, document50 and financial recovery60 plus strict types passed. Catalog setup failed before six cases. Captured part9 forward REVOKE defect; cleanup passed. Exact colliding reviews recovered. Reload recovery successor remains required. See journal/2026-10-05.md.
+2026-10-05 15:03 EDT — Marker-only recovery63 and strict types passed. Complete47-schema types/generation passed. Document target corrections and exact security extraction reviewed. CatalogV3 failed CASE parsing; reversible22-expression repair awaits independent review. Shared dispatch and CSM source remain open. See journal/2026-10-05.md.
+2026-10-05 15:44 EDT — Financial catalogV5 passed6 actual cases; shared wiring24 and contracts36 plus strict types passed. Dispatcher review found attribution-loss F1; V2 repair awaits review. First81 document/finance catalog is prepared. Full delivery remains open. See journal/2026-10-05.md.
+2026-10-05 16:25 EDT — First81/repaired85 passed seven catalog cases each; adapter64 and strict types passed. ComposedV6 failed four fixture type errors; lint skipped. Five unsafe corruption cases remain unrun. SafeV9 and separate fixture approval remain required. See journal/2026-10-05.md. Full delivery remains incomplete.
+2026-10-05 16:54 EDT — CorpusV10 passed composed types and focused lint, with22 warnings. Independent review confirms72 exact old bodies and5 safe guard cases; original5 claims remain UNMET. Actual process absence passed. Permission, probe, drain and physical-cleanup integration remain open. See journal/2026-10-05.md.
+2026-10-05 17:35 EDT — CSM through reschedule proposals passed composed types and lint, with24 warnings. Process absence passed. Owned27 fixture review found three blockers;19 source/2 partial/17 unmet remains unrun. V2 repair and five-file CSM unit preparation are active. See journal/2026-10-05.md.
+2026-10-05 17:58 EDT — CSM through X passed composed types/lint;113 Q units and strict types passed. Shared fixtureV2 strict types passed, but root review found cleanup SQL after incomplete settlement. V3 closed-state repair is active. SQL, grants and full delivery remain open. See journal/2026-10-05.md.
+2026-10-05 18:31 EDT — Shared fixtureV3 passed29 units/strict types. Root227-file review found raw authority SQL after awaited file I/O. V4 and failure-safe capture remain required. CSM Z/schema source and fixture publication approval remain open. See journal/2026-10-05.md.
+
+2026-10-05 19:14 EDT — CSM throughZ/schema gates and generation passed. SharedV4 controls passed. Actual27 database cases failed transaction settlement; exact cleanup passed. Source diagnosis and128 helper preparation continue. See journal/2026-10-05.md. Full delivery remains incomplete.
+
+2026-10-05 19:34 EDT — Diagnostic27 failed; exact cleanup passed. Trace proves portal seed savepoint cancellation gap. Independent publication review found four source blockers and baseline gaps. Separate repairs continue. See journal/2026-10-05.md. Full delivery remains incomplete.
+
+2026-10-05 20:04 EDT — SharedV6 passed45 pure cases and strict types; known processes are absent. Actual PostgreSQL behavior remains unproved. PublicationV7 review and181-case validation preparation continue. See journal/2026-10-05.md. Full delivery remains incomplete.
+
+2026-10-05 20:19 EDT — OwnedV5 strict passed; all27 cases failed. Installed SQL Identifier helpers are misclassified;17 savepoint deadline failures need separate diagnosis. Exact Docker/process/port cleanup passed. See journal/2026-10-05.md. Full delivery remains incomplete.
+
+2026-10-05 20:51 EDT — Shared57 pure cases and strict types passed. Publication178/8 failed; native cancellation repair continues. Known test processes are absent. Private setup source and CSM catalog preparation continue. See journal/2026-10-05.md. Full delivery remains incomplete.
+
+2026-10-06 13:40 EDT — User changed priority to core MVP features, then shared design, then further security. Document and current source review completed. MVP plan awaits approval. No application changes or new runners started. See journal/2026-10-06.md.
+
+2026-10-06 17:17 EDT — Saved the complete MVP UI/UX and backend roadmap in .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md. Six phases cover all launch screens, services, design and acceptance. Document links and commands passed validation. Application work remains stopped for approval. See journal/2026-10-06.md.
+
+2026-10-06 18:28 EDT — Reviewed the saved MVP roadmap against source and delivered an opinion with recommended modifications in the conversation. Type-check and lint passed on the dirty tree. No application, canonical document or plan file changed. See journal/2026-10-06.md.
+
+2026-10-06 18:52 EDT — Saved roadmap version 1.1 with the owner-approved review modifications: 30 anchored edits, new status line, Section 16 change record. Links and script names verified. Implementation awaits the explicit P0 start instruction. See journal/2026-10-06.md.
+
+2026-10-07 01:28 EDT — Began P0 on owner instruction. Recorded the baseline, launch inventory, isolation approach, work list, interface rules and recovery design in .codex/plans/build-mvp-p0-baseline-2026-10-07.md; added supersession notices to nine documents; migrated the local DB to 169. Unit, build, matrix and secret checks pass; dependency audit fails. Eight owner decisions open. See journal/2026-10-07.md.
+
+2026-10-07 07:22 EDT — P0 integration result: 119/126 files and 1465/1492 tests pass in 20859s. Two launch-scope failures, five excluded-scope files. Decision D9 added; nine decisions open. See journal/2026-10-07.md.

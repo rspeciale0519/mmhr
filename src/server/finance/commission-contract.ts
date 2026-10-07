@@ -310,6 +310,15 @@ export function transitionCommissionEvent(
 }
 
 /** Reconciles immutable payment records without changing their source history. */
+function sumReceivedMinorUnits(payments: readonly CommissionPayment[]): number {
+  let total = BigInt(0);
+  for (const payment of payments) {
+    if (payment.state === "received") total += BigInt(payment.amountMinorUnits);
+  }
+  if (total > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error("Payment total exceeds the supported amount");
+  return Number(total);
+}
+
 export function reconcilePayments(
   expectedMinorUnitsInput: number,
   paymentsInput: readonly unknown[],
@@ -321,12 +330,11 @@ export function reconcilePayments(
     return result.data;
   });
   const seenPayments = new Set<string>();
-  let receivedMinorUnits = 0;
   for (const payment of payments) {
     if (seenPayments.has(payment.paymentId)) throw new Error(`Duplicate commission payment: ${payment.paymentId}`);
     seenPayments.add(payment.paymentId);
-    if (payment.state === "received") receivedMinorUnits += payment.amountMinorUnits;
   }
+  const receivedMinorUnits = sumReceivedMinorUnits(payments);
   const balanceMinorUnits = expectedMinorUnits - receivedMinorUnits;
   return {
     expectedMinorUnits,
@@ -391,9 +399,8 @@ export function reconcileFinancialReport(
   if (new Set(reports.map((row) => row.commissionEventId)).size !== reports.length) throw new Error("Duplicate finance report row");
   if (reports.some((row) => !eventIds.has(row.commissionEventId))) throw new Error("Finance report references an unknown event");
   const reconciled = events.map((event) => {
-    const receivedMinorUnits = payments
-      .filter((payment) => payment.commissionEventId === event.eventId && payment.state === "received")
-      .reduce((total, payment) => total + payment.amountMinorUnits, 0);
+    const receivedMinorUnits = sumReceivedMinorUnits(payments
+      .filter((payment) => payment.commissionEventId === event.eventId));
     const report = reports.find((row) => row.commissionEventId === event.eventId);
     if (!report || report.currency !== event.currency || report.earnedMinorUnits !== event.commissionAmountMinorUnits
       || report.invoicedMinorUnits !== event.commissionAmountMinorUnits

@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 
 import { startRehearsal, stopRehearsal, type RehearsalContext } from "./r1-migration-rehearsal";
 import { adapterCases } from "./r1-identity-intent-adapter-cases";
@@ -8,7 +8,7 @@ import { prepareWorkerFixtureRole } from "./r1-identity-intent-fixtures";
 import { applyIdentityIntentMigrations, rehearseIdentityIntentMigration } from "./r1-identity-intent-migration-cases";
 import { reconciliationCases } from "./r1-identity-intent-reconciliation-cases";
 import { resultCases } from "./r1-identity-intent-result-cases";
-import { createCommandFixture, rollbackCase, type SecurityCommandFixture } from "./r1-security-command-fixtures";
+import { asAuthenticated, createCommandFixture, rollbackCase, type SecurityCommandFixture } from "./r1-security-command-fixtures";
 
 describe("R1.4 restricted identity intent worker SQL contract", () => {
   let context: RehearsalContext | undefined;
@@ -28,6 +28,22 @@ describe("R1.4 restricted identity intent worker SQL contract", () => {
 
   // All authorizations and evidence below are synthetic database fixtures.
   // They do not validate human identity or the unfinished public recovery flow.
+  test("uses the database clock for modeled claims and still denies future-issued claims", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const hostClock = vi.spyOn(Date, "now").mockReturnValue(Date.now() + 60_000);
+      try {
+        await asAuthenticated(sql, foundation.pair[0], async (runtime) => {
+          expect(await runtime`SELECT * FROM public.mmhr_authorize('audit.view', NULL::uuid)`).toHaveLength(1);
+          await runtime`SELECT set_config('request.jwt.claims',
+            (auth.jwt() || jsonb_build_object('iat',
+              floor(extract(epoch FROM clock_timestamp())) + 60))::text, true)`;
+          expect(await runtime`SELECT * FROM public.mmhr_authorize('audit.view', NULL::uuid)`).toHaveLength(0);
+        });
+      } finally {
+        hostClock.mockRestore();
+      }
+    });
+  });
   for (const scenario of [...dispatchCases, ...resultCases, ...reconciliationCases, ...adapterCases]) {
     test(scenario.name, async () => {
       await rollbackCase(context!, (sql) => scenario.run(sql, foundation));

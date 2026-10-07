@@ -69,7 +69,7 @@ describe("R1.4 empty database migration", () => {
       { stable_key: "staff", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "super_admin",
-        version: 9,
+        version: 10,
         kind: "platform",
         state: "active",
       },
@@ -119,14 +119,14 @@ describe("R1.4 empty database migration", () => {
     `;
 
     expect(events).toEqual([
-      { action: "permission_registry.sync", count: 8 },
+      { action: "permission_registry.sync", count: 9 },
       { action: "r1.2_schema.add", count: 1 },
       { action: "r1.3_access.add", count: 1 },
       { action: "r1.4_permissions.add", count: 1 },
       { action: "role_authority.backfill", count: 1 },
       { action: "role_authority.expand", count: 1 },
-      { action: "role_version.activate", count: 27 },
-      { action: "role_version.deactivate", count: 21 },
+      { action: "role_version.activate", count: 28 },
+      { action: "role_version.deactivate", count: 22 },
     ]);
   });
 

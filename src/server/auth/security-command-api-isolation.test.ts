@@ -2,7 +2,7 @@
 import { describe, expect, test, vi } from "vitest";
 
 import {
-  createScratchNetwork, removeScratchNetwork, verifyScratchApiBindings,
+  createScratchNetwork, removeScratchNetwork, verifyScratchApiBindings, verifyScratchDatabaseBindings,
   verifyScratchNetworkIfPresent, type ScratchNetwork,
 } from "./security-command-api-isolation";
 
@@ -120,5 +120,41 @@ describe("disposable API network isolation", () => {
     state.listed = "";
     await removeScratchNetwork(network, run);
     expect(run).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("database-only scratch network isolation", () => {
+  const databaseFixture = () => {
+    const value = fixture();
+    delete value.state.inspected.Containers[apiId];
+    delete value.state.bindings[apiId];
+    return value;
+  };
+  test("requires a loopback database without requiring or attesting API availability", async () => {
+    const { run } = databaseFixture();
+    expect(await verifyScratchDatabaseBindings(network, ports, run)).toBe(true);
+    await expect(verifyScratchApiBindings(network, ports, run)).rejects.toThrow("database or API container");
+  });
+  test.each(["0.0.0.0", "::", "", "192.168.1.2"])("denies database published HostIp %s", async host => {
+    const { state, run } = databaseFixture();
+    state.bindings[databaseId]!["5432/tcp"]![0]!.HostIp = host;
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("non-loopback binding");
+  });
+  test("denies missing database container, missing publication, and unrelated ports", async () => {
+    const { state, run } = databaseFixture();
+    state.bindings[databaseId]!["5432/tcp"]![0]!.HostPort = "57022";
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("unexpected port");
+    state.bindings[databaseId]!["5432/tcp"] = null;
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("checked loopback port");
+    delete state.inspected.Containers[databaseId];
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("missing its database container");
+  });
+  test("denies foreign project containers and network ownership", async () => {
+    const { state, run } = databaseFixture();
+    state.inspected.Containers[databaseId]!.Name = "supabase_db_mmhr";
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("checked project");
+    state.inspected.Containers[databaseId]!.Name = "supabase_db_" + projectId;
+    state.inspected.Labels["mmhr.rehearsal.project"] = "mmhr";
+    await expect(verifyScratchDatabaseBindings(network, ports, run)).rejects.toThrow("checked project");
   });
 });

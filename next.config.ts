@@ -13,6 +13,7 @@ export default withSentryConfig(nextConfig, {
   // Source maps are uploaded only where an auth token exists (CI / Vercel);
   // local builds skip it rather than failing.
   silent: !process.env.CI,
+  telemetry: false,
   disableLogger: true,
   widenClientFileUpload: true,
 });

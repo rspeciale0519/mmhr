@@ -5,8 +5,9 @@ import path from "node:path";
 const windowsWorkerSettings =
   process.platform === "win32"
     ? {
-        // Windows fork workers can time out before they load on constrained hosts.
-        pool: "threads" as const,
+        // The complete Windows browser suite passed in forks after thread
+        // workers repeatedly failed before loading. Keep each file isolated.
+        pool: "forks" as const,
         maxWorkers: 1,
         fileParallelism: false,
       }

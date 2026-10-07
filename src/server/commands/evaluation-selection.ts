@@ -32,6 +32,7 @@ export const getInitialEvaluationSelectionsSchema = z.strictObject({
   organizationId: uuid,
   intakeId: uuid,
   correlationId: uuid,
+  selectionPublicationId: uuid.optional(),
 });
 
 const selectionItemSchema = z.strictObject({
@@ -94,6 +95,8 @@ const selectionReadSchema = z.strictObject({
   remainingInitialChoices: z.number().int().min(0).max(5),
   items: z.array(selectionReadItemSchema).max(5),
   correlationId: uuid,
+  selectionPublicationId: uuid.optional(),
+  selectedOptionIds: z.array(uuid).optional(),
 }).superRefine((result, context) => {
   if (result.items.length > result.initialCandidateCount) {
     context.addIssue({ code: "custom", path: ["items"], message: "Items exceed initial candidate count" });
@@ -201,7 +204,9 @@ export async function getInitialEvaluationSelections(
     }
     const result = selectionReadSchema.safeParse(response.data);
     if (!result.success || result.data.organizationId !== parsed.data.organizationId ||
-      result.data.intakeId !== parsed.data.intakeId || result.data.correlationId !== correlationId) {
+      result.data.intakeId !== parsed.data.intakeId || result.data.correlationId !== correlationId ||
+      result.data.selectionPublicationId !== parsed.data.selectionPublicationId ||
+      (parsed.data.selectionPublicationId !== undefined && result.data.selectedOptionIds === undefined)) {
       throw new EvaluationSelectionError("INVALID_RESPONSE");
     }
     return result.data;

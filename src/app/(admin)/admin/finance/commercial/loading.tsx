@@ -1,0 +1,5 @@
+export default function CommercialFinanceLoading() {
+  return <main className="mx-auto max-w-5xl px-6 py-10">
+    <p role="status">Loading the authorized commission records.</p>
+  </main>;
+}

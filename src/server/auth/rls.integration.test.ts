@@ -3,28 +3,12 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import postgres from "postgres";
 
 import { enrollTestTotp, verifyTestTotp } from "./permission-test-fixtures";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
-const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const migrationUrl = process.env.TEST_MIGRATION_DATABASE_URL;
-
-if (!apiUrl || !anonKey || !serviceRoleKey || !migrationUrl) {
-  throw new Error("R1.3 integration environment is incomplete");
-}
-
-const parsedApiUrl = new URL(apiUrl);
-if (
-  !["127.0.0.1", "localhost", "::1"].includes(parsedApiUrl.hostname) ||
-  parsedApiUrl.port !== "57021"
-) {
-  throw new Error("R1.3 integration tests require the local MMHR API");
-}
-
-const owner = postgres(migrationUrl, { max: 2, prepare: true });
-const admin = createClient(apiUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
+let apiUrl: string, anonKey: string;
+let owner: ReturnType<typeof postgres>, admin: SupabaseClient;
 
 let userId = "";
 let viewerUserId = "";
@@ -62,6 +46,13 @@ async function signIn(userEmail: string): Promise<SupabaseClient> {
 
 describe("R1.3 request-scoped grants and RLS", () => {
   beforeAll(async () => {
+    startup = startRestrictedRehearsal("rls");
+    rehearsal = await startup;
+    const api = rehearsal.context.api!;
+    apiUrl = api.url;
+    anonKey = api.publicKey;
+    owner = postgres(rehearsal.context.databaseUrl, { max: 2, prepare: true });
+    admin = createClient(apiUrl, api.adminKey, { auth: { autoRefreshToken: false, persistSession: false } });
     adminEmail = `r13-admin-${Date.now()}@example.com`;
     viewerEmail = `r13-viewer-${Date.now()}@example.com`;
     const user = await createConfirmedUser(adminEmail);
@@ -108,7 +99,7 @@ describe("R1.3 request-scoped grants and RLS", () => {
     `;
     adminFactor = await enrollTestTotp(await signIn(adminEmail));
     viewerFactor = await enrollTestTotp(await signIn(viewerEmail));
-  }, 60_000);
+  }, 300_000);
 
   afterAll(async () => {
     const organizationIds = [organizationId, otherOrganizationId].filter(Boolean);
@@ -132,9 +123,10 @@ describe("R1.3 request-scoped grants and RLS", () => {
         if (result.error) throw new Error("RLS Auth fixture cleanup failed");
       });
     }
-    await attempt("owner connection", () => owner.end({ timeout: 5 }));
+    if (owner) await attempt("owner connection", () => owner.end({ timeout: 5 }));
+    await attempt("isolated stack", async () => { await (rehearsal ?? await startup)?.close(); });
     if (failures.length) throw new Error(`RLS fixture cleanup failed: ${failures.join(", ")}`);
-  });
+  }, 180000);
 
   test("anonymous clients cannot read tables or fixed functions", async () => {
     const anonymous = createClient(apiUrl!, anonKey!);

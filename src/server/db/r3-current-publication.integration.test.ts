@@ -139,7 +139,8 @@ describe("R3 current evaluation publication discovery", () => {
   test("denies unauthorized, missing, and foreign intake scopes", async () => {
     await rollbackCase(context!, async (sql) => {
       const intakeId = await seedSubmittedIntake(sql, fixture, customerContributor);
-      await expect(current(sql, fixture.target, intakeId)).rejects.toMatchObject({ code: "42501" });
+      const outsider = await createSecurityPrincipal(sql);
+      await expect(current(sql, outsider, intakeId)).rejects.toMatchObject({ code: "42501" });
       await expect(current(sql, customerContributor, randomUUID())).rejects.toMatchObject({ code: "42501" });
 
       const foreignOrganizationId = randomUUID();
@@ -150,9 +151,9 @@ describe("R3 current evaluation publication discovery", () => {
       `;
       await createMembership(sql, foreignOrganizationId, fixture.organizationAdmin, "organization_admin");
       await sql`
-        INSERT INTO public.intakes (id, organization_id, status, created_by_identity_id, updated_by_identity_id)
+        INSERT INTO public.intakes (id, organization_id, status, created_by_identity_id, updated_by_identity_id, submitted_at)
         VALUES (${foreignIntakeId}::uuid, ${foreignOrganizationId}::uuid, 'submitted',
-          ${fixture.organizationAdmin.identityId}::uuid, ${fixture.organizationAdmin.identityId}::uuid)
+          ${fixture.organizationAdmin.identityId}::uuid, ${fixture.organizationAdmin.identityId}::uuid, now())
       `;
       await expect(current(sql, customerContributor, foreignIntakeId)).rejects.toMatchObject({ code: "42501" });
     });

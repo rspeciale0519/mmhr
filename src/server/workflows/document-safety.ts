@@ -38,7 +38,7 @@ const hexBytesSchema = z.string().regex(/^(?:[0-9a-f]{2})+$/i, "Magic bytes must
 export const documentSafetyInputSchema = z.strictObject({
   fileName: fileNameSchema,
   declaredMimeType: z.string().trim().toLowerCase().min(1).max(255),
-  sizeBytes: z.number().int().nonnegative(),
+  sizeBytes: z.number().int().positive(),
   sha256: sha256Schema,
   magicBytes: hexBytesSchema,
 });

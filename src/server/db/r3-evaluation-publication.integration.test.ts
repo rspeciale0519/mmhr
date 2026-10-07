@@ -41,6 +41,7 @@ import {
   type SecurityTransaction,
 } from "./r1-security-command-fixtures";
 import { assertEvaluationParity } from "./r3-evaluation-publication-parity";
+import { annualCostEstimateSchema, maskedPublicationDetailsSchema } from "@/server/matching/masked-publication-details";
 
 describe("R3 evaluation publication RPCs", () => {
   let context: RehearsalContext | undefined;
@@ -303,6 +304,157 @@ describe("R3 evaluation publication RPCs", () => {
   test("keeps the private SQL evaluator aligned with the TypeScript oracle", async () => {
     await rollbackCase(context!, async (sql) => {
       await assertEvaluationParity(sql);
+    });
+  }, 240_000);
+
+  test("returns opt-in immutable estimates while preserving legacy reads and customer scope", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const intakeId = await seedSubmittedIntake(sql, fixture, customerContributor);
+      const estimate = { recurring: { minimum: 12000, maximum: 18000 }, currency: "USD", employeeCount: 100,
+        includedModules: ["hr", "payroll"], assumptions: ["annual_billing"], exclusions: ["taxes"], oneTime: null };
+      const costInput = await seedVendorOption(sql, fixture, 70, {
+        fieldKey: "comparison_annual_cost", factValue: JSON.stringify(estimate),
+      });
+      await seedVendorOption(sql, fixture, 71);
+      const prepared = await prepare(sql, fixture.pair[0], {
+        organizationId: fixture.organizationId, intakeId, expectedRevision: 2, configuration: CONFIG,
+      });
+      const payload = publicationPayload(fixture.organizationId, intakeId, String(prepared.publicationId), 0, 25);
+      const legacy = publicationReadSchema.parse(await readPublication(sql, fixture.pair[0], "review", payload));
+      expect(legacy.options.every((option) => option.details === undefined)).toBe(true);
+      const detailedPayload = { ...payload, detailsVersion: 1 };
+      const detailed = publicationReadSchema.parse(await readPublication(sql, fixture.pair[0], "review", detailedPayload));
+      expect(detailed.options.map((option) => {
+        const legacyOption = { ...option };
+        delete legacyOption.details;
+        return legacyOption;
+      })).toEqual(legacy.options);
+      const cost = detailed.options.find((option) => option.details?.annualCost !== null)?.details?.annualCost;
+      expect(annualCostEstimateSchema.parse(cost)).toMatchObject({ ...estimate, evidence: { basis: "evidence", version: 1 } });
+      expect(detailed.options.every((option) => option.details?.setup === null)).toBe(true);
+      expect(JSON.stringify(detailed)).not.toMatch(/vendor\.example|productId|fact_id|content_hash|source_id|review_id/);
+      await expect(readPublication(sql, customerContributor, "get", detailedPayload, "aal1")).rejects.toMatchObject({ code: "42501" });
+      await expect(sql.savepoint((probe) => readPublication(probe, fixture.pair[0], "review", {
+        ...payload, detailsVersion: 2,
+      }))).rejects.toMatchObject({ code: "22023" });
+      await publish(sql, fixture.pair[0], { organizationId: fixture.organizationId, publicationId: prepared.publicationId,
+        expectedDigest: prepared.inputDigest, approvalReference: "synthetic-estimate-review", reason: "Review synthetic estimate projection" });
+      const customer = publicationReadSchema.parse(await readPublication(sql, customerContributor, "get", detailedPayload, "aal1"));
+      expect(customer.options).toEqual(detailed.options);
+      const later = publicationReadSchema.parse(await readPublication(sql, customerContributor, "get", {
+        ...detailedPayload, afterOrdinal: 1, limit: 1,
+      }, "aal1"));
+      expect(later.options).toEqual(customer.options.slice(1, 2));
+      await expect(readPublication(sql, customerContributor, "get", {
+        ...detailedPayload, organizationId: randomUUID(),
+      }, "aal1")).rejects.toMatchObject({ code: "42501" });
+      await sql`UPDATE public.vendor_evidence_versions SET fresh_until=${fixtureDates().expiredAt}::timestamptz
+        WHERE id=${costInput.evidenceId}::uuid`;
+      await expect(readPublication(sql, customerContributor, "get", detailedPayload, "aal1")).rejects.toMatchObject({ code: "42501" });
+    });
+  }, 240_000);
+
+  test("rejects malformed or identity-bearing approved estimates before returning their values", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const estimate = { recurring: { minimum: 12000, maximum: 18000 }, currency: "USD", employeeCount: 100,
+        includedModules: ["hr", "payroll"], assumptions: ["annual_billing"], exclusions: [], oneTime: null };
+      for (const value of [
+        { ...estimate, sourceUrl: "https://vendor.example/quote" },
+        { ...estimate, assumptions: ["Vendor-branded onboarding"] },
+        { ...estimate, recurring: { minimum: -1, maximum: 10 } },
+        { ...estimate, includedModules: ["payroll", "payroll"] },
+      ]) {
+        const input = { value: JSON.stringify(value) };
+        await expect(sql.savepoint(async (probe) => {
+          await probe`SELECT mmhr_private.r3_masked_estimate(${JSON.stringify(input)}::jsonb,'annual_cost')`;
+        })).rejects.toMatchObject({ code: "22023" });
+      }
+      await expect(asAuthenticated(sql, customerContributor, async (probe) => {
+        await probe`SELECT mmhr_private.r3_masked_estimate(NULL::jsonb,'annual_cost')`;
+      }, "aal1")).rejects.toMatchObject({ code: "42501" });
+    });
+  }, 240_000);
+
+  test("projects separately approved delivery types without changing stored match results", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const seeded = await seedVendorOption(sql, fixture, 72);
+      const requirements = [{ key: REQUIREMENT_KEY, response: "yes" }];
+      for (const coverage of ["native", "add_on", "partner", "limited", "not_supported", "unknown"]) {
+        const coverageInput = { ...seeded.input, fact_id: randomUUID(), field_key: "comparison_feature_coverage",
+          value: JSON.stringify({ [REQUIREMENT_KEY]: coverage }) };
+        const [row] = await sql<{ result: unknown }[]>`SELECT mmhr_private.r3_masked_publication_details(
+          ${JSON.stringify(CONFIG)}::jsonb, ${JSON.stringify(requirements)}::jsonb,
+          ${JSON.stringify([seeded.input, coverageInput])}::jsonb,
+          ${JSON.stringify({ fitReasons: [REQUIREMENT_KEY] })}::jsonb) AS result`;
+        const result = maskedPublicationDetailsSchema.parse(row!.result);
+        expect(result.features).toMatchObject([{ requirementKey: REQUIREMENT_KEY, outcome: "match", coverage,
+          evidence: { basis: "evidence" }, coverageEvidence: { basis: "evidence" } }]);
+        expect(result.annualCost).toBeNull();
+      }
+      const unsafeInput = { ...seeded.input, field_key: "comparison_feature_coverage",
+        value: JSON.stringify({ [REQUIREMENT_KEY]: "Branded payroll" }) };
+      await expect(sql.savepoint(async (probe) => {
+        await probe`SELECT mmhr_private.r3_masked_publication_details(${JSON.stringify(CONFIG)}::jsonb,
+          ${JSON.stringify(requirements)}::jsonb, ${JSON.stringify([unsafeInput])}::jsonb, '{"fitReasons":[]}'::jsonb)`;
+      })).rejects.toMatchObject({ code: "22023" });
+    });
+  }, 240_000);
+
+  test("format 2 uses stable product order without changing an earlier format 1 publication", async () => {
+    await rollbackCase(context!, async (sql) => {
+      const intakeId = await seedSubmittedIntake(sql, fixture, customerContributor);
+      const lowProductId = `00000000${randomUUID().slice(8)}`;
+      const highProductId = `ffffffff${randomUUID().slice(8)}`;
+      const seededOptions = [await seedVendorOption(sql, fixture, 80, { productId: lowProductId, factValue: "no" }),
+        await seedVendorOption(sql, fixture, 81, { productId: highProductId, factValue: "yes" })];
+      for (const seeded of seededOptions) {
+        const factId = randomUUID(), evidenceId = randomUUID();
+        await sql`INSERT INTO public.vendor_facts (id,organization_id,vendor_profile_id,product_id,field_key,
+          value,observed_at,status,created_by_identity_id)
+          SELECT ${factId}::uuid,organization_id,vendor_profile_id,product_id,'comparison_fact_scopes',
+            ${JSON.stringify({ [REQUIREMENT_KEY]: { version: 1, conditions: [] } })},observed_at,status,created_by_identity_id
+          FROM public.vendor_facts WHERE id=${String(seeded.input.fact_id)}::uuid`;
+        await sql`INSERT INTO public.vendor_evidence_versions (id,organization_id,fact_id,source_id,version,
+          content_hash,captured_at,fresh_until,citation)
+          SELECT ${evidenceId}::uuid,organization_id,${factId}::uuid,source_id,1,content_hash,captured_at,fresh_until,
+            'Synthetic unrestricted scope for ordering test'
+          FROM public.vendor_evidence_versions WHERE id=${seeded.evidenceId}::uuid`;
+        await sql`INSERT INTO public.vendor_fact_reviews (id,organization_id,evidence_id,reviewer_identity_id,decision,decided_at,reason)
+          SELECT ${randomUUID()}::uuid,organization_id,${evidenceId}::uuid,reviewer_identity_id,decision,decided_at,reason
+          FROM public.vendor_fact_reviews WHERE id=${String(seeded.input.review_id)}::uuid`;
+      }
+      const beforeRejected = await sql`SELECT id FROM public.evaluation_publications
+        WHERE intake_id=${intakeId}::uuid ORDER BY id`;
+      for (const version of [1, 2]) {
+        for (const factKey of ["commercial_relationship", "sponsorship", "advertising", "paid_placement", "partner_status"]) {
+          await expect(prepare(sql, fixture.pair[0], {
+            organizationId: fixture.organizationId, intakeId, expectedRevision: 2,
+            configuration: { version, criteria: CONFIG.criteria.map((criterion) => ({ ...criterion, factKey })) },
+          })).rejects.toMatchObject({ code: "22023" });
+        }
+      }
+      expect(await sql`SELECT id FROM public.evaluation_publications
+        WHERE intake_id=${intakeId}::uuid ORDER BY id`).toEqual(beforeRejected);
+      const legacy = await prepare(sql, fixture.pair[0], {
+        organizationId: fixture.organizationId, intakeId, expectedRevision: 2, configuration: CONFIG,
+      });
+      const legacyPayload = publicationPayload(fixture.organizationId, intakeId, String(legacy.publicationId), 0, 25);
+      const before = publicationReadSchema.parse(await readPublication(sql, fixture.pair[0], "review", legacyPayload));
+      const revised = await prepare(sql, fixture.pair[0], {
+        organizationId: fixture.organizationId, intakeId, expectedRevision: 2, configuration: { ...CONFIG, version: 2 },
+      });
+      for (const [publication, expected] of [[legacy, [highProductId, lowProductId]], [revised, [lowProductId, highProductId]]] as const) {
+        const rows = await sql<{ product_id: string; deterministic_score: number }[]>`SELECT product_id,deterministic_score FROM public.evaluation_publication_options
+          WHERE publication_id=${String(publication.publicationId)}::uuid ORDER BY ordinal`;
+        const ids = rows.map((row) => row.product_id);
+        expect(ids.filter((id) => id === highProductId || id === lowProductId)).toEqual(expected);
+        expect(rows.find((row) => row.product_id === highProductId)?.deterministic_score).toBe(10000);
+        expect(rows.find((row) => row.product_id === lowProductId)?.deterministic_score).toBe(0);
+        if (publication === revised) expect(ids).toEqual([...ids].sort());
+        expect(rows.length).toBe(before.optionCount);
+      }
+      const after = publicationReadSchema.parse(await readPublication(sql, fixture.pair[0], "review", legacyPayload));
+      expect(after.options).toEqual(before.options);
     });
   }, 240_000);
 });

@@ -39,6 +39,7 @@ describe("document safety contract", () => {
   });
 
   test("rejects paths and malformed digests without exposing input", () => {
+    expect(validateDocumentSafety({ ...base, sizeBytes: 0 })).toEqual({ ok: false, code: "invalid_metadata" });
     expect(validateDocumentSafety({ ...base, fileName: "../secret.pdf" })).toEqual({ ok: false, code: "invalid_metadata" });
     expect(validateDocumentSafety({ ...base, sha256: "not-a-digest" })).toEqual({ ok: false, code: "invalid_metadata" });
   });

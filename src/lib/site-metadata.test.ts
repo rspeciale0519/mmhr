@@ -21,6 +21,13 @@ describe("site metadata origin", () => {
     )?.toEqual(new URL("http://localhost:3000"));
   });
 
+  test("uses the process origin only when no environment object is supplied", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://configured.example.test");
+    expect(getSiteMetadataBase()).toEqual(new URL("https://configured.example.test"));
+    expect(getSiteMetadataBase({})).toBeUndefined();
+    expect(getSiteMetadataBase({ NEXT_PUBLIC_APP_URL: undefined })).toBeUndefined();
+  });
+
   test.each([
     undefined,
     "https://app.example.test/path",

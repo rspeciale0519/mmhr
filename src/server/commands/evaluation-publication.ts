@@ -12,7 +12,9 @@ const reason = z.string().trim().min(1).max(2_000);
 export const prepareEvaluationPublicationSchema = z.strictObject({
   ...commandFields, intakeId: uuid, expectedRevision: z.number().int().min(1).max(2_147_483_647),
   configuration: publicationConfigSchema,
-});
+}).refine((input) => input.configuration.criteria.every((criterion) =>
+  !/^(commercial|sponsorship|advertising|paid_placement|partner_status)/.test(criterion.factKey)),
+"Commercial fields cannot affect new publications");
 export const publishEvaluationPublicationSchema = z.strictObject({
   ...commandFields, publicationId: uuid, expectedDigest: digest,
   approvalReference: z.string().trim().min(1).max(500), reason,
@@ -122,7 +124,7 @@ async function readPublication(input: unknown, internal: boolean, options: Autho
   try {
     const context = await authorizedContext(payload.organizationId, correlationId, internal, options);
     const response = await context.supabase.rpc(internal ? "mmhr_review_evaluation_publication" : "mmhr_get_evaluation_publication", {
-      payload, correlation_id: correlationId,
+      payload: { ...payload, detailsVersion: 1 }, correlation_id: correlationId,
     });
     if (!response || response.error !== null) {
       throw new EvaluationPublicationError(response?.error?.code === "42501" ? "REJECTED" : "UNAVAILABLE");

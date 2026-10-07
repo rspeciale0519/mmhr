@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/lib/trpc/client";
+import { ComparisonMatrix, type ComparisonRequirement } from "./comparison-matrix";
 import type { EvaluationSelectionRead } from "@/server/commands/evaluation-selection";
-import type { MaskedOption, PublicationRead } from "@/server/matching/option-publication-contract";
+import type { PublicationRead } from "@/server/matching/option-publication-contract";
 
 type SelectionInput = {
   organizationId: string; intakeId: string; publicationId: string; expectedDigest: string;
@@ -15,33 +16,13 @@ type SelectionInput = {
 };
 type SaveState = "ready" | "saving" | "uncertain" | "rejected" | "confirmed";
 const buttonClass = "min-h-11 transition-colors";
-const eligibilityLabels = {
-  eligible: "Meets recorded required capabilities",
-  ineligible: "Some required capabilities do not match",
-  unknown: "More approved evidence is needed",
-};
 
 function requestId() {
   return typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : null;
 }
 
-function OptionEvidence({ option }: { option: MaskedOption }) {
-  return <details className="mt-3 text-sm">
-    <summary className="flex min-h-11 cursor-pointer items-center font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2">View supporting details</summary>
-    <div className="space-y-4 pb-3 leading-6">
-      <div><h4 className="font-semibold">Matching needs</h4>
-        {option.fitReasons.length ? <ul className="list-disc pl-5">{option.fitReasons.map((value, index) => <li className="break-words" key={index}>{value}</li>)}</ul> : <p>No confirmed matching needs.</p>}
-      </div>
-      <div><h4 className="font-semibold">Limits and missing information</h4>
-        {option.limitations.length ? <ul className="list-disc pl-5">{option.limitations.map((value, index) => <li className="break-words" key={index}>{value}</li>)}</ul> : <p>No limits recorded in this comparison.</p>}
-      </div>
-      <p className="text-muted-foreground">Evidence date: {option.evidenceFreshAt ? <time dateTime={option.evidenceFreshAt}>{new Date(option.evidenceFreshAt).toISOString().slice(0, 10)} UTC</time> : "Not available"}.</p>
-    </div>
-  </details>;
-}
-
-export function EvaluationOptions({ publication, history, canSelect }: {
-  publication: PublicationRead; history: EvaluationSelectionRead; canSelect: boolean;
+export function EvaluationOptions({ publication, history, canSelect, requirementLabels = {}, requirements = [] }: {
+  publication: PublicationRead; history: EvaluationSelectionRead; canSelect: boolean; requirementLabels?: Record<string, string>; requirements?: ComparisonRequirement[];
 }) {
   const trpc = useTRPC();
   const router = useRouter();
@@ -60,7 +41,10 @@ export function EvaluationOptions({ publication, history, canSelect }: {
   const loadingPage = useRef(false);
   const attempt = useRef<SelectionInput | null>(null);
   const uncertain = useRef(false);
-  const alreadySelected = new Set(history.items.filter((item) => item.publicationId === publication.publicationId).map((item) => item.optionId));
+  const alreadySelected = new Set([
+    ...history.items.filter((item) => item.publicationId === publication.publicationId).map((item) => item.optionId),
+    ...(history.selectionPublicationId === publication.publicationId ? history.selectedOptionIds ?? [] : []),
+  ]);
   const remaining = history.remainingInitialChoices;
   const locked = saveState !== "ready" || pageFailed || reviewing;
   const refreshHref = `/customer/evaluation?intake=${encodeURIComponent(publication.intakeId)}`;
@@ -138,27 +122,17 @@ export function EvaluationOptions({ publication, history, canSelect }: {
       <p>We could not load the next options. This comparison or your access may have changed. Choices are disabled.</p>
       <a href={refreshHref} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">Reload comparison</a>
     </div>}
-    {options.length === 0 ? <p role="status" className="rounded-lg bg-muted p-5 text-sm leading-6">This approved comparison contains no options. Contact MMHR to review your requirements.</p> : <ul className="divide-y border-y">
-      {options.map((option) => <li key={option.optionId} className="grid gap-4 py-6 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-8">
-        <div className="min-w-0">
-          <h3 className="text-lg font-semibold">{option.maskedLabel}</h3>
-          <p className="mt-1 text-pretty text-sm leading-6 text-muted-foreground">{eligibilityLabels[option.eligibility]}</p>
-          <OptionEvidence option={option} />
-        </div>
-        <div>
-          <dl className="grid grid-cols-2 gap-3 text-sm">
-            <div><dt className="text-muted-foreground">Match score</dt><dd className="mt-1 font-semibold tabular-nums">{(option.deterministicScore / 100).toFixed(1)}%</dd></div>
-            <div><dt className="text-muted-foreground">Evidence coverage</dt><dd className="mt-1 font-semibold tabular-nums">{(option.confidenceBasisPoints / 100).toFixed(1)}%</dd></div>
-          </dl>
-          {alreadySelected.has(option.optionId) ? <p className="mt-4 min-h-11 text-sm font-semibold">Choice saved</p> : canSelect && <label className="mt-3 flex min-h-11 items-center gap-3 rounded-md border px-3 text-sm has-[:checked]:border-foreground has-[:checked]:bg-muted">
-            <input type="checkbox" checked={selected.includes(option.optionId)}
-              disabled={locked || (selected.length >= remaining && !selected.includes(option.optionId))}
-              onChange={() => toggleOption(option.optionId)} className="size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
-            <span>Choose {option.maskedLabel}</span>
-          </label>}
-        </div>
-      </li>)}
-    </ul>}
+    {options.length === 0 ? <p role="status" className="rounded-lg bg-muted p-5 text-sm leading-6">This approved comparison contains no options. Contact MMHR to review your requirements.</p> : <ComparisonMatrix options={options} requirements={requirements} labels={requirementLabels}
+      selectedOptionIds={new Set([...alreadySelected, ...selected])}
+      renderChoice={(option) => alreadySelected.has(option.optionId)
+        ? <p className="flex min-h-11 items-center text-sm font-semibold text-teal-800 dark:text-teal-200">Choice saved</p>
+        : canSelect && <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-3 text-sm font-medium has-[:checked]:border-teal-600">
+          <input type="checkbox" checked={selected.includes(option.optionId)}
+            disabled={locked || (selected.length >= remaining && !selected.includes(option.optionId))}
+            onChange={() => toggleOption(option.optionId)}
+            className="size-4 accent-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2" />
+          <span>Choose {option.maskedLabel}</span>
+        </label>} />}
     {nextOrdinal !== null && <Button type="button" variant="outline" className={buttonClass}
       disabled={loading || pageFailed || reviewing || saveState !== "ready"} onClick={() => void loadMore()}>{loading ? "Loading options…" : "Show more options"}</Button>}
     {canSelect && <section aria-label="Initial choices" className="space-y-4 border-l-2 border-foreground pl-5">

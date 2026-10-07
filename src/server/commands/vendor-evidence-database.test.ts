@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { AuthorizationError, requirePermission, type AuthorizationContext, type RequestSupabaseClient } from "@/server/auth/authorization";
-import { approveVendorEvidence, recordVendorEvidence } from "./vendor-evidence-database";
+import { approveVendorEvidence, recordVendorEvidence, getVendorEvidence } from "./vendor-evidence-database";
 
 vi.mock("@/server/auth/authorization", () => {
   class MockAuthorizationError extends Error { constructor() { super("Request is not authorized"); this.name = "AuthorizationError"; } }
@@ -30,13 +30,51 @@ describe("vendor evidence database boundary", () => {
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(rpc.mock.calls[0]![0]).toBe("mmhr_record_vendor_evidence");
   });
+  test("preserves renewal concurrency checks in the command payload", async () => {
+    rpc.mockResolvedValue({ data: { sourceId, factId, evidenceId, approvalId: null, organizationId, outcomeCode: "recorded", correlationId: evidenceId }, error: null });
+    await recordVendorEvidence({ source, fact, evidence: { ...evidence, version: 2 }, expectedEvidenceVersion: 1 }, { supabase });
+    expect(rpc.mock.calls[0][1].payload.expectedEvidenceVersion).toBe(1);
+    rpc.mockClear();
+    await expect(recordVendorEvidence({ source, fact, evidence, expectedEvidenceVersion: 1 }, { supabase }))
+      .rejects.toMatchObject({ code: "INVALID_INPUT" });
+    expect(rpc).not.toHaveBeenCalled();
+  });
   test("requires caller identity for approval", async () => {
     const approval = { approvalId, organizationId, evidenceId, reviewerIdentityId: "88888888-8888-4888-8888-888888888888", decision: "approved" as const, decidedAt: "2026-09-01T00:00:00.000Z", reason: null };
     await expect(approveVendorEvidence(approval, { supabase })).rejects.toBeInstanceOf(AuthorizationError);
     expect(rpc).not.toHaveBeenCalled();
   });
+  test.each([
+    { evidence: { ...evidence, factId: sourceId } },
+    { evidence: { ...evidence, sourceId: factId } },
+    { fact: { ...fact, status: "published" } },
+    { actorIdentityId: actorId },
+  ])("rejects inconsistent evidence bundles before recording %#", async (patch) => {
+    await expect(recordVendorEvidence({ source, fact, evidence, ...patch }, { supabase }))
+      .rejects.toMatchObject({ code: "INVALID_INPUT" });
+    expect(requirePermission).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
+  });
   test("maps provider failures without exposing details", async () => {
     rpc.mockResolvedValue({ data: null, error: new Error("private detail") });
     await expect(recordVendorEvidence({ source, fact, evidence }, { supabase })).rejects.toMatchObject({ code: "UNAVAILABLE" });
+  });
+  test("reads a scoped saved evidence page with staff authority", async () => {
+    vi.mocked(requirePermission).mockResolvedValueOnce(context)
+      .mockResolvedValueOnce({ ...context, scope: { kind: "platform" } });
+    const page = { organizationId, readAt: evidence.capturedAt, items: [{ productName: null, source, fact, evidence, review: null }], nextCursor: null };
+    rpc.mockResolvedValue({ data: page, error: null });
+    await expect(getVendorEvidence({ organizationId }, { supabase })).resolves.toEqual(page);
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_get_vendor_evidence", { payload: { organizationId, limit: 25 } });
+  });
+  test.each([
+    { organizationId: actorId },
+    { items: [{ source, fact, evidence: { ...evidence, sourceId: factId }, review: null }] },
+    { nextCursor: evidenceId },
+  ])("rejects wrong-scope or incomplete evidence pages %#", async (patch) => {
+    vi.mocked(requirePermission).mockResolvedValueOnce(context)
+      .mockResolvedValueOnce({ ...context, scope: { kind: "platform" } });
+    rpc.mockResolvedValue({ data: { organizationId, readAt: evidence.capturedAt, items: [], nextCursor: null, ...patch }, error: null });
+    await expect(getVendorEvidence({ organizationId }, { supabase })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
   });
 });

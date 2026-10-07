@@ -14,6 +14,7 @@ import {
 
 import { identities, orgs } from "./identity";
 import { deals } from "./crm-workflow";
+import { rfpRecipients } from "./workflow-foundation";
 
 const demoStatuses = sql`'requested', 'scheduled', 'completed', 'cancelled', 'no_show'`;
 const proposalStatuses = sql`'received', 'under_review', 'revision_requested', 'approved_for_comparison', 'superseded', 'withdrawn'`;
@@ -31,6 +32,8 @@ export const demoRounds = pgTable("demo_rounds", {
   scheduledStartAt: timestamp("scheduled_start_at", { withTimezone: true }),
   scheduledEndAt: timestamp("scheduled_end_at", { withTimezone: true }),
   meetingReference: text("meeting_reference"),
+  portalRecipientId: uuid("portal_recipient_id"),
+  coordination: jsonb("coordination"),
   revision: integer("revision").notNull().default(1),
   correlationId: uuid("correlation_id").notNull().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -39,12 +42,32 @@ export const demoRounds = pgTable("demo_rounds", {
   uniqueIndex("demo_rounds_organization_id_id_uq").on(t.organizationId, t.id),
   index("demo_rounds_organization_status_idx").on(t.organizationId, t.status, t.requestedAt),
   foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "demo_rounds_deal_scope_fk" }),
+  foreignKey({ columns: [t.organizationId, t.portalRecipientId], foreignColumns: [rfpRecipients.organizationId, rfpRecipients.id], name: "demo_rounds_portal_recipient_fk" }).onDelete("restrict"),
+  check("demo_rounds_coordination_ck", sql`(${t.portalRecipientId} is null and ${t.coordination} is null) or (${t.portalRecipientId} is not null and ${t.coordination} is not null and jsonb_typeof(${t.coordination}) = 'object')`),
   check("demo_rounds_status_ck", sql`${t.status} in (${demoStatuses})`),
   check("demo_rounds_scope_ck", sql`${t.organizationId} = ${t.customerOrganizationId} and ${t.customerOrganizationId} <> ${t.vendorOrganizationId}`),
   check("demo_rounds_schedule_ck", sql`(${t.status} = 'scheduled' and ${t.scheduledStartAt} is not null and ${t.scheduledEndAt} is not null and ${t.meetingReference} is not null) or (${t.status} <> 'scheduled' and ${t.scheduledStartAt} is null and ${t.scheduledEndAt} is null and ${t.meetingReference} is null)`),
   check("demo_rounds_revision_ck", sql`${t.revision} > 0`),
   check("demo_rounds_time_ck", sql`${t.scheduledEndAt} is null or ${t.scheduledEndAt} > ${t.scheduledStartAt}`),
   check("demo_rounds_updated_ck", sql`${t.updatedAt} >= ${t.createdAt}`),
+]);
+
+export const demoCoordinationEvents = pgTable("demo_coordination_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  demoId: uuid("demo_id").notNull(),
+  revision: integer("revision").notNull(),
+  action: text("action").notNull(),
+  actorIdentityId: uuid("actor_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  snapshot: jsonb("snapshot").notNull(),
+  correlationId: uuid("correlation_id").notNull(),
+  occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("demo_coordination_events_revision_uq").on(t.demoId, t.revision),
+  foreignKey({ columns: [t.organizationId, t.demoId], foreignColumns: [demoRounds.organizationId, demoRounds.id], name: "demo_coordination_events_scope_fk" }).onDelete("restrict"),
+  check("demo_coordination_events_revision_ck", sql`${t.revision} > 0`),
+  check("demo_coordination_events_action_ck", sql`${t.action} in ('create', 'customer_availability', 'vendor_availability', 'confirm', 'reopen', 'complete', 'cancel', 'no_show')`),
+  check("demo_coordination_events_snapshot_ck", sql`jsonb_typeof(${t.snapshot}) = 'object'`),
 ]);
 
 export const demoRoundHistory = pgTable("demo_round_history", {

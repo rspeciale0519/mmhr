@@ -58,6 +58,7 @@ export const crmSearchResultSchema = z.object({
   resource: z.enum(crmSearchResources),
   label,
   status: z.enum(crmSearchStatuses),
+  revision: z.int().positive().optional(),
 });
 export type CrmSearchResult = z.output<typeof crmSearchResultSchema>;
 
@@ -106,11 +107,12 @@ export function redactCrmSearchResults(
   return results
     .sort((left, right) => left.recordId.localeCompare(right.recordId))
     .slice(0, limit)
-    .map(({ recordId, organizationId, resource: rowResource, label: rowLabel, status }) => ({
+    .map(({ recordId, organizationId, resource: rowResource, label: rowLabel, status, revision }) => ({
       recordId,
       organizationId,
       resource: rowResource,
       label: rowLabel,
       status,
+      ...(rowResource === "product" && revision !== undefined ? { revision } : {}),
     }));
 }

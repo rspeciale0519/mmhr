@@ -46,10 +46,11 @@ test("shows access guidance for a verified active identity", async () => {
 
   const page = await PendingAccessPage();
   expect(page).toMatchObject({ type: "main" });
-  expect(renderToStaticMarkup(page)).toContain("Sign in again to retry account setup");
+  expect(renderToStaticMarkup(page)).toContain("Sign in to retry account setup");
   expect(renderToStaticMarkup(page)).not.toContain("administrator must grant");
-  const children = Array.isArray(page.props.children) ? page.props.children : [page.props.children];
-  expect(children.some((child: { props?: { children?: unknown } } | null) => child?.props?.children === "Review pending invitations")).toBe(true);
+  expect(renderToStaticMarkup(page)).toContain("Open workspaces");
+  expect(renderToStaticMarkup(page)).toContain("Review pending invitations");
+  expect(renderToStaticMarkup(page)).not.toContain("workspace access is not ready");
 });
 
 test("accepts the full RPC shape without rendering the email", async () => {
@@ -64,7 +65,7 @@ test("accepts the full RPC shape without rendering the email", async () => {
   const page = await PendingAccessPage();
   expect(rpc).toHaveBeenCalledWith("mmhr_get_my_account_setup");
   const markup = renderToStaticMarkup(page);
-  expect(markup).toContain("Access pending");
+  expect(markup).toContain("Account access");
   expect(markup).not.toContain("synthetic-pending-page@example.com");
 });
 

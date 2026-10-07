@@ -137,18 +137,10 @@ async function addLegacyInitialCandidate(sql: SecurityTransaction, fixture: Secu
 }
 
 async function archiveCandidate(sql: SecurityTransaction, fixture: SecurityCommandFixture, candidateId: string) {
-  return asAuthenticated(sql, fixture.pair[0], async (probe) => {
-    const payload = {
-      candidateId, organizationId: fixture.organizationId, fromState: "proposed", toState: "archived",
-      expectedRevision: 1, actorIdentityId: fixture.pair[0].identityId, approvalReference: null,
-    };
-    const [row] = await probe<{ result: RpcResult }[]>`
-      SELECT public.mmhr_transition_evaluation_candidate(
-        ${JSON.stringify(payload)}::jsonb, ${randomUUID()}::uuid, ${randomUUID()}::uuid
-      ) AS result
-    `;
-    return row!.result;
-  }, "aal2");
+  // Seed a historical archived record; the live transition API cannot archive proposed candidates.
+  await sql`UPDATE public.evaluation_candidates SET state = 'archived', revision = revision + 1,
+    updated_at = clock_timestamp(), updated_by_identity_id = ${fixture.pair[0].identityId}::uuid
+    WHERE id = ${candidateId}::uuid AND organization_id = ${fixture.organizationId}::uuid`;
 }
 
 describe("R3 initial customer selection RPCs", () => {
@@ -197,6 +189,31 @@ describe("R3 initial customer selection RPCs", () => {
       const read = initialEvaluationSelectionReadSchema.parse(await readInitial(sql, customerContributor, fixture.organizationId, seeded.intakeId));
       expect(read).toMatchObject({ organizationId: fixture.organizationId, intakeId: seeded.intakeId, initialCandidateCount: 3, remainingInitialChoices: 2 });
       expect(read.items).toHaveLength(3);
+      expect(read).not.toHaveProperty("selectedOptionIds");
+      const replacement = await prepare(sql, fixture.pair[0], {
+        organizationId: fixture.organizationId, intakeId: seeded.intakeId, expectedRevision: 2, configuration: CONFIG,
+      });
+      await publish(sql, fixture.pair[0], {
+        organizationId: fixture.organizationId, publicationId: String(replacement.publicationId),
+        expectedDigest: replacement.inputDigest, approvalReference: "history-mapping", reason: "Verify saved products across versions",
+      });
+      const mappingInput = { organizationId: fixture.organizationId, intakeId: seeded.intakeId,
+        selectionPublicationId: String(replacement.publicationId) };
+      const mapped = initialEvaluationSelectionReadSchema.parse(await readInitialPayload(sql, customerContributor, mappingInput));
+      expect(mapped.selectedOptionIds).toHaveLength(3);
+      expect(mapped.selectedOptionIds!.some(id => optionIds.includes(id))).toBe(false);
+      expect(mapped.items).toEqual(read.items);
+      const expectedMapping = await sql<{ id: string }[]>`SELECT o.id FROM public.evaluation_publication_options o
+        JOIN public.evaluation_candidates c ON c.product_id=o.product_id
+        WHERE o.publication_id=${String(replacement.publicationId)}::uuid AND c.intake_id=${seeded.intakeId}::uuid ORDER BY o.ordinal`;
+      expect(mapped.selectedOptionIds).toEqual(expectedMapping.map(row => row.id));
+      expect(JSON.stringify(mapped)).not.toContain("productId");
+      for (const selectionPublicationId of [seeded.publicationId, randomUUID()]) {
+        await expect(sql.savepoint(probe => readInitialPayload(probe, customerContributor,
+          { ...mappingInput, selectionPublicationId }))).rejects.toMatchObject({ code: "42501" });
+      }
+      await expect(sql.savepoint(probe => readInitialPayload(probe, customerContributor,
+        { ...mappingInput, selectionPublicationId: null }))).rejects.toMatchObject({ code: "22023" });
       const candidates = await sql<{ source: string; state: string; eligibility: string; scoring_configuration_version: number }[]>`
         SELECT source, state, eligibility, scoring_configuration_version
         FROM public.evaluation_candidates WHERE organization_id = ${fixture.organizationId}::uuid AND intake_id = ${seeded.intakeId}::uuid
@@ -260,7 +277,7 @@ describe("R3 initial customer selection RPCs", () => {
       `;
       expect(exactArtifacts).toEqual({ audits: 1, receipts: 1 });
       const before = await selectionArtifacts(sql, seeded.intakeId);
-      await expect(sql.savepoint((probe) => selectInitial(probe, customerContributor, { ...input, expectedDigest: "f".repeat(64) }, "aal1", correlationId, idempotencyKey))).rejects.toMatchObject({ code: "42501" });
+      await expect(sql.savepoint((probe) => selectInitial(probe, customerContributor, { ...input, expectedDigest: "f".repeat(64) }, "aal1", correlationId, idempotencyKey))).rejects.toMatchObject({ code: "22023" });
       expect(await selectionArtifacts(sql, seeded.intakeId)).toEqual(before);
       await sql`ALTER TABLE public.audit_events ADD CONSTRAINT r3_initial_selection_audit_failure CHECK (false) NOT VALID`;
       await expect(sql.savepoint((probe) => selectInitial(probe, customerContributor, {

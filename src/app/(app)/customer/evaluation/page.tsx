@@ -11,6 +11,9 @@ import { EvaluationPublicationError } from "@/server/commands/evaluation-publica
 import { EvaluationSelectionError, getInitialEvaluationSelections } from "@/server/commands/evaluation-selection";
 import { CustomerFrame, IntakeNotice } from "../intake-views";
 import { EvaluationOptions } from "./evaluation-options";
+import type { ComparisonRequirement } from "./comparison-matrix";
+import { getSubmittedRequirements } from "@/server/commands/submitted-requirements";
+import { RequirementReadError } from "@/server/commands/requirement-read";
 
 const querySchema = z.object({ intake: securityUuidSchema });
 const linkClass = "inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold underline underline-offset-4 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -30,6 +33,8 @@ export default async function CustomerEvaluationPage({ searchParams }: {
   let publication: Awaited<ReturnType<typeof getCurrentEvaluationPublication>>["publication"] = null;
   let publicationFailed = false;
   let canSelect = false;
+  let requirementLabels: Record<string, string> = {};
+  let requirements: ComparisonRequirement[] = [];
   try {
     intake = await getIntake({ organizationId, intakeId }, options);
     const permission = await authorizePermission("evaluation.select", authorization.scope, options);
@@ -43,15 +48,25 @@ export default async function CustomerEvaluationPage({ searchParams }: {
       if (!(error instanceof EvaluationPublicationError) && !(error instanceof AuthorizationError)) throw error;
       publicationFailed = true;
     }
+    if (publication) {
+      history = await getInitialEvaluationSelections({ organizationId, intakeId, correlationId: randomUUID(),
+        selectionPublicationId: publication.publicationId }, options);
+      const page = await getSubmittedRequirements(organizationId, intakeId, options);
+      requirements = page.requirements.flatMap(item => item.status === "active" && item.importance !== "not_applicable" && item.response !== null ? [{
+        key: item.stableKey, label: item.label, importance: item.importance,
+      }] : []);
+      requirementLabels = Object.fromEntries(requirements.map(item => [item.key, item.label]));
+    }
   } catch (error) {
-    if (!(error instanceof IntakeReadError) && !(error instanceof EvaluationSelectionError) && !(error instanceof AuthorizationError)) throw error;
+    if (!(error instanceof IntakeReadError) && !(error instanceof EvaluationSelectionError) && !(error instanceof AuthorizationError) && !(error instanceof RequirementReadError)) throw error;
     return <CustomerFrame><IntakeNotice title="This comparison is not available"
       description="The intake or your access may have changed. Return to saved intakes to check." /></CustomerFrame>;
   }
 
   return <CustomerFrame>
     <Link href={`/customer?intake=${encodeURIComponent(intakeId)}`} prefetch={false} className={`${linkClass} mb-6`}>Back to saved intake</Link>
-    {publication ? <EvaluationOptions publication={publication} history={history} canSelect={canSelect}
+    {publication ? <EvaluationOptions publication={publication} history={history} canSelect={canSelect} requirementLabels={requirementLabels}
+      requirements={requirements}
       key={`${organizationId}:${intakeId}:${publication.publicationId}:${history.initialCandidateCount}:${canSelect}`} />
       : <section className="space-y-3 border-l-2 border-foreground pl-5" aria-labelledby="comparison-status">
         <h2 id="comparison-status" className="text-balance text-2xl font-semibold">{publicationFailed ? "We could not load the current comparison" : "No approved comparison is available yet"}</h2>
@@ -73,5 +88,6 @@ export default async function CustomerEvaluationPage({ searchParams }: {
       </ul> : history.initialCandidateCount === 0 ? <p className="mt-3 text-sm text-muted-foreground">No initial choices have been saved.</p> : null}
       {history.items.length < history.initialCandidateCount && <p className="mt-3 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">Some choices came from an earlier review. They still count toward the limit. Contact MMHR for their details.</p>}
     </section>
+    {history.initialCandidateCount > 0 && <Link href={`/customer/rfp?intake=${intakeId}`} className={`${linkClass} mt-8`}>Continue to RFP and provider review</Link>}
   </CustomerFrame>;
 }

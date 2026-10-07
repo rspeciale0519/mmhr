@@ -26,6 +26,11 @@ const normalizePath = (value) => {
 };
 const rehearsalFiles = new Set(
   [
+    "src/server/auth/auth.integration.test.ts",
+    "src/server/auth/rls.integration.test.ts",
+    "src/server/auth/permissions.integration.test.ts",
+    "src/server/auth/r1-security.integration.test.ts",
+    "src/server/db/db.integration.test.ts",
     "src/server/db/r1-empty-migration.integration.test.ts",
     "src/server/db/r1-account-setup.integration.test.ts",
     "src/server/db/r1-customer-registration.integration.test.ts",
@@ -65,17 +70,43 @@ const rehearsalFiles = new Set(
       "src/server/db/r4-response-ingestion.integration.test.ts",
       "src/server/db/r4-response-normalization.integration.test.ts",
       "src/server/db/r4-response-review.integration.test.ts",
+      "src/server/db/r4-portal-response.integration.test.ts",
       "src/server/db/r4-response-clarifications.integration.test.ts",
       "src/server/db/r4-response-failures.integration.test.ts",
       "src/server/db/r4-communication.integration.test.ts",
       "src/server/db/r4-document-controls.integration.test.ts",
+      "src/server/db/r4-document-uploads.integration.test.ts",
+      "src/server/db/r4-document-reservations.integration.test.ts",
+    "src/server/db/r4-document-reservations-auth.integration.test.ts",
+    "src/server/db/r4-document-reads.integration.test.ts",
+    "src/server/db/r4-document-reads-auth.integration.test.ts",
+      "src/server/integrations/documents/supabase-document-storage.integration.test.ts",
+      "src/server/integrations/documents/document-scan-flow.integration.test.ts",
+      "src/server/integrations/documents/document-review-access.integration.test.ts",
+      "src/server/db/r4-document-worker.integration.test.ts",
+      "src/server/workflows/clamav-document-scanner.integration.test.ts",
       "src/server/db/r4-job-controls.integration.test.ts",
       "src/server/db/r6-demo-round.integration.test.ts",
       "src/server/db/r6-proposal.integration.test.ts",
+      "src/server/db/r6-proposal-quotes.integration.test.ts",
+      "src/server/db/r6-proposal-quotes-auth.integration.test.ts",
       "src/server/db/r6-contract-handoff.integration.test.ts",
+      "src/server/db/r6-contract-portal.integration.test.ts",
+      "src/server/db/r6-contract-portal-auth.integration.test.ts",
       "src/server/db/r7-commission.integration.test.ts",
+      "src/server/db/r7-commission-calculation.integration.test.ts",
       "src/server/db/r7-payment.integration.test.ts",
-      "src/server/db/r7-invoice.integration.test.ts",
+    "src/server/db/r7-invoice.integration.test.ts",
+    "src/server/db/r7-finance-auth.integration.test.ts",
+    "src/server/db/r7-finance-document-auth.integration.test.ts",
+    "src/server/db/r7-managed-finance-auth.integration.test.ts",
+    "src/server/db/r7-managed-invoice-auth.integration.test.ts",
+    "src/server/db/r4-rfp-notifications.integration.test.ts",
+    "src/server/db/r8-deal-follow-up-auth.integration.test.ts",
+    "src/server/db/r8-task-historical-request.integration.test.ts",
+    "src/server/db/r4-rfp-receipt-auth.integration.test.ts",
+    "src/server/db/r4-rfp-receipt-history.integration.test.ts",
+    "src/server/audit/staff-audit.integration.test.ts",
       "src/server/db/r7-dispute.integration.test.ts",
       "src/server/db/r7-adjustment-handoff.integration.test.ts",
       "src/server/db/r7-reconciliation.integration.test.ts",
@@ -112,6 +143,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r3-evaluation-publication.integration.test.ts",
     "src/server/db/r3-initial-selection.integration.test.ts",
     "src/server/db/r3-current-publication.integration.test.ts",
+    "src/server/db/r3-disclosure.integration.test.ts",
       "src/server/db/r3-matching.integration.test.ts",
       "src/server/db/r3-comparison-export.integration.test.ts",
       "src/server/db/r3-duplicate-product.integration.test.ts",
@@ -163,7 +195,7 @@ if (
   throw new Error("The R1 worker wrapper refused an unexpected child command");
 }
 
-if (!isRehearsal) {
+if (!isRehearsal && !isFullIntegrationSuite) {
   dotenv.config({ path: path.join(projectRoot, ".env.local") });
 }
 
@@ -435,7 +467,7 @@ async function runWithWorker(isIntegrationTest, includeRehearsals) {
 }
 
 try {
-  if (isRehearsal) {
+  if (isRehearsal || isFullIntegrationSuite) {
     await runRehearsal();
   } else {
     await runWithWorker(isVitestCommand, isFullIntegrationSuite);

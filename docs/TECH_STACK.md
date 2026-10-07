@@ -1,11 +1,19 @@
 # MMHR Technical Architecture and Stack
 
+> **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](../.codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
+> It replaces the October 3 instruction to complete all mandatory software before live use.
+> Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
+> Financial-record management and private document storage are outside the MVP.
+> Where this document conflicts with the roadmap on launch scope or delivery order, follow the roadmap.
+> The architecture is unchanged. Finance, private document storage, and the document parser stay inactive in the launch configuration.
+> A full rewrite follows the launch.
+
 ## Document Control
 
 | Field | Value |
 |---|---|
-| Version | 2.1 |
-| Date | 2026-08-27 |
+| Version | 2.9 |
+| Date | 2026-10-03 |
 | Status | Canonical technical authority |
 | Product authority | [PRD.md](./PRD.md) |
 | R0 release authority | [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) |
@@ -15,7 +23,17 @@ This document defines approved architecture and identifies implementation status
 
 Current source, migrations, configuration, tests, and CI define what is implemented. An approved choice is not an implemented feature.
 
+Use the [October 3 code audit](code-audit-2026-10-03.md) for the current requirement record and implementation gaps.
+The audit found extensive backend foundations without complete application workflows.
+Its failed dependency gate and incomplete release evidence remain blockers.
+
 Use package-lock.json as the dependency-version authority. Do not upgrade only because a newer stable version exists.
+
+Structured proposal quotes now have vendor submission, separate staff review and approval, and approved customer comparison screens.
+The [proposal verification record](security/r6-proposal-pricing.md) defines their controls and local evidence.
+Private workspace file upload, review, and controlled original access have [local evidence](security/r4-document-review-access.md).
+Portal contract handoff has [local source and workflow evidence](security/r6-contract-portal.md).
+Approved proposal attachments, active ingestion, and complete proposal and contract acceptance remain unfinished.
 
 ## 1. Architecture Rules
 
@@ -54,14 +72,18 @@ Use these primary domain modules:
 | Data access | Drizzle ORM and Postgres.js | Installed |
 | Authentication | Supabase Auth through the server-rendering client | Installed foundation |
 | Validation | Zod | Installed |
-| Background jobs | Trigger.dev | Health wiring only |
+| Background jobs | Trigger.dev | Health task and identity administration intent worker; other business workers remain incomplete |
 | Analytics | PostHog with consent-gated initialization | Installed foundation |
 | Error monitoring | Sentry for Next.js | Installed foundation |
 | Tests | Vitest, Testing Library, jsdom, and local Supabase integration tests | Installed |
 | Hosting | Vercel and Supabase Cloud | Approved deployment target |
 | Source control and CI | GitHub and GitHub Actions | Active |
 
-## 3. Approved Integrations Not Yet Implemented
+## 3. Approved Integration Choices and Current Evidence
+
+The table records approved provider choices, not completed integrations.
+Except for newsletter code, these choices still lack a complete configured application flow.
+Contracts, metadata commands, and injected test adapters do not establish production service operation.
 
 | Capability | Initial choice | Required internal boundary |
 |---|---|---|
@@ -74,12 +96,40 @@ Use these primary domain modules:
 | Newsletter | Beehiiv | NewsletterService |
 | PDF generation | @react-pdf/renderer | PdfRenderer |
 | AI processing | No fixed provider or model | AIService |
-| Malware scanning | Select during implementation | DocumentScanner |
+| Malware scanning | ClamAV; verified local engine 1.4.6 | DocumentScanner |
 | Finance export or handoff | Select during commission implementation | FinanceExportService |
+
+The newsletter route uses an actual Beehiiv adapter in `src/server/workflows/beehiiv-newsletter-service.ts`.
+Configured live delivery, consent withdrawal, and provider failure acceptance remain unverified.
+The adapter location differs from the required `src/server/integrations/` boundary below. Reconcile it during the integration work.
+The AI service supports injected adapters, but routing, persistent run evidence, cost, and human review are not fully composed.
+Document byte validation, quarantine adapters, and leased scan commands now have local test evidence.
+Provider implementations use `src/server/integrations/documents/`.
+Workspace reservations, private upload policies, and scan queue creation passed local Auth and Storage checks.
+Lease-bound processor reads and the combined Auth, Storage, database, and scanner path passed local backend checks.
+Scoped metadata, versions, and history now have customer, vendor, and assigned staff screens with local browser evidence.
+Metadata reads expose no signed URLs, private scan receipts, or extracted content.
+Assigned MFA staff can now record independent manual decisions on exact clean originals.
+Approved current files have a 60-second, session-bound download through an authenticated POST route.
+Seventeen genuine Auth and Storage checks passed.
+Thirteen combined checks passed at migration level 157, including actual antivirus evidence through independent review and approved customer bytes.
+Synthetic staff decisions, customer approved access, vendor isolation, histories, and file-name search passed browser checks.
+Vendor approval and approved download initiation passed the later synthetic browser rehearsal.
+Saved-file capture and actual file opening remain unverified.
+Provider signed URLs, extraction, approved content search, and business-record attachments remain unfinished.
+See [document review and access](./security/r4-document-review-access.md) for controls, evidence, and recovery.
+File-name search uses a scoped POST action and literal matching. Private search terms stay outside page URLs.
+Upload screens now use scoped tRPC preparation/completion and direct authenticated private Storage writes.
+Browser manifests remain untrusted until the worker checks actual bytes. Genuine Auth, Storage, and scanner tests passed.
+The production build passed. October 2 browser uploads passed for synthetic customer and vendor sessions.
+Both private uploads entered quarantine, with safety checks pending and no approval before disposable cleanup.
+The stale-workspace search error, narrow upload layout, and owned service cleanup also passed.
+Signed access, reviewed processing, scheduled runtime, and hosted scanner operation remain incomplete.
+See [the private document checkpoint](./security/r4-private-document-work.md) for evidence and limits.
 
 Do not add a production dependency until its implementation starts and receives approval.
 
-Deferred decisions include inbound email, document scanning, finance destinations, and AI adapter configurations.
+Deferred decisions include inbound email, the hosted scanner runtime, finance destinations, and AI adapter configurations.
 
 ## 4. Application Structure
 
@@ -355,6 +405,12 @@ Store original files in private object storage.
 
 Store metadata, versions, permissions, hashes, processing state, and relationships in PostgreSQL.
 
+Use separate short-lived machine Auth and database credentials for document scanning.
+Bind quarantine reads to the exact current lease and document worker login.
+Keep machine readers outside application identities. Never give them a service key or raw table access.
+The owner provisions reader capabilities and installs operation-specific Storage policies after bucket initialization.
+Local verification does not authorize hosted provisioning or credential activation.
+
 The minimum document flow is received, quarantined, scanning, ready, processing, needs review, and approved.
 
 Use rejected and failed as terminal exception states.
@@ -431,6 +487,9 @@ Application roles must not update or delete audit rows.
 
 ## 15. Environments and Deployment
 
+The [MVP launch checklist](../.codex/plans/release-mvp-launch-checklist.md) defines the earlier product milestone and its required release evidence.
+This milestone does not change the architecture, environment separation, access controls, or deployment approval rules below.
+
 Use local Supabase for local development.
 
 Use separate staging and production secrets.
@@ -462,6 +521,12 @@ Current GitHub Actions runs:
 - `npm run lint`
 - `npm test`
 - `npm run build`
+- `npm run check:integration-matrix`
+- `npm run check:r9-evidence`
+- `npm run check:dependency-audit`
+- `npm run check:secrets`
+
+This list describes checked-in workflow configuration. It does not prove a successful remote run for the current candidate.
 
 The shared integration workflow starts the local Supabase services, applies
 Drizzle migrations, and runs the integration suite. PR CI and the manual
@@ -472,16 +537,22 @@ command remains fail-closed until every required record has real evidence.
 
 CI and the production gate now run `npm run check:dependency-audit` as a
 required check. It covers production and development dependencies and blocks
-on high or critical findings. The updated lockfile has zero findings as of
-2026-09-05; installation and runtime validation must also pass before merge.
+on high or critical findings. The September 5 zero-finding result is historical.
+The September 30 audit failed with 18 high and 12 moderate dependency entries.
+Review remediation and rerun the required checks before merge or release.
 
 Run `npm run test:integration` locally for database, authentication, RLS, migration, and query changes.
 
-Planned CI additions are:
+Configured checks still need qualifying current evidence:
 
-- Clean-database migration verification
-- Local Supabase integration tests
-- Complete RLS role matrices
+- Clean-database migration and local integration workflows
+- Integration matrix coverage and direct RPC role checks
+- Repository secret scanning, with its documented patterns and exclusions
+- The manual production release gate
+
+Further checks or completed operational coverage remain required:
+
+- Complete deployed RLS and action-role evidence
 - Webhook signature and replay tests
 - Job idempotency and retry tests
 - AI fixture tests
@@ -489,8 +560,7 @@ Planned CI additions are:
 - Accessibility checks
 - Marketing performance budgets
 - Further dependency policy checks beyond the required npm advisory audit
-- High-confidence repository secret scanning
-- Deployment approval gates
+- Verified deployment approvals and live smoke checks
 
 Do not describe a planned gate as active.
 
@@ -517,7 +587,9 @@ Do not describe a planned gate as active.
 
 ## 18. Implementation Sequence
 
-This sequence controls dependencies. It is not a reduced product definition.
+This sequence describes full v2 dependencies. It is not a reduced product definition.
+The [MVP checklist](../.codex/plans/release-mvp-launch-checklist.md) selects the earlier operational subset and brings required release checks forward.
+The [roadmap milestone](../.codex/plans/roadmap-v2-implementation.md#earlier-mvp-launch-milestone) defines that sequencing amendment.
 
 1. Reconcile v2 roadmap, routes, data model, and authorization boundaries.
 2. Complete identity, permissions, RLS, audit, and organization administration.
@@ -530,4 +602,5 @@ This sequence controls dependencies. It is not a reduced product definition.
 9. Build onboarding, customer success, renewals, reminders, and work queues.
 10. Complete dashboards, operational tooling, security hardening, and end-to-end tests.
 
-A new v2 roadmap must define phase exit criteria before feature implementation continues.
+The approved [v2 roadmap](../.codex/plans/roadmap-v2-implementation.md) defines module exit criteria.
+The MVP checklist adds milestone completion checks while preserving the remaining full-product work.

@@ -54,7 +54,7 @@ test("discovers the current publication through customer authority", async () =>
   await expect(getCurrentEvaluationPublication(input, { supabase })).resolves.toMatchObject({ publication: { publicationId } });
   expect(requirePermission).toHaveBeenCalledExactlyOnceWith("portal.customer.access", { kind: "organization", organizationId }, { supabase, correlationId });
   expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_get_current_evaluation_publication", {
-    payload: { organizationId, intakeId, limit: 2 }, correlation_id: correlationId,
+    payload: { organizationId, intakeId, limit: 2, detailsVersion: 1 }, correlation_id: correlationId,
   });
 });
 

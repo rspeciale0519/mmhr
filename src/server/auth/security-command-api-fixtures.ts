@@ -1,11 +1,13 @@
-import { randomUUID } from "node:crypto";
+import { createHash, createHmac, pbkdf2Sync, randomBytes, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import {
-  applyAllMigrations, startRehearsal, stopRehearsal, type RehearsalContext,
+  applyAllMigrations, prepareTaskRequestEvidenceMigration, prepareRfpReceiptMigration, openDocumentRehearsalWorker, startRehearsal, stopRehearsal, type RehearsalContext,
 } from "@/server/db/r1-migration-rehearsal";
 import { enrollTestTotp } from "./permission-test-fixtures";
+import { DOCUMENT_QUARANTINE_BUCKET } from "@/server/workflows/document-store";
+import { createDocumentScanRepository } from "@/server/db/document-scan-repository";
 
 export type SecurityApiPrincipal = {
   subjectId: string;
@@ -70,19 +72,25 @@ async function waitForCommandSchema(client: SupabaseClient) {
   throw new Error("Scratch command schema did not become ready");
 }
 
-export async function createSecurityCommandApiFixtures() {
-  const context = await startRehearsal("commandapi", { api: true });
+export async function createSecurityCommandApiFixtures(options: { storage?: boolean; migrationStage?: "before_r8_task_request_evidence" | "before_r4_rfp_receipts" } = {}) {
+  if (options.migrationStage !== undefined && options.migrationStage !== "before_r8_task_request_evidence" && options.migrationStage !== "before_r4_rfp_receipts") {
+    throw new Error("Invalid disposable task migration stage");
+  }
+  const context = await startRehearsal("commandapi", { api: true, storage: options.storage });
   try {
     const api = requireScratchApi(context);
     const authOptions = { auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false } };
     const admin = createClient(api.url, api.adminKey, authOptions);
     const anonymous = createClient(api.url, api.publicKey, authOptions);
     const owner = context.client;
-    await applyAllMigrations(context);
+    const taskEvidence = options.migrationStage === "before_r8_task_request_evidence"
+      ? await prepareTaskRequestEvidenceMigration(context) : null;
+    const rfpReceipt = options.migrationStage === "before_r4_rfp_receipts" ? await prepareRfpReceiptMigration(context) : null;
+    if (!taskEvidence && !rfpReceipt) await applyAllMigrations(context);
     await owner`NOTIFY pgrst, 'reload schema'`;
     await waitForCommandSchema(anonymous);
 
-    async function createPrincipal(options: { mfa?: boolean; pending?: boolean } = {}): Promise<SecurityApiPrincipal> {
+    async function createPrincipal(options: { mfa?: boolean; pending?: boolean; freshAal1?: boolean } = {}): Promise<SecurityApiPrincipal> {
       const email = `scratch-command-${randomUUID()}@example.invalid`;
       const password = `Disposable-command-${randomUUID()}`;
       const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
@@ -112,12 +120,15 @@ export async function createSecurityCommandApiFixtures() {
         if (claims.subjectId !== subjectId) throw new Error("The disposable Auth subject did not match");
         return client;
       }
-      const aal1 = await signIn();
+      let aal1 = await signIn();
       let aal2: SupabaseClient | null = null;
       if (options.mfa) {
         aal2 = await signIn();
         await enrollTestTotp(aal2);
         await verifiedApiClaims(aal2, "aal2");
+        // MFA enrollment can retire earlier sessions. A new synthetic portal
+        // principal must expose a current low-assurance session for denial tests.
+        if (options.freshAal1) aal1 = await signIn();
       }
       return { subjectId, identityId, aal1, aal2 };
     }
@@ -170,7 +181,87 @@ export async function createSecurityCommandApiFixtures() {
       owner, anonymous, pair, organizationAdmin, identityTarget, membershipTarget, outsider,
       organizationId, adminMembershipId, targetMembershipId,
       projectId: context.projectId,
+      taskRequestEvidenceMigration: taskEvidence?.manifest ?? null,
+      rfpReceiptMigration: rfpReceipt?.manifest ?? null,
+      async finishRfpReceiptMigration() {
+        requireScratchApi(context);
+        if (!rfpReceipt) throw new Error("The RFP receipt migration stage was not requested");
+        await rfpReceipt.finish();
+        await owner`NOTIFY pgrst, 'reload schema'`;
+        await waitForCommandSchema(anonymous);
+      },
+      async finishTaskRequestEvidenceMigration() {
+        requireScratchApi(context);
+        if (!taskEvidence) throw new Error("The task historical migration stage was not requested");
+        await taskEvidence.finish();
+        await owner`NOTIFY pgrst, 'reload schema'`;
+        await waitForCommandSchema(anonymous);
+      },
+      browserApiForLocalRehearsal() {
+        requireScratchApi(context);
+        if (options.storage !== true) throw new Error("Owned invoice browser fixture requires Storage");
+        return Object.freeze({
+          projectId: context.projectId,
+          apiOrigin: new URL(api.url).origin,
+          apiPort: context.ports.api,
+          publicApiKey: api.publicKey,
+          async assertCurrent() {
+            requireScratchApi(context);
+            await owner`SELECT 1 AS owned_fixture_available`;
+          },
+        });
+      },
       isolation: { apiLoopbackOnly: context.apiLoopbackOnly, apiPort: context.ports.api, databasePort: context.ports.database },
+      async createSyntheticPrincipal(options: { mfa?: boolean; pending?: boolean } = {}) {
+        requireScratchApi(context);
+        return createPrincipal({ ...options, freshAal1: true });
+      },
+      async createPrivateDocumentBucket() {
+        if (options.storage !== true) throw new Error("The disposable Storage service was not requested");
+        const created = await admin.storage.createBucket(DOCUMENT_QUARANTINE_BUCKET, {
+          public: false, fileSizeLimit: 25_000_000,
+          allowedMimeTypes: ["application/pdf", "image/png", "image/jpeg", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+        });
+        if (created.error || created.data?.name !== DOCUMENT_QUARANTINE_BUCKET) throw new Error("Disposable private bucket creation failed");
+        const checked = await admin.storage.getBucket(DOCUMENT_QUARANTINE_BUCKET);
+        if (checked.error || checked.data?.id !== DOCUMENT_QUARANTINE_BUCKET || checked.data.public !== false
+          || Number(checked.data.file_size_limit) !== 25_000_000) throw new Error("Disposable private bucket verification failed");
+      },
+      async seedPrivateDocumentObject() {
+        if (options.storage !== true) throw new Error("The disposable Storage service was not requested");
+        const objectPath = `${randomUUID()}/${randomUUID()}/${randomUUID()}`;
+        const uploaded = await admin.storage.from(DOCUMENT_QUARANTINE_BUCKET).upload(objectPath,
+          Buffer.from("%PDF-1.7\nsynthetic private bucket fixture bytes"), { contentType: "application/pdf", cacheControl: "0", upsert: false });
+        if (uploaded.error || uploaded.data?.path !== objectPath) throw new Error("Disposable private object fixture failed");
+        return objectPath;
+      },
+      async createDocumentScanProcessor() {
+        if (options.storage !== true) throw new Error("The disposable Storage service was not requested");
+        requireScratchApi(context);
+        const loginName = `mmhr_document_worker_${randomBytes(16).toString("hex")}`;
+        const credential = randomBytes(32).toString("base64url"), salt = randomBytes(16);
+        const salted = pbkdf2Sync(credential, salt, 4096, 32, "sha256");
+        const verifier = `SCRAM-SHA-256$4096:${salt.toString("base64")}$${createHash("sha256").update(createHmac("sha256", salted).update("Client Key").digest()).digest("base64")}:${createHmac("sha256", salted).update("Server Key").digest("base64")}`;
+        const expiresAt = new Date(Date.now() + 480_000).toISOString();
+        await owner`SELECT mmhr_private.r4_create_ephemeral_document_worker_login(${loginName},${verifier},${expiresAt}::timestamptz)`;
+        const email = `scratch-document-reader-${randomUUID()}@example.invalid`, password = `Disposable-reader-${randomUUID()}`;
+        const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+        if (created.error || !created.data.user?.id) throw new Error("Disposable machine reader creation failed");
+        const reader = createClient(api.url, api.publicKey, authOptions);
+        const signedIn = await reader.auth.signInWithPassword({ email, password });
+        if (signedIn.error || signedIn.data.user?.id !== created.data.user.id) throw new Error("Disposable machine reader sign-in failed");
+        const claims = await verifiedApiClaims(reader, "aal1");
+        await owner`SELECT mmhr_private.r4_register_document_scan_reader(${claims.subjectId}::uuid,${claims.sessionId}::uuid,
+          ${loginName},${expiresAt}::timestamptz,${randomUUID()}::uuid)`;
+        const worker = await openDocumentRehearsalWorker(context, loginName, credential);
+        return { loginName, reader, subjectId: claims.subjectId, sessionId: claims.sessionId,
+          repository: createDocumentScanRepository(worker.db),
+          async close() {
+            try { await owner`SELECT mmhr_private.r4_revoke_document_scan_reader(${claims.subjectId}::uuid,${randomUUID()}::uuid)`; }
+            finally { await worker.close(); }
+          },
+        };
+      },
       async close() { await stopRehearsal(context); },
     };
   } catch (error) {

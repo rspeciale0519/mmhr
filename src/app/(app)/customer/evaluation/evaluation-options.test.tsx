@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { PublicationRead } from "@/server/matching/option-publication-contract";
 import type { EvaluationSelectionRead } from "@/server/commands/evaluation-selection";
@@ -34,6 +34,14 @@ function view(patch: Partial<Props> = {}) {
   return <QueryClientProvider client={new QueryClient()}><EvaluationOptions publication={publication} history={history} canSelect {...patch} /></QueryClientProvider>;
 }
 function choose(n: number) { fireEvent.click(screen.getByRole("checkbox", { name: `Choose Option ${n}` })); }
+
+test("marks a product saved across publication versions without exposing its identity", () => {
+  render(view({ history: { ...history, initialCandidateCount: 1, remainingInitialChoices: 4,
+    selectionPublicationId: publication.publicationId, selectedOptionIds: [publication.options[0].optionId] } }));
+  expect(screen.getByText("Choice saved")).toBeInTheDocument();
+  expect(screen.queryByRole("checkbox", { name: "Choose Option 1" })).not.toBeInTheDocument();
+  expect(screen.getAllByRole("checkbox")).toHaveLength(5);
+});
 function review() {
   fireEvent.click(screen.getByRole("button", { name: "Review choices" }));
   fireEvent.click(screen.getByRole("checkbox", { name: "Save these initial choices" }));
@@ -61,6 +69,14 @@ test("shows all six options and permits unknown and ineligible choices", () => {
   expect(screen.getByRole("checkbox", { name: "Choose Option 6" })).toBeChecked();
   expect(screen.getByText("3 new choices. 5 initial choices remain.")).toBeInTheDocument();
   expect(mutate).not.toHaveBeenCalled();
+});
+
+test("shows requirement labels instead of generated identifiers", () => {
+  const key="need_12345678901234567890123456789012";
+  render(view({requirementLabels:{[key]:"Payroll processing"},publication:{...publication,
+    options:[{...publication.options[0],fitReasons:[key],limitations:[]}],optionCount:1}}));
+  expect(screen.getByText("Payroll processing")).toBeInTheDocument();
+  expect(screen.queryByText(key)).not.toBeInTheDocument();
 });
 
 test("requires explicit review and sends exact opaque choices with a stable request identity", async () => {
@@ -195,4 +211,62 @@ test("renders the approved empty comparison without choice actions", () => {
   render(view({ publication: { ...publication, options: [], optionCount: 0 } }));
   expect(screen.getByRole("status")).toHaveTextContent("contains no options");
   expect(screen.getByRole("button", { name: "Review choices" })).toBeDisabled();
+});
+
+test("uses a navigable comparison table and counts only required matches", () => {
+  render(view({ requirements: [
+    { key: "payroll", label: "US payroll", importance: "must" },
+    { key: "recruiting", label: "Recruiting", importance: "nice" },
+  ], publication: { ...publication, optionCount: 1, options: [{ ...publication.options[0],
+    fitReasons: ["recruiting"], limitations: ["payroll"],
+  }] } }));
+  expect(screen.getByRole("region", { name: "Software comparison" })).toHaveAttribute("tabindex", "0");
+  const table = screen.getByRole("table");
+  expect(within(table).getAllByRole("columnheader")).toHaveLength(2);
+  expect(within(table).getByRole("rowheader", { name: "US payroll Required" })).toHaveAttribute("scope", "row");
+  expect(within(table).getByText("0 of 1")).toBeInTheDocument();
+  const payrollRow = within(table).getByRole("rowheader", { name: "US payroll Required" }).closest("tr")!;
+  expect(within(payrollRow).getByRole("cell")).toHaveTextContent("Unknown");
+  const recruitingRow = within(table).getByRole("rowheader", { name: "Recruiting Nice to have" }).closest("tr")!;
+  expect(within(recruitingRow).getByRole("cell")).toHaveTextContent("Match confirmed");
+});
+
+test("does not invent prices, setup estimates, or absence from legacy limitations", () => {
+  render(view({ publication: { ...publication, optionCount: 1, options: [publication.options[0]] } }));
+  for (const name of [/Estimated annual cost/, /Estimated setup/, /Required features met/]) {
+    const row = screen.getByRole("rowheader", { name }).closest("tr")!;
+    expect(within(row).getByRole("cell")).toHaveTextContent("Unknown");
+  }
+  expect(screen.queryByText("Not supported")).not.toBeInTheDocument();
+});
+
+test("displays published estimates with their basis and distinguishes coverage from fit", () => {
+  const evidence = { basis: "evidence" as const, capturedAt: "2026-09-16T00:30:00+14:00",
+    reviewedAt: "2026-09-15T11:00:00Z", validUntil: "2026-10-15T10:00:00Z", version: 2 };
+  render(view({ requirementLabels: { payroll: "US payroll" }, requirements: [
+    { key: "payroll", label: "US payroll", importance: "must" },
+  ], publication: { ...publication, optionCount: 1, options: [{ ...publication.options[0],
+    fitReasons: ["payroll"], limitations: [], details: {
+      version: 1, features: [{ requirementKey: "payroll", outcome: "match", coverage: "add_on", evidence, coverageEvidence: evidence }],
+      annualCost: { recurring: { minimum: 12000, maximum: 18000 }, currency: "USD", employeeCount: 100,
+        includedModules: ["hr", "payroll"], assumptions: ["annual_billing"], exclusions: ["taxes"],
+        oneTime: null, evidence },
+      setup: { duration: { minimum: 4, maximum: 8 }, unit: "weeks", scope: "initial_implementation",
+        includedModules: ["payroll"], assumptions: ["customer_data_ready"], evidence },
+    },
+  }] } }));
+  const cost = within(screen.getByRole("rowheader", { name: /Estimated annual cost/ }).closest("tr")!);
+  expect(cost.getByRole("cell")).toHaveTextContent("USD 12,000.00 – USD 18,000.00 / year");
+  expect(cost.getByRole("cell")).toHaveTextContent("100 employees");
+  expect(cost.getByRole("cell")).toHaveTextContent("Includes: HR records, Payroll");
+  expect(cost.getByRole("cell")).toHaveTextContent("Excludes: Taxes");
+  expect(cost.getByRole("cell")).toHaveTextContent("One-time charges: Unknown");
+  expect(cost.getByRole("cell")).toHaveTextContent("Captured: 2026-09-15 UTC");
+  const setup = within(screen.getByRole("rowheader", { name: /Estimated setup/ }).closest("tr")!);
+  expect(setup.getByRole("cell")).toHaveTextContent("4 – 8 weeks");
+  expect(setup.getByRole("cell")).toHaveTextContent("Customer data ready");
+  const feature = within(screen.getByRole("rowheader", { name: "US payroll Required" }).closest("tr")!);
+  expect(feature.getByRole("cell")).toHaveTextContent("Match confirmed");
+  expect(feature.getByRole("cell")).toHaveTextContent("Add-on");
+  expect(screen.queryAllByRole("link").every((link) => !link.getAttribute("href")?.startsWith("http"))).toBe(true);
 });

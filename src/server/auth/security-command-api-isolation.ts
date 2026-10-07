@@ -76,15 +76,16 @@ export async function verifyScratchNetworkIfPresent(network: ScratchNetwork, run
   return inspectScratchNetwork(network, runDocker);
 }
 
-export async function verifyScratchApiBindings(
+async function verifyScratchBindings(
   network: ScratchNetwork,
-  ports: Readonly<{ database: number; api: number; all: readonly number[] }>,
+  ports: Readonly<{ database: number; all: readonly number[] }>,
   runDocker: DockerRunner,
+  apiPort?: number,
 ) {
   const inspected = await inspectScratchNetwork(network, runDocker);
   const names = Object.values(inspected.Containers).map((container) => container.Name);
-  if (!names.includes(`supabase_db_${network.projectId}`) || !names.includes(`supabase_kong_${network.projectId}`)) {
-    throw new Error("The scratch network is missing its database or API container");
+  if (!names.includes(`supabase_db_${network.projectId}`) || (apiPort !== undefined && !names.includes(`supabase_kong_${network.projectId}`))) {
+    throw new Error(apiPort === undefined ? "The scratch network is missing its database container" : "The scratch network is missing its database or API container");
   }
   const published = new Set<number>();
   for (const id of Object.keys(inspected.Containers)) {
@@ -99,10 +100,26 @@ export async function verifyScratchApiBindings(
       published.add(port);
     }
   }
-  if (!published.has(ports.database) || !published.has(ports.api)) {
-    throw new Error("The scratch API did not publish both checked loopback ports");
+  if (!published.has(ports.database) || (apiPort !== undefined && !published.has(apiPort))) {
+    throw new Error(apiPort === undefined ? "The scratch database did not publish its checked loopback port" : "The scratch API did not publish both checked loopback ports");
   }
   return true as const;
+}
+
+export async function verifyScratchApiBindings(
+  network: ScratchNetwork,
+  ports: Readonly<{ database: number; api: number; all: readonly number[] }>,
+  runDocker: DockerRunner,
+) {
+  return verifyScratchBindings(network, ports, runDocker, ports.api);
+}
+
+export async function verifyScratchDatabaseBindings(
+  network: ScratchNetwork,
+  ports: Readonly<{ database: number; all: readonly number[] }>,
+  runDocker: DockerRunner,
+) {
+  return verifyScratchBindings(network, ports, runDocker);
 }
 
 export async function removeScratchNetwork(network: ScratchNetwork, runDocker: DockerRunner) {

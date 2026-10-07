@@ -42,6 +42,7 @@ export const permissionKeys = [
   "intake.requirement.save",
   "intake.submit",
   "evaluation.publish",
+  "evaluation.disclose",
   "evaluation.select",
 ] as const;
 
@@ -244,6 +245,11 @@ export const permissionRegistry = {
     minimumAssurance: "aal2", internalOnly: true, requiredPortal: null,
     description: "Review and publish masked evaluation options for an authorized customer organization.",
   },
+  "evaluation.disclose": {
+    kind: "action", platformScope: false, organizationScope: true,
+    minimumAssurance: "aal2", internalOnly: true, requiredPortal: null,
+    description: "Review and disclose provider identities after an authorized MMHR discussion.",
+  },
   "evaluation.select": {
     kind: "action", platformScope: false, organizationScope: true,
     minimumAssurance: "aal1", internalOnly: false, requiredPortal: "customer",
@@ -328,6 +334,7 @@ export const rolePermissionDefaults = {
     "intake.requirement.save",
     "intake.submit",
     "evaluation.publish",
+    "evaluation.disclose",
     "evaluation.select",
   ],
   admin: [

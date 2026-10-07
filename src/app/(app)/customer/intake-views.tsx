@@ -17,18 +17,25 @@ function SavedTime({ value }: { value: string }) {
   return <time dateTime={value} className="tabular-nums">{dateFormat.format(new Date(value))} UTC</time>;
 }
 
-export function CustomerFrame({ children }: { children: ReactNode }) {
+export function CustomerFrame({ children, title = "Your software needs", description = "Review the intake information saved in your selected workspace." }: {
+  children: ReactNode; title?: string; description?: string;
+}) {
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
       <header className="mb-10 border-b pb-6">
         <nav aria-label="Customer workspace" className="mb-8 flex flex-wrap gap-2">
           <Link href="/home" prefetch={false} className={linkStyle}>Home</Link>
+          <Link href="/customer" prefetch={false} className={linkStyle}>Your intakes</Link>
+          <Link href="/customer/proposals" prefetch={false} className={linkStyle}>Proposals and pricing</Link>
+          <Link href="/customer/contracts" prefetch={false} className={linkStyle}>Vendor selection and contracts</Link>
           <Link href="/workspaces" prefetch={false} className={linkStyle}>Change workspace</Link>
+          <Link href="/customer/demos" prefetch={false} className={linkStyle}>Demo coordination</Link>
+          <Link href="/documents" prefetch={false} className={linkStyle}>Workspace documents</Link>
         </nav>
         <p className="mb-2 text-sm font-medium text-muted-foreground">Customer workspace</p>
-        <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Your software needs</h1>
+        <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
         <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-muted-foreground">
-          Review the intake information saved in your selected workspace.
+          {description}
         </p>
       </header>
       {children}
@@ -116,10 +123,10 @@ function SavedSection({ title, value }: { title: string; value: string[] | Recor
   );
 }
 
-export function IntakeDetails({ intake, canEdit = false }: { intake: Intake; canEdit?: boolean }) {
+export function IntakeDetails({ intake, canEdit = false, staffView = false }: { intake: Intake; canEdit?: boolean; staffView?: boolean }) {
   return (
     <article aria-labelledby="intake-details">
-      <Link href="/customer" prefetch={false} className={`${linkStyle} mb-6`}>Back to saved intakes</Link>
+      {!staffView && <Link href="/customer" prefetch={false} className={`${linkStyle} mb-6`}>Back to saved intakes</Link>}
       <div className="mb-7">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id="intake-details" className="text-balance text-2xl font-semibold">Saved intake details</h2>
@@ -132,11 +139,12 @@ export function IntakeDetails({ intake, canEdit = false }: { intake: Intake; can
         {intake.submittedAt && <p className="mt-2 text-sm">Submitted <SavedTime value={intake.submittedAt} /></p>}
       </div>
       <p className="mb-7 rounded-lg bg-muted p-4 text-pretty text-sm leading-6">
-        This view shows saved intake details and active requirements, including custom requests. Open the comparison to view approved options and saved choices.
+        {staffView ? "Review the customer's saved answers and requirements below. Prepare the comparison, discuss provider details, and manage the RFP on this page."
+          : "This view shows saved intake details and active requirements, including custom requests. Open the comparison to view approved options and saved choices."}
       </p>
-      <Link href={`/customer/evaluation?intake=${encodeURIComponent(intake.intakeId)}`} prefetch={false}
-        className={`${linkStyle} mb-5`}>View software comparison</Link>
-      {canEdit && <Link href={`/customer?intake=${intake.intakeId}&edit=1`} prefetch={false}
+      {!staffView && <Link href={`/customer/evaluation?intake=${encodeURIComponent(intake.intakeId)}`} prefetch={false}
+        className={`${linkStyle} mb-5`}>View software comparison</Link>}
+      {canEdit && !staffView && <Link href={`/customer?intake=${intake.intakeId}&edit=1`} prefetch={false}
         className={`${linkStyle} mb-5`}>Edit intake answers</Link>}
       <SavedSection title="Company context" value={intake.data.companyContext} />
       <SavedSection title="Current systems" value={intake.data.currentSystems} />

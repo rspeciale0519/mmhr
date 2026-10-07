@@ -1,6 +1,7 @@
 import { createHmac, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import postgres from "postgres";
+import { assertRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
 type PlatformRole = "super_admin" | "admin" | "staff";
 type OrganizationRole = "organization_admin" | "contributor" | "viewer";
@@ -94,13 +95,14 @@ export async function verifyTestTotp(
   return verification.data.access_token;
 }
 
-export function createPermissionFixtures() {
+export function createPermissionFixtures(rehearsal?: RestrictedRehearsal) {
   if (process.env.NODE_ENV !== "test") throw new Error("Permission fixtures are test-only");
-  const apiUrl = requireLocalUrl(process.env.NEXT_PUBLIC_SUPABASE_URL, "57021");
-  const migrationUrl = requireLocalUrl(process.env.TEST_MIGRATION_DATABASE_URL, "57022");
-  const workerUrl = requireLocalUrl(process.env.DATABASE_URL, "57022");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (rehearsal) assertRestrictedRehearsal(rehearsal);
+  const apiUrl = rehearsal?.context.api?.url ?? requireLocalUrl(process.env.NEXT_PUBLIC_SUPABASE_URL, "57021");
+  const migrationUrl = rehearsal?.context.databaseUrl ?? requireLocalUrl(process.env.TEST_MIGRATION_DATABASE_URL, "57022");
+  const workerUrl = rehearsal?.workerUrl ?? requireLocalUrl(process.env.DATABASE_URL, "57022");
+  const anonKey = rehearsal?.context.api?.publicKey ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceKey = rehearsal?.context.api?.adminKey ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!anonKey || !serviceKey) throw new Error("Local permission test credentials are missing");
 
   const authOptions = { auth: { autoRefreshToken: false, persistSession: false } };

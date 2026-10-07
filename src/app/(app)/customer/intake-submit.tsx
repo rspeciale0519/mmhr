@@ -12,6 +12,7 @@ export type CustomerIntakeSubmitProps = {
   organizationId: string;
   intakeId: string;
   expectedRevision: number;
+  requiresRequirement?: boolean;
 };
 
 type SubmitInput = CustomerIntakeSubmitProps & {
@@ -34,7 +35,7 @@ function classifyRejection(error: unknown): Rejection {
     ? "fresh-review" : null;
 }
 
-export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevision }: CustomerIntakeSubmitProps) {
+export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevision, requiresRequirement = false }: CustomerIntakeSubmitProps) {
   const trpc = useTRPC();
   const router = useRouter();
   const submit = useMutation(trpc.intakes.submit.mutationOptions({ retry: false }));
@@ -97,6 +98,12 @@ export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevisio
     <h2 className="mt-2 text-xl font-semibold">Your submission is confirmed</h2>
     <p className="mt-2 max-w-xl text-pretty text-sm leading-6 text-muted-foreground">Open the saved intake to see its current status and saved answers.</p>
     <a href={currentIntakeHref} className="mt-5 inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Open submitted intake</a>
+  </section>;
+
+  if (requiresRequirement) return <section className="mt-12 space-y-4 border-t pt-8">
+    <h2 className="text-xl font-semibold">Add a requirement before submission</h2>
+    <p role="status" className="text-sm leading-6">Save at least one must-have or nice-to-have requirement before you submit this intake.</p>
+    <a className="inline-flex min-h-11 items-center text-sm font-semibold underline" href={`${currentIntakeHref}&newRequirement=1`}>Add a requirement</a>
   </section>;
 
   return <section aria-labelledby="submit-intake-heading" className="mt-12 space-y-6 border-t pt-8">

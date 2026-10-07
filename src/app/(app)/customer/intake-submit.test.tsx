@@ -49,6 +49,14 @@ beforeEach(() => {
     .mockReturnValueOnce(retryCorrelationId).mockReturnValueOnce(retryIdempotencyKey) });
 });
 
+test("explains missing requirements before a submission request can start", () => {
+  renderSubmit({ requiresRequirement: true });
+  expect(screen.getByRole("status")).toHaveTextContent("Save at least one must-have or nice-to-have requirement");
+  expect(screen.getByRole("link", { name: "Add a requirement" })).toHaveAttribute("href", currentHref + "&newRequirement=1");
+  expect(screen.queryByRole("button", { name: "Review submission" })).not.toBeInTheDocument();
+  expect(mutate).not.toHaveBeenCalled();
+});
+
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 test("requires review and an explicit confirmation before submitting", () => {

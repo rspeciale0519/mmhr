@@ -184,6 +184,16 @@ test("calculates remaining choices from the full initial candidate count", async
   });
 });
 
+test("requires the requested publication mapping and rejects mismatched mappings", async () => {
+  const mappedInput = { ...readInput, selectionPublicationId: publicationId };
+  rpc.mockResolvedValue({ data: readResult(), error: null });
+  await expect(getInitialEvaluationSelections(mappedInput, { supabase })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+  rpc.mockResolvedValue({ data: readResult({ selectionPublicationId: publicationId, selectedOptionIds: [] }), error: null });
+  await expect(getInitialEvaluationSelections(mappedInput, { supabase })).resolves.toMatchObject({ selectedOptionIds: [] });
+  rpc.mockResolvedValue({ data: readResult({ selectionPublicationId: otherId, selectedOptionIds: [] }), error: null });
+  await expect(getInitialEvaluationSelections(mappedInput, { supabase })).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+});
+
 test("rejects identity-bearing read input before authority", async () => {
   const patch = { actorIdentityId: otherId };
   await expect(getInitialEvaluationSelections({ ...readInput, ...patch })).rejects.toMatchObject({ code: "INVALID_INPUT" });

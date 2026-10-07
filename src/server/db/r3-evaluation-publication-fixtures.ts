@@ -8,6 +8,7 @@ import {
   createMembership,
   type SecurityCommandFixture,
   type SecurityPrincipal,
+  type SecurityTokenPrincipal,
   type SecuritySql,
   type SecurityTransaction,
 } from "./r1-security-command-fixtures";
@@ -33,7 +34,7 @@ export function fixtureDates() {
   };
 }
 
-export async function addContributor(sql: SecurityTransaction, organizationId: string, principal: SecurityPrincipal) {
+export async function addContributor(sql: SecurityTransaction, organizationId: string, principal: SecurityTokenPrincipal) {
   const [row] = await sql<{ id: string }[]>`
     INSERT INTO public.org_members (org_id, identity_id, user_id, role, role_key, migration_review_required)
     VALUES (${organizationId}::uuid, ${principal.identityId}::uuid, ${principal.subject}::uuid,
@@ -54,7 +55,7 @@ export async function addPortalGrant(sql: SecurityTransaction, organizationId: s
 export async function seedSubmittedIntake(
   sql: SecurityTransaction,
   fixture: SecurityCommandFixture,
-  principal: SecurityPrincipal,
+  principal: SecurityTokenPrincipal,
 ) {
   const intakeId = randomUUID();
   await sql`
@@ -95,7 +96,7 @@ export async function seedVendorOption(
   sql: SecurityTransaction,
   fixture: SecurityCommandFixture,
   index: number,
-  options: { capturedAt?: string; freshUntil?: string; sourceActive?: boolean; fieldKey?: string; factValue?: string } = {},
+  options: { productId?: string; capturedAt?: string; freshUntil?: string; sourceActive?: boolean; fieldKey?: string; factValue?: string } = {},
 ): Promise<SeededInput> {
   const dates = fixtureDates();
   const capturedAt = options.capturedAt ?? dates.capturedAt;
@@ -104,7 +105,7 @@ export async function seedVendorOption(
   const factValue = options.factValue ?? "yes";
   const organizationId = randomUUID();
   const profileId = randomUUID();
-  const productId = randomUUID();
+  const productId = options.productId ?? randomUUID();
   const sourceId = randomUUID();
   const factId = randomUUID();
   const evidenceId = randomUUID();
