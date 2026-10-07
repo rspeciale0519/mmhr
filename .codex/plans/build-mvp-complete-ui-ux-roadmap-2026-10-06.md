@@ -570,11 +570,13 @@ A calendar launch date before those checks would be unreliable.
 
 ### During implementation
 
+**Testing rule, owner decision of October 7, 2026:** During P1 to P4, run only short checks: type check, lint, unit tests, the build, and single integration files that the wrapper allows. Run the full integration suite only when the app is ready to go live, against the hosted staging candidate in P5.
+
 Run the smallest relevant existing tests for each behavior change.
 Add regression checks for new behavior and practical defect cases.
 Run local integration checks for database, authentication, query, RLS, and migration changes.
 Verify rendered changes through the available built-in browser first.
-Check for an existing healthy server on port 3000 before starting another.
+Check for an existing healthy server on port 3100 before starting another.
 Run the automated journey tests after each phase once they exist.
 
 For each relevant screen, check loading, empty, populated, success, validation, failure, denied, stale, and expired states.

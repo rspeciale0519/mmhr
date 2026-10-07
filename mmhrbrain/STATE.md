@@ -1,19 +1,19 @@
 # MMHR — Current State
 
-Updated: 2026-10-07 07:22 EDT. Branch: `codex/full-delivery-verification`. No commits.
+Updated: 2026-10-07 13:10 EDT. Branch: `codex/full-delivery-verification`. Last commit 0b552be, pushed.
 
 ## Scope and authority
 - Latest user direction: working core features first, then high-quality public and logged-in design, then further security and features.
-- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P1 application work waits for the nine P0 decisions D1-D9 in the P0 record.
+- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P0 is complete: the owner approved D1-D9 on 2026-10-07. D3, D7 and D8 are applied; D9 is blocked by the auto-mode classifier and waits for the owner. P1 is next.
 - This direction supersedes the October3 full-platform-before-live instruction. Nine older documents now carry dated supersession notices; full rewrites follow launch.
 - Financial-record management and private document storage are outside the requested MVP. Contracts and existing permission controls remain important.
 - Do not resume superseded finance/parser/security expansion. Local migrations and checks are authorized within P0 and later phases.
-- Preserve dirty user work. No Git write, cloud migration, production action, provider activation, or real-data rehearsal is authorized.
+- Approved on 2026-10-07: checkpoint commit and push (done), audit fix (done), port 3100 (done), Resend, Playwright dev dependency, staging at the end of P1. Still unapproved: other Git writes, cloud migrations, production actions, and real-data rehearsal.
 - Exact braces package has local installation/testing approval. Parser acquisition, build, and activation have no approval.
 - Brain sync and consolidation are not requested. Neither ran.
 
 ## Evidence locations
-- Current plan: .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md (v1.1, owner-approved). Current phase record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md. P0 status: work done; decisions D1-D9 open.
+- Current plan: .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md (v1.1, owner-approved). Current phase record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md. P0 status: complete. Checkpoint commit 0b552be is pushed. Local dev port is 3100.
 - Current journal: mmhrbrain/journal/2026-10-07.md. Earlier runtime evidence remains in the October 4 and 5 journals.
 - Prior full state: mmhrbrain/archive/STATE-before-2026-10-06-1340.md.
 - Current scratch: C:/Users/rob/.codex/visualizations/2026/10/04/01a10918-17c6-7272-b7a9-caedeac93d50.

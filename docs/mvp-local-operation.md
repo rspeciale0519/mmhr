@@ -30,7 +30,7 @@ Vendor evidence still requires data preparation before staff can publish meaning
 1. Start Docker Desktop.
 2. Run `supabase start` from the MMHR project.
 3. Run `npm run dev:local`.
-4. Open `http://127.0.0.1:3000/sign-in`.
+4. Open `http://127.0.0.1:3100/sign-in`.
 
 Use `npm run dev:local -- --port 3006` when you need the existing browser test port.
 The command reads local connection values from Supabase and uses the existing worker wrapper.

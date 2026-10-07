@@ -83,7 +83,8 @@ Use these commands:
 - Unit and component tests: `npm test`
 - Local integration tests: `npm run test:integration`
 
-The expected application port is `3000`. Check it before starting a server.
+The expected application port is `3100`. Windows port-proxy rules on the owner machine hold ports 3000 to 3005.
+Start the application with `npm run dev:local`. Check the port before starting a server.
 
 CI runs `npm ci`, type checking, lint, unit tests, and the production build.
 

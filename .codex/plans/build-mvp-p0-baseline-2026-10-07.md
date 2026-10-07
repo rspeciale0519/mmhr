@@ -48,6 +48,21 @@ The commit would include the Codex hook files under `.codex/hooks/`, which match
 `npm run dev:local -- --port 3100` already supports another port.
 Email links use the local Site URL, so `supabase/config.toml` needs the matching Site URL and redirect URLs.
 
+**Actions after approval, October 7:**
+
+| Decision | Action | Status |
+|---|---|---|
+| D3 | Checkpoint commit `0b552be` with 877 files, pushed to `origin/codex/full-delivery-verification`. A stale, empty Git index lock from September 14 was removed first. | Done |
+| D8 | `npm audit fix` updated the four planned packages in `package-lock.json` only. The audit gate passes; 3 moderate findings remain in the excluded document parser. | Done |
+| D7 | The local dev script default, the local Auth Site URL and redirect list, `.env.example`, `AGENTS.md`, and two how-to documents now use port 3100. Local Supabase restarted with its data intact. | Done |
+| D9 | The Claude Code auto-mode safety classifier blocked the CI workflow change as a CI bypass. No D9 change remains in the tree. | Waiting for the owner |
+| D1, D2, D4, D5, D6 | Scheduled in the P1 order in Section 9 | Pending |
+
+After these changes, type check, lint, dependency audit, both secret scans, unit tests (491 files, 6,346 tests), and the build all pass. The integration suite was not rerun, because the changed packages are build and command-line tools.
+These changes are not committed yet; D3 covered only the checkpoint commit.
+
+`npm run dev` still reads `NEXT_PUBLIC_APP_URL` from `.env.local`, which only the owner edits. Use `npm run dev:local`, which sets the 3100 address itself.
+
 ## 3. Starting condition
 
 ### 3.1 Checks
@@ -132,6 +147,7 @@ The staff evaluation, RFP, response, demo, proposal, and contract screens are mo
 | `r7-payment` | 1 of 43 | Excluded finance | The payment event has 17 fields; the test expects 14 | D9 |
 
 The October 3 run failed 4 checks in 4 of 116 files. The new failures come mainly from finance work added after that run.
+The CI integration job has a 120-minute limit, but the local full run took 20,859 seconds. CI integration therefore cannot finish today. P1 needs a measured limit or split jobs.
 
 ## 4. Launch surface inventory
 
@@ -427,6 +443,8 @@ The built-in Supabase sender delivers only to project team addresses, has low ra
 
 ## 9. P1 start order after the decisions
 
+**Testing rule, owner decision of October 7, 2026:** During P1 to P4, run only short checks: type check, lint, unit tests, the build, and single integration files that the wrapper allows. Run the full integration suite only when the app is ready to go live, against the hosted staging candidate in P5.
+
 1. Make the checkpoint commit and push (D3).
 2. Apply the dependency audit fix (D8), resolve the two launch-scope integration failures in Section 3.5, apply D9, and repeat the standard checks.
 3. Resolve the local port (D7) before any browser check.
@@ -444,5 +462,5 @@ The built-in Supabase sender delivers only to project team addresses, has low ra
 | Date | Change |
 |---|---|
 | October 7, 2026 | P0 baseline, launch inventory, isolation approach, work list, interface rules, and recovery design recorded. Supersession notices added to nine planning documents. |
-| October 7, 2026 | Owner approved D1 to D9. P0 complete. |
+| October 7, 2026 | Owner approved D1 to D9. P0 complete. D3, D7, and D8 applied; D9 blocked by the safety classifier. |
 | October 7, 2026 | Integration result recorded: 7 of 126 files failed. Failures classified in Section 3.5. Decision D9 added for excluded-feature tests in CI. |

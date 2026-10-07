@@ -9,7 +9,7 @@ test("uses the configured local stack without a saved environment file", () => {
     MIGRATION_DATABASE_URL: stack.DB_URL, NEXT_PUBLIC_SUPABASE_URL: stack.API_URL,
     NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3006", PORT: "3006",
   });
-  expect(localDevelopmentEnvironment(stack, config).PORT).toBe("3000");
+  expect(localDevelopmentEnvironment(stack, config).PORT).toBe("3100");
 });
 
 test("rejects remote or unrelated stacks and unexpected arguments", () => {

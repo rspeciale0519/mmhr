@@ -1019,3 +1019,5 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-07 01:28 EDT — Began P0 on owner instruction. Recorded the baseline, launch inventory, isolation approach, work list, interface rules and recovery design in .codex/plans/build-mvp-p0-baseline-2026-10-07.md; added supersession notices to nine documents; migrated the local DB to 169. Unit, build, matrix and secret checks pass; dependency audit fails. Eight owner decisions open. See journal/2026-10-07.md.
 
 2026-10-07 07:22 EDT — P0 integration result: 119/126 files and 1465/1492 tests pass in 20859s. Two launch-scope failures, five excluded-scope files. Decision D9 added; nine decisions open. See journal/2026-10-07.md.
+
+2026-10-07 13:10 EDT — Owner approved D1-D9; P0 closed. Checkpoint commit 0b552be pushed; audit fix applied; local port moved to 3100. D9 blocked by the auto-mode classifier. See journal/2026-10-07.md.

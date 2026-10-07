@@ -8,7 +8,8 @@ const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 
 export function localDevelopmentEnvironment(stack, config, args = []) {
   if (args.length && (args.length !== 2 || args[0] !== "--port")) throw new Error("Use --port followed by a local port.");
-  const port = args[1] ?? "3000";
+  // Owner decision D7: Windows port-proxy rules on the owner machine hold ports 3000 to 3005.
+  const port = args[1] ?? "3100";
   if (!/^\d{4,5}$/.test(port) || Number(port) > 65535 || Number(port) < 1024) throw new Error("Use a port from 1024 to 65535.");
   const configuredPort = section => config.match(new RegExp(`\\[${section}\\]([\\s\\S]*?)(?:\\r?\\n\\[|$)`))?.[1].match(/^port\s*=\s*(\d+)\s*$/m)?.[1];
   let database, api;

@@ -141,7 +141,7 @@ Setup:
 3. Add the required local values without committing secrets.
 4. Run `supabase start`.
 5. Run `npm run dev:local` to use the running local stack.
-6. Open `http://localhost:3000`.
+6. Open `http://127.0.0.1:3100`.
 
 Use `supabase status` to inspect the local database services.
 
