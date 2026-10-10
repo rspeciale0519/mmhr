@@ -4,6 +4,7 @@ import {
   createPublicReleaseBlockResponse,
   createPublicReleaseRobotsResponse,
   getPublicReleaseRobotsMetadata,
+  isGalleryPreviewRequest,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
 
@@ -45,6 +46,18 @@ describe("public release control", () => {
         "r2a-approved",
       ),
     ).toBe(true);
+  });
+
+  test("opens only the gallery, only on Vercel previews, only for reads", () => {
+    const preview = { NODE_ENV: "production", VERCEL_ENV: "preview" };
+    expect(isGalleryPreviewRequest("/gallery", "GET", preview)).toBe(true);
+    expect(isGalleryPreviewRequest("/gallery/lumen", "HEAD", preview)).toBe(true);
+    expect(isGalleryPreviewRequest("/gallery/lumen", "POST", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/galleryx", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/admin", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery", "GET", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery", "GET", { NODE_ENV: "production" })).toBe(false);
   });
 
   test("keeps crawler metadata blocked until release approval", () => {

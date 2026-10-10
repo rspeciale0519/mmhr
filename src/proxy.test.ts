@@ -84,6 +84,28 @@ describe("public-release middleware", () => {
     expect(await response.json()).toEqual({ error: "service_unavailable" });
   });
 
+  test("serves the gallery on a Vercel preview without session work", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+
+    const gallery = await proxy(new NextRequest("https://mmhr.test/gallery/lumen"));
+    expect(gallery.status).toBe(200);
+    expect(gallery.headers.get("x-robots-tag")).toContain("noindex");
+    expect(createServerClient).not.toHaveBeenCalled();
+
+    const home = await proxy(new NextRequest("https://mmhr.test/"));
+    expect(home.status).toBe(503);
+
+    const post = await proxy(new NextRequest("https://mmhr.test/gallery", { method: "POST", headers: { "next-action": "x" } }));
+    expect(post.status).toBe(503);
+  });
+
+  test("keeps the gallery closed on production deployments", async () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+
+    const response = await proxy(new NextRequest("https://mmhr.test/gallery"));
+    expect(response.status).toBe(503);
+  });
+
   test("an environment flag cannot bypass the checked-in release gate", async () => {
     vi.stubEnv("PUBLIC_RELEASE_ENABLED", "1");
     vi.stubEnv("PUBLIC_RELEASE_APPROVAL_ID", "unreviewed-release");

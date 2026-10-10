@@ -10,6 +10,7 @@ const CHECKED_IN_PUBLIC_RELEASE_ID: string | null = null;
 
 type PublicReleaseEnvironment = {
   NODE_ENV?: string;
+  VERCEL_ENV?: string;
   PUBLIC_RELEASE_APPROVAL_ID?: string;
   PUBLIC_RELEASE_ENABLED?: string;
 };
@@ -34,6 +35,22 @@ export function isPublicReleaseBlocked(
     environment.PUBLIC_RELEASE_ENABLED === "1" &&
     environment.PUBLIC_RELEASE_APPROVAL_ID === checkedInReleaseId
   );
+}
+
+/**
+ * Owner decision, October 10, 2026: Vercel preview links may show the design
+ * gallery while the release gate stays closed for every other path. Only GET
+ * and HEAD reach it, and production deployments never do. Previews stay behind
+ * Vercel Authentication, and gallery pages are noindex.
+ */
+export function isGalleryPreviewRequest(
+  pathname: string,
+  method: string,
+  environment: PublicReleaseEnvironment = process.env,
+) {
+  if (environment.VERCEL_ENV !== "preview") return false;
+  if (method !== "GET" && method !== "HEAD") return false;
+  return pathname === "/gallery" || pathname.startsWith("/gallery/");
 }
 
 /**

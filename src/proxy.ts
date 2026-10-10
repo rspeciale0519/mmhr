@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import {
   createPublicReleaseBlockResponse,
+  isGalleryPreviewRequest,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
 import { isPathInLaunch } from "@/lib/launch-surface";
@@ -18,6 +19,12 @@ import { shouldRejectServerActionRequest } from "@/server/auth/server-action-req
  */
 export async function proxy(request: NextRequest) {
   if (isPublicReleaseBlocked()) {
+    // The design gallery is static sample content; it needs no session work.
+    if (isGalleryPreviewRequest(request.nextUrl.pathname, request.method)) {
+      const response = NextResponse.next();
+      response.headers.set("x-robots-tag", "noindex, nofollow, noarchive, nosnippet");
+      return response;
+    }
     return createPublicReleaseBlockResponse(
       request.nextUrl.pathname,
       undefined,
