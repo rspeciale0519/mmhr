@@ -1,0 +1,377 @@
+import type { ComponentType } from "react";
+
+/**
+ * Every gallery design is listed here once. To add a design, create
+ * src/gallery/designs/<slug>/ with home.tsx and fonts.ts, add an entry below,
+ * and add its fonts to src/gallery/design-fonts.ts. See src/gallery/README.md.
+ */
+export type GalleryDesign = {
+  slug: string;
+  name: string;
+  idea: string;
+  summary: string;
+  palette: { name: string; hex: string }[];
+  typefaces: string;
+  signature: string;
+  /** Review round. The overview shows the newest round first. */
+  round: 1 | 2 | 3 | 4;
+  load: () => Promise<{ default: ComponentType }>;
+};
+
+export const galleryDesigns: readonly GalleryDesign[] = [
+  {
+    slug: "orbit",
+    name: "Orbit",
+    idea: "Matchmaking as compatibility",
+    summary: "Bright, optimistic, and precise. Every screen asks one question: how well do you fit?",
+    palette: [
+      { name: "Lilac white", hex: "#F4F5FB" },
+      { name: "Night indigo", hex: "#17184A" },
+      { name: "Signal indigo", hex: "#3B3FD8" },
+      { name: "Lilac", hex: "#E4E2FF" },
+      { name: "Fit tangerine", hex: "#FF6B3D" },
+    ],
+    typefaces: "Bricolage Grotesque and Instrument Sans",
+    signature: "Two rings, your needs and a vendor, drift together until their overlap reads as a fit score.",
+    round: 1,
+    load: () => import("./designs/orbit/home"),
+  },
+  {
+    slug: "margin",
+    name: "Margin",
+    idea: "The advisor's annotated brief",
+    summary: "Calm, literate, and personal. The page reads like notes your advisor made for you.",
+    palette: [
+      { name: "Cool paper", hex: "#F6F7F9" },
+      { name: "Ink", hex: "#15171C" },
+      { name: "Annotation blue", hex: "#2350E0" },
+      { name: "Highlighter", hex: "#FFF07A" },
+      { name: "Red pencil", hex: "#C8372A" },
+    ],
+    typefaces: "Newsreader and Inter Tight",
+    signature: "Hand-drawn circles and underlines draw themselves around the facts that matter.",
+    round: 1,
+    load: () => import("./designs/margin/home"),
+  },
+  {
+    slug: "shortlist",
+    name: "Shortlist",
+    idea: "A deck you narrow to five",
+    summary: "Tactile, decisive, and friendly. Vendors are cards, and choosing feels physical.",
+    palette: [
+      { name: "Sage", hex: "#EEF1EC" },
+      { name: "Deep forest", hex: "#102A22" },
+      { name: "Forest", hex: "#1F6F54" },
+      { name: "Mint", hex: "#CDEBDD" },
+      { name: "Butter", hex: "#F5C451" },
+    ],
+    typefaces: "Archivo, mixing expanded and normal widths",
+    signature: "A fanned deck of masked vendor cards; your picks slide into a five-slot tray.",
+    round: 1,
+    load: () => import("./designs/shortlist/home"),
+  },
+  {
+    slug: "atelier",
+    name: "Atelier",
+    idea: "White-glove private advisory",
+    summary: "Quiet, assured, and exclusive. Advice that feels made for one client.",
+    palette: [
+      { name: "Oxblood", hex: "#1B0E12" },
+      { name: "Velvet", hex: "#2A161D" },
+      { name: "Ivory", hex: "#F3ECE4" },
+      { name: "Brass", hex: "#C8A05A" },
+      { name: "Porcelain", hex: "#F5F3F4" },
+    ],
+    typefaces: "Gloock and Manrope",
+    signature: "An engraved line pattern with one slow sweep of light across a brass monogram.",
+    round: 1,
+    load: () => import("./designs/atelier/home"),
+  },
+  {
+    slug: "gridline",
+    name: "Gridline",
+    idea: "Swiss precision; the scorecard is the hero",
+    summary: "Exact, confident, and fast. The evidence leads, and nothing decorates it.",
+    palette: [
+      { name: "White", hex: "#FFFFFF" },
+      { name: "Black", hex: "#000000" },
+      { name: "Swiss red", hex: "#E1251B" },
+      { name: "Concrete", hex: "#6B6B6B" },
+      { name: "Rule", hex: "#D9D9D9" },
+    ],
+    typefaces: "Schibsted Grotesk with tabular figures",
+    signature: "The live scorecard fills the opening screen; your picks drive a giant count.",
+    round: 1,
+    load: () => import("./designs/gridline/home"),
+  },
+  {
+    slug: "mercury",
+    name: "Mercury",
+    idea: "Matches that merge",
+    summary: "Fluid, luminous, and exact. Your needs are a drop of liquid chrome; the right vendors flow into it.",
+    palette: [
+      { name: "Pearl", hex: "#EEF0F5" },
+      { name: "Gunmetal", hex: "#161A26" },
+      { name: "Ultraviolet", hex: "#5531E8" },
+      { name: "Lilac mist", hex: "#E3DCFF" },
+      { name: "Reflection cyan", hex: "#1FB6E0" },
+    ],
+    typefaces: "Unbounded and Onest",
+    signature: "Real-time liquid chrome drawn on the graphics card. Choose a vendor and its drop flows into yours and merges.",
+    round: 2,
+    load: () => import("./designs/mercury/home"),
+  },
+  {
+    slug: "reeded",
+    name: "Reeded",
+    idea: "Evidence behind glass",
+    summary: "Architectural, calm, and discreet. Vendor names sit behind fluted privacy glass until you are ready.",
+    palette: [
+      { name: "Frost", hex: "#F1F5F3" },
+      { name: "Aubergine", hex: "#2A1430" },
+      { name: "Celadon glass", hex: "#BFDCCF" },
+      { name: "Plum", hex: "#6B3A78" },
+      { name: "Sodium", hex: "#F2661B" },
+    ],
+    typefaces: "Bodoni Moda and Hanken Grotesk",
+    signature: "A pane of fluted glass refracts the shortlist; your cursor or finger clears it, and disclosed names decode letter by letter.",
+    round: 2,
+    load: () => import("./designs/reeded/home"),
+  },
+  {
+    slug: "console",
+    name: "Console",
+    idea: "Tune what matters",
+    summary: "Tactile, precise, and playful. A hardware instrument where you set what matters and watch the ranking move.",
+    palette: [
+      { name: "Bench grey", hex: "#E8E8E4" },
+      { name: "Aluminum", hex: "#D4D5D0" },
+      { name: "Graphite", hex: "#1E2023" },
+      { name: "Signal orange", hex: "#FF5B14" },
+      { name: "Backlit screen", hex: "#B4C29A" },
+    ],
+    typefaces: "Geist, with Doto on the dot-matrix screen",
+    signature: "Eight real knobs weight your requirements; the backlit screen re-ranks vendors live, and rows slide to their new places.",
+    round: 2,
+    load: () => import("./designs/console/home"),
+  },
+  {
+    slug: "sift",
+    name: "Sift",
+    idea: "From every platform to your five",
+    summary: "Bold, clear, and story-led. One scroll shows a whole market narrowing to the fits that matter.",
+    palette: [
+      { name: "Klein blue", hex: "#1E33D4" },
+      { name: "Paper", hex: "#F4F5F9" },
+      { name: "Midnight", hex: "#0E1442" },
+      { name: "Lemon", hex: "#FFE14D" },
+      { name: "Set-aside coral", hex: "#FF8A75" },
+    ],
+    typefaces: "Funnel Display and Funnel Sans",
+    signature: "A pinned scroll story: 120 platforms filter down, requirement by requirement, to six fits; your picks turn yellow.",
+    round: 2,
+    load: () => import("./designs/sift/home"),
+  },
+  {
+    slug: "velocity",
+    name: "Velocity",
+    idea: "One request, not forty sales calls",
+    summary: "Loud, fast, and confident. Kinetic poster type sells the time you save.",
+    palette: [
+      { name: "Chalk", hex: "#EFEFEA" },
+      { name: "Asphalt", hex: "#1C1D21" },
+      { name: "Flare", hex: "#FF4A1C" },
+      { name: "Cobalt", hex: "#1F3BFF" },
+      { name: "Concrete", hex: "#CFCFC8" },
+    ],
+    typefaces: "Mona Sans, stretched from condensed to expanded",
+    signature: "Moving lines of type lean and widen with your scroll speed; the journey pins and travels sideways as you scroll down.",
+    round: 2,
+    load: () => import("./designs/velocity/home"),
+  },
+  {
+    slug: "lumen",
+    name: "Lumen",
+    idea: "Everything in a clear light",
+    summary: "Bright, calm, and exact. White surfaces float above the page, and you decide where the light falls.",
+    palette: [
+      { name: "Daylight", hex: "#F6F8FB" },
+      { name: "Paper", hex: "#FFFFFF" },
+      { name: "Slate ink", hex: "#172033" },
+      { name: "Clear blue", hex: "#2563EB" },
+      { name: "Sun", hex: "#FFC53D" },
+    ],
+    typefaces: "Host Grotesk",
+    signature: "Drag the sun across the table: every floating surface on the page casts a soft shadow that turns with it. Better fits float higher.",
+    round: 3,
+    load: () => import("./designs/lumen/home"),
+  },
+  {
+    slug: "halo",
+    name: "Halo",
+    idea: "Six fits, one turn",
+    summary: "Light, tactile, and focused. The shortlist stands in a ring of cards you can turn, flip, and choose.",
+    palette: [
+      { name: "Mist", hex: "#F4F5FA" },
+      { name: "Card white", hex: "#FFFFFF" },
+      { name: "Night ink", hex: "#1A1C35" },
+      { name: "Rose", hex: "#C2255C" },
+      { name: "Track", hex: "#ECEDF5" },
+    ],
+    typefaces: "Epilogue",
+    signature: "A 3D ring of vendor cards: drag or swipe to turn it, flip the front card for its evidence, and a rose halo glows under each card you choose.",
+    round: 3,
+    load: () => import("./designs/halo/home"),
+  },
+  {
+    slug: "plinth",
+    name: "Plinth",
+    idea: "Fit, measured in the round",
+    summary: "Quiet, spacious, and exact, like a gallery. Each vendor stands on a white plinth as tall as its fit.",
+    palette: [
+      { name: "Gallery wall", hex: "#F3F5F7" },
+      { name: "Plinth white", hex: "#FFFFFF" },
+      { name: "Floor", hex: "#E5E9EE" },
+      { name: "Graphite", hex: "#22262E" },
+      { name: "Marigold", hex: "#F2B51C" },
+    ],
+    typefaces: "Hedvig Letters Serif and Public Sans",
+    signature: "Six 3D plinths rise and fall as you switch requirements on and off; drag to walk around them, and a marigold sphere settles on each one you choose.",
+    round: 3,
+    load: () => import("./designs/plinth/home"),
+  },
+  {
+    slug: "vista",
+    name: "Vista",
+    idea: "A clear view",
+    summary: "Open, light, and spatial. Frosted glass panes float at different depths in a pale sky.",
+    palette: [
+      { name: "Sky", hex: "#EAF1FF" },
+      { name: "Glass", hex: "#FFFFFF" },
+      { name: "Deep navy", hex: "#0F1E3D" },
+      { name: "Aqua", hex: "#0E7C9A" },
+      { name: "Lavender light", hex: "#D9D4FF" },
+    ],
+    typefaces: "Red Hat Display and Red Hat Text",
+    signature: "Glass panes drift in from the distance and lean toward your pointer, near panes more than far ones; chosen scorecard columns lift toward you.",
+    round: 3,
+    load: () => import("./designs/vista/home"),
+  },
+  {
+    slug: "fold",
+    name: "Fold",
+    idea: "Your search, unfolded",
+    summary: "Crisp, orderly, and calm, like good paper. The whole process fits on one leaflet that opens as you read.",
+    palette: [
+      { name: "Desk", hex: "#F2F4F7" },
+      { name: "Paper", hex: "#FFFFFF" },
+      { name: "Navy ink", hex: "#14213D" },
+      { name: "Fresh green", hex: "#12A26E" },
+      { name: "Rule", hex: "#DDE2EA" },
+    ],
+    typefaces: "Literata and Albert Sans",
+    signature: "A five-panel paper leaflet unfolds one crease at a time as you scroll, sideways on wide screens and downward on phones; the hero sheets turn like pages.",
+    round: 3,
+    load: () => import("./designs/fold/home"),
+  },
+  {
+    slug: "stack",
+    name: "Stack",
+    idea: "Your HR stack, layer by layer",
+    summary: "Clear and technical, like a good architecture diagram. Your HR needs float as layers you can open and inspect.",
+    palette: [
+      { name: "Cloud", hex: "#F7F9FC" },
+      { name: "Slab white", hex: "#FFFFFF" },
+      { name: "Graphite blue", hex: "#1E2433" },
+      { name: "Cobalt cyan", hex: "#0B76B8" },
+      { name: "Edge sky", hex: "#8EC5E6" },
+    ],
+    typefaces: "Rethink Sans",
+    signature: "An isometric 3D diagram of the HR stack that explodes into layers; choose a layer to lift it and see which vendors cover it.",
+    round: 4,
+    load: () => import("./designs/stack/home"),
+  },
+  {
+    slug: "graph",
+    name: "Graph",
+    idea: "Requirements, connected",
+    summary: "Precise and calm, like a well-made data tool. Every requirement links to the vendors with evidence for it.",
+    palette: [
+      { name: "Mint white", hex: "#F8FCFA" },
+      { name: "Panel", hex: "#FFFFFF" },
+      { name: "Deep ink", hex: "#1B2A26" },
+      { name: "Emerald", hex: "#14936A" },
+      { name: "Edge grey", hex: "#A9B7B1" },
+    ],
+    typefaces: "Wix Madefor Display and Wix Madefor Text",
+    signature: "A live 3D network of your requirements and the vendors that meet them; it turns slowly, you can drag it, and chosen vendors light their links.",
+    round: 4,
+    load: () => import("./designs/graph/home"),
+  },
+  {
+    slug: "query",
+    name: "Query",
+    idea: "One request, ranked answers",
+    summary: "Exact and developer-clean, like the best product documentation. Matching shown as a request and a response.",
+    palette: [
+      { name: "Lavender white", hex: "#F8F7FC" },
+      { name: "Card", hex: "#FFFFFF" },
+      { name: "Ink violet", hex: "#211C33" },
+      { name: "Violet", hex: "#6A3DD8" },
+      { name: "String green", hex: "#167A5C" },
+    ],
+    typefaces: "IBM Plex Sans with JetBrains Mono for code",
+    signature: "Floating 3D request and response cards: switch requirements and the request retypes itself while the ranked results slide into their new order.",
+    round: 4,
+    load: () => import("./designs/query/home"),
+  },
+  {
+    slug: "radar",
+    name: "Radar",
+    idea: "The shape of a good fit",
+    summary: "Bright and analytical. Each vendor is a shape, and the right one matches the shape of your needs.",
+    palette: [
+      { name: "Blush white", hex: "#FCF8FA" },
+      { name: "Panel", hex: "#FFFFFF" },
+      { name: "Plum ink", hex: "#2B1D27" },
+      { name: "Magenta", hex: "#D6246B" },
+      { name: "Idle violet", hex: "#8A86A0" },
+    ],
+    typefaces: "Urbanist",
+    signature: "A rotatable 3D stack of radar charts, one per vendor; collapse it to overlay the shapes, and hover a vendor to isolate its layer.",
+    round: 4,
+    load: () => import("./designs/radar/home"),
+  },
+  {
+    slug: "launch",
+    name: "Launch",
+    idea: "The product, front and center",
+    summary: "Polished and modern, like a major software launch page. The real product view is the hero.",
+    palette: [
+      { name: "White", hex: "#FCFCFE" },
+      { name: "Window", hex: "#FFFFFF" },
+      { name: "Night", hex: "#1A1F2B" },
+      { name: "Signal blue", hex: "#2F66D6" },
+      { name: "Glow lilac", hex: "#C9C4F2" },
+    ],
+    typefaces: "DM Sans",
+    signature: "A tilted 3D product window that lies flat as you scroll; its tabs morph between compare, request, and decide views.",
+    round: 4,
+    load: () => import("./designs/launch/home"),
+  },
+];
+
+export function findDesign(slug: string): GalleryDesign | undefined {
+  return galleryDesigns.find((design) => design.slug === slug);
+}
+
+/** Previous and next designs, wrapping at both ends. */
+export function neighbors(slug: string): { previous: GalleryDesign; next: GalleryDesign } {
+  const index = galleryDesigns.findIndex((design) => design.slug === slug);
+  if (index < 0) throw new Error(`Unknown gallery design: ${slug}`);
+  const count = galleryDesigns.length;
+  return {
+    previous: galleryDesigns[(index - 1 + count) % count]!,
+    next: galleryDesigns[(index + 1) % count]!,
+  };
+}

@@ -142,6 +142,8 @@ These results prove local evaluation behavior only. Command, remote, staging, an
 | `src/app/(marketing)/(site)/transparency/page.tsx#default` | /transparency | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/designs/page.tsx#default` | /designs | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/designs/[slug]/page.tsx#default` | /designs/[slug] | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
+| `src/app/gallery/page.tsx#default` | /gallery | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
+| `src/app/gallery/[slug]/page.tsx#default` | /gallery/[slug] | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(admin)/admin/audit/page.tsx#default` | /admin/audit | page | internal-only | admin.access and audit.view with AAL2 | exact platform scope or server-selected workspace | request-scoped fixed audit RPC; five-field metadata; current session and authority | audit/page.test.tsx; staff-audit-read.test.ts; genuine audit database proof pending |
 | `src/app/(admin)/admin/audit/error.tsx#default` | /admin/audit error | boundary | framework | parent audit route guard | parent route | static loading or generic error; no protected audit data | audit/page.test.tsx; entry-point-inventory.test.ts |
 | `src/app/(admin)/admin/audit/loading.tsx#default` | /admin/audit loading | boundary | framework | parent audit route guard | parent route | static loading or generic error; no protected audit data | audit/page.test.tsx; entry-point-inventory.test.ts |

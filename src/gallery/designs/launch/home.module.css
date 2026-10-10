@@ -1,0 +1,131 @@
+.root {
+  --l-bg: oklch(99% 0.003 260);
+  --l-surface: oklch(100% 0 none);
+  --l-raised: oklch(97% 0.006 260);
+  --l-ink: oklch(21% 0.025 262);
+  --l-muted: oklch(47% 0.02 262);
+  --l-line: oklch(92% 0.008 262);
+  --l-accent: oklch(54% 0.17 258);
+  --l-accent-text: oklch(47% 0.16 258);
+  --l-accent-soft: color-mix(in oklch, var(--l-accent) 10%, var(--l-surface));
+  --l-glow-a: oklch(84% 0.09 225);
+  --l-glow-b: oklch(84% 0.08 300);
+
+  --t-bg: var(--l-bg);
+  --t-surface: var(--l-surface);
+  --t-raised: var(--l-raised);
+  --t-ink: var(--l-ink);
+  --t-muted: var(--l-muted);
+  --t-line: var(--l-line);
+  --t-line-strong: oklch(63% 0.02 262);
+  --t-accent: var(--l-accent);
+  --t-on-accent: oklch(100% 0 none);
+  --t-accent-soft: var(--l-accent-soft);
+  --t-link: var(--l-accent-text);
+  --t-success: oklch(46% 0.11 160);
+  --t-info: oklch(48% 0.14 258);
+  --t-warning: oklch(50% 0.11 70);
+  --t-danger: oklch(50% 0.18 28);
+  --t-display: var(--launch-font), ui-sans-serif, system-ui, sans-serif;
+  --t-body: var(--launch-font), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 650;
+  --t-display-tracking: -0.04em;
+  --t-r-lg: 1.25rem;
+  --t-r-md: 0.875rem;
+  --t-r-sm: 0.625rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px oklch(25% 0.03 260 / 0.06), 0 4px 12px -6px oklch(25% 0.03 260 / 0.14);
+  --t-shadow-md: 0 1px 2px oklch(25% 0.03 260 / 0.05), 0 18px 36px -20px oklch(30% 0.06 260 / 0.24);
+  --t-shadow-lg: 0 2px 4px oklch(25% 0.03 260 / 0.05), 0 34px 70px -34px oklch(30% 0.08 270 / 0.3);
+  --t-next-bg: var(--l-surface);
+  --t-next-ink: var(--l-ink);
+  --t-next-danger: var(--t-danger);
+  --t-overlay: oklch(21% 0.025 262 / 0.32);
+}
+
+.root[data-theme="dark"] {
+  --l-bg: oklch(15.5% 0.02 262);
+  --l-surface: oklch(20% 0.022 262);
+  --l-raised: oklch(24% 0.025 262);
+  --l-ink: oklch(95% 0.008 262);
+  --l-muted: oklch(75% 0.015 262);
+  --l-line: oklch(30% 0.025 262);
+  --l-accent: oklch(72% 0.13 255);
+  --l-accent-text: oklch(80% 0.11 255);
+  --l-glow-a: oklch(42% 0.1 230);
+  --l-glow-b: oklch(40% 0.1 300);
+  --t-line-strong: oklch(52% 0.03 262);
+  --t-on-accent: oklch(15.5% 0.02 262);
+  --t-success: oklch(78% 0.13 160);
+  --t-info: oklch(78% 0.1 255);
+  --t-warning: oklch(80% 0.12 80);
+  --t-danger: oklch(74% 0.14 25);
+  --t-overlay: oklch(0% 0 none / 0.55);
+  color-scheme: dark;
+}
+
+.mark {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(135deg, var(--l-glow-a), var(--l-accent));
+  box-shadow: 0 4px 10px -3px color-mix(in oklch, var(--l-accent) 50%, transparent);
+}
+
+.hero {
+  display: grid;
+  justify-items: center;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  padding-block: clamp(3rem, 8vw, 6rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+.hero > * {
+  justify-self: stretch;
+}
+
+.heroCopy {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.heroTitle {
+  max-inline-size: 17ch;
+  margin: 0;
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-inline-size: 38rem;
+  margin: 0;
+  color: var(--l-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-block-size: 3.25rem;
+  padding-inline: 1.5rem;
+}
+
+.root .promise {
+  text-align: center;
+  justify-items: center;
+}
+
+.root .step {
+  padding: 1.25rem;
+  border-radius: var(--t-r-md);
+  background: var(--l-raised);
+}

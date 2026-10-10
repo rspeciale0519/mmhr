@@ -1,0 +1,150 @@
+.root {
+  --f-desk: #f2f4f7;
+  --f-ink: #14213d;
+  --f-muted: #52607a;
+  --f-line: #dde2ea;
+  --f-green: #12a26e;
+  --f-green-text: #0b7a52;
+  --f-shade: 30 40 66;
+
+  --t-bg: var(--f-desk);
+  --t-surface: #ffffff;
+  --t-raised: #eceff4;
+  --t-ink: var(--f-ink);
+  --t-muted: var(--f-muted);
+  --t-line: var(--f-line);
+  --t-line-strong: #8792a6;
+  --t-accent: var(--f-green-text);
+  --t-on-accent: #ffffff;
+  --t-accent-soft: #dcf3e9;
+  --t-link: var(--f-green-text);
+  --t-success: var(--f-green-text);
+  --t-info: #2a55a6;
+  --t-warning: #8a5a00;
+  --t-danger: #b42318;
+  --t-display: var(--fold-display), Georgia, serif;
+  --t-body: var(--fold-body), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 500;
+  --t-display-tracking: -0.02em;
+  --t-r-lg: 0.75rem;
+  --t-r-md: 0.5rem;
+  --t-r-sm: 0.375rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 1px rgb(var(--f-shade) / 0.06), 0 6px 14px -8px rgb(var(--f-shade) / 0.2);
+  --t-shadow-md: 0 1px 1px rgb(var(--f-shade) / 0.05), 0 18px 32px -20px rgb(var(--f-shade) / 0.3);
+  --t-shadow-lg: 0 1px 2px rgb(var(--f-shade) / 0.05), 0 34px 60px -34px rgb(var(--f-shade) / 0.38);
+  --t-next-bg: #ffffff;
+  --t-next-ink: var(--f-ink);
+  --t-next-danger: #b42318;
+  --t-overlay: rgb(20 33 61 / 0.32);
+  font-synthesis: none;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root *, .root *::before, .root *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+:where(.root) :where(button, a) {
+  touch-action: manipulation;
+}
+
+:where(.root button:not(:disabled):active) {
+  scale: 0.97;
+}
+
+.root[data-theme="dark"] {
+  --f-desk: #121826;
+  --f-ink: #eaeef6;
+  --f-muted: #a7b0c3;
+  --f-line: #2c3549;
+  --f-green: #3fcf95;
+  --f-green-text: #5fdba8;
+  --f-shade: 0 0 0;
+  --t-surface: #1d2434;
+  --t-raised: #262e40;
+  --t-line-strong: #65708a;
+  --t-on-accent: #121826;
+  --t-accent-soft: #163a2d;
+  --t-info: #9db8f2;
+  --t-warning: #f0c065;
+  --t-danger: #ff8f85;
+  --t-next-bg: #1d2434;
+  --t-next-danger: #ff8f85;
+  --t-overlay: rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+/* A folded sheet. */
+.mark {
+  width: 1.125rem;
+  height: 1.25rem;
+  border-radius: 0.125rem;
+  background: linear-gradient(225deg, var(--f-green) 0 28%, #ffffff 28%);
+  box-shadow: inset 0 0 0 1.5px var(--f-ink);
+}
+
+.hero {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 4rem);
+  align-items: center;
+  padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(4rem, 8vw, 6rem);
+}
+
+.hero > * {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 4rem;
+    min-height: calc(100svh - 5rem);
+  }
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--fold-display), Georgia, serif;
+  font-size: clamp(2.5rem, 5.8vw, 4.75rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--f-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+}
+
+/* Promises read like a typed memo: a rule, a title, a line of text. */
+.root .promise {
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--f-ink);
+}
+
+.root .closing {
+  border-radius: 0.375rem;
+}

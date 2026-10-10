@@ -1,0 +1,165 @@
+.root {
+  --h-bg: #f4f5fa;
+  --h-ink: #1a1c35;
+  --h-muted: #555874;
+  --h-accent: #c2255c;
+  --h-on-accent: #ffffff;
+  --h-track: #ecedf5;
+  --h-card-end: #f7f7fc;
+  --h-card-mid: #ffffff;
+  --h-line-strong: #a3a6bf;
+  --h-shade: 40 42 90;
+
+  --t-bg: var(--h-bg);
+  --t-surface: #ffffff;
+  --t-raised: var(--h-track);
+  --t-ink: var(--h-ink);
+  --t-muted: var(--h-muted);
+  --t-line: #e1e2ee;
+  --t-line-strong: #8d90ab;
+  --t-accent: var(--h-accent);
+  --t-on-accent: var(--h-on-accent);
+  --t-accent-soft: #fce4ec;
+  --t-link: var(--h-accent);
+  --t-success: #1d7148;
+  --t-info: #3348b8;
+  --t-warning: #8a5a00;
+  --t-danger: #b42318;
+  --t-display: var(--halo-font), ui-sans-serif, system-ui, sans-serif;
+  --t-body: var(--halo-font), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 650;
+  --t-display-tracking: -0.04em;
+  --t-r-lg: 2rem;
+  --t-r-md: 1.25rem;
+  --t-r-sm: 0.875rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px rgb(var(--h-shade) / 0.06), 0 4px 12px -4px rgb(var(--h-shade) / 0.12);
+  --t-shadow-md: 0 1px 2px rgb(var(--h-shade) / 0.05), 0 16px 36px -18px rgb(var(--h-shade) / 0.22);
+  --t-shadow-lg: 0 2px 4px rgb(var(--h-shade) / 0.04), 0 32px 70px -32px rgb(var(--h-shade) / 0.3);
+  --t-next-bg: #ffffff;
+  --t-next-ink: var(--h-ink);
+  --t-next-danger: #b42318;
+  --t-overlay: rgb(26 28 53 / 0.32);
+  font-synthesis: none;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root *, .root *::before, .root *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+:where(.root) :where(button, a) {
+  touch-action: manipulation;
+}
+
+:where(.root button:not(:disabled):active) {
+  scale: 0.97;
+}
+
+.root[data-theme="dark"] {
+  --h-bg: #121327;
+  --h-ink: #ecedf8;
+  --h-muted: #a9abc6;
+  --h-accent: #ff86ae;
+  --h-on-accent: #121327;
+  --h-track: #34365a;
+  --h-card-end: #22243d;
+  --h-card-mid: #2a2c4a;
+  --h-line-strong: #5b5e85;
+  --h-shade: 0 0 0;
+  --t-surface: #1c1e36;
+  --t-line: #2c2e4d;
+  --t-line-strong: #646790;
+  --t-accent-soft: #3a1f33;
+  --t-success: #64d69c;
+  --t-info: #9fb0ff;
+  --t-warning: #f0c065;
+  --t-danger: #ff8f85;
+  --t-next-bg: #22243d;
+  --t-next-danger: #ff8f85;
+  --t-overlay: rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+/* A small ring mark. */
+.mark {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 3px solid var(--h-accent);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px -2px rgb(194 37 92 / 0.45);
+}
+
+.hero {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3.5rem, 8vw, 6rem);
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .heroCopy {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 4rem;
+    align-items: end;
+  }
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(2.375rem, 5.6vw, 4.5rem);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.heroAside {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.heroLede {
+  margin: 0;
+  color: var(--h-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+}
+
+.root .promise {
+  padding: 1.75rem;
+  border-radius: var(--t-r-md);
+  background: var(--t-surface);
+  box-shadow: var(--t-shadow-md);
+}
+
+/* Steps sit on a gentle arc, like cards around the ring. */
+@media (min-width: 64rem) {
+  .root .step {
+    transform: translateY(calc((2 - var(--i)) * (2 - var(--i)) * -0.75rem + 3rem));
+  }
+}
+
+.root .step {
+  padding: 1.5rem;
+  border-radius: var(--t-r-md);
+  background: var(--t-surface);
+  box-shadow: var(--t-shadow-md);
+}

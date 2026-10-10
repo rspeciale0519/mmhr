@@ -1,0 +1,160 @@
+.root {
+  --s-bg: oklch(98.6% 0.004 240);
+  --s-surface: oklch(100% 0 none);
+  --s-ink: oklch(24% 0.03 255);
+  --s-muted: oklch(47% 0.025 255);
+  --s-line: oklch(91% 0.01 245);
+  --s-line-strong: oklch(63% 0.02 250);
+  --s-accent: oklch(52% 0.14 230);
+  --s-on-accent: oklch(100% 0 none);
+  --s-accent-soft: color-mix(in oklch, var(--s-accent) 12%, var(--s-surface));
+  --s-top: oklch(100% 0 none);
+  --s-base: oklch(95% 0.012 240);
+  --s-grid: color-mix(in oklch, var(--s-accent) 8%, transparent);
+  --s-rim: oklch(90% 0.02 235);
+  --s-edge-a: oklch(84% 0.07 225);
+  --s-edge-b: oklch(72% 0.11 235);
+  --s-edge-c: oklch(64% 0.13 250);
+  --s-gap: oklch(70% 0.15 65);
+  --s-gap-text: oklch(47% 0.12 60);
+
+  --t-bg: var(--s-bg);
+  --t-surface: var(--s-surface);
+  --t-raised: oklch(96% 0.008 240);
+  --t-ink: var(--s-ink);
+  --t-muted: var(--s-muted);
+  --t-line: var(--s-line);
+  --t-line-strong: var(--s-line-strong);
+  --t-accent: var(--s-accent);
+  --t-on-accent: var(--s-on-accent);
+  --t-accent-soft: var(--s-accent-soft);
+  --t-link: oklch(46% 0.13 235);
+  --t-success: oklch(48% 0.12 155);
+  --t-info: oklch(48% 0.14 255);
+  --t-warning: oklch(50% 0.11 70);
+  --t-danger: oklch(50% 0.18 28);
+  --t-display: var(--stack-font), ui-sans-serif, system-ui, sans-serif;
+  --t-body: var(--stack-font), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 700;
+  --t-display-tracking: -0.035em;
+  --t-r-lg: 1.25rem;
+  --t-r-md: 0.875rem;
+  --t-r-sm: 0.625rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px oklch(30% 0.04 250 / 0.06), 0 4px 12px -6px oklch(30% 0.04 250 / 0.14);
+  --t-shadow-md: 0 1px 2px oklch(30% 0.04 250 / 0.05), 0 18px 36px -20px oklch(30% 0.06 250 / 0.24);
+  --t-shadow-lg: 0 2px 4px oklch(30% 0.04 250 / 0.05), 0 34px 70px -34px oklch(30% 0.08 250 / 0.32);
+  --t-next-bg: var(--s-surface);
+  --t-next-ink: var(--s-ink);
+  --t-next-danger: var(--t-danger);
+  --t-overlay: oklch(24% 0.03 255 / 0.32);
+}
+
+.root[data-theme="dark"] {
+  --s-bg: oklch(17% 0.02 255);
+  --s-surface: oklch(22% 0.025 255);
+  --s-ink: oklch(95% 0.01 250);
+  --s-muted: oklch(75% 0.02 250);
+  --s-line: oklch(30% 0.03 255);
+  --s-line-strong: oklch(52% 0.03 255);
+  --s-accent: oklch(74% 0.12 225);
+  --s-on-accent: oklch(17% 0.02 255);
+  --s-top: oklch(26% 0.03 250);
+  --s-base: oklch(21% 0.025 250);
+  --s-rim: oklch(36% 0.04 240);
+  --s-edge-a: oklch(42% 0.08 230);
+  --s-edge-b: oklch(36% 0.1 240);
+  --s-edge-c: oklch(30% 0.1 255);
+  --s-gap: oklch(78% 0.14 75);
+  --s-gap-text: oklch(84% 0.12 80);
+  --t-raised: oklch(26% 0.03 255);
+  --t-link: oklch(78% 0.11 225);
+  --t-success: oklch(76% 0.13 155);
+  --t-info: oklch(78% 0.1 255);
+  --t-warning: oklch(80% 0.12 80);
+  --t-danger: oklch(74% 0.14 25);
+  --t-overlay: oklch(0% 0 none / 0.55);
+  color-scheme: dark;
+}
+
+/* Three stacked bars: a tiny stack. */
+.mark {
+  display: inline-grid;
+  gap: 2px;
+  inline-size: 1.125rem;
+}
+
+.mark i {
+  display: block;
+  block-size: 0.25rem;
+  border-radius: 2px;
+  background: var(--s-accent);
+}
+
+.mark i:nth-child(2) {
+  margin-inline-start: 0.1875rem;
+  opacity: 0.7;
+}
+
+.mark i:nth-child(3) {
+  margin-inline-start: 0.375rem;
+  opacity: 0.45;
+}
+
+.hero {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  padding-block: clamp(2.5rem, 7vw, 5rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.25rem;
+  max-inline-size: 46rem;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(2.375rem, 5.6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-inline-size: 38rem;
+  margin: 0;
+  color: var(--s-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-block-size: 3.25rem;
+  padding-inline: 1.5rem;
+}
+
+.root .promise {
+  padding-block-start: 1.25rem;
+  border-block-start: 2px solid var(--s-ink);
+}
+
+/* Steps read as layers: each one starts a little further in. */
+@media (min-width: 64rem) {
+  .root .step {
+    margin-block-start: calc(var(--i) * 1rem);
+  }
+}
+
+.root .step {
+  padding: 1.25rem;
+  border: 1px solid var(--s-line);
+  border-radius: var(--t-r-md);
+  background: var(--s-surface);
+}

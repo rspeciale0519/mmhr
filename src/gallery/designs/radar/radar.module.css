@@ -1,0 +1,122 @@
+.wrap {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+@media (min-width: 64rem) {
+  .wrap {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+.view {
+  position: relative;
+}
+
+.canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: clamp(21rem, 62vw, 34rem);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(70% 60% at 50% 60%, color-mix(in oklch, var(--r-accent) 8%, transparent), transparent 72%),
+    var(--r-panel);
+  box-shadow: inset 0 0 0 1px var(--r-line), 0 30px 60px -40px oklch(30% 0.08 350 / 0.35);
+  font-family: var(--radar-font), ui-sans-serif, system-ui, sans-serif;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+.canvas:focus-visible {
+  outline: 3px solid var(--r-accent);
+  outline-offset: 4px;
+}
+
+.mode {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+  min-block-size: 2.75rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--r-line-strong);
+  border-radius: 999px;
+  background: var(--r-panel);
+  color: var(--r-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 64rem) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vendor {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  inline-size: 100%;
+  min-block-size: 3rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--r-line);
+  border-radius: 0.875rem;
+  background: var(--r-panel);
+  color: var(--r-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.vendor[aria-pressed="true"] {
+  border-color: var(--r-accent);
+}
+
+.swatch {
+  flex: none;
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  border: 1.5px solid var(--r-idle);
+  border-radius: 0.25rem;
+  transform: rotate(45deg);
+}
+
+.vendor[aria-pressed="true"] .swatch {
+  border-color: var(--r-accent);
+  background: var(--r-accent);
+}
+
+.vendorName {
+  flex: 1;
+  font-weight: 600;
+}
+
+.vendorFit {
+  color: var(--r-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) {
+  .vendor:hover,
+  .mode:hover {
+    border-color: var(--r-accent);
+  }
+}

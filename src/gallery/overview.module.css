@@ -1,0 +1,162 @@
+/* The overview stays neutral so each design's own type and color stand out. */
+
+.page {
+  min-height: 100dvh;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 5vw, 4rem) 4rem;
+  background: #f3f3f1;
+  color: #18181b;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.intro {
+  max-width: 44rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.kicker {
+  margin: 0 0 0.75rem;
+  color: #6b6b72;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  color: #4a4a52;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+}
+
+.link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1rem 1.25rem;
+  border: 1px solid #dcdcd8;
+  border-radius: 1rem;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+@media (hover: hover) {
+
+.link:hover {
+  border-color: #18181b;
+}
+}
+
+.link:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1fr 1fr 0.7fr;
+  height: 5.5rem;
+  overflow: clip;
+  border-radius: 0.625rem;
+  outline: 1px solid rgb(0 0 0 / 0.06);
+}
+
+.swatch {
+  display: block;
+}
+
+.meta {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.number {
+  color: #6b6b72;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  font-size: 1.75rem;
+  line-height: 1.15;
+}
+
+.idea {
+  color: #4a4a52;
+  font-size: 0.9375rem;
+}
+
+.summary {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.detail {
+  color: #4a4a52;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.open {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+  .link:hover {
+    transform: translateY(-2px);
+  }
+  }
+}
+
+.round + .round {
+  margin-top: clamp(3rem, 7vw, 5rem);
+}
+
+.roundHead {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.roundTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.roundText {
+  max-width: 38rem;
+  margin: 0;
+  color: #4a4a52;
+}
