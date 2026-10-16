@@ -92,8 +92,12 @@ describe("public-release middleware", () => {
     expect(gallery.headers.get("x-robots-tag")).toContain("noindex");
     expect(createServerClient).not.toHaveBeenCalled();
 
-    const home = await proxy(new NextRequest("https://mmhr.test/"));
-    expect(home.status).toBe(503);
+    const home = await proxy(new NextRequest("https://mmhr.test/?_vercel_share=x"));
+    expect(home.status).toBe(307);
+    expect(home.headers.get("location")).toBe("https://mmhr.test/gallery");
+
+    const signIn = await proxy(new NextRequest("https://mmhr.test/sign-in"));
+    expect(signIn.status).toBe(503);
 
     const post = await proxy(new NextRequest("https://mmhr.test/gallery", { method: "POST", headers: { "next-action": "x" } }));
     expect(post.status).toBe(503);
@@ -129,6 +133,8 @@ describe("public-release middleware", () => {
 
     const response = await proxy(new NextRequest("https://mmhr.test/gallery"));
     expect(response.status).toBe(503);
+    const home = await proxy(new NextRequest("https://mmhr.test/"));
+    expect(home.status).toBe(503);
   });
 
   test("an environment flag cannot bypass the checked-in release gate", async () => {

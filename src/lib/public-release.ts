@@ -66,6 +66,19 @@ export function isGalleryPreviewRequest(
 }
 
 /**
+ * On a Vercel preview, the home page sends visitors to the gallery, so a
+ * shared preview link opens the designs instead of the holding page.
+ * Production and every other path keep the release gate response.
+ */
+export function isGalleryPreviewHomeRequest(
+  pathname: string,
+  method: string,
+  environment: PublicReleaseEnvironment = process.env,
+) {
+  return environment.VERCEL_ENV === "preview" && pathname === "/" && (method === "GET" || method === "HEAD");
+}
+
+/**
  * Keeps generated page metadata aligned with the production release gate.
  * The checked-in release ID remains the source of truth for opening production.
  */

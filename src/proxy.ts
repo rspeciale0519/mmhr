@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import {
   createPublicReleaseBlockResponse,
+  isGalleryPreviewHomeRequest,
   isGalleryPreviewRequest,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
@@ -24,6 +25,12 @@ export async function proxy(request: NextRequest) {
       const response = NextResponse.next();
       response.headers.set("x-robots-tag", "noindex, nofollow, noarchive, nosnippet");
       return response;
+    }
+    if (isGalleryPreviewHomeRequest(request.nextUrl.pathname, request.method)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/gallery";
+      url.search = "";
+      return NextResponse.redirect(url, { headers: { "cache-control": "no-store" } });
     }
     return createPublicReleaseBlockResponse(
       request.nextUrl.pathname,

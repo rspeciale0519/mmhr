@@ -4,6 +4,7 @@ import {
   createPublicReleaseBlockResponse,
   createPublicReleaseRobotsResponse,
   getPublicReleaseRobotsMetadata,
+  isGalleryPreviewHomeRequest,
   isGalleryPreviewRequest,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
@@ -76,6 +77,16 @@ describe("public release control", () => {
     expect(isGalleryPreviewRequest("/gallery/final", "POST", preview)).toBe(false);
     expect(isGalleryPreviewRequest("/api/gallery/feedback", "POST", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);
     expect(isGalleryPreviewRequest("/api/gallery/recipes", "POST", { NODE_ENV: "production" })).toBe(false);
+  });
+
+  test("sends only the preview home page to the gallery", () => {
+    const preview = { NODE_ENV: "production", VERCEL_ENV: "preview" };
+    expect(isGalleryPreviewHomeRequest("/", "GET", preview)).toBe(true);
+    expect(isGalleryPreviewHomeRequest("/", "HEAD", preview)).toBe(true);
+    expect(isGalleryPreviewHomeRequest("/", "POST", preview)).toBe(false);
+    expect(isGalleryPreviewHomeRequest("/home", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewHomeRequest("/", "GET", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);
+    expect(isGalleryPreviewHomeRequest("/", "GET", { NODE_ENV: "production" })).toBe(false);
   });
 
   test("keeps crawler metadata blocked until release approval", () => {
