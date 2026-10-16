@@ -1023,3 +1023,29 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-07 13:10 EDT — Owner approved D1-D9; P0 closed. Checkpoint commit 0b552be pushed; audit fix applied; local port moved to 3100. D9 blocked by the auto-mode classifier. See journal/2026-10-07.md.
 
 2026-10-07 17:52 EDT — P1 steps 2-4 done: deny policies (0169), launch allowlist and proxy rename, excluded-function revocation (0170). All short checks pass. Uncommitted. See journal/2026-10-07.md.
+
+2026-10-07 19:16 EDT — Built the extensible design gallery at /gallery with five new designs (Orbit, Margin, Shortlist, Atelier, Gridline). All pass functional, overflow, console, and contrast checks. Owner picks one to replace Pulse. See journal/2026-10-07.md.
+
+2026-10-07 20:23 EDT — Business-name brainstorm: two rounds of 25 names with Namecheap availability. Top picks Benchtrial, Blindfit, Fitgap. No purchase and no code change. See journal/2026-10-08.md.
+
+2026-10-07 20:52 EDT — Built the shared Claude/Codex project board in .project-board/ with rules in AGENTS.md and a CLAUDE.md pointer. Page checked in the browser. No commits. See journal/2026-10-08.md.
+
+2026-10-07 21:05 EDT — Gallery round 2: Mercury, Reeded, Console, Sift, Velocity added to /gallery after research of award winners. All checks pass. Uncommitted. See journal/2026-10-07.md.
+
+2026-10-08 00:30 EDT — Gallery round 3: Lumen, Halo, Plinth, Vista, Fold added (clean, airy, 3D). Checks pass; one load timeout passes alone. Uncommitted. See journal/2026-10-08.md.
+
+2026-10-08 01:15 EDT — Applied good-css rules to the gallery CSS (logical properties, hover media, clip, focus, motion caps). Checks pass. Uncommitted. See journal/2026-10-08.md.
+
+2026-10-08 — Gallery round 4: Stack, Graph, Query, Radar, Launch (useful 3D and interaction). Checks pass. Uncommitted. See journal/2026-10-08.md.
+
+2026-10-10 09:01 EDT — Gallery committed (201393b) and pushed for a Vercel preview; production untouched. See journal/2026-10-10.md.
+
+2026-10-10 09:15 EDT — Release gate exception for /gallery on Vercel previews only (630c4c6); production stays closed. See journal/2026-10-10.md.
+2026-10-14 16:22 EDT — Gallery review system (task 46) built and verified locally; paused for laptop restart. Resume: journal/2026-10-14.md. Uncommitted.
+2026-10-14 22:31 EDT — Task 46 gallery review system done locally; all gates pass; waits for owner approval of hosted storage, commit, push (board C5). See journal/2026-10-14.md.
+2026-10-15 21:30 EDT — Task 46: pushed 78275a9 + a453597; preview READY, / opens /gallery; waiting for owner Neon connection (prefix GALLERY_REVIEW_, Preview only) and share link. See journal/2026-10-16.md.
+2026-10-15 22:00 EDT — Task 46 live: Neon connected (Preview), 1bfb536 lets preview images through; preview bsk05vwlk verified. See journal/2026-10-16.md.
+2026-10-15 22:37 EDT — Task 47: all Google fonts self-hosted (80 files, unique family names); gates pass; waits for commit/push approval (C7). See journal/2026-10-16.md.
+2026-10-16 01:07 EDT — Task 47 pushed be89df6; Vercel preview czz7wdawp verified (local fonts, saves, images). See journal/2026-10-16.md.
+2026-10-16 09:30 EDT — Lasting partner share link on the branch alias (owner-approved; older temporary links revoked). See journal/2026-10-16.md.
+2026-10-16 09:45 EDT — Short public gallery URL mmhr-gallery.vercel.app (branch domain); Vercel Authentication turned off with owner approval; mmhr.vercel.app found serving the public July build. See journal/2026-10-16.md.

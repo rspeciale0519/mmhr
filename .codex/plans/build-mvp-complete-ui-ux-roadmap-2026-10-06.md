@@ -270,6 +270,8 @@ Broad configuration builders are not a prerequisite for this workspace.
 
 ### Direction and shared layout
 
+**Owner decision, October 7, 2026:** The owner chose to replace Pulse completely, on the public site and in the application. Fifteen candidate designs are in the design gallery at `/gallery`, source in `src/gallery/`: round 1 (Orbit, Margin, Shortlist, Atelier, Gridline), round 2 (Mercury, Reeded, Console, Sift, Velocity), and round 3 (Lumen, Halo, Plinth, Vista, Fold), which the owner asked to be clean, airy, and crisp, with 3D depth and soft shadows. The owner picks one, and that design replaces the Pulse tokens, fonts, and component rules below. P0 record Section 7 then needs the same update.
+
 Keep Pulse as the visual identity.
 Use calm working surfaces, clear typography, restrained teal accents, and strong information hierarchy.
 Make the case timeline and next-action panel the main visual feature of the logged-in application.

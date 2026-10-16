@@ -50,3 +50,5 @@ mmhrbrain/.brainstate/
 mmhrbrain/.obsidian/
 # <<< brain (managed) <<<
 
+# Shared agent project board (local only)
+.project-board/

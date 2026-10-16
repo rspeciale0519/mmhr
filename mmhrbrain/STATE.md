@@ -1,16 +1,18 @@
 # MMHR — Current State
 
-Updated: 2026-10-07 17:52 EDT. Branch: `codex/full-delivery-verification`. Last commit ef05d63, pushed; P1 steps 2-4 uncommitted.
+Updated: 2026-10-14 22:31 EDT. Branch: `codex/full-delivery-verification`. Last commit be89df6 (all fonts self-hosted), pushed; gallery review tools live on preview mmhr-czz7wdawp with Neon storage.
 
 ## Scope and authority
 - Latest user direction: working core features first, then high-quality public and logged-in design, then further security and features.
-- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P0 is complete: the owner approved D1-D9 on 2026-10-07. D3, D7 and D8 are applied; D9 is blocked by the auto-mode classifier and waits for the owner. P1 steps 1 to 4 are done (launch allowlist, migrations 0169-0170); step 5, the shell and design system, is next. Owner rule: no full integration run until go-live on hosted staging.
+- Owner approved roadmap v1.1 and started P0 on 2026-10-07. P0 is complete: the owner approved D1-D9 on 2026-10-07. D3, D7 and D8 are applied; D9 is blocked by the auto-mode classifier and waits for the owner. P1 steps 1 to 4 are done (launch allowlist, migrations 0169-0170); step 5 changed: the owner chose to replace Pulse entirely. Twenty candidate designs live at /gallery (src/gallery), rounds 1 to 4; the owner picks one, then P1 applies it everywhere. The gallery now has ToddSpeciale4-style review tools (comment, pick, /gallery/final builder, /gallery/inbox) with a separate review database (GALLERY_REVIEW_DATABASE_URL); live on the Vercel preview with Neon review storage (GALLERY_REVIEW_DATABASE_URL, Preview only); public short address https://mmhr-gallery.vercel.app (branch domain; owner turned Vercel Authentication off on 2026-10-16, so all previews are public behind the release gate). Warning: mmhr.vercel.app serves the public July build (pre-gate), not a holding page (journal 2026-10-16). Owner rule: no full integration run until go-live on hosted staging.
 - This direction supersedes the October3 full-platform-before-live instruction. Nine older documents now carry dated supersession notices; full rewrites follow launch.
 - Financial-record management and private document storage are outside the requested MVP. Contracts and existing permission controls remain important.
 - Do not resume superseded finance/parser/security expansion. Local migrations and checks are authorized within P0 and later phases.
 - Approved on 2026-10-07: checkpoint commit and push (done), audit fix (done), port 3100 (done), Resend, Playwright dev dependency, staging at the end of P1. Still unapproved: other Git writes, cloud migrations, production actions, and real-data rehearsal.
 - Exact braces package has local installation/testing approval. Parser acquisition, build, and activation have no approval.
 - Brain sync and consolidation are not requested. Neither ran.
+- Rename open (2026-10-07 20:23 EDT): the owner wants a new name to replace "MatchMaker HR." Round-2 top picks are Benchtrial, Blindfit, and Fitgap (journal/2026-10-08.md). No domain is bought and no brand text has changed yet.
+- Shared project board (2026-10-07 20:52 EDT): .project-board/ (Git-ignored) tracks tasks, both agents' status, questions, and conflicts. Rules: "Shared project board" in AGENTS.md. Both agents follow it before each task.
 
 ## Evidence locations
 - Current plan: .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md (v1.1, owner-approved). Current phase record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md. P0 status: complete. Checkpoint commit 0b552be is pushed. Local dev port is 3100.
