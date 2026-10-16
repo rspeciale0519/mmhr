@@ -99,6 +99,31 @@ describe("public-release middleware", () => {
     expect(post.status).toBe(503);
   });
 
+  test("passes the gallery review endpoints on a preview without session work", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+
+    const save = await proxy(new NextRequest("https://mmhr.test/api/gallery/feedback", { method: "POST" }));
+    expect(save.status).toBe(200);
+    expect(save.headers.get("x-middleware-next")).toBe("1");
+    expect(createServerClient).not.toHaveBeenCalled();
+
+    const recipe = await proxy(new NextRequest("https://mmhr.test/api/gallery/recipes", { method: "POST" }));
+    expect(recipe.headers.get("x-middleware-next")).toBe("1");
+
+    const listRecipes = await proxy(new NextRequest("https://mmhr.test/api/gallery/recipes"));
+    expect(listRecipes.status).toBe(503);
+
+    const otherApi = await proxy(new NextRequest("https://mmhr.test/api/leads", { method: "POST" }));
+    expect(otherApi.status).toBe(503);
+  });
+
+  test("keeps the gallery review endpoints closed on production deployments", async () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+
+    const response = await proxy(new NextRequest("https://mmhr.test/api/gallery/feedback", { method: "POST" }));
+    expect(response.status).toBe(503);
+  });
+
   test("keeps the gallery closed on production deployments", async () => {
     vi.stubEnv("VERCEL_ENV", "production");
 

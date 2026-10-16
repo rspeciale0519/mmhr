@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { findDesign, galleryDesigns } from "@/gallery/registry";
-import { GallerySwitcher } from "@/gallery/switcher";
 
 export const dynamicParams = false;
 
@@ -19,19 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+/** One design's home page. The review bar comes from the gallery layout. */
 export default async function GalleryDesignPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const design = findDesign(slug);
   if (!design) notFound();
   const { default: Home } = await design.load();
-
-  return (
-    <>
-      <Home />
-      <GallerySwitcher
-        current={design.slug}
-        designs={galleryDesigns.map(({ slug: item, name, idea }) => ({ slug: item, name, idea }))}
-      />
-    </>
-  );
+  return <Home />;
 }

@@ -38,10 +38,20 @@ export function isPublicReleaseBlocked(
 }
 
 /**
- * Owner decision, October 10, 2026: Vercel preview links may show the design
- * gallery while the release gate stays closed for every other path. Only GET
- * and HEAD reach it, and production deployments never do. Previews stay behind
- * Vercel Authentication, and gallery pages are noindex.
+ * The gallery review endpoints and the methods each one accepts. They write
+ * only to the separate gallery review database, never to MMHR data.
+ */
+const galleryReviewApi: Readonly<Record<string, readonly string[]>> = {
+  "/api/gallery/feedback": ["GET", "HEAD", "POST", "DELETE"],
+  "/api/gallery/recipes": ["POST"],
+};
+
+/**
+ * Owner decisions, October 10 and 14, 2026: Vercel preview links may show the
+ * design gallery and its review tools while the release gate stays closed for
+ * every other path. Gallery pages accept only GET and HEAD. The two review
+ * endpoints accept only their listed methods. Production deployments never
+ * open. Previews stay behind Vercel Authentication, and gallery pages are noindex.
  */
 export function isGalleryPreviewRequest(
   pathname: string,
@@ -49,8 +59,10 @@ export function isGalleryPreviewRequest(
   environment: PublicReleaseEnvironment = process.env,
 ) {
   if (environment.VERCEL_ENV !== "preview") return false;
-  if (method !== "GET" && method !== "HEAD") return false;
-  return pathname === "/gallery" || pathname.startsWith("/gallery/");
+  if (pathname === "/gallery" || pathname.startsWith("/gallery/")) {
+    return method === "GET" || method === "HEAD";
+  }
+  return Object.hasOwn(galleryReviewApi, pathname) && galleryReviewApi[pathname]!.includes(method);
 }
 
 /**

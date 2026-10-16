@@ -60,6 +60,24 @@ describe("public release control", () => {
     expect(isGalleryPreviewRequest("/gallery", "GET", { NODE_ENV: "production" })).toBe(false);
   });
 
+  test("opens only the two gallery review endpoints, with their own methods, only on previews", () => {
+    const preview = { NODE_ENV: "production", VERCEL_ENV: "preview" };
+    for (const method of ["GET", "HEAD", "POST", "DELETE"]) {
+      expect(isGalleryPreviewRequest("/api/gallery/feedback", method, preview)).toBe(true);
+    }
+    expect(isGalleryPreviewRequest("/api/gallery/feedback", "PUT", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/recipes", "POST", preview)).toBe(true);
+    expect(isGalleryPreviewRequest("/api/gallery/recipes", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/recipes", "DELETE", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/feedback/extra", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/constructor", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/leads", "POST", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery/final", "POST", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/feedback", "POST", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);
+    expect(isGalleryPreviewRequest("/api/gallery/recipes", "POST", { NODE_ENV: "production" })).toBe(false);
+  });
+
   test("keeps crawler metadata blocked until release approval", () => {
     expect(getPublicReleaseRobotsMetadata(true)).toEqual({
       index: false,

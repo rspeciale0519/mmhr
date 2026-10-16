@@ -8,6 +8,7 @@ const root = process.cwd();
 const poolFile = "src/server/db/index.ts";
 const identityWorkerFile = "src/server/integrations/auth-admin/worker.ts";
 const candidateBackfillTestFile = "src/server/db/r3-candidate-vendor-backfill.integration.test.ts";
+const galleryReviewStoreFile = "src/gallery/review/store.ts";
 const runtimeConfigFiles = new Set(["sentry.server.config.ts", "sentry.edge.config.ts"]);
 const fixtureFiles = new Set([
   "src/server/db/test/migration-owner.ts",
@@ -231,7 +232,12 @@ function inspectSources(sources: Sources): Violation[] {
       // It gains no driver, application pool or credential capability.
       const fixedBackfillMigratorImport = file === candidateBackfillTestFile &&
         specifier === "drizzle-orm/postgres-js/migrator";
+      // The design gallery review store connects to its own database through
+      // GALLERY_REVIEW_DATABASE_URL. It gains the bare driver only: no
+      // application pool, no MMHR database credential, and no other file.
+      const fixedGalleryReviewDriverImport = file === galleryReviewStoreFile && specifier === "postgres";
       if (!directDatabaseFiles.has(file) && !fixedWorkerPoolImport && !fixedBackfillMigratorImport &&
+        !fixedGalleryReviewDriverImport &&
         (target === poolFile || isDirectDatabaseModule(specifier))) {
         report(node, "direct-database-import", target ?? specifier);
       }
@@ -384,6 +390,26 @@ describe("R1 authorization architecture boundaries", () => {
       expect.objectContaining({ rule: "direct-database-import", target: poolFile }),
     ]);
   });
+
+  test("allows only the bare driver in the gallery review store, never the pool or MMHR credentials", () => {
+    expect(inspectSources(synthetic('import postgres from "postgres";', galleryReviewStoreFile))).toEqual([]);
+    expect(inspectSources(synthetic('import { db } from "@/server/db";', galleryReviewStoreFile))).toEqual([
+      expect.objectContaining({ rule: "direct-database-import", target: poolFile }),
+    ]);
+    expect(inspectSources(synthetic('import { drizzle } from "drizzle-orm/postgres-js";', galleryReviewStoreFile))).toEqual([
+      expect.objectContaining({ rule: "direct-database-import" }),
+    ]);
+    expect(inspectSources(synthetic("const url = process.env.DATABASE_URL;", galleryReviewStoreFile))).toEqual([
+      expect.objectContaining({ rule: "privileged-credential", target: "DATABASE_URL" }),
+    ]);
+  });
+
+  test.each(["src/gallery/review/other.ts", "src/app/api/gallery/feedback/route.ts"])(
+    "does not extend the gallery review driver capability to %s", (file) => {
+      expect(inspectSources(synthetic('import postgres from "postgres";', file)))
+        .toEqual([expect.objectContaining({ file, rule: "direct-database-import" })]);
+    },
+  );
 
   test.each(["src/server/db/another-backfill.integration.test.ts", "src/server/commands/candidate-backfill.ts"])(
     "does not extend the candidate rehearsal migrator capability to %s", (file) => {
