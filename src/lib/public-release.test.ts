@@ -55,6 +55,10 @@ describe("public release control", () => {
     expect(isGalleryPreviewRequest("/gallery/lumen", "HEAD", preview)).toBe(true);
     expect(isGalleryPreviewRequest("/gallery/lumen", "POST", preview)).toBe(false);
     expect(isGalleryPreviewRequest("/galleryx", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery-previews/stack.jpg", "GET", preview)).toBe(true);
+    expect(isGalleryPreviewRequest("/gallery-previews/stack.jpg", "POST", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery-previews", "GET", preview)).toBe(false);
+    expect(isGalleryPreviewRequest("/gallery-previews/stack.jpg", "GET", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);
     expect(isGalleryPreviewRequest("/admin", "GET", preview)).toBe(false);
     expect(isGalleryPreviewRequest("/", "GET", preview)).toBe(false);
     expect(isGalleryPreviewRequest("/gallery", "GET", { NODE_ENV: "production", VERCEL_ENV: "production" })).toBe(false);

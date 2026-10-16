@@ -99,6 +99,9 @@ describe("public-release middleware", () => {
     const signIn = await proxy(new NextRequest("https://mmhr.test/sign-in"));
     expect(signIn.status).toBe(503);
 
+    const previewImage = await proxy(new NextRequest("https://mmhr.test/gallery-previews/stack.jpg"));
+    expect(previewImage.headers.get("x-middleware-next")).toBe("1");
+
     const post = await proxy(new NextRequest("https://mmhr.test/gallery", { method: "POST", headers: { "next-action": "x" } }));
     expect(post.status).toBe(503);
   });

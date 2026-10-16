@@ -49,9 +49,10 @@ const galleryReviewApi: Readonly<Record<string, readonly string[]>> = {
 /**
  * Owner decisions, October 10 and 14, 2026: Vercel preview links may show the
  * design gallery and its review tools while the release gate stays closed for
- * every other path. Gallery pages accept only GET and HEAD. The two review
- * endpoints accept only their listed methods. Production deployments never
- * open. Previews stay behind Vercel Authentication, and gallery pages are noindex.
+ * every other path. Gallery pages and their preview images accept only GET and
+ * HEAD. The two review endpoints accept only their listed methods. Production
+ * deployments never open. Previews stay behind Vercel Authentication, and
+ * gallery pages are noindex.
  */
 export function isGalleryPreviewRequest(
   pathname: string,
@@ -59,7 +60,7 @@ export function isGalleryPreviewRequest(
   environment: PublicReleaseEnvironment = process.env,
 ) {
   if (environment.VERCEL_ENV !== "preview") return false;
-  if (pathname === "/gallery" || pathname.startsWith("/gallery/")) {
+  if (pathname === "/gallery" || pathname.startsWith("/gallery/") || pathname.startsWith("/gallery-previews/")) {
     return method === "GET" || method === "HEAD";
   }
   return Object.hasOwn(galleryReviewApi, pathname) && galleryReviewApi[pathname]!.includes(method);
