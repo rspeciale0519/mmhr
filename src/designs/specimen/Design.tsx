@@ -1,19 +1,25 @@
-import { Fraunces, Work_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+const retainedSpecimenDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/fraunces/fraunces-italic-400-600-latin.woff2", weight: "400 600", style: "italic" },
+    { path: "../../assets/fonts/fraunces/fraunces-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Work_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const display = retainedSpecimenDisplay;
+const retainedSpecimenBody = localFont({
+  src: [
+    { path: "../../assets/fonts/work-sans/work-sans-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-body",
 });
+const body = retainedSpecimenBody;
 
 /**
  * The two supporting entries under the main plate, so the signature device

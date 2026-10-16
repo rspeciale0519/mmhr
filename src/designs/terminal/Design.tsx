@@ -1,17 +1,25 @@
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const sans = Archivo({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedTerminalSans = localFont({
+  src: [
+    { path: "../../assets/fonts/archivo/archivo-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const sans = retainedTerminalSans;
+const retainedTerminalMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedTerminalMono;
 
 const ROWS = [
   { name: "Rippling", note: "HR + IT + Finance", fit: 94, price: "$8–12", ver: "4d ago", feat: false },

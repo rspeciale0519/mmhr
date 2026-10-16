@@ -1,15 +1,24 @@
-import { Geist, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+const retainedBureauDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/instrument-serif/instrument-serif-italic-400-latin.woff2", weight: "400", style: "italic" },
+    { path: "../../assets/fonts/instrument-serif/instrument-serif-normal-400-latin.woff2", weight: "400", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Geist({ subsets: ["latin"] });
+const display = retainedBureauDisplay;
+const retainedBureauBody = localFont({
+  src: [
+    { path: "../../assets/fonts/geist/geist-normal-100-900-latin.woff2", weight: "100 900", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedBureauBody;
 
 const FIG = [
   { name: "Rippling", note: "HR + IT + finance", fit: 94, price: "$8–12", ours: false },

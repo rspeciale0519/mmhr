@@ -1,22 +1,31 @@
-import { Hanken_Grotesk, Red_Hat_Mono, Unbounded } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const body = Hanken_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedConsoleBody = localFont({
+  src: [
+    { path: "../../assets/fonts/hanken-grotesk/hanken-grotesk-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const display = Unbounded({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+const body = retainedConsoleBody;
+const retainedConsoleDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/unbounded/unbounded-normal-600-800-latin.woff2", weight: "600 800", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const mono = Red_Hat_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const display = retainedConsoleDisplay;
+const retainedConsoleMono = localFont({
+  src: [
+    { path: "../../assets/fonts/red-hat-mono/red-hat-mono-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedConsoleMono;
 
 const TILES = [
   {

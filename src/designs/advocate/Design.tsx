@@ -1,14 +1,23 @@
-import { Karla, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const display = Newsreader({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
+const retainedAdvocateDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/newsreader/newsreader-italic-300-600-latin.woff2", weight: "300 600", style: "italic" },
+    { path: "../../assets/fonts/newsreader/newsreader-normal-300-600-latin.woff2", weight: "300 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Karla({ subsets: ["latin"] });
+const display = retainedAdvocateDisplay;
+const retainedAdvocateBody = localFont({
+  src: [
+    { path: "../../assets/fonts/karla/karla-normal-200-800-latin.woff2", weight: "200 800", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedAdvocateBody;
 
 export default function Advocate() {
   return (

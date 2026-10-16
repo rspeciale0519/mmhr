@@ -1,14 +1,23 @@
-import { Literata, Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Literata({
-  subsets: ["latin"],
-  weight: ["500", "600"],
+const retainedDossierDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/literata/literata-normal-500-600-latin.woff2", weight: "500 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Public_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const display = retainedDossierDisplay;
+const retainedDossierBody = localFont({
+  src: [
+    { path: "../../assets/fonts/public-sans/public-sans-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedDossierBody;
 
 const FILE = [
   { name: "Rippling", note: "HR + IT + finance", fit: 94, price: "$8–12", ours: false },

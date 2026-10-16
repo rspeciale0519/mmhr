@@ -1,14 +1,23 @@
-import { Figtree, Overpass_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const body = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const mono = Overpass_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const retainedCalibrateBody = localFont({
+  src: [
+    { path: "../../assets/fonts/figtree/figtree-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedCalibrateBody;
+const retainedCalibrateMono = localFont({
+  src: [
+    { path: "../../assets/fonts/overpass-mono/overpass-mono-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedCalibrateMono;
 
 export default function Calibrate() {
   return (

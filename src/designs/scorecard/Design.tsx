@@ -1,13 +1,25 @@
-import { IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-sans-d1" });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const retainedScorecardSans = localFont({
+  src: [
+    { path: "../../assets/fonts/instrument-sans/instrument-sans-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-sans-d1",
+});
+const sans = retainedScorecardSans;
+const retainedScorecardMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedScorecardMono;
 
 /** Placeholder figures for layout evaluation — not claims. */
 const MATCHES = [

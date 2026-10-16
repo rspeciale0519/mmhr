@@ -1,18 +1,32 @@
-import { IBM_Plex_Mono, Karla, Spectral } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const display = Spectral({
-  subsets: ["latin"],
-  weight: ["500", "600"],
+const retainedLedgerDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/spectral/spectral-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/spectral/spectral-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Karla({ subsets: ["latin"] });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const display = retainedLedgerDisplay;
+const retainedLedgerBody = localFont({
+  src: [
+    { path: "../../assets/fonts/karla/karla-normal-200-800-latin.woff2", weight: "200 800", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedLedgerBody;
+const retainedLedgerMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedLedgerMono;
 
 /** Placeholder figures for layout evaluation — not claims. */
 const LINES = [

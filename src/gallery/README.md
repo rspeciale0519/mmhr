@@ -68,7 +68,7 @@ The overview and the design switcher show `public/gallery-previews/<slug>.jpg`. 
 
 ## Add a design
 
-1. Create `src/gallery/designs/<slug>/` with `fonts.ts` exporting `display`, and `home.tsx` with a default export marked `"use client"`.
+1. Create `src/gallery/designs/<slug>/` with `fonts.ts` exporting `display`, and `home.tsx` with a default export marked `"use client"`. Fonts are self-hosted: add the files to `src/assets/fonts` and load them with `next/font/local` (see `src/assets/fonts/README.md`).
 2. Wrap the page in `DesignRoot` and pass the theme from `useDesignTheme("<slug>", "light")`.
 3. Compose the kit components and style them through their `ui` slots in the design's CSS modules. Naming the classes as in `parts-ui.ts` lets `scorecardUi(p)`, `formUi(p)`, and the other helpers wire every slot.
 4. Add an entry to `galleryDesigns` in `registry.ts` with the next `round` number, and the font to `design-fonts.ts`. The overview groups designs by round, newest first; add the round's heading to `src/app/gallery/page.tsx`.

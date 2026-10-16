@@ -1,12 +1,15 @@
-import { Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const retainedHarborJakarta = localFont({
+  src: [
+    { path: "../../assets/fonts/plus-jakarta-sans/plus-jakarta-sans-normal-400-800-latin.woff2", weight: "400 800", style: "normal" },
+  ],
+  display: "swap",
 });
+const jakarta = retainedHarborJakarta;
 
 const MATCHES = [
   { name: "Rippling", note: "HR + IT + Finance", fit: 94, price: "$8–12", feat: false },

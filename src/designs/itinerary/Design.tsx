@@ -1,11 +1,32 @@
-import { DM_Sans, Space_Grotesk, Space_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"] });
-const body = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-body" });
-const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-mono" });
+const retainedItineraryDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/space-grotesk/space-grotesk-normal-500-700-latin.woff2", weight: "500 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const display = retainedItineraryDisplay;
+const retainedItineraryBody = localFont({
+  src: [
+    { path: "../../assets/fonts/dm-sans/dm-sans-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-body",
+});
+const body = retainedItineraryBody;
+const retainedItineraryMono = localFont({
+  src: [
+    { path: "../../assets/fonts/space-mono/space-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/space-mono/space-mono-normal-700-latin.woff2", weight: "700", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-mono",
+});
+const mono = retainedItineraryMono;
 
 /**
  * Buying HRIS software has a real, ordered sequence — RFP, shortlist, demos,

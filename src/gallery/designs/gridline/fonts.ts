@@ -1,3 +1,10 @@
-import { Schibsted_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 
-export const display = Schibsted_Grotesk({ subsets: ["latin"], variable: "--gridline-font" });
+const gridlineDisplay = localFont({
+  src: [
+    { path: "../../../assets/fonts/schibsted-grotesk/schibsted-grotesk-normal-400-700-latin.woff2", weight: "400 900", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--gridline-font",
+});
+export const display = gridlineDisplay;

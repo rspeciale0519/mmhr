@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import localFont from "next/font/local";
 
 import { CookieConsent } from "@/components/cookie-consent";
 import { brand } from "@/lib/brand";
@@ -11,7 +11,14 @@ import "./globals.css";
 
 // Base typography from the shadcn preset. Pulse is selected, but its final
 // typography and theme tokens are not yet codified across every surface.
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const appGeist = localFont({
+  src: [
+    { path: "../assets/fonts/geist/geist-normal-100-900-latin.woff2", weight: "100 900", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-sans",
+});
+const geist = appGeist;
 
 export const metadata: Metadata = {
   metadataBase: getSiteMetadataBase(),

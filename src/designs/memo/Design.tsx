@@ -1,18 +1,24 @@
-import { Inter, Special_Elite } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Special_Elite({
-  subsets: ["latin"],
-  weight: ["400"],
+const retainedMemoDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/special-elite/special-elite-normal-400-latin.woff2", weight: "400", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const display = retainedMemoDisplay;
+const retainedMemoBody = localFont({
+  src: [
+    { path: "../../assets/fonts/inter/inter-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-body",
 });
+const body = retainedMemoBody;
 
 export default function Memo() {
   return (

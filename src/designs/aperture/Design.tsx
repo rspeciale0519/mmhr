@@ -1,17 +1,23 @@
-import { Albert_Sans, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const body = Albert_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const retainedApertureBody = localFont({
+  src: [
+    { path: "../../assets/fonts/albert-sans/albert-sans-normal-400-800-latin.woff2", weight: "400 800", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const body = retainedApertureBody;
+const retainedApertureMono = localFont({
+  src: [
+    { path: "../../assets/fonts/geist-mono/geist-mono-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedApertureMono;
 
 const focusStats = STATS.slice(0, 3);
 const vendorRow = VENDORS.slice(0, 12);

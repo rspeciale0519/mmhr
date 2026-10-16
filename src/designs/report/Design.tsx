@@ -1,17 +1,23 @@
-import { Chivo_Mono, Libre_Franklin } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const sans = Libre_Franklin({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedReportSans = localFont({
+  src: [
+    { path: "../../assets/fonts/libre-franklin/libre-franklin-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = Chivo_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const sans = retainedReportSans;
+const retainedReportMono = localFont({
+  src: [
+    { path: "../../assets/fonts/chivo-mono/chivo-mono-normal-400-500-latin.woff2", weight: "400 500", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedReportMono;
 
 /**
  * A price distribution for comparable companies, with the reader's own quote

@@ -1,18 +1,34 @@
-import { IBM_Plex_Mono, IBM_Plex_Sans, Saira_Semi_Condensed } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const display = Saira_Semi_Condensed({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const retainedBlueprintDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/saira-semi-condensed/saira-semi-condensed-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/saira-semi-condensed/saira-semi-condensed-normal-600-latin.woff2", weight: "600", style: "normal" },
+    { path: "../../assets/fonts/saira-semi-condensed/saira-semi-condensed-normal-700-latin.woff2", weight: "700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "600"] });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const display = retainedBlueprintDisplay;
+const retainedBlueprintBody = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-sans/ibm-plex-sans-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedBlueprintBody;
+const retainedBlueprintMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedBlueprintMono;
 
 const PHASES = [
   {
