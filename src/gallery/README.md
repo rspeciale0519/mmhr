@@ -57,7 +57,7 @@ The pieces are listed in `review/parts.ts`. `tagParts()` finds each section in a
 
 Review records live in a separate Postgres database set by `GALLERY_REVIEW_DATABASE_URL`, never in the MMHR application database. The records are reviewer names and design notes only. Without the variable, the tools show the pages and report that review storage is not set up. The store creates its tables (`review/schema.ts`) on first use, so a new database needs no setup step.
 
-- Local: create the database with `docker exec supabase_db_mmhr psql -U postgres -c "create database gallery_review"`, then put `GALLERY_REVIEW_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:57022/gallery_review` in `.env.development.local`. Confirm the port with `supabase status`.
+- Local: create the database with `docker exec supabase_db_mmhr psql -U postgres -c "create database gallery_review"`, then set `GALLERY_REVIEW_DATABASE_URL` in `.env.development.local` to the `DB URL` that `supabase status` prints, with the database name changed from `postgres` to `gallery_review`. The tracked-file secret scan rejects a URL that contains a user and password, so do not write the full URL here.
 - Vercel: a Neon database connected to the project for the Preview environment only, with the variable prefix `GALLERY_REVIEW_`. The prefix keeps it from replacing the application's `DATABASE_URL`.
 
 On Vercel, the release gate opens the gallery pages and the two review endpoints only on preview deployments (`isGalleryPreviewRequest` in `src/lib/public-release.ts`). Production stays closed. Saves must come from the same host, as JSON.

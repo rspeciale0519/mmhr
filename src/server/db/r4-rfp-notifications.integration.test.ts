@@ -86,7 +86,10 @@ describe("RFP notification private source, leases, retries, and original receipt
   afterAll(async () => { if (context) await stopRehearsal(context); }, 180000);
   test("preserves every public history row while applying the additive outbox migration", async () => {
     await expect(applyMigrationsBeforeRfpNotifications({ ...context })).rejects.toThrow("An active owned notification database rehearsal is required");
-    expect(afterMigration).toEqual(beforeMigration);
+    // Later migrations add public tables. Every earlier table must keep its exact
+    // rows, and no added table may receive a row from the migration chain.
+    expect(Object.fromEntries(Object.keys(beforeMigration).map(name => [name, afterMigration[name]]))).toEqual(beforeMigration);
+    expect(Object.entries(afterMigration).filter(([name, rows]) => !(name in beforeMigration) && rows.length > 0)).toEqual([]);
     expect(beforeMigration.rfp_versions?.length).toBeGreaterThan(0);
     expect(beforeMigration.audit_events?.length).toBeGreaterThan(0);
   });
