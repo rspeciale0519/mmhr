@@ -9,6 +9,17 @@ on:
 jobs:
   integration:
     uses: ./.github/workflows/integration.yml
+    with:
+      scope: launch
+    permissions:
+      contents: read
+
+  # Owner decision D9 (October 7, 2026): the excluded finance and document
+  # files run here and report failures, but this job does not block.
+  integration-excluded-features:
+    uses: ./.github/workflows/integration.yml
+    with:
+      scope: excluded-features
     permissions:
       contents: read
 

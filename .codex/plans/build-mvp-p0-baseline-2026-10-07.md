@@ -55,7 +55,7 @@ Email links use the local Site URL, so `supabase/config.toml` needs the matching
 | D3 | Checkpoint commit `0b552be` with 877 files, pushed to `origin/codex/full-delivery-verification`. A stale, empty Git index lock from September 14 was removed first. | Done |
 | D8 | `npm audit fix` updated the four planned packages in `package-lock.json` only. The audit gate passes; 3 moderate findings remain in the excluded document parser. | Done |
 | D7 | The local dev script default, the local Auth Site URL and redirect list, `.env.example`, `AGENTS.md`, and two how-to documents now use port 3100. Local Supabase restarted with its data intact. | Done |
-| D9 | The Claude Code auto-mode safety classifier blocked the CI workflow change as a CI bypass. No D9 change remains in the tree. | Waiting for the owner |
+| D9 | The Claude Code auto-mode safety classifier blocked the CI workflow change as a CI bypass on October 7 and October 16. On October 17 the owner moved the session to Default permission mode and approved each edit at the prompt. Section 3.6 records the scope change. | Applied October 17, not committed |
 | D1, D2, D4, D5, D6 | Scheduled in the P1 order in Section 9 | Pending |
 
 After these changes, type check, lint, dependency audit, both secret scans, unit tests (491 files, 6,346 tests), and the build all pass. The integration suite was not rerun, because the changed packages are build and command-line tools.
@@ -148,6 +148,20 @@ The staff evaluation, RFP, response, demo, proposal, and contract screens are mo
 
 The October 3 run failed 4 checks in 4 of 116 files. The new failures come mainly from finance work added after that run.
 The CI integration job has a 120-minute limit, but the local full run took 20,859 seconds. CI integration therefore cannot finish today. P1 needs a measured limit or split jobs.
+
+### 3.6 D9 scope change, October 17
+
+This section is the documented scope change that D9 requires.
+
+- Since migration 0170 (D2), 23 integration files fail in CI. They test the excluded finance and private-document features, which can no longer run the revoked functions (42501). CI run 38853805079 failed 24 of 126 files; the 24th, `r4-rfp-notifications`, had the stale baseline in Section 3.5 and is fixed in commit 214b57a.
+- The 23 files are listed in `scripts/integration-excluded-features.json`. No test file or assertion changed.
+- `.github/workflows/integration.yml` takes a `scope` input: `all` (default), `launch`, or `excluded-features`. It sets `MMHR_INTEGRATION_SCOPE`, which `vitest.integration.config.ts` reads. An unknown value stops the run.
+- `.github/workflows/ci.yml` runs two jobs. `integration` uses `launch` (103 files) and blocks. `integration-excluded-features` uses `excluded-features` (23 files). Its test step has `continue-on-error`, so the job reports failures with a warning annotation and a step summary but does not fail.
+- The production release gate and manual runs keep `all`. A release therefore still requires every integration file, including the excluded ones, until the owner decides otherwise.
+- `scripts/r1-with-local-worker.mjs` passes `MMHR_INTEGRATION_SCOPE` to the full-suite child. `scripts/check-r1-integration-matrix.mjs` rejects stale or duplicate entries in the list.
+- Estimated test time from run 38853805079: launch files about 64 minutes, excluded files about 39 minutes. Both fit the 120-minute limit; the first CI run gives the measured values.
+- To undo: remove the `with` blocks and the second job from `ci.yml`. The default scope `all` then runs every file in one blocking job again.
+- To restore the features: apply the reverse grants in migration 0170, then move the files back by removing them from the list.
 
 ## 4. Launch surface inventory
 
@@ -462,7 +476,7 @@ The built-in Supabase sender delivers only to project team addresses, has low ra
 | Step | Status, October 7 |
 |---|---|
 | 1. Checkpoint commit and push | Done: `0b552be`, then `ef05d63` |
-| 2. Audit fix and launch-scope test failures | Audit fix done. The security-check failure is fixed by migration 0169, which adds explicit deny policies to the two finance document tables; the single-file run passes. The RFP notification baseline fix waits for the pre-launch full run, because that file cannot run alone. D9 waits for the owner. |
+| 2. Audit fix and launch-scope test failures | Audit fix done. The security-check failure is fixed by migration 0169, which adds explicit deny policies to the two finance document tables; the single-file run passes. The RFP notification baseline fix waits for the pre-launch full run, because that file cannot run alone. D9 waits for the owner. Update October 17: the RFP notification file ran alone and passed 24 of 24 after the fix (commit 214b57a), and D9 is applied (Section 3.6). |
 | 3. Local port | Done: 3100 |
 | 4. Launch allowlist, navigation, and database access | Done. `src/lib/launch-surface.ts` drives the proxy, the tRPC route, page guards, and the staff and home links. `MMHR_LAUNCH_CANDIDATE` selects A, the default, or B. Migration 0170 revokes signed-in access to the 39 excluded functions; the reverse grants are in the file. The 13 Candidate B functions stay callable and permission-guarded. `src/middleware.ts` is now `src/proxy.ts`, and the deprecated Sentry option is replaced. |
 | 5 onward | Next: tokens, fonts, theme, components, and the shell |
@@ -477,3 +491,5 @@ Checks after step 4: type check, lint, unit tests (492 files, 6,372 tests), and 
 | October 7, 2026 | P0 baseline, launch inventory, isolation approach, work list, interface rules, and recovery design recorded. Supersession notices added to nine planning documents. |
 | October 7, 2026 | Owner approved D1 to D9. P0 complete. D3, D7, and D8 applied; D9 blocked by the safety classifier. |
 | October 7, 2026 | Integration result recorded: 7 of 126 files failed. Failures classified in Section 3.5. Decision D9 added for excluded-feature tests in CI. |
+| October 16, 2026 | RFP notification baseline fixed and Next.js patched to 16.3.8 (commit 214b57a). |
+| October 17, 2026 | D9 applied: Section 3.6 records the scope change. |
