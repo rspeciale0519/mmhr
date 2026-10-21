@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   ANALYTICS_CONSENT_COOKIE,
+  buildConsentCookie,
   grantAnalyticsConsent,
   denyAnalyticsConsent,
   hasAnalyticsConsent,
@@ -37,6 +38,15 @@ describe("analytics consent", () => {
     grantAnalyticsConsent();
     denyAnalyticsConsent();
     expect(hasAnalyticsConsent()).toBe(false);
+  });
+
+  test("marks the consent cookie SameSite=Lax and Secure on HTTPS", () => {
+    expect(buildConsentCookie(ANALYTICS_CONSENT_COOKIE, "granted", "https:")).toBe(
+      `${ANALYTICS_CONSENT_COOKIE}=granted; Max-Age=31536000; path=/; SameSite=Lax; Secure`,
+    );
+    expect(buildConsentCookie(ANALYTICS_CONSENT_COOKIE, "denied", "http:")).toBe(
+      `${ANALYTICS_CONSENT_COOKIE}=denied; Max-Age=31536000; path=/; SameSite=Lax`,
+    );
   });
 });
 

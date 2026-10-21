@@ -1,9 +1,20 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+import { APPLICATION_SECURITY_HEADERS } from "./src/lib/security-headers";
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   experimental: {
     authInterrupts: true,
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: APPLICATION_SECURITY_HEADERS,
+      },
+    ];
   },
 };
 

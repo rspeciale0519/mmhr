@@ -1049,6 +1049,11 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-16 01:07 EDT — Task 47 pushed be89df6; Vercel preview czz7wdawp verified (local fonts, saves, images). See journal/2026-10-16.md.
 2026-10-16 09:30 EDT — Lasting partner share link on the branch alias (owner-approved; older temporary links revoked). See journal/2026-10-16.md.
 2026-10-16 09:45 EDT — Short public gallery URL mmhr-gallery.vercel.app (branch domain); Vercel Authentication turned off with owner approval; mmhr.vercel.app found serving the public July build. See journal/2026-10-16.md.
+2026-10-17 15:25 EDT — Cursor Agent security scan delivered as draft PR #11 from the August develop; report now at docs/security/security-scan-2026-10-17.md. See journal/2026-10-17.md.
+2026-10-21 13:36 EDT — PR #11 reviewed and rebuilt on develop in fix/security-scan-2026-10-17 (Next.js 16.4.2, headers, Secure/Lax cookies, email throttle, CI contents:read); gates pass except the 2026-10-20 vite/hono audit findings; waits for owner approval of npm audit fix and the commit. See journal/2026-10-21.md.
+2026-10-21 14:11 EDT — PR #11 rebuild committed as 7aa3940 on fix/security-scan-2026-10-17 after npm audit fix (vite 8.3.5, hono 4.13.13); all gates pass; waits for push approval. See journal/2026-10-21.md.
+2026-10-21 14:23 EDT — PR #11 force-pushed to fb3af2e (lease on 6ebc135) and re-described; CI run 39652014116 in progress; draft stays. See journal/2026-10-21.md.
 2026-10-21 14:28 EDT — Task 51: develop CI r8 queue cursor test failure is a test order defect (edits the min-UUID task of a shared org; 8/53 not editable); test-only fix waits for owner. See journal/2026-10-21.md.
+2026-10-21 15:18 EDT — Flaky late-bytes assertion fixed as f22e4d7 (global Uint8Array.prototype.set spy saw Node 22 IPC frames); Node 22 and Node 24 runs pass; pushed to PR #11 with the brain record. See journal/2026-10-21.md.
 2026-10-21 15:21 EDT — Task 51: owner-approved test-only fix applied (uncommitted); type-check, lint pass; r8 file 5/5 runs pass. Commit waits for owner. See journal/2026-10-21.md.
 2026-10-21 16:16 EDT — Task 51: fix e7f740b pushed as PR #12 to develop; checks fail only on vite/hono audit (PR #11 fixes it); owner chose to wait for PR #11, then sync. See journal/2026-10-21.md.

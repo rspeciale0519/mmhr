@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { hardenSessionCookieOptions } from "@/lib/session-cookie";
+
 /**
  * Supabase client for Server Components, Server Actions, and Route Handlers.
  *
@@ -23,7 +25,11 @@ export async function createClient({ requireCookieWrites = false }: { requireCoo
         setAll(cookiesToSet) {
           try {
             for (const { name, value, options } of cookiesToSet) {
-              cookieStore.set(name, value, options);
+              cookieStore.set(
+                name,
+                value,
+                hardenSessionCookieOptions(options ?? {}),
+              );
             }
           } catch (error) {
             if (requireCookieWrites) throw error;
