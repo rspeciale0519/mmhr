@@ -30,6 +30,10 @@ describe("public-release middleware", () => {
       expect(response.status).toBe(503);
       expect(response.headers.get("cache-control")).toBe("no-store");
       expect(response.headers.get("x-robots-tag")).toContain("noindex");
+      expect(response.headers.get("x-frame-options")).toBe("DENY");
+      expect(response.headers.get("strict-transport-security")).toMatch(/max-age=\d+/);
+      // The holding page keeps its own, stricter policy.
+      expect(response.headers.get("content-security-policy")).toContain("default-src 'none'");
       expect(createServerClient).not.toHaveBeenCalled();
     },
   );
@@ -55,8 +59,10 @@ describe("public-release middleware", () => {
 
       expect(response.status).toBe(503);
       expect(response.headers.get("cache-control")).toBe("no-store");
+      // Stricter than the application baseline, and the baseline must not replace it.
       expect(response.headers.get("referrer-policy")).toBe("no-referrer");
       expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+      expect(response.headers.get("x-frame-options")).toBe("DENY");
       expect(response.headers.get("x-robots-tag")).toContain("noindex");
       expect(createServerClient).not.toHaveBeenCalled();
     },
@@ -90,11 +96,13 @@ describe("public-release middleware", () => {
     const gallery = await proxy(new NextRequest("https://mmhr.test/gallery/lumen"));
     expect(gallery.status).toBe(200);
     expect(gallery.headers.get("x-robots-tag")).toContain("noindex");
+    expect(gallery.headers.get("x-frame-options")).toBe("DENY");
     expect(createServerClient).not.toHaveBeenCalled();
 
     const home = await proxy(new NextRequest("https://mmhr.test/?_vercel_share=x"));
     expect(home.status).toBe(307);
     expect(home.headers.get("location")).toBe("https://mmhr.test/gallery");
+    expect(home.headers.get("x-frame-options")).toBe("DENY");
 
     const signIn = await proxy(new NextRequest("https://mmhr.test/sign-in"));
     expect(signIn.status).toBe(503);
@@ -193,7 +201,7 @@ describe("session refresh middleware", () => {
               {
                 name: "sb-access-token",
                 value: "refreshed-token",
-                options: { httpOnly: true, path: "/" },
+                options: { path: "/" },
               },
             ],
             {
@@ -222,12 +230,47 @@ describe("session refresh middleware", () => {
     );
 
     expect(downstreamCookie).toBe("refreshed-token");
-    expect(response.headers.get("set-cookie")).toContain(
-      "sb-access-token=refreshed-token",
-    );
+    const setCookie = response.headers.get("set-cookie");
+    expect(setCookie).toContain("sb-access-token=refreshed-token");
+    expect(setCookie).toMatch(/SameSite=Lax/i);
+    expect(setCookie).toMatch(/Secure/i);
+    // The browser Supabase client reads this cookie for MFA, so it must stay
+    // readable from document.cookie.
+    expect(setCookie).not.toMatch(/HttpOnly/i);
     expect(response.headers.get("cache-control")).toContain("no-store");
     expect(response.headers.get("expires")).toBe("0");
     expect(response.headers.get("pragma")).toBe("no-cache");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(response.headers.get("content-security-policy")).toContain(
+      "frame-ancestors 'none'",
+    );
+  });
+
+  test("keeps local HTTP session cookies usable without the Secure flag", async () => {
+    vi.mocked(createServerClient).mockImplementation(
+      (_url, _key, options) => {
+        getClaims.mockImplementation(async () => {
+          options.cookies.setAll!(
+            [{ name: "sb-access-token", value: "local-token", options: { path: "/" } }],
+            {},
+          );
+          return { data: { claims: { sub: "user-123" } }, error: null };
+        });
+
+        return { auth: { getClaims } } as never;
+      },
+    );
+
+    const response = await proxy(
+      new NextRequest("http://localhost:3000/home", {
+        headers: { cookie: "sb-access-token=stale-token" },
+      }),
+    );
+
+    const setCookie = response.headers.get("set-cookie");
+    expect(setCookie).toContain("sb-access-token=local-token");
+    expect(setCookie).toMatch(/SameSite=Lax/i);
+    expect(setCookie).not.toMatch(/Secure/i);
   });
 
   test("passes invalid claims to the entry point without an identity", async () => {
@@ -307,6 +350,7 @@ describe("Server Action request middleware", () => {
 
     expect(response.status).toBe(403);
     expect(response.headers.get("cache-control")).toContain("no-store");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
     expect(createServerClient).not.toHaveBeenCalled();
   });
 
@@ -344,6 +388,7 @@ describe("launch surface proxy", () => {
       const response = await proxy(new NextRequest(`https://mmhr.test${path}`));
 
       expect(response.headers.get("x-middleware-rewrite")).toBe("https://mmhr.test/__not-in-launch");
+      expect(response.headers.get("x-frame-options")).toBe("DENY");
       expect(createServerClient).not.toHaveBeenCalled();
     },
   );
@@ -355,6 +400,7 @@ describe("launch surface proxy", () => {
 
       expect(response.status).toBe(404);
       expect(response.headers.get("cache-control")).toBe("private, no-store");
+      expect(response.headers.get("x-frame-options")).toBe("DENY");
       expect(await response.json()).toEqual({ error: "not_found" });
       expect(createServerClient).not.toHaveBeenCalled();
     },
