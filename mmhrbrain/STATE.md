@@ -13,7 +13,7 @@ Updated: 2026-10-14 22:31 EDT. Branch: `codex/full-delivery-verification`. Last 
 - Brain sync and consolidation are not requested. Neither ran.
 - Rename open (2026-10-07 20:23 EDT): the owner wants a new name to replace "MatchMaker HR." Round-2 top picks are Benchtrial, Blindfit, and Fitgap (journal/2026-10-08.md). No domain is bought and no brand text has changed yet.
 - Shared project board (2026-10-07 20:52 EDT): .project-board/ (Git-ignored) tracks tasks, both agents' status, questions, and conflicts. Rules: "Shared project board" in AGENTS.md. Both agents follow it before each task.
-- Known flaky test (2026-10-21, task 51): `r8-deal-follow-up-auth` "rejects changed, foreign and malformed queue cursors..." fails about 15% of runs on develop (edits the min-UUID task of a shared org). Owner-approved test-only fix is applied in worktree dazzling-wright-4b6bf0, uncommitted; commit and push wait for the owner (journal/2026-10-21.md).
+- Known flaky test (2026-10-21, task 51): `r8-deal-follow-up-auth` "rejects changed, foreign and malformed queue cursors..." fails about 15% of runs on develop aaf9aee (edits the min-UUID task of a shared org). Test-only fix e7f740b is pushed in PR #12 (bugfix/r8-queue-cursor-flake -> develop). Its checks job fails only on the vite/hono audit; owner chose to wait for PR #11, then sync PR #12 with develop. Merge needs owner approval (journal/2026-10-21.md).
 
 ## Evidence locations
 - Current plan: .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md (v1.1, owner-approved). Current phase record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md. P0 status: complete. Checkpoint commit 0b552be is pushed. Local dev port is 3100.
