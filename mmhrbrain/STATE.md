@@ -1,6 +1,6 @@
 # MMHR — Current State
 
-Updated: 2026-10-14 22:31 EDT. Branch: `codex/full-delivery-verification`. Last commit be89df6 (all fonts self-hosted), pushed; gallery review tools live on preview mmhr-czz7wdawp with Neon storage.
+Updated: 2026-10-21 13:36 EDT. Branch: `fix/security-scan-2026-10-17` (PR #11 rebuilt on develop aaf9aee); code committed as 7aa3940 plus this brain record; pushed to the PR #11 branch; flaky test assertion fixed as f22e4d7 after CI run 39652014116 failed on it; a new CI run follows the push. PR #10 merged into develop on 2026-10-21 (aaf9aee). Gallery review tools remain live on preview mmhr-czz7wdawp with Neon storage.
 
 ## Scope and authority
 - Latest user direction: working core features first, then high-quality public and logged-in design, then further security and features.
@@ -13,6 +13,8 @@ Updated: 2026-10-14 22:31 EDT. Branch: `codex/full-delivery-verification`. Last 
 - Brain sync and consolidation are not requested. Neither ran.
 - Rename open (2026-10-07 20:23 EDT): the owner wants a new name to replace "MatchMaker HR." Round-2 top picks are Benchtrial, Blindfit, and Fitgap (journal/2026-10-08.md). No domain is bought and no brand text has changed yet.
 - Shared project board (2026-10-07 20:52 EDT): .project-board/ (Git-ignored) tracks tasks, both agents' status, questions, and conflicts. Rules: "Shared project board" in AGENTS.md. Both agents follow it before each task.
+
+- 2026-10-21: PR #11 (Cursor security scan) rebuilt on develop in `fix/security-scan-2026-10-17`: Next.js 16.4.2 for the 2026-10-14 advisories (16.3.8 is not patched), security headers, Secure and Lax session cookies without HttpOnly (the browser MFA client reads the cookie), consent cookie Secure, local email throttle 60s, CI `contents: read`. `npm audit fix` applied (vite 8.3.5, hono 4.13.13; lockfile only). Committed as 7aa3940 and pushed to PR #11 (fb3af2e); CI pending. Open: HSTS includeSubDomains, cloud Auth settings, PR readiness and merge. See journal/2026-10-21.md.
 
 ## Evidence locations
 - Current plan: .codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md (v1.1, owner-approved). Current phase record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md. P0 status: complete. Checkpoint commit 0b552be is pushed. Local dev port is 3100.

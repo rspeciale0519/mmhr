@@ -41,6 +41,8 @@ Prior execution: [Complete pilot workflow plan](../.codex/plans/build-complete-p
 - [[knowledge/superseded]] — current (2026-08-24) — v1 documents and claims
 
 ## Recent journal
+- [[journal/2026-10-21]] — reviewed and rebuilt PR #11 on develop: Next.js 16.4.2, security headers, Secure/Lax cookies; checks pass except the 2026-10-20 vite/hono audit findings.
+- [[journal/2026-10-17]] — Cursor security scan (PR #11): Next.js patch, headers, auth error redaction, cookie flags; later rebuilt on develop.
 - [[journal/2026-10-06]] — MVP priority review and saved complete UI/UX/backend roadmap; implementation stopped for approval.
 - [[journal/2026-10-03]] — updated completion audit, payment approval and original retry corrections, measured contract test recovery; full integration and delivery remain open.
 - [[journal/2026-10-02]] — real customer/vendor browser uploads, stale-workspace search denial, finance command bindings, and current validation checkpoints; full delivery remains active.

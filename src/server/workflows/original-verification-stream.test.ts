@@ -154,7 +154,9 @@ describe("original stream, synthetic SDK and Web Stream boundaries", () => {
     await vi.waitFor(() => expect(read).toHaveBeenCalledOnce()); f.controller.abort(); await check;
     pending.resolve({ done: false, value: f.bytes });
     await Promise.resolve(); await Promise.resolve();
-    expect(copy).not.toHaveBeenCalled(); expect(read).toHaveBeenCalledOnce();
+    // The spy is global: on Node 22 the vitest worker's IPC writer also calls
+    // Uint8Array.prototype.set, so only a copy of the late bytes counts.
+    expect(copy.mock.calls.map(([value]) => value)).not.toContain(f.bytes); expect(read).toHaveBeenCalledOnce();
     expect(body.cancel).toHaveBeenCalledOnce(); expect(body.stream.locked).toBe(false);
   });
   test("cleans an unexpected body even when the provider also returns a denial", async () => {

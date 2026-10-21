@@ -8,7 +8,25 @@ import {
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
 import { isPathInLaunch } from "@/lib/launch-surface";
+import { APPLICATION_SECURITY_HEADERS } from "@/lib/security-headers";
+import { hardenSessionCookieOptions } from "@/lib/session-cookie";
 import { shouldRejectServerActionRequest } from "@/server/auth/server-action-request";
+
+/**
+ * Baseline browser protections for every response the proxy returns. Next's
+ * `headers()` config never sees the responses created here (release gate,
+ * 403, 404, redirects, rewrites), so they are applied in both places. A header
+ * the handler already set, such as the stricter release-gate CSP and referrer
+ * policy, stays as it is.
+ */
+function withApplicationSecurityHeaders<T extends Response>(response: T): T {
+  for (const { key, value } of APPLICATION_SECURITY_HEADERS) {
+    if (!response.headers.has(key)) {
+      response.headers.set(key, value);
+    }
+  }
+  return response;
+}
 
 /**
  * Enforces the temporary public-release quarantine and the launch surface
@@ -19,6 +37,10 @@ import { shouldRejectServerActionRequest } from "@/server/auth/server-action-req
  * and admin protection belongs with the canonical IAM and RLS implementation.
  */
 export async function proxy(request: NextRequest) {
+  return withApplicationSecurityHeaders(await handleRequest(request));
+}
+
+async function handleRequest(request: NextRequest): Promise<Response> {
   if (isPublicReleaseBlocked()) {
     // The design gallery is static sample content; it needs no session work.
     if (isGalleryPreviewRequest(request.nextUrl.pathname, request.method)) {
@@ -99,7 +121,11 @@ export async function proxy(request: NextRequest) {
           response = NextResponse.next({ request });
 
           for (const { name, value, options } of cookiesToSet) {
-            response.cookies.set(name, value, options);
+            response.cookies.set(
+              name,
+              value,
+              hardenSessionCookieOptions(options ?? {}, request.nextUrl.origin),
+            );
           }
 
           for (const [name, value] of Object.entries(headers)) {

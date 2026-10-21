@@ -35,9 +35,18 @@ test("default Server Component clients preserve read-only cookie behavior", asyn
   expect(() => cookieAdapter().setAll!(writes, {})).not.toThrow();
 });
 
-test.each([false, true])("reads and writes cookies with their original options: %s", async (requireCookieWrites) => {
+test.each([false, true])("reads cookies and writes them with hardened options: %s", async (requireCookieWrites) => {
   await createClient({ requireCookieWrites });
   expect(await cookieAdapter().getAll()).toEqual([{ name: "test-session", value: "saved-test-value" }]);
   cookieAdapter().setAll!(writes, {});
-  expect(set).toHaveBeenCalledExactlyOnceWith("test-session", "test-value", { httpOnly: true, path: "/" });
+  // HttpOnly passes through from the provider unchanged: the browser client must keep reading the session.
+  expect(set).toHaveBeenCalledExactlyOnceWith("test-session", "test-value", { httpOnly: true, path: "/", sameSite: "lax", secure: false });
+});
+
+test("marks session cookies Secure when the app origin is HTTPS", async () => {
+  vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example");
+  await createClient({ requireCookieWrites: true });
+  cookieAdapter().setAll!([{ name: "test-session", value: "test-value", options: { path: "/" } }], {});
+  expect(set).toHaveBeenCalledExactlyOnceWith("test-session", "test-value", { path: "/", sameSite: "lax", secure: true });
+  vi.unstubAllEnvs();
 });

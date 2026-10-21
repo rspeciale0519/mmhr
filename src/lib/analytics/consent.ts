@@ -18,9 +18,18 @@ function readCookie(name: string): string | null {
   return null;
 }
 
+export function buildConsentCookie(
+  name: string,
+  value: string,
+  protocol = typeof window === "undefined" ? "http:" : window.location.protocol,
+) {
+  const secure = protocol === "https:" ? "; Secure" : "";
+  return `${name}=${value}; Max-Age=${ONE_YEAR_SECONDS}; path=/; SameSite=Lax${secure}`;
+}
+
 function writeCookie(name: string, value: string) {
   if (typeof document === "undefined") return;
-  document.cookie = `${name}=${value}; Max-Age=${ONE_YEAR_SECONDS}; path=/; SameSite=Lax`;
+  document.cookie = buildConsentCookie(name, value);
 }
 
 export function hasAnalyticsConsent(): boolean {
