@@ -1049,3 +1049,6 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-16 01:07 EDT — Task 47 pushed be89df6; Vercel preview czz7wdawp verified (local fonts, saves, images). See journal/2026-10-16.md.
 2026-10-16 09:30 EDT — Lasting partner share link on the branch alias (owner-approved; older temporary links revoked). See journal/2026-10-16.md.
 2026-10-16 09:45 EDT — Short public gallery URL mmhr-gallery.vercel.app (branch domain); Vercel Authentication turned off with owner approval; mmhr.vercel.app found serving the public July build. See journal/2026-10-16.md.
+2026-10-17 15:25 EDT — Cursor Agent security scan delivered as draft PR #11 from the August develop; report now at docs/security/security-scan-2026-10-17.md. See journal/2026-10-17.md.
+2026-10-21 13:36 EDT — PR #11 reviewed and rebuilt on develop in fix/security-scan-2026-10-17 (Next.js 16.4.2, headers, Secure/Lax cookies, email throttle, CI contents:read); gates pass except the 2026-10-20 vite/hono audit findings; waits for owner approval of npm audit fix and the commit. See journal/2026-10-21.md.
+2026-10-21 14:11 EDT — PR #11 rebuild committed as 7aa3940 on fix/security-scan-2026-10-17 after npm audit fix (vite 8.3.5, hono 4.13.13); all gates pass; waits for push approval. See journal/2026-10-21.md.
