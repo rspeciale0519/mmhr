@@ -1,0 +1,230 @@
+/* The pinned desk: scroll distance here opens the leaflet. */
+.track {
+  height: 250svh;
+}
+
+.sticky {
+  position: sticky;
+  inset-block-start: 0;
+  display: grid;
+  place-items: center;
+  height: 100svh;
+  overflow: clip;
+}
+
+.desk {
+  --opened: 0;
+  --w: min(13.5rem, (100vw - 4rem) / 5);
+  --hgt: 17rem;
+  position: relative;
+  width: 100%;
+  height: calc(var(--hgt) + 6rem);
+  perspective: 1800px;
+  perspective-origin: 50% 0%;
+}
+
+/* The open part stays centered on the desk. */
+.leaflet {
+  position: absolute;
+  inset-inline-start: calc(50% - var(--w) / 2);
+  inset-block-start: 2rem;
+  width: var(--w);
+  height: var(--hgt);
+  transform-style: preserve-3d;
+  transform: rotateX(14deg) translateX(calc(var(--w) * var(--opened) * -0.5));
+}
+
+/* Its shadow on the desk grows as it opens. */
+.leaflet::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -6%;
+  inset-block-start: 8%;
+  width: calc(var(--w) * (1 + var(--opened)) * 1.04);
+  height: 100%;
+  border-radius: 1rem;
+  background: rgb(var(--f-shade) / 0.18);
+  filter: blur(22px);
+  transform: translateZ(-30px) translateY(16px);
+}
+
+/* Each panel sits in its place and swings open around its left crease. */
+.panel {
+  position: absolute;
+  inset-inline-start: calc(var(--k) * var(--w));
+  inset-block-start: 0;
+  width: var(--w);
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transform: rotateY(calc(-180deg * (1 - var(--u))));
+}
+
+.paper,
+.back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.paper {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(180deg, #ffffff, #fbfcfd);
+  color: var(--f-ink);
+  box-shadow: inset 1px 0 0 rgb(var(--f-shade) / 0.08);
+}
+
+/* A crease catches the light; the shade fades as the panel lies flat. */
+.paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(var(--f-shade) / 0.18), rgb(var(--f-shade) / 0) 45%);
+  opacity: calc(1 - var(--u));
+  pointer-events: none;
+}
+
+.panel[data-panel="0"] .paper {
+  border-radius: 0.625rem 0 0 0.625rem;
+}
+
+.panel[data-panel="4"] .paper {
+  border-radius: 0 0.625rem 0.625rem 0;
+}
+
+.back {
+  background: linear-gradient(90deg, #e9edf2, #f4f6f9);
+  transform: rotateY(180deg);
+}
+
+[data-theme="dark"] .paper {
+  background: linear-gradient(180deg, #232b3d, #1f2636);
+}
+
+[data-theme="dark"] .back {
+  background: #1a2030;
+}
+
+/* Only the face toward the viewer is drawn; unopened panels are not drawn. */
+.panel[data-face="none"],
+.panel[data-face="back"] > .paper,
+.panel[data-face="front"] > .back {
+  visibility: hidden;
+}
+
+.number {
+  color: var(--f-green-text);
+  font-family: var(--fold-display), Georgia, serif;
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.title {
+  margin: 0.25rem 0 0;
+  font-family: var(--fold-display), Georgia, serif;
+  font-size: 1.1875rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.text {
+  margin: 0;
+  color: var(--f-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+/* Narrow screens: the leaflet opens downward. */
+@media (max-width: 47.99rem) {
+  .track {
+    height: 260svh;
+  }
+
+  .desk {
+    --w: min(100vw - 2.5rem, 24rem);
+    --hgt: 7.25rem;
+    height: calc(var(--hgt) * 5 + 3rem);
+  }
+
+  .leaflet {
+    inset-block-start: 1rem;
+    transform: rotateX(6deg) translateY(calc(var(--hgt) * var(--opened) * -0.5 + var(--hgt) * 2));
+  }
+
+  .leaflet::before {
+    width: 100%;
+    height: calc(var(--hgt) * (1 + var(--opened)));
+  }
+
+  .panel {
+    inset-inline-start: 0;
+    inset-block-start: calc(var(--k) * var(--hgt));
+    height: var(--hgt);
+    transform-origin: center top;
+    transform: rotateX(calc(180deg * (1 - var(--u))));
+  }
+
+  .back {
+    transform: rotateX(180deg);
+  }
+
+  .paper {
+    grid-template-columns: auto 1fr;
+    gap: 0.125rem 0.875rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .paper::after {
+    background: linear-gradient(180deg, rgb(var(--f-shade) / 0.18), rgb(var(--f-shade) / 0) 45%);
+  }
+
+  .number {
+    grid-row: span 2;
+    font-size: 1.75rem;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+
+  .text {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  .panel[data-panel="0"] .paper {
+    border-radius: 0.625rem 0.625rem 0 0;
+  }
+
+  .panel[data-panel="4"] .paper {
+    border-radius: 0 0 0.625rem 0.625rem;
+  }
+}
+
+/* Without motion, the leaflet lies open and nothing is pinned. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    height: auto;
+  }
+
+  .sticky {
+    position: static;
+    height: auto;
+    padding: 2rem 0;
+  }
+}
+
+.srList {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: clip;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

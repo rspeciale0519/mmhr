@@ -1,37 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
-import { afterAll, describe, expect, test } from "vitest";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
 /**
  * Prove the authentication round-trip against the running local stack.
  * This exercises Supabase Auth directly (no Next.js), so a failure here means
  * the stack/env is wrong rather than our UI.
  */
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
+let url: string, anonKey: string, serviceRoleKey: string;
+let admin: SupabaseClient;
 const createdUserIds: string[] = [];
-
-function requireLocalSupabase(value: string | undefined) {
-  if (!value) throw new Error("Local Supabase URL is required");
-
-  const { hostname, port } = new URL(value);
-  if (!["127.0.0.1", "localhost", "::1"].includes(hostname)) {
-    throw new Error("Integration tests require a loopback Supabase URL");
-  }
-  if (port !== "56321") {
-    throw new Error("Integration tests require the MMHR local Supabase API");
-  }
-}
-
-requireLocalSupabase(url);
-
-if (!serviceRoleKey) {
-  throw new Error("Local Supabase service role key is required");
-}
-
-const admin = createClient(url!, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
 
 async function createConfirmedUser(email: string, password: string) {
   const { data, error } = await admin.auth.admin.createUser({
@@ -45,11 +25,23 @@ async function createConfirmedUser(email: string, password: string) {
 }
 
 describe("supabase auth round-trip (local stack)", () => {
+  beforeAll(async () => {
+    startup = startRestrictedRehearsal("auth");
+    rehearsal = await startup;
+    const api = rehearsal.context.api!;
+    url = api.url;
+    anonKey = api.publicKey;
+    serviceRoleKey = api.adminKey;
+    admin = createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  }, 300000);
   afterAll(async () => {
-    for (const userId of createdUserIds) {
-      await admin.auth.admin.deleteUser(userId);
-    }
-  });
+    try {
+      for (const userId of createdUserIds) {
+        const result = await admin.auth.admin.deleteUser(userId);
+        if (result.error) throw new Error("Synthetic Auth fixture cleanup failed");
+      }
+    } finally { await (rehearsal ?? await startup)?.close(); }
+  }, 180000);
 
   test("env is wired for the local stack", () => {
     expect(url).toBeTruthy();

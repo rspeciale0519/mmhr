@@ -86,5 +86,7 @@ export const auditEvents = pgTable(
     check("audit_events_reason_ck", sql`length(btrim(${t.reason})) > 0`),
     check("audit_events_command_ck", sql`length(btrim(${t.command})) > 0`),
     check("audit_events_action_ck", sql`length(btrim(${t.action})) > 0`),
+    check("audit_events_before_summary_safe_ck", sql`mmhr_private.r1_audit_summary_is_safe(${t.beforeSummary})`),
+    check("audit_events_after_summary_safe_ck", sql`mmhr_private.r1_audit_summary_is_safe(${t.afterSummary})`),
   ],
 );

@@ -1,0 +1,218 @@
+.root {
+  --v-ink: #0f1e3d;
+  --v-muted: #4f5d7a;
+  --v-accent: #0e7c9a;
+  --v-shade: 30 50 100;
+
+  --t-bg: #f6f9ff;
+  --t-surface: #ffffff;
+  --t-raised: #eef3fc;
+  --t-ink: var(--v-ink);
+  --t-muted: var(--v-muted);
+  --t-line: #dfe6f2;
+  --t-line-strong: #8794ad;
+  --t-accent: var(--v-accent);
+  --t-on-accent: #ffffff;
+  --t-accent-soft: #dcf2f7;
+  --t-link: #0b6c87;
+  --t-success: #1d7148;
+  --t-info: #2a56b5;
+  --t-warning: #8a5a00;
+  --t-danger: #b42318;
+  --t-display: var(--vista-display), ui-sans-serif, system-ui, sans-serif;
+  --t-body: var(--vista-body), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 600;
+  --t-display-tracking: -0.035em;
+  --t-r-lg: 1.75rem;
+  --t-r-md: 1.25rem;
+  --t-r-sm: 0.875rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px rgb(var(--v-shade) / 0.06), 0 6px 16px -8px rgb(var(--v-shade) / 0.16);
+  --t-shadow-md: 0 1px 3px rgb(var(--v-shade) / 0.05), 0 24px 48px -26px rgb(var(--v-shade) / 0.28);
+  --t-shadow-lg: 0 2px 6px rgb(var(--v-shade) / 0.05), 0 40px 90px -40px rgb(var(--v-shade) / 0.36);
+  --t-next-bg: #ffffff;
+  --t-next-ink: var(--v-ink);
+  --t-next-danger: #b42318;
+  --t-overlay: rgb(15 30 61 / 0.3);
+  font-synthesis: none;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
+
+}
+.root *, .root *::before, .root *::after {
+  box-sizing: border-box;
+  min-width: 0;
+
+}
+:where(.root) :where(button, a) {
+  touch-action: manipulation;
+
+}
+:where(.root button:not(:disabled):active) {
+  scale: 0.97;
+
+}
+
+/* A pale sky with two soft lights far behind the glass. */
+.root[data-theme] {
+  background:
+    radial-gradient(40rem 28rem at 85% 6%, rgb(199 240 245 / 0.75), transparent 70%),
+    radial-gradient(36rem 26rem at 8% 18%, rgb(217 212 255 / 0.7), transparent 70%),
+    linear-gradient(180deg, #eaf1ff 0%, #f6f9ff 40%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+.root[data-theme="dark"] {
+  --v-ink: #e9eefb;
+  --v-muted: #a6b1ca;
+  --v-accent: #5cc7e0;
+  --v-shade: 0 0 0;
+  --t-bg: #0d1428;
+  --t-surface: #182040;
+  --t-raised: #1f2a4f;
+  --t-line: #2a3560;
+  --t-line-strong: #64709a;
+  --t-on-accent: #0d1428;
+  --t-accent-soft: #123a47;
+  --t-link: #7fd6ea;
+  --t-success: #64d69c;
+  --t-info: #9fb8ff;
+  --t-warning: #f0c065;
+  --t-danger: #ff8f85;
+  --t-next-bg: #1f2a4f;
+  --t-next-danger: #ff8f85;
+  --t-overlay: rgb(0 0 0 / 0.55);
+  background:
+    radial-gradient(40rem 28rem at 85% 6%, rgb(30 90 110 / 0.45), transparent 70%),
+    radial-gradient(36rem 26rem at 8% 18%, rgb(70 60 140 / 0.45), transparent 70%),
+    linear-gradient(180deg, #0d1428 0%, #0f1730 100%);
+  background-attachment: fixed;
+  color-scheme: dark;
+}
+
+.root .header {
+  background: rgb(255 255 255 / 0.45);
+}
+
+.root[data-theme="dark"] .header {
+  background: rgb(13 20 40 / 0.55);
+}
+
+/* A small pane mark. */
+.mark {
+  width: 1.25rem;
+  height: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: 0.3125rem;
+  background: linear-gradient(160deg, #c7f0f5, #d9d4ff);
+  box-shadow: 4px 4px 0 -1px rgb(14 124 154 / 0.35);
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  padding: clamp(2rem, 6vw, 4rem) 0 clamp(3rem, 7vw, 5rem);
+}
+
+.hero > * {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 3rem;
+    min-height: calc(100svh - 5rem);
+  }
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--vista-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--v-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+}
+
+.root .promise {
+  padding: 1.75rem;
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: var(--t-r-md);
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.55));
+  box-shadow: var(--t-shadow-md);
+  backdrop-filter: blur(14px);
+}
+
+.root[data-theme="dark"] .promise {
+  border-color: rgb(255 255 255 / 0.1);
+  background: linear-gradient(160deg, rgb(36 46 76 / 0.85), rgb(24 31 54 / 0.7));
+}
+
+/* Steps as panes that overlap slightly, nearest last. */
+@media (min-width: 64rem) {
+  .root .steps {
+    gap: 0;
+  }
+
+  .root .step {
+    margin-inline-start: -1rem;
+  }
+
+  .root .step:first-child {
+    margin-inline-start: 0;
+  }
+}
+
+.root .step {
+  position: relative;
+  z-index: calc(var(--i) + 1);
+  padding: 1.5rem;
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: var(--t-r-md);
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.66));
+  box-shadow: 0 2px 4px rgb(var(--v-shade) / 0.04), 0 24px 44px -26px rgb(var(--v-shade) / 0.32);
+  backdrop-filter: blur(14px);
+}
+
+.root[data-theme="dark"] .step {
+  border-color: rgb(255 255 255 / 0.1);
+  background: linear-gradient(160deg, rgb(36 46 76 / 0.92), rgb(24 31 54 / 0.8));
+}
+
+.root .closing {
+  border: 1px solid rgb(255 255 255 / 0.9);
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.6));
+  backdrop-filter: blur(18px);
+}
+
+.root[data-theme="dark"] .closing {
+  border-color: rgb(255 255 255 / 0.1);
+  background: linear-gradient(160deg, rgb(36 46 76 / 0.9), rgb(24 31 54 / 0.75));
+}

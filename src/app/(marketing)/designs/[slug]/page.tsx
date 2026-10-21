@@ -41,7 +41,7 @@ export default async function DesignPage({
     <>
       {/* Review chrome. Sits above the design so you can move through the whole
           set without going back to the directory each time. */}
-      <div className="gv-bar">
+      <div className="gv-bar" role="region" aria-label="Design gallery navigation">
         <Link className="gv-back" href="/designs">
           ← All layouts
         </Link>
@@ -49,7 +49,7 @@ export default async function DesignPage({
         <span className="gv-round">
           Round {design.round} · {design.scope} · placeholder content
         </span>
-        <nav className="gv-nav">
+        <nav className="gv-nav" aria-label="Design navigation">
           <Link className="gv-link" href={`/designs/${prev.slug}`}>
             ← {prev.name}
           </Link>

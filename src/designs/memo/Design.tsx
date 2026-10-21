@@ -1,18 +1,24 @@
-import { Inter, Special_Elite } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Special_Elite({
-  subsets: ["latin"],
-  weight: ["400"],
+const retainedMemoDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/special-elite/special-elite-normal-400-latin.woff2", weight: "400", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const display = retainedMemoDisplay;
+const retainedMemoBody = localFont({
+  src: [
+    { path: "../../assets/fonts/inter/inter-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-body",
 });
+const body = retainedMemoBody;
 
 export default function Memo() {
   return (
@@ -70,8 +76,8 @@ export default function Memo() {
             </button>
           </form>
           <p className="me-fine">
-            Free. The vendor pays our commission — the same rate whichever
-            one you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
         </div>
 
@@ -246,8 +252,8 @@ export default function Memo() {
             <div>
               <div className="me-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="me-fc">

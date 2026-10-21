@@ -1,0 +1,801 @@
+/* Review tools. They sit over every design, so they carry their own tokens
+   and the app's sans-serif, and look the same on all 20 designs. */
+
+.ui {
+  --r-ink: oklch(98% 0 none);
+  --r-muted: oklch(98% 0 none / 0.62);
+  --r-faint: oklch(98% 0 none / 0.14);
+  --r-panel: oklch(20.5% 0.006 286 / 0.96);
+  --r-panel-solid: oklch(16% 0.005 286);
+  --r-line: oklch(98% 0 none / 0.16);
+  --r-comment: oklch(58% 0.2 262);
+  --r-pick: oklch(60% 0.22 8);
+  --r-card: oklch(100% 0 none);
+  --r-card-ink: oklch(23% 0.006 286);
+  --r-card-muted: oklch(48% 0.01 286);
+  --r-card-line: oklch(87% 0.005 286);
+  --r-shadow: 0 1px 2px oklch(0% 0 none / 0.2), 0 18px 40px -12px oklch(0% 0 none / 0.5);
+
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ui :where(button, a) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ui :where(button, a):focus-visible {
+  outline: 2px solid oklch(80% 0.12 262);
+  outline-offset: 2px;
+}
+
+.ui :where(button):active {
+  scale: 0.97;
+}
+
+.spacer {
+  block-size: 6.5rem;
+}
+
+/* Bottom stack: toast, look-and-feel chips, and the dock itself. */
+.stack {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: max(1rem, env(safe-area-inset-bottom));
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.75rem;
+  pointer-events: none;
+}
+
+.stack > * {
+  pointer-events: auto;
+}
+
+.dock {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-inline-size: 100%;
+  padding: 0.375rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-radius: 999px;
+  background: var(--r-panel);
+  color: var(--r-ink);
+  box-shadow: var(--r-shadow), inset 0 0 0 1px var(--r-line);
+  backdrop-filter: blur(12px);
+}
+
+.dock::-webkit-scrollbar {
+  display: none;
+}
+
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.5rem;
+  padding-inline: 0.875rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--r-muted);
+  font: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out, scale 120ms ease-out;
+}
+
+.button[aria-pressed="true"] {
+  background: var(--r-faint);
+  color: var(--r-ink);
+}
+
+.dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--dot);
+}
+
+.primary {
+  background: var(--r-ink);
+  color: var(--r-panel-solid);
+  font-weight: 550;
+}
+
+.arrow {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  color: var(--r-muted);
+  text-decoration: none;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+
+.arrow svg,
+.close svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.current {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.5rem;
+  padding-inline: 0.875rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--r-faint);
+  color: var(--r-ink);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+
+.number {
+  color: var(--r-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.caret {
+  font-size: 0.625rem;
+  color: var(--r-muted);
+}
+
+.wideOnly {
+  display: none;
+}
+
+.long {
+  display: none;
+}
+
+.rowBreak {
+  flex-basis: 100%;
+  order: 1;
+}
+
+.tool {
+  order: 2;
+}
+
+/* Phones: the switcher and close button on the first row, the tools centered
+   on the next row, with short labels. Rows wrap instead of scrolling. */
+@media (width < 40rem) {
+  .dock {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+    border-radius: 1.5rem;
+  }
+
+  .dock .button {
+    padding-inline: 0.625rem;
+  }
+
+  .spacer {
+    block-size: 9.5rem;
+  }
+}
+
+@media (width >= 40rem) {
+  .wideOnly {
+    display: inline-flex;
+  }
+
+  .long {
+    display: inline;
+  }
+
+  .short,
+  .rowBreak {
+    display: none;
+  }
+
+  .tool {
+    order: 0;
+  }
+}
+
+@media (hover: hover) {
+  .button:hover,
+  .arrow:hover {
+    background: var(--r-faint);
+    color: var(--r-ink);
+  }
+
+  .primary:hover {
+    background: oklch(88% 0.004 286);
+    color: var(--r-panel-solid);
+  }
+
+  .current:hover {
+    background: oklch(98% 0 none / 0.22);
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.375rem;
+  max-inline-size: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 1rem;
+  background: var(--r-panel);
+  color: var(--r-ink);
+  box-shadow: var(--r-shadow), inset 0 0 0 1px var(--r-line);
+}
+
+.chipsLabel {
+  align-self: center;
+  padding-inline: 0.25rem;
+  color: var(--r-muted);
+  font-size: 0.75rem;
+}
+
+.chip {
+  min-block-size: 2rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px oklch(98% 0 none / 0.28);
+  color: var(--r-ink);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--r-pick);
+  box-shadow: none;
+}
+
+.toast {
+  max-inline-size: min(100%, 32rem);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background: var(--r-card);
+  color: var(--r-card-ink);
+  text-align: center;
+  box-shadow: var(--r-shadow);
+}
+
+/* Top banner while a mode is on. */
+.banner {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-start: 0.75rem;
+  z-index: 2147483000;
+  display: flex;
+  justify-content: center;
+  padding-inline: 1rem;
+  pointer-events: none;
+}
+
+.bannerInner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-inline-size: 36rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--r-panel);
+  color: var(--r-ink);
+  font-size: 0.8125rem;
+  box-shadow: var(--r-shadow), inset 0 0 0 1px var(--r-line);
+  pointer-events: auto;
+}
+
+/* Inspector outline that follows the section under the pointer. */
+.outline {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 2147482000;
+  border-radius: 0.375rem;
+  outline: 3px solid var(--tone);
+  outline-offset: -3px;
+  background: color-mix(in oklch, var(--tone) 9%, transparent);
+  pointer-events: none;
+}
+
+.outlineLabel {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--tone);
+  color: oklch(100% 0 none);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  box-shadow: var(--r-shadow);
+}
+
+.flash {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flash {
+    animation: flash 2.2s ease-out 1 forwards;
+  }
+}
+
+@keyframes flash {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Comment pins. */
+.pin {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 2147482500;
+}
+
+.pinButton {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: 2px solid oklch(100% 0 none);
+  border-radius: 50% 50% 50% 0;
+  background: var(--r-comment);
+  color: oklch(100% 0 none);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--r-shadow);
+}
+
+.pinCard {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 2.25rem;
+  inline-size: min(18rem, 70vw);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--r-card);
+  color: var(--r-card-ink);
+  font-size: 0.8125rem;
+  box-shadow: var(--r-shadow);
+}
+
+.pinMeta {
+  margin: 0 0 0.25rem;
+  color: var(--r-card-muted);
+  font-size: 0.75rem;
+}
+
+.pinBody {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Comment composer and the name dialog. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483200;
+}
+
+.scrimDim {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: oklch(0% 0 none / 0.45);
+}
+
+.card {
+  inline-size: min(92vw, 22rem);
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--r-card);
+  color: var(--r-card-ink);
+  box-shadow: var(--r-shadow);
+}
+
+.anchored {
+  position: absolute;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.cardSub {
+  margin: 0.125rem 0 0;
+  color: var(--r-card-muted);
+  font-size: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  margin-block-start: 0.75rem;
+  color: var(--r-card-muted);
+  font-size: 0.75rem;
+}
+
+.input {
+  inline-size: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--r-card-line);
+  border-radius: 0.5rem;
+  background: oklch(100% 0 none);
+  color: var(--r-card-ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--r-comment);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.error {
+  margin: 0.5rem 0 0;
+  color: oklch(50% 0.19 27);
+  font-size: 0.8125rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+}
+
+.ghost,
+.solid {
+  min-block-size: 2.25rem;
+  padding-inline: 0.875rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, scale 120ms ease-out;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--r-card-muted);
+}
+
+.solid {
+  background: var(--r-card-ink);
+  color: oklch(100% 0 none);
+  font-weight: 550;
+}
+
+.solid:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .ghost:hover {
+    background: oklch(95% 0.003 286);
+  }
+
+  .chip:not([aria-pressed="true"]):hover {
+    background: var(--r-faint);
+  }
+}
+
+/* Design switcher sheet. */
+.sheetScrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: oklch(0% 0 none / 0.6);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  max-block-size: 88dvh;
+  overflow: clip;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: var(--r-panel-solid);
+  color: var(--r-ink);
+  box-shadow: var(--r-shadow), inset 0 0 0 1px var(--r-line);
+}
+
+@media (width >= 40rem) {
+  .sheetScrim {
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  .sheet {
+    inline-size: min(100%, 64rem);
+    max-block-size: 86vh;
+    border-radius: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheetScrim {
+    animation: fade 200ms ease-out;
+  }
+
+  .sheet {
+    animation: rise 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+@keyframes rise {
+  from { translate: 0 1.5rem; opacity: 0; }
+}
+
+.sheetHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1rem 0.75rem;
+  border-block-end: 1px solid var(--r-line);
+}
+
+@media (width >= 40rem) {
+  .sheetHead {
+    padding: 1.25rem 1.5rem 0.75rem;
+  }
+}
+
+.sheetTitleWrap {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.sheetTitle {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.sheetText {
+  margin: 0;
+  color: var(--r-muted);
+  font-size: 0.8125rem;
+}
+
+.outlineLink {
+  min-block-size: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.875rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--r-line);
+  color: var(--r-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--r-muted);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .outlineLink:hover,
+  .close:hover {
+    background: var(--r-faint);
+    color: var(--r-ink);
+  }
+}
+
+.sheetBody {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 1rem max(1.25rem, env(safe-area-inset-bottom));
+}
+
+@media (width >= 40rem) {
+  .sheetBody {
+    padding-inline: 1.5rem;
+  }
+}
+
+.roundTitle {
+  margin: 0 0 0.625rem;
+  color: var(--r-muted);
+  font-size: 0.8125rem;
+  font-weight: 550;
+}
+
+.roundBlock + .roundBlock {
+  margin-block-start: 1.5rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 40rem) {
+  .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 64rem) {
+  .tiles {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.tile {
+  display: block;
+  padding: 0.375rem;
+  border-radius: 1rem;
+  color: var(--r-ink);
+  text-decoration: none;
+  transition: background-color 150ms ease-out;
+}
+
+.tile[aria-current="page"] {
+  background: oklch(98% 0 none / 0.1);
+  box-shadow: inset 0 0 0 2px var(--r-ink);
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: clip;
+  border-radius: 0.75rem;
+  background: oklch(28% 0.005 286);
+}
+
+.thumb img {
+  object-fit: cover;
+  object-position: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .thumb img {
+    transition: scale 300ms ease-out;
+  }
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    background: oklch(98% 0 none / 0.07);
+  }
+
+  .tile:hover .thumb img {
+    scale: 1.04;
+  }
+}
+
+.viewing {
+  position: absolute;
+  inset-block-start: 0.375rem;
+  inset-inline-start: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--r-ink);
+  color: var(--r-panel-solid);
+  font-size: 0.6875rem;
+  font-weight: 550;
+}
+
+.bar {
+  display: flex;
+  block-size: 0.25rem;
+  margin-block-start: 0.375rem;
+  overflow: clip;
+  border-radius: 999px;
+}
+
+.bar > span {
+  flex: 1;
+}
+
+.tileName {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  margin-block-start: 0.375rem;
+  padding-inline: 0.125rem;
+  font-weight: 550;
+}
+
+.tileName > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tileIdea {
+  display: -webkit-box;
+  padding-inline: 0.125rem;
+  overflow: hidden;
+  color: var(--r-muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tip {
+  display: none;
+  margin: 1rem 0 0;
+  color: var(--r-muted);
+  font-size: 0.75rem;
+}
+
+@media (width >= 40rem) {
+  .tip {
+    display: block;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

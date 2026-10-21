@@ -2,13 +2,14 @@
 kind: knowledge
 slug: roadmap
 status: current
-updated: 2026-08-28
+updated: 2026-10-07
 layer: roadmap
 sources:
   - docs/README.md
   - docs/PRD.md
   - docs/TECH_STACK.md
   - .codex/plans/roadmap-v2-implementation.md
+  - .codex/plans/release-mvp-launch-checklist.md
   - .codex/plans/module-r0-roadmap-and-public-release-control.md
   - .codex/plans/module-r1-secure-platform-base.md
   - drizzle/0001_heavy_kulan_gath.sql
@@ -19,23 +20,35 @@ sources:
 
 # Roadmap
 
-The approved v2 roadmap is .codex/plans/roadmap-v2-implementation.md.
+Current delivery order, owner-approved October 7, 2026: [MVP complete UI/UX and backend roadmap v1.1](../../.codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md), phases P0 to P5, with Launch Candidate A after P2 and Candidate B after P3. Current phase record: [P0 baseline](../../.codex/plans/build-mvp-p0-baseline-2026-10-07.md).
+Finance ledgers and private document storage are outside the MVP. The older plans carry dated supersession notices and remain history until their post-launch rewrite.
+The full v2 roadmap is [roadmap-v2-implementation.md](../../.codex/plans/roadmap-v2-implementation.md).
+The earlier MVP checklist, [release-mvp-launch-checklist.md](../../.codex/plans/release-mvp-launch-checklist.md), keeps its task IDs as tracking labels only; later mandatory software work remains in the full roadmap.
+
+## Historical Implementation Baseline — August 31
+
+The implementation statements below record the August 31 baseline, not a new audit.
+Use STATE.md and dated evidence for subsequent implementation status.
 
 It maps all 148 PRD identifiers to evidence status, release, owner role, and
-recovery controls. Version 1.8 records all required R1 owner approvals and the
-R1.0 and R1.1 status. Current source and tests provide R1.2 evidence.
+recovery controls. Version 1.10 records the R0 control record, R1 owner
+approvals, and the resolved RFP amendment decision. Current source and tests
+provide verified R1 through R9 foundation evidence; target release evidence
+remains open.
 
 ## Baseline
 
-- 5 requirements are Implemented.
-- 22 requirements are Partial.
-- 119 requirements are Missing.
+- 6 requirements are Implemented.
+- 141 requirements are Partial.
+- 0 requirements are Missing.
 - FR-IAM-08 is Deferred.
-- FR-RFP-05 is Open.
+
+FR-RFP-05 is implemented with a common base and additive immutable vendor
+amendments. The production release remains blocked by missing target evidence.
 
 See the roadmap traceability matrix for evidence paths and classifications.
 
-## Release Order
+## Full v2 Release Order
 
 1. R0 records approval, assigns decision ownership, and enforces the public-release block.
 2. R1 completes identity, permissions, RLS, and audit.
@@ -49,15 +62,18 @@ See the roadmap traceability matrix for evidence paths and classifications.
 10. R9 completes production hardening and release gates.
 
 R2A and R2B can run in parallel after R1. R3 depends on R2B.
+The MVP milestone is an earlier delivery subset with its own mapped sequence and the existing release checks.
+See the authoritative checklist rather than treating this full-product order as a requirement to finish every later UI before the MVP.
 
 ## R0 Control
 
-The R0 record defines assigned owner roles, the policy quarantine, claim-source inventory, local
-fail-closed gate, recovery, and remaining exit evidence. The local gate is
-verified but is not active on the current production deployment.
+The R0 record defines assigned owner roles, the policy quarantine, claim-family
+inventory with accountable owners, route coverage, the local fail-closed gate,
+recovery, and remaining exit evidence. The control records are complete. The
+local gate is verified but is not active on the current production deployment.
 
-R0 remains open for exact claim review, deployment and alias controls, and
-live verification.
+Public release remains blocked for exact statement review, deployment and alias
+controls, live verification, and the required approvals.
 
 The product owner chose to retain unverified statements as blocked placeholders
 for now. This decision does not approve public use.
@@ -76,13 +92,12 @@ Their final evidence belongs to R6 and R7.
 FR-IAM-12 remains in R1. R2B must extend its implemented portal-grant control
 to real deal grants.
 
-R1.0, R1.1, R1.2, and R1.3 are complete on the implementation branch. R1.3
-adds explicit grants, deny policies, fixed field-safe functions, request-scoped
-access helpers, and migration recovery rehearsals. Runtime recovery remains
-disabled pending stable bindings and audited commands.
+R1.0 through R1.4 are complete on the implementation branch. R1.4 adds
+audited commands, recovery, identity adapters, and restricted worker delivery.
+R1.5 route and MFA foundations are in progress. Runtime recovery remains
+disabled until target-environment activation is separately approved.
 
 ## Authorization
 
-The current standing instruction authorizes R1 implementation and routine Git
-work through `develop`. Production dependencies, cloud migrations, bootstrap,
-`main`, and deployments need separate approval.
+The August 27 record authorized R1 implementation and routine Git work through `develop`.
+That historical record does not authorize current launch actions; use the current user instructions and project working agreement.

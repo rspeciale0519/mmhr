@@ -131,8 +131,8 @@ export const POSTS: Post[] = [
     excerpt:
       "A broker who will not tell you how they are paid is telling you how they are paid.",
     body: [
-      "We are paid by the vendor, at the same rate regardless of which one you choose. That structure is the whole reason our recommendations can be trusted, so it would be strange to hide it.",
-      "The alternative models are worse for buyers. Percentage-of-contract creates an incentive to steer you toward the expensive option. Vendor-specific rates create an incentive to steer you toward whoever pays best.",
+      "Providers pay us under commission or referral arrangements that may differ by provider. Customers do not pay MMHR a fee. We disclose these arrangements because they matter to your decision.",
+      "Our recommendations follow your requirements and verified data. Payment terms do not set the ranking or the score.",
       "We also resell one system, CBIZ Centrally HR. It is labelled everywhere it appears and it is scored on the same data as everything else. If it is not right for you, the ranking will say so.",
     ],
   },
@@ -145,11 +145,11 @@ export function getPost(slug: string) {
 export const FAQS = [
   {
     q: "What does this cost me?",
-    a: "Nothing. There is no fee, no subscription, and nothing added to the price the vendor quotes you. We are paid a commission by the vendor you select, at the same rate whichever one that is.",
+    a: "Customers do not pay MMHR a fee or subscription. Providers pay us under commission or referral arrangements.",
   },
   {
     q: "If the vendor pays you, how can your advice be neutral?",
-    a: "Because the rate is identical across every vendor in the marketplace. Steering you toward one system rather than another cannot make us more money, which removes the incentive that makes most referral models untrustworthy.",
+    a: "Providers may pay us under different commission or referral arrangements. We disclose those arrangements, and our rankings use your requirements and verified data.",
   },
   {
     q: "Do you sell your own HRIS?",

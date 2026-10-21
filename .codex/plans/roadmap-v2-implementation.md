@@ -1,16 +1,26 @@
 # MMHR v2 Implementation Roadmap
 
+> **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
+> It replaces the October 3 instruction to complete all mandatory software before live use.
+> Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
+> Financial-record management and private document storage are outside the MVP.
+> Where this document conflicts with the roadmap on launch scope or delivery order, follow the roadmap.
+> Later requirements remain in this roadmap. Launch acceptance follows the MVP roadmap.
+> A full rewrite follows the launch.
+
 ## Document Control
 
 | Field | Value |
 |---|---|
-| Version | 1.8 |
-| Date | 2026-08-28 |
-| Status | Approved roadmap; R0 quarantine active; R1.0 and R1.1 complete; R1.2 ready |
+| Version | 1.13 |
+| Date | 2026-10-03 |
+| Status | Approved full v2 roadmap with an earlier MVP milestone; production release evidence remains incomplete |
 | Approval date | 2026-08-24 |
 | Amendment approval date | 2026-08-24 |
 | R1 owner record date | 2026-08-25 |
 | R1 full owner approval date | 2026-08-27 |
+| MVP documentation alignment | 2026-09-14; user authorized the authoritative checklist and document reconciliation |
+| MVP launch sequence | [MVP launch checklist](release-mvp-launch-checklist.md) |
 | R0 control record | [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md) |
 | Product authority | [docs/PRD.md](../../docs/PRD.md) |
 | Architecture authority | [docs/TECH_STACK.md](../../docs/TECH_STACK.md) |
@@ -30,17 +40,39 @@ Build the complete v2 platform through secure, independently testable releases.
 
 Preserve all canonical requirements. Do not reduce scope to make a partial release appear complete.
 
-The baseline audit found 148 requirement identifiers:
+The August 31 historical traceability baseline covers 148 requirement identifiers:
 
 - 132 functional requirements
 - 16 non-functional requirements
-- 5 Implemented
-- 22 Partial
-- 119 Missing
+- 6 Implemented
+- 141 Partial
+- 0 Missing
 - 1 Deferred
-- 1 Open
+
+The earlier baseline recorded 5 Implemented, 43 Partial, 98 Missing,
+1 Deferred, and 1 Open before the R1 through R9 foundation work.
 
 The earlier count of 132 covered functional requirements only.
+
+The September 14 amendment adds MVP delivery sequencing. It does not reclassify the baseline implementation counts.
+Use current source and qualifying evidence before treating any baseline status as current.
+
+The [October 3 code audit](../../docs/code-audit-2026-10-03.md) supersedes historical counts as the current requirement assessment.
+Its [requirement matrix](../../docs/code-audit-requirements-2026-10-03.md) maps all 148 requirements to code, remaining work, and acceptance conditions.
+It records five narrow local implementations, 72 connected partial, 43 backend partial, 20 contract-only, seven evidence-open, and one deferred requirement.
+These classifications describe implementation depth. They do not measure effort or release readiness.
+FR-RFP-05 remains backend partial because its amendment commands lack a complete application workflow.
+Keep the historical traceability rows below for their release and ownership mappings.
+Use the current audit for status until newer qualifying evidence supersedes it.
+
+Delivery must close complete business workflows before counting isolated backend modules as delivered features.
+Keep the six MVP phases and all later mandatory v2 requirements.
+Prioritize real comparison acceptance, stable accounts, staff operation, and a real approved vendor handoff.
+Resolve dependency findings and all required release evidence before launch.
+
+The October 3 instruction requires completion of mandatory software and synthetic role testing before real customer use.
+Use the [current execution sequence](build-complete-pilot-workflow.md#full-software-completion-before-live-use).
+The earlier manual MVP remains a historical milestone. It does not authorize an earlier live launch under the current instruction.
 
 ## 2. Status Rules
 
@@ -69,7 +101,7 @@ Architecture approval does not prove implementation.
 | DATA | Vendor-data owner | Rob Speciale |
 | REL | Production release owner | Rob Speciale |
 
-All roadmap owner roles have named people.
+[All roadmap owner roles](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) have named people.
 
 ## 4. Evidence and Gap Codes
 
@@ -87,7 +119,7 @@ All roadmap owner roles have named people.
 | G3 | Authentication exists, but the required route or permission enforcement is incomplete |
 | G4 | Placeholder or legacy public claims still render |
 | G5 | No measured compliance, service-level, performance, or recovery evidence exists |
-| D1 | The common RFP and vendor-amendment decision remains open |
+| D1 | Resolved: common RFP base plus additive, immutable, vendor-scoped amendments |
 
 Evidence paths:
 
@@ -118,7 +150,22 @@ R2A lead-routing completion depends on the R2B CRM command. R3 depends on R2B.
 | R6 | Build demos, proposals, pricing, selection, and contract handoff | R5 | Product, operations, and security owners |
 | R7 | Build commissions, invoicing, collection, disputes, and finance reconciliation | R6 | Product, finance, and security owners |
 | R8 | Complete onboarding, work queues, administration, reporting, analytics, and operational health | R7 | Product, operations, finance, and security owners |
-| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates | R8 | Product, security, and release owners |
+| R9 | Complete performance, accessibility, availability, privacy, recovery, security, and production gates for full v2 | R8 for full v2; the MVP applies the same release evidence categories earlier | Product, security, and [release owners](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) |
+
+### Earlier MVP Launch Milestone
+
+The user requested an MVP that can grow one feature at a time, then authorized documentation alignment on September 14, 2026.
+The [MVP launch checklist](release-mvp-launch-checklist.md) is the authoritative sequence for that earlier milestone.
+
+1. Complete the required R1, R2A, R2B, R3, and R4 portions for registration through approved RFP portal delivery.
+2. Complete the staff operating subset from R8 and document manual handling of later workflow activities.
+3. Pass every required R9 release evidence category and all R0 exit rules before MVP production release.
+4. Continue the remaining v2 software work through the dependencies in the table above.
+
+Full R5–R8 feature completion is not a dependency of the earlier MVP milestone.
+This changes delivery timing, not the mandatory full-product scope or controls on exposed operations.
+MVP evidence does not mark full R4, R8, or R9 modules complete.
+The [retained-work table](release-mvp-launch-checklist.md#retained-later-work) identifies the manual pilot boundaries and later software work.
 
 Each release must build only from an approved module plan.
 
@@ -126,15 +173,16 @@ Each release must build only from an approved module plan.
 
 | Decision | Current default | Required before |
 |---|---|---|
-| Common RFP with vendor amendments | Open | R4 implementation |
-| Exact identity-unmasking rule | No unmasking without recorded internal approval | R3 implementation |
+| Common RFP with vendor amendments | Resolved: common base plus additive, immutable, vendor-scoped amendments; amendments cannot replace the base | R4 implementation, 2026-09-03 |
+| Exact identity-unmasking rule | Resolved: required MMHR discussion, then recorded disclosure before RFP submission | Preserve PRD FR-MAT-08 during R3/R4 work |
 | Customer-visible scoring methodology | No public or customer-visible method beyond approved explanations | R3 release |
+| Customer password recovery and confirmation-email replacement | Open recommendations; record the chosen operating method | MVP-04; see the MVP checklist decision table |
 | Public vendor-ranking scope | No public ranking | Any public-ranking work |
 | Impersonation | Deferred and disabled | R8 impersonation work |
 | Category expansion | HR software only | Any new-category work |
 | Sponsored placement | No sponsored placement | Any sponsored-placement work |
 
-Record each decision in the PRD before its owning module starts.
+Record each decision in the [PRD decision register](../../docs/PRD.md#11-open-product-decisions) before its owning module starts.
 
 ## 7. Integration Approval Gates
 
@@ -157,30 +205,36 @@ AI capability selection must remain interchangeable behind AIService.
 
 Control record: [module-r0-roadmap-and-public-release-control.md](./module-r0-roadmap-and-public-release-control.md).
 
-The claim-source inventory and fail-closed local release gate are recorded.
+The R0 control record now records named owners, open decisions, the exact
+public-claim inventory, route coverage, the fail-closed local release gate,
+recovery, and linked control status.
 
-The exact claim review register remains incomplete.
+The exact statement register is complete as a blocked inventory. No public
+claim is approved by the inventory.
 
 The product owner chose to retain the blocked statements as placeholders for now.
 
 Production activation still needs a separate approved deployment.
 
-The exact claim review register and production controls keep R0 open.
+Claim evidence, deployment and alias controls, live verification, and
+production approval keep the public release blocked.
 
 Outcome:
 
 - Approve this roadmap and its status mapping.
 - Assign named owners to every release and open decision.
 - Keep indexing and public deployment blocked until legacy claims are replaced.
-- Create an approved copy inventory with sources and review records.
+- Create the exact copy inventory with sources and review fields; approve each
+  statement separately before publication.
 - Record the first module plan approval.
 
 Exit evidence:
 
 - Product-owner approval of this roadmap
-- Decision register with owners and required dates or release gates
-- Complete legacy-claim inventory
-- Written public-release block
+- [Decision register](./module-r0-roadmap-and-public-release-control.md#1-owner-and-decision-register) with owners and required dates or release gates
+- [Exact public-claim inventory](./module-r0-roadmap-and-public-release-control.md#4-exact-public-claim-review-register) with source, evidence, reviewer, date, and
+  decision fields
+- [Written public-release block](./module-r0-roadmap-and-public-release-control.md#2-active-public-release-block)
 - No unresolved authority conflict between README, PRD, technical architecture, and roadmap
 
 Recovery:
@@ -203,7 +257,7 @@ The reset removes every MFA factor and binds one verified replacement to the tar
 
 Lost-factor recovery requires a call to the target's pre-existing company-record phone number.
 
-R1.2 is ready to start. Recovery remains disabled until implementation, identity binding, and tests are complete.
+R1.4 and R1.5 route and MFA foundations are locally verified. Recovery remains disabled until target-environment activation is approved.
 
 Outcome:
 
@@ -249,7 +303,7 @@ Cross-release authorization obligations:
 
 - R1 completes FR-IAM-12 through authorized portal grants, revocations, and audit evidence.
 - FR-IAM-10 remains Partial until R6 completes customer-resource isolation.
-- FR-IAM-11 remains Partial until R7 proves vendor isolation and commission denial.
+- FR-IAM-11 remains Partial until target-environment vendor isolation and commission denial evidence is complete.
 - Every R2A through R9 module must extend R1 permissions, RLS, audit, and isolation evidence.
 - Every R5 through R9 module must prove that AI cannot influence authorization results.
 - R9 must repeat the complete customer and vendor isolation matrices.
@@ -330,7 +384,7 @@ Outcome:
 
 - Build saved intake, requirements, candidates, scorecards, collaboration, and workspaces.
 - Keep candidate state separate from deal state.
-- Enforce five candidates only for the initial evaluation.
+- Limit initial RFP contender selections to five. Do not cap displayed masked options at five.
 - Add approved post-review candidate additions.
 - Build deterministic eligibility and scoring.
 - Keep commission data outside eligibility and scoring.
@@ -397,6 +451,13 @@ Recovery:
 - Reuse durable records and idempotency keys during reruns.
 
 ### R5 — Provider-Neutral AI Assistance
+
+The local foundation now includes a server-only `AiService` boundary with
+capability and data-class allowlists, schema validation, prompt-injection
+denial, safe provider failures, provenance fields, and mandatory human review.
+Database run storage, approval records, and provider-evaluation reports now have
+durable audited command paths with replay protection and authenticated local
+rehearsal evidence. Target-environment release evidence remains open.
 
 Outcome:
 
@@ -524,6 +585,9 @@ Recovery:
 
 ### R9 — Release Hardening and Production Readiness
 
+Apply all release evidence categories below to the earlier MVP milestone through the [MVP checklist](release-mvp-launch-checklist.md#release-evidence-register).
+Verify the exposed MVP scope before its launch; retain remaining full-product acceptance work under R9.
+
 Outcome:
 
 - Complete critical-workflow interaction performance.
@@ -537,6 +601,7 @@ Outcome:
 Exit evidence:
 
 - Full standard CI gates
+- Every passed gate must include a non-empty reference to its evidence record.
 - Local and CI integration tests
 - Critical browser journeys
 - Keyboard, screen-reader, contrast, and automated accessibility evidence
@@ -615,149 +680,149 @@ Every PRD requirement appears exactly once below.
 | FR-IAM-02 | Partial | R1 | SEC | E2; G2 |
 | FR-IAM-03 | Partial | R1 | SEC | E1; G2 |
 | FR-IAM-04 | Partial | R1 | SEC | E2 |
-| FR-IAM-05 | Missing | R1 | SEC | G1 |
-| FR-IAM-06 | Missing | R1 | SEC | G1 |
+| FR-IAM-05 | Partial | R1 | SEC | G1 |
+| FR-IAM-06 | Partial | R1 | SEC | G1 |
 | FR-IAM-07 | Partial | R1 | SEC | E1; G3 |
 | FR-IAM-08 | Deferred | R8 | PO + SEC | PRD deferred |
 | FR-IAM-09 | Partial | R1 | SEC | E3 |
-| FR-IAM-10 | Missing | R6 | SEC | G1 |
-| FR-IAM-11 | Missing | R7 | SEC | G1 |
-| FR-IAM-12 | Missing | R1 | SEC | G1 |
+| FR-IAM-10 | Partial | R6 | SEC | G1 |
+| FR-IAM-11 | Partial | R7 | SEC | G1 |
+| FR-IAM-12 | Partial | R1 | SEC | G1 |
 | FR-MKT-01 | Implemented | R2A | PO + MKT | E4 |
 | FR-MKT-02 | Implemented | R2A | PO + MKT | E4 |
-| FR-MKT-03 | Missing | R2A | PO + MKT | G4 |
-| FR-MKT-04 | Missing | R2A | PO + MKT | G1 |
+| FR-MKT-03 | Partial | R2A | PO + MKT | G4 |
+| FR-MKT-04 | Partial | R2A | PO + MKT | G1 |
 | FR-MKT-05 | Partial | R2A | PO + MKT | E4; G1 |
 | FR-MKT-06 | Partial | R2A | PO + MKT | E1; E3 |
-| FR-MKT-07 | Missing | R2A | PO + MKT | G1 |
-| FR-MKT-08 | Missing | R2A | PO + MKT | G1 |
+| FR-MKT-07 | Partial | R2A | PO + MKT | G1 |
+| FR-MKT-08 | Partial | R2A | PO + MKT | G1 |
 | FR-MKT-09 | Partial | R2A | PO + MKT | E5 |
 | FR-MKT-10 | Partial | R2A | PO + MKT | E3 |
-| FR-MKT-11 | Missing | R2A | PO + MKT | G1 |
+| FR-MKT-11 | Partial | R2A | PO + MKT | G1 |
 | FR-CRM-01 | Partial | R2B | OPS | E2; E3 |
-| FR-CRM-02 | Missing | R2B | OPS | G1 |
-| FR-CRM-03 | Missing | R2B | OPS | G1 |
-| FR-CRM-04 | Missing | R2B | OPS | G1 |
+| FR-CRM-02 | Partial | R2B | OPS | G1 |
+| FR-CRM-03 | Partial | R2B | OPS | G1 |
+| FR-CRM-04 | Partial | R2B | OPS | G1 |
 | FR-CRM-05 | Partial | R2B | OPS | E3 |
-| FR-CRM-06 | Missing | R2B | OPS | G1 |
-| FR-CRM-07 | Missing | R2B | OPS | G1 |
-| FR-CRM-08 | Missing | R2B | OPS | G1 |
-| FR-CRM-09 | Missing | R2B | OPS | G1 |
-| FR-INT-01 | Missing | R3 | PO + OPS | G1 |
-| FR-INT-02 | Missing | R3 | PO + OPS | G1 |
-| FR-INT-03 | Missing | R3 | PO + OPS | G1 |
-| FR-INT-04 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-01 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-02 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-03 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-04 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-05 | Missing | R3 | PO + OPS | G1 |
+| FR-CRM-06 | Partial | R2B | OPS | G1 |
+| FR-CRM-07 | Partial | R2B | OPS | G1 |
+| FR-CRM-08 | Partial | R2B | OPS | G1 |
+| FR-CRM-09 | Partial | R2B | OPS | G1 |
+| FR-INT-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-INT-02 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-INT-03 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-INT-04 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-02 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-03 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-04 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-05 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-EVL-06 | Partial | R3 | PO + OPS | E2 |
-| FR-EVL-07 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-08 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-09 | Missing | R3 | PO + OPS | G1 |
-| FR-EVL-10 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-01 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-02 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-03 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-04 | Missing | R3 | PO + OPS | G1 |
+| FR-EVL-07 | Partial | R3 | PO + OPS | G1 |
+| FR-EVL-08 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-09 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-EVL-10 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-01 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-02 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-03 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-04 | Partial | R3 | PO + OPS | E2; G1 |
 | FR-MAT-05 | Partial | R3 | PO + OPS | E4; G4 |
-| FR-MAT-06 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-07 | Missing | R3 | PO + OPS | G1 |
-| FR-MAT-08 | Missing | R3 | PO + OPS | G1 |
-| FR-VND-01 | Missing | R2B | DATA | G1 |
-| FR-VND-02 | Missing | R4 | DATA | G1 |
-| FR-VND-03 | Missing | R5 | DATA | G1 |
-| FR-VND-04 | Missing | R5 | DATA | G1 |
-| FR-VND-05 | Missing | R2B | DATA | G1 |
-| FR-VND-06 | Missing | R2B | DATA | G1 |
-| FR-VND-07 | Missing | R2B | DATA | G1 |
-| FR-VND-08 | Missing | R2B | DATA | G1 |
-| FR-RFP-01 | Missing | R4 | OPS | G1 |
-| FR-RFP-02 | Missing | R4 | OPS | G1 |
-| FR-RFP-03 | Missing | R4 | OPS | G1 |
-| FR-RFP-04 | Missing | R4 | OPS | G1 |
-| FR-RFP-05 | Open | R4 | OPS | D1 |
-| FR-RFP-06 | Missing | R4 | OPS | G1 |
-| FR-RSP-01 | Missing | R4 | OPS | G1 |
-| FR-RSP-02 | Missing | R4 | OPS | G1 |
-| FR-RSP-03 | Missing | R5 | OPS | G1 |
-| FR-RSP-04 | Missing | R4 | OPS | G1 |
-| FR-RSP-05 | Missing | R4 | OPS | G1 |
-| FR-RSP-06 | Missing | R4 | OPS | G1 |
-| FR-DMO-01 | Missing | R6 | OPS | G1 |
-| FR-DMO-02 | Missing | R6 | OPS | G1 |
-| FR-DMO-03 | Missing | R6 | OPS | G1 |
-| FR-PRP-01 | Missing | R6 | OPS | G1 |
-| FR-PRP-02 | Missing | R6 | OPS | G1 |
-| FR-PRP-03 | Missing | R6 | OPS | G1 |
-| FR-CTR-01 | Missing | R6 | OPS | G1 |
-| FR-CTR-02 | Missing | R6 | OPS | G1 |
-| FR-CTR-03 | Missing | R6 | OPS | G1 |
-| FR-CTR-04 | Missing | R6 | OPS | G1 |
-| FR-FIN-01 | Missing | R7 | FIN | G1 |
-| FR-FIN-02 | Missing | R7 | FIN | G1 |
-| FR-FIN-03 | Missing | R7 | FIN | G1 |
-| FR-FIN-04 | Missing | R7 | FIN | G1 |
-| FR-FIN-05 | Missing | R7 | FIN | G1 |
-| FR-FIN-06 | Missing | R7 | FIN | G1 |
-| FR-FIN-07 | Missing | R7 | FIN | G1 |
-| FR-FIN-08 | Missing | R7 | FIN | G1 |
-| FR-CSM-01 | Missing | R8 | OPS | G1 |
-| FR-CSM-02 | Missing | R8 | OPS | G1 |
-| FR-CSM-03 | Missing | R8 | OPS | G1 |
-| FR-CSM-04 | Missing | R8 | OPS | G1 |
-| FR-CSM-05 | Missing | R8 | OPS | G1 |
-| FR-WRK-01 | Missing | R2B | OPS | G1 |
-| FR-WRK-02 | Missing | R8 | OPS | G1 |
-| FR-WRK-03 | Missing | R8 | OPS | G1 |
-| FR-CMN-01 | Missing | R4 | OPS + ENG | G1 |
-| FR-CMN-02 | Missing | R4 | OPS + ENG | G1 |
-| FR-CMN-03 | Missing | R4 | OPS + ENG | G1 |
-| FR-CMN-04 | Missing | R4 | OPS + ENG | G1 |
-| FR-DOC-01 | Missing | R4 | ENG + SEC | G1 |
-| FR-DOC-02 | Missing | R4 | ENG + SEC | G1 |
-| FR-DOC-03 | Missing | R4 | ENG + SEC | G1 |
-| FR-DOC-04 | Missing | R4 | ENG + SEC | G1 |
-| FR-DOC-05 | Missing | R4 | ENG + SEC | G1 |
+| FR-MAT-06 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-07 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-MAT-08 | Partial | R3 | PO + OPS | E2; G1 |
+| FR-VND-01 | Partial | R2B | DATA | G1 |
+| FR-VND-02 | Partial | R4 | DATA | G1 |
+| FR-VND-03 | Partial | R5 | DATA | G1 |
+| FR-VND-04 | Partial | R5 | DATA | G1 |
+| FR-VND-05 | Partial | R2B | DATA | G1 |
+| FR-VND-06 | Partial | R2B | DATA | G1 |
+| FR-VND-07 | Partial | R2B | DATA | G1 |
+| FR-VND-08 | Partial | R2B | DATA | G1 |
+| FR-RFP-01 | Partial | R4 | OPS | G1 |
+| FR-RFP-02 | Partial | R4 | OPS | E2; G1 |
+| FR-RFP-03 | Partial | R4 | OPS | E2; G1 |
+| FR-RFP-04 | Partial | R4 | OPS | G1 |
+| FR-RFP-05 | Implemented | R4 | OPS | E2; G1 |
+| FR-RFP-06 | Partial | R4 | OPS | G1 |
+| FR-RSP-01 | Partial | R4 | OPS | G1 |
+| FR-RSP-02 | Partial | R4 | OPS | G1 |
+| FR-RSP-03 | Partial | R5 | OPS | G1 |
+| FR-RSP-04 | Partial | R4 | OPS | G1 |
+| FR-RSP-05 | Partial | R4 | OPS | G1 |
+| FR-RSP-06 | Partial | R4 | OPS | G1 |
+| FR-DMO-01 | Partial | R6 | OPS | G1 |
+| FR-DMO-02 | Partial | R6 | OPS | G1 |
+| FR-DMO-03 | Partial | R6 | OPS | G1 |
+| FR-PRP-01 | Partial | R6 | OPS | G1 |
+| FR-PRP-02 | Partial | R6 | OPS | G1 |
+| FR-PRP-03 | Partial | R6 | OPS | G1 |
+| FR-CTR-01 | Partial | R6 | OPS | G1 |
+| FR-CTR-02 | Partial | R6 | OPS | G1 |
+| FR-CTR-03 | Partial | R6 | OPS | G1 |
+| FR-CTR-04 | Partial | R6 | OPS | G1 |
+| FR-FIN-01 | Partial | R7 | FIN | G1 |
+| FR-FIN-02 | Partial | R7 | FIN | G1 |
+| FR-FIN-03 | Partial | R7 | FIN | G1 |
+| FR-FIN-04 | Partial | R7 | FIN | G1 |
+| FR-FIN-05 | Partial | R7 | FIN | G1 |
+| FR-FIN-06 | Partial | R7 | FIN | G1 |
+| FR-FIN-07 | Partial | R7 | FIN | G1 |
+| FR-FIN-08 | Partial | R7 | FIN | G1 |
+| FR-CSM-01 | Partial | R8 | OPS | G1 |
+| FR-CSM-02 | Partial | R8 | OPS | G1 |
+| FR-CSM-03 | Partial | R8 | OPS | G1 |
+| FR-CSM-04 | Partial | R8 | OPS | G1 |
+| FR-CSM-05 | Partial | R8 | OPS | G1 |
+| FR-WRK-01 | Partial | R2B | OPS | G1 |
+| FR-WRK-02 | Partial | R8 | OPS | G1 |
+| FR-WRK-03 | Partial | R8 | OPS | G1 |
+| FR-CMN-01 | Partial | R4 | OPS + ENG | G1 |
+| FR-CMN-02 | Partial | R4 | OPS + ENG | G1 |
+| FR-CMN-03 | Partial | R4 | OPS + ENG | G1 |
+| FR-CMN-04 | Partial | R4 | OPS + ENG | G1 |
+| FR-DOC-01 | Partial | R4 | ENG + SEC | G1 |
+| FR-DOC-02 | Partial | R4 | ENG + SEC | G1 |
+| FR-DOC-03 | Partial | R4 | ENG + SEC | G1 |
+| FR-DOC-04 | Partial | R4 | ENG + SEC | G1 |
+| FR-DOC-05 | Partial | R4 | ENG + SEC | G1 |
 | FR-AI-01 | Partial | R5 | ENG + PO | E7; G1 |
-| FR-AI-02 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-03 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-04 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-05 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-06 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-07 | Missing | R5 | ENG + PO | G1 |
-| FR-AI-08 | Missing | R5 | ENG + PO | G1 |
+| FR-AI-02 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-03 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-04 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-05 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-06 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-07 | Partial | R5 | ENG + PO | G1 |
+| FR-AI-08 | Partial | R5 | ENG + PO | G1 |
 | FR-AI-09 | Partial | R5 | ENG + PO | E7; G1 |
-| FR-AI-10 | Missing | R5 | ENG + PO | G1 |
-| FR-ADM-01 | Missing | R8 | OPS + SEC | G1 |
-| FR-ADM-02 | Missing | R8 | OPS + SEC | G1 |
-| FR-ADM-03 | Missing | R8 | OPS + SEC | G1 |
-| FR-ADM-04 | Missing | R8 | OPS + SEC | G1 |
-| FR-RPT-01 | Missing | R8 | OPS + FIN | G1 |
-| FR-RPT-02 | Missing | R8 | OPS + FIN | G1 |
-| FR-RPT-03 | Missing | R8 | OPS + FIN | G1 |
-| FR-RPT-04 | Missing | R8 | OPS + FIN | G1 |
-| FR-RPT-05 | Missing | R8 | OPS + FIN | G1 |
+| FR-AI-10 | Partial | R5 | ENG + PO | G1 |
+| FR-ADM-01 | Partial | R8 | OPS + SEC | G1 |
+| FR-ADM-02 | Partial | R8 | OPS + SEC | G1 |
+| FR-ADM-03 | Partial | R8 | OPS + SEC | G1 |
+| FR-ADM-04 | Partial | R8 | OPS + SEC | G1 |
+| FR-RPT-01 | Partial | R8 | OPS + FIN | G1 |
+| FR-RPT-02 | Partial | R8 | OPS + FIN | G1 |
+| FR-RPT-03 | Partial | R8 | OPS + FIN | G1 |
+| FR-RPT-04 | Partial | R8 | OPS + FIN | G1 |
+| FR-RPT-05 | Partial | R8 | OPS + FIN | G1 |
 | FR-ANL-01 | Implemented | R8 | PO + ENG | E5 |
 | FR-ANL-02 | Partial | R8 | PO + ENG | E5 |
-| FR-ANL-03 | Missing | R8 | PO + ENG | G1 |
+| FR-ANL-03 | Partial | R8 | PO + ENG | G1 |
 | FR-ANL-04 | Partial | R8 | PO + ENG | E6 |
-| NFR-PERF-01 | Missing | R2A | ENG | G5 |
-| NFR-PERF-02 | Missing | R9 | ENG | G5 |
-| NFR-AVL-01 | Missing | R9 | ENG | G5 |
+| NFR-PERF-01 | Partial | R2A | ENG | G5 |
+| NFR-PERF-02 | Partial | R9 | ENG | G5 |
+| NFR-AVL-01 | Partial | R9 | ENG | G5 |
 | NFR-AUTH-01 | Partial | R1 | SEC | E1; G2 |
 | NFR-ISO-01 | Partial | R1 | SEC | E2; G2 |
 | NFR-ACC-01 | Partial | R9 | PO + ENG | E4; E5; G5 |
-| NFR-DATA-01 | Missing | R2B | DATA | G1 |
-| NFR-DATA-02 | Missing | R2B | DATA | G1 |
+| NFR-DATA-01 | Partial | R2B | DATA | G1 |
+| NFR-DATA-02 | Partial | R2B | DATA | G1 |
 | NFR-AUD-01 | Partial | R1 | SEC | E3; G1 |
 | NFR-PRV-01 | Implemented | R2A | SEC | E5 |
-| NFR-PRV-02 | Missing | R9 | SEC | G1 |
-| NFR-REC-01 | Missing | R9 | ENG | G5 |
-| NFR-REC-02 | Missing | R9 | ENG | G5 |
-| NFR-AI-01 | Missing | R5 | ENG + PO | G1 |
-| NFR-DOC-01 | Missing | R4 | SEC | G1 |
+| NFR-PRV-02 | Partial | R9 | SEC | G1 |
+| NFR-REC-01 | Partial | R9 | ENG | G5 |
+| NFR-REC-02 | Partial | R9 | ENG | G5 |
+| NFR-AI-01 | Partial | R5 | ENG + PO | G1 |
+| NFR-DOC-01 | Partial | R4 | SEC | G1 |
 | NFR-OBS-01 | Partial | R9 | ENG | E6; G1 |
 
 ## 12. Approval Record
@@ -765,9 +830,12 @@ Every PRD requirement appears exactly once below.
 | Approval | Status | Record |
 |---|---|---|
 | Product-owner roadmap approval | Approved | Rob Speciale, current Codex task, 2026-08-24 |
+| Earlier MVP milestone and authoritative checklist alignment | Documentation alignment authorized | User request, current Codex task, 2026-09-14; no new feature or production approval implied |
+| FR-RFP-05 versioning decision | Approved | Rob Speciale, current Codex task, 2026-09-03; common base plus additive immutable vendor amendments |
 | FR-IAM-10 and FR-IAM-11 roadmap amendment | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Product-owner R1 plan approval | Approved | Rob Speciale, current Codex task, 2026-08-24 |
 | Product-owner R0 control approval | Approved | Rob Speciale, current Codex task, 2026-08-27 |
+| R0 exact public-claim inventory audit | Complete as a blocked register | Current Codex task, 2026-08-31; see R0 Section 4 |
 | Security review of R1 boundaries | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Engineering feasibility review | Approved | Rob Speciale, current Codex task, 2026-08-27 |
 | Operations workflow review | Approved | Rob Speciale, current Codex task, 2026-08-27 |

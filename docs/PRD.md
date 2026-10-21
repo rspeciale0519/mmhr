@@ -1,18 +1,31 @@
 # MMHR Product Requirements Document
 
+> **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](../.codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
+> It replaces the October 3 instruction to complete all mandatory software before live use.
+> Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
+> Financial-record management and private document storage are outside the MVP.
+> Where this document conflicts with the roadmap on launch scope or delivery order, follow the roadmap.
+> Product behavior requirements remain in force. The financial completeness measure applies when the finance module returns.
+> A full rewrite follows the launch.
+
 ## Document Control
 
 | Field | Value |
 |---|---|
-| Version | 2.1 |
-| Date | 2026-08-27 |
+| Version | 2.6 |
+| Date | 2026-10-03 |
 | Status | Canonical product baseline |
 | Product owner | Rob Speciale |
 | Architecture authority | [TECH_STACK.md](./TECH_STACK.md) |
+| R0 release authority | [R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) |
 | Supporting research | [outsail-competitive-operating-model.md](./outsail-competitive-operating-model.md) |
 | Supersedes | Prior PRD v1 content and [PRD-2.md](./PRD-2.md) |
 
 All requirements in this document are mandatory unless they are marked Deferred or Open.
+The MVP milestone controls delivery timing. Later mandatory features remain commitments for the complete v2 product.
+
+The [October 3 code audit](code-audit-2026-10-03.md) records implementation evidence and gaps for all 148 requirements.
+Its status does not change mandatory behavior or approve a release.
 
 Technical providers and model selections belong in TECH_STACK.md. Product behavior must not depend on one AI provider or model.
 
@@ -20,9 +33,53 @@ Technical providers and model selections belong in TECH_STACK.md. Product behavi
 
 MMHR is a private operating platform for HR software selection, vendor management, CRM, deal flow, commissions, and customer success.
 
-MMHR staff use the platform with invited customer and vendor users. MMHR does not sell the platform as a general SaaS product.
+MMHR staff use the platform with registered customers and invited vendor users. MMHR does not sell the platform as a general SaaS product.
+
+### Approved Customer Journey
+
+The owner confirmed this journey in the September 7 checkpoint and approved implementation on September 8.
+See [checkpoint clarification](./CHECKPOINT-2026-09-07.md#product-clarification) and the
+[registration policy](../.codex/plans/module-r1-secure-platform-base.md).
+
+Customers create free accounts and enter software needs. Verified customers receive a new private workspace without administration rights or staff approval.
+The initial scorecard shows all vendor options from approved data with provider names masked. The customer selects up to five RFP contenders.
+The customer then uses a representative call or a form to prepare the RFP. MMHR discusses required capabilities and customization requests.
+Provider names become visible after that discussion and before approved RFP submission. MMHR records the disclosure decision.
+MMHR sends the approved RFP to selected providers. Customers compare responses, select a provider and sign a direct contract with that provider.
+Customers never pay MMHR. Providers pay MMHR a commission or referral fee; this does not imply identical rates.
+
+This journey sets delivery priority. All other mandatory requirements remain in scope.
 
 The initial category scope is HR and workforce software. Category expansion requires a separate product decision.
+
+### MVP Launch Milestone
+
+The October 3 execution instruction requires complete mandatory software and synthetic customer, staff, and vendor testing before real customer use.
+Follow the [current execution plan](../.codex/plans/build-complete-pilot-workflow.md#full-software-completion-before-live-use) for this completion sequence.
+The earlier MVP definition below remains a historical milestone. It does not authorize an earlier live launch under the current instruction.
+
+The first launch supports registration, saved intake, staff review, the Comparison matrix, initial selections, provider disclosure, and approved RFP portal delivery.
+MMHR staff prepare the RFP after the customer discussion.
+Responses, demos, proposals, contracts, commissions, and onboarding use the documented manual pilot process.
+Customer RFP editing and automated RFP email remain later software delivery.
+
+The [MVP launch checklist](../.codex/plans/release-mvp-launch-checklist.md) is the authoritative task sequence and completion record for this milestone.
+It maps the launch work to existing requirements and preserves later v2 delivery.
+The user authorized this documentation alignment on September 14, 2026.
+
+The MVP may launch before all R5–R8 software features are complete.
+All required R9 evidence categories and R0 exit rules still apply before production release.
+Requirements outside the MVP remain incomplete until their own implementation and acceptance checks pass.
+Every exposed operation retains its applicable authorization, audit, consent, data, and ranking controls.
+
+The pilot must support an accountable operating process from registration through the agreed manual handoff.
+Each active case needs an owner, current status, next action, due date, and decision history.
+Manual records must identify the case and its evidence location without exposing private data through unapproved tools.
+Manual handling does not satisfy the corresponding v2 software requirement.
+MVP-07 defines the operating procedure; MVP-18 verifies staff can use it.
+
+Completion requires a usable entry point, enforced permissions, a stored result, failure handling, and dated acceptance evidence.
+A schema, pure function, isolated command, or passing fixture does not complete a user workflow.
 
 ### Operating Principle
 
@@ -53,7 +110,7 @@ Automate administrative work while preserving human control at trust, judgment, 
 | Vendor-data freshness | Published vendor records inside their configured freshness window | At least 95% |
 | Customer trust | Net Promoter Score | At least 70 |
 | Workflow adoption | Completed intakes reaching an initial candidate set | At least 40% |
-| Operational visibility | Required marketing, product, workflow, and financial analytics | Available at launch |
+| Operational visibility | Required marketing, product, workflow, and financial analytics | Full software reporting at v2 launch; traceable staff records and required release monitoring at the earlier MVP |
 
 The product owner can change business targets through a versioned PRD update.
 
@@ -152,6 +209,8 @@ Also maintain partner, resource, transparency, privacy, and terms pages.
 
 **FR-MKT-06 — Lead fields.** Public customer registration must collect full name, company, work email, and direct company phone.
 
+Registration is free. Verified customers receive an isolated private workspace without administration rights, under the approved R1 initialization policy.
+
 **FR-MKT-07 — Email validation.** Public registration must reject known personal email domains. Authorized staff can record a reviewed exception.
 
 **FR-MKT-08 — Gated resources.** Gated resources must use the same identity, consent, and lead-routing rules.
@@ -190,7 +249,9 @@ Also maintain partner, resource, transparency, privacy, and terms pages.
 
 **FR-INT-03 — Initial evaluation.** The system must create an initial masked assessment using approved inputs and vendor data.
 
-**FR-INT-04 — Initial candidates.** The initial evaluation supports up to five candidates.
+**FR-INT-04 — Initial candidates.** The customer can select up to five initial RFP contenders from the masked scorecard.
+
+This cap applies to selections. It must not restrict the number of displayed vendor options from approved data.
 
 After MMHR review, authorized staff or a permitted Customer Organization Admin can add candidates without a fixed funnel limit.
 
@@ -214,6 +275,27 @@ After MMHR review, authorized staff or a permitted Customer Organization Admin c
 
 **FR-EVL-10 — Live scorecards.** Approved demo workflows can support concurrent score entry with conflict handling and complete history.
 
+#### Approved MVP Comparison Design
+
+**Decision: Comparison matrix.** Rob Speciale approved this design on September 14, 2026, and requested its inclusion in the documentation.
+It is the selected primary UI for the MVP vendor software comparison.
+This records design approval. The application now contains a partial implementation.
+Approved real data publication and complete browser acceptance remain open in the [code audit](code-audit-2026-10-03.md).
+
+- Show vendors in columns and comparison criteria in rows. Keep requirement labels visible during horizontal scrolling.
+- Show overall fit, estimated annual cost, required features met, individual feature coverage, evidence coverage, setup estimates, and evidence details.
+- Keep fit scores separate from evidence coverage. Use approved scoring rules and data; the preview does not define production scoring weights.
+- Label cost and setup estimates. Show unknown, limited, missing, and add-on coverage explicitly. Do not invent values when approved data is unavailable.
+- Show all published vendor options. Allow up to five initial selections, retain selection state, and show the current count.
+- Keep provider names masked until the required MMHR discussion and recorded disclosure. Preserve the workflow rules in FR-MAT-08.
+- Use the Pulse visual direction, with teal accents, clear typography, readable values, and visible selected columns.
+- Support keyboard use and narrow screens. Contain horizontal scrolling within the matrix without widening the page.
+
+The reference is the Comparison matrix tab in the September 13 five-design preview.
+Its vendor identities, prices, scores, and evidence are fictional sample data.
+See the [preview record](../mmhrbrain/journal/2026-09-13.md) for the artifact location and browser checks.
+The other four designs remain alternatives. They are not required MVP views.
+
 ### 5.4 Recommendation Integrity
 
 **FR-MAT-01 — Eligibility.** Candidate eligibility must use approved requirements, vendor data, and configured business rules.
@@ -233,6 +315,8 @@ AI can draft explanations, but it cannot calculate or change eligibility or scor
 **FR-MAT-07 — Duplicate products.** Avoid showing duplicate representations of the same underlying product unless the distinction is material and disclosed.
 
 **FR-MAT-08 — Masking.** The product must record when identities are masked, who can unmask them, and why disclosure occurred.
+
+Provider names remain masked until the required MMHR discussion. Record authorized disclosure after that discussion and before RFP submission.
 
 ### 5.5 Vendor Knowledge and Evidence
 
@@ -260,11 +344,17 @@ AI can draft explanations, but it cannot calculate or change eligibility or scor
 
 **FR-RFP-03 — Mandatory review.** No RFP can leave the server before recorded MMHR approval.
 
+Separate staff approval is configurable and is off for the current two-person MMHR team.
+When off, an authorized MMHR staff member can approve their own draft.
+When on, a different authorized MMHR staff member must approve the draft.
+Customer-created drafts still require MMHR approval.
+See [RFP approval setting](./security/r4-approval-policy.md).
+
 **FR-RFP-04 — Clarification.** Track customer questions, answers, changes, decisions, and approval after MMHR review.
 
-**FR-RFP-05 — Versions (Open).** Preserve a common base.
+**FR-RFP-05 — Versions (Decided).** Preserve one common RFP base for every vendor.
 
-Support vendor-specific amendments only after the product owner closes the related decision.
+MMHR supports additive, vendor-specific amendments after product-owner approval. Each amendment is immutable content with its own version, vendor scope, and approval evidence. An amendment cannot replace or mutate the common base.
 
 **FR-RFP-06 — Distribution.** Record recipients, version, delivery state, deadlines, reminders, and acknowledgements.
 
@@ -504,23 +594,38 @@ Before a module starts, its detailed plan must identify requirement IDs, state t
 Database and authorization changes require local integration evidence. Production changes require explicit approval.
 
 Production publication and search indexing remain blocked while the
-[R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md) is active.
+[R0 public-release control](../.codex/plans/module-r0-roadmap-and-public-release-control.md#2-active-public-release-block) is active.
 
-A new v2 implementation roadmap must replace the legacy roadmap before feature work continues.
+The [R0 record](../.codex/plans/module-r0-roadmap-and-public-release-control.md#4-exact-public-claim-review-register) contains the exact public-claim inventory and required evidence,
+reviewer, date, and approval fields. Every claim remains blocked until its row
+has approved evidence and publication approval.
+
+The [approved v2 roadmap](../.codex/plans/roadmap-v2-implementation.md) replaces legacy sequencing.
+Its earlier MVP milestone follows the [MVP launch checklist](../.codex/plans/release-mvp-launch-checklist.md).
+The checklist does not waive module review, release evidence, or production approval.
 
 ## 11. Open Product Decisions
 
 | Decision | Owner | Required before |
 |---|---|---|
-| Common RFP plus vendor-specific amendments | Rob Speciale | RFP implementation |
-| Exact identity-unmasking rule | Rob Speciale | Evaluation implementation |
-| Customer-visible or public scoring methodology | Rob Speciale | Recommendation release |
+| Broader customer-visible or public scoring methodology beyond the approved MVP policy | Rob Speciale | Release beyond the approved MVP recommendation scope |
+| Customer password-recovery method; self-service is a recommendation | Rob Speciale | MVP-04 account-support decision |
+| Confirmation-email replacement method; resend UI is a recommendation | Rob Speciale | MVP-04 account-support decision |
 | Public vendor-ranking scope | Rob Speciale | Public ranking work |
 | Support impersonation | Rob Speciale, product and security owner | Administration implementation |
 | Category expansion beyond HR software | Rob Speciale | New-category work |
 | Sponsored-placement policy | Rob Speciale | Any sponsored placement |
 
 The current default is no sponsored placement.
+
+The [September 15 MVP catalog and scoring policy](../.codex/plans/decision-phase1-catalog-and-scoring.md) is approved for its stated scope.
+Individual facts, active configuration, real publication, and customer verification remain separate completion checks.
+That approval does not authorize broader public ranking or new scoring methods.
+
+Resolved decisions remain requirements: FR-RFP-05 defines the common base and additive vendor amendments.
+FR-MAT-08 defines discussion followed by recorded disclosure before RFP submission.
+FR-RFP-03 records optional separate staff approval. The approved matrix appears in Section 5.3.
+The [MVP decision table](../.codex/plans/release-mvp-launch-checklist.md#product-decisions-still-open) separates account-support recommendations from approved scope.
 
 ## 12. Legacy Requirement Compatibility
 

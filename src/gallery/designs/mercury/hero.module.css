@@ -1,0 +1,240 @@
+.hero {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  padding: clamp(1.5rem, 5vw, 3rem) 0 clamp(2rem, 6vw, 4rem);
+}
+
+.hero > * {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2rem;
+    min-height: calc(100svh - 5rem);
+  }
+}
+
+.copy {
+  display: grid;
+  gap: 1.5rem;
+  align-content: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--mercury-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.25rem, 5.6vw, 4.75rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.lede {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--m-muted);
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primary {
+  background: var(--m-violet);
+  color: var(--m-on-violet);
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--m-violet) 70%, transparent);
+}
+
+@media (hover: hover) {
+
+.primary:hover {
+  background: var(--m-ink);
+  color: var(--m-bg);
+}
+}
+
+.secondary {
+  border: 1px solid var(--m-line-strong);
+  color: var(--m-ink);
+}
+
+@media (hover: hover) {
+
+.secondary:hover {
+  background: var(--m-surface);
+}
+}
+
+.figure {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  margin: 0;
+}
+
+.stage {
+  position: relative;
+  width: min(100%, 76svh, 46rem);
+  aspect-ratio: 1;
+  touch-action: manipulation;
+}
+
+/* A soft studio floor under the drops. */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 12% 8% 6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--m-violet-soft), transparent);
+  opacity: 0.85;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Shown only when WebGL2 is unavailable. */
+.still {
+  display: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 30%, #fff 0 8%, transparent 22%),
+    linear-gradient(180deg, #f4f5fb 0%, #b9bfd2 46%, #1b1f2c 50%, #5531e8 78%, #1fb6e0 100%);
+  transform: translate(-50%, -50%);
+}
+
+.stage[data-renderer="still"] .still {
+  display: block;
+}
+
+.dropLabel {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.82);
+  color: #161a26;
+  font-family: var(--mercury-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgb(22 26 38 / 0.25);
+}
+
+.dropLabel[data-selected] {
+  background: var(--m-violet);
+  color: var(--m-on-violet);
+}
+
+.caption {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--m-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.toggles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 40rem);
+}
+
+@media (min-width: 40rem) {
+  .toggles {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.toggle {
+  display: grid;
+  place-items: center;
+  gap: 0.125rem;
+  min-height: 3.75rem;
+  padding: 0.375rem;
+  border: 1px solid var(--m-line-strong);
+  border-radius: 1.75rem;
+  background: var(--m-surface);
+  color: var(--m-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+
+.toggle:hover {
+  border-color: var(--m-violet);
+}
+}
+
+.toggle[aria-pressed="true"] {
+  border-color: var(--m-violet);
+  background: var(--m-violet);
+  color: var(--m-on-violet);
+}
+
+.toggleLetter {
+  font-family: var(--mercury-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.toggleFit {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.count {
+  margin: 0;
+  color: var(--m-muted);
+  font-size: 0.9375rem;
+}
+
+.countValue {
+  color: var(--m-ink);
+  font-family: var(--mercury-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toggle {
+    transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+  }
+}

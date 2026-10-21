@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   check,
   index,
@@ -86,6 +87,11 @@ export const permissionDefinitions = pgTable(
     key: text("key").primaryKey(),
     kind: permissionKind("kind").notNull(),
     description: text("description").notNull(),
+    platformScope: boolean("platform_scope").notNull().default(false),
+    organizationScope: boolean("organization_scope").notNull().default(false),
+    minimumAssurance: text("minimum_assurance").notNull().default("aal2"),
+    internalOnly: boolean("internal_only").notNull().default(false),
+    requiredPortal: portalKind("required_portal"),
     active: boolean("active").notNull().default(true),
     retiredAt: timestamp("retired_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -101,6 +107,14 @@ export const permissionDefinitions = pgTable(
     check(
       "permission_definitions_retirement_ck",
       sql`(${t.active} and ${t.retiredAt} is null) or (not ${t.active} and ${t.retiredAt} is not null)`,
+    ),
+    check(
+      "permission_definitions_assurance_ck",
+      sql`${t.minimumAssurance} in ('aal1', 'aal2')`,
+    ),
+    check(
+      "permission_definitions_portal_scope_ck",
+      sql`${t.requiredPortal} is null or (${t.organizationScope} and not ${t.platformScope})`,
     ),
   ],
 );
@@ -190,6 +204,10 @@ export const userPermissionOverrides = pgTable(
     effect: permissionEffect("effect").notNull(),
     state: securityRecordState("state").notNull().default("active"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
+    sourceDelegationId: uuid("source_delegation_id").references(
+      (): AnyPgColumn => adminDelegationGrants.id,
+      { onDelete: "restrict" },
+    ),
     issuedByIdentityId: uuid("issued_by_identity_id")
       .notNull()
       .references(() => identities.id, { onDelete: "restrict" }),
@@ -243,6 +261,14 @@ export const adminDelegationGrants = pgTable(
       onDelete: "restrict",
     }),
     scopeKey: text("scope_key").notNull(),
+    canView: boolean("can_view").notNull().default(false),
+    canGrant: boolean("can_grant").notNull().default(false),
+    canRevoke: boolean("can_revoke").notNull().default(false),
+    canDelegate: boolean("can_delegate").notNull().default(false),
+    parentGrantId: uuid("parent_grant_id").references(
+      (): AnyPgColumn => adminDelegationGrants.id,
+      { onDelete: "restrict" },
+    ),
     state: securityRecordState("state").notNull().default("active"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     issuedByIdentityId: uuid("issued_by_identity_id")
@@ -266,6 +292,11 @@ export const adminDelegationGrants = pgTable(
     index("admin_delegation_grants_issuer_idx").on(
       t.issuedByIdentityId,
       t.state,
+    ),
+    index("admin_delegation_grants_parent_idx").on(t.parentGrantId),
+    check(
+      "admin_delegation_grants_parent_not_self_ck",
+      sql`${t.parentGrantId} is null or ${t.parentGrantId} <> ${t.id}`,
     ),
     check(
       "admin_delegation_grants_scope_ck",

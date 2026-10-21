@@ -1,0 +1,130 @@
+.root {
+  --r-bg: oklch(98.6% 0.005 350);
+  --r-panel: oklch(100% 0 none);
+  --r-ink: oklch(24% 0.03 340);
+  --r-muted: oklch(47% 0.025 340);
+  --r-line: oklch(92% 0.01 345);
+  --r-line-strong: oklch(63% 0.025 345);
+  --r-grid: oklch(88% 0.015 345);
+  --r-idle: oklch(62% 0.02 300);
+  --r-accent: oklch(55% 0.21 355);
+
+  --t-bg: var(--r-bg);
+  --t-surface: var(--r-panel);
+  --t-raised: oklch(96.5% 0.008 350);
+  --t-ink: var(--r-ink);
+  --t-muted: var(--r-muted);
+  --t-line: var(--r-line);
+  --t-line-strong: var(--r-line-strong);
+  --t-accent: var(--r-accent);
+  --t-on-accent: oklch(100% 0 none);
+  --t-accent-soft: color-mix(in oklch, var(--r-accent) 10%, var(--r-panel));
+  --t-link: oklch(49% 0.2 355);
+  --t-success: oklch(46% 0.11 160);
+  --t-info: oklch(48% 0.13 255);
+  --t-warning: oklch(50% 0.11 70);
+  --t-danger: oklch(50% 0.18 28);
+  --t-display: var(--radar-font), ui-sans-serif, system-ui, sans-serif;
+  --t-body: var(--radar-font), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 700;
+  --t-display-tracking: -0.035em;
+  --t-r-lg: 1.75rem;
+  --t-r-md: 1.125rem;
+  --t-r-sm: 0.75rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px oklch(25% 0.04 340 / 0.06), 0 4px 12px -6px oklch(25% 0.04 340 / 0.14);
+  --t-shadow-md: 0 1px 2px oklch(25% 0.04 340 / 0.05), 0 18px 36px -20px oklch(30% 0.07 345 / 0.24);
+  --t-shadow-lg: 0 2px 4px oklch(25% 0.04 340 / 0.05), 0 34px 70px -34px oklch(30% 0.09 345 / 0.3);
+  --t-next-bg: var(--r-panel);
+  --t-next-ink: var(--r-ink);
+  --t-next-danger: var(--t-danger);
+  --t-overlay: oklch(24% 0.03 340 / 0.32);
+}
+
+.root[data-theme="dark"] {
+  --r-bg: oklch(16.5% 0.02 340);
+  --r-panel: oklch(21% 0.022 340);
+  --r-ink: oklch(95% 0.01 340);
+  --r-muted: oklch(75% 0.02 340);
+  --r-line: oklch(30% 0.025 340);
+  --r-line-strong: oklch(52% 0.03 340);
+  --r-grid: oklch(32% 0.02 340);
+  --r-idle: oklch(62% 0.03 300);
+  --r-accent: oklch(74% 0.16 355);
+  --t-raised: oklch(25% 0.025 340);
+  --t-on-accent: oklch(16.5% 0.02 340);
+  --t-link: oklch(80% 0.13 355);
+  --t-success: oklch(78% 0.13 160);
+  --t-info: oklch(78% 0.1 255);
+  --t-warning: oklch(80% 0.12 80);
+  --t-danger: oklch(74% 0.14 25);
+  --t-overlay: oklch(0% 0 none / 0.55);
+  color-scheme: dark;
+}
+
+/* An octagon outline, like one radar layer. */
+.mark {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  background: var(--r-accent);
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+.hero {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  padding-block: clamp(2.5rem, 7vw, 5rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.25rem;
+  max-inline-size: 48rem;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(2.375rem, 5.4vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-inline-size: 38rem;
+  margin: 0;
+  color: var(--r-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-block-size: 3.25rem;
+  padding-inline: 1.5rem;
+}
+
+.caption {
+  margin: 0;
+  color: var(--r-muted);
+  font-size: 0.875rem;
+}
+
+.root .promise {
+  padding: 1.5rem;
+  border-radius: var(--t-r-md);
+  background: var(--r-panel);
+  box-shadow: var(--t-shadow-md);
+}
+
+.root .stepNumber {
+  background: var(--r-accent);
+  color: var(--t-on-accent);
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+  border-radius: 0;
+}

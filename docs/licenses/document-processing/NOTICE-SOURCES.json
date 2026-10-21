@@ -1,0 +1,395 @@
+{
+  "status": "Incomplete internal evidence bundle; not distribution approval",
+  "proposedRepositoryDestination": "docs/licenses/document-processing/",
+  "approvedRootVersions": {
+    "pdfjs-dist": "6.3.289",
+    "mammoth": "1.13.0",
+    "sharp": "0.35.5",
+    "@napi-rs/canvas": "1.0.10"
+  },
+  "nativeWindowsSharpVersion": "0.35.5",
+  "nativeWindowsCanvasVersion": "1.0.10",
+  "approvedPackageSha256": "fada8f89c4078012125590394f33dae9df34c75311fc62e1fa1a8f36ce2c06d1",
+  "approvedLockSha256": "3661b32594ac594e13a368d07f2cd96db971ccba6be154ce5fc255d96b839c0e",
+  "predecessorPacket": "document-dependency-notice-review-2026-10-04",
+  "predecessorManifestSha256": "e08ef5b4413d865d8e1430b15a6227af4a592529bb0824a8eb9b481a9d4d8f9f",
+  "jszipChoice": "MIT recommended; original dual-license notice preserved unchanged",
+  "notices": [
+    {
+      "sourcePath": "node_modules/@img/colour/LICENSE.md",
+      "sourceSha256": "e2eaa4603c14cb26f301e88648c12a853fa3f0f5da6d4b0972958c666e7f2ab8",
+      "retainedSourcePath": "retained-notices/node_modules/@img/colour/LICENSE.md",
+      "retainedSha256": "e2eaa4603c14cb26f301e88648c12a853fa3f0f5da6d4b0972958c666e7f2ab8",
+      "destination": "notices/npm/@img/colour/LICENSE.md",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/@img/sharp-win32-x64/LICENSE",
+      "sourceSha256": "dc1f5d2d43c5531dfe0acaf4e950ea5dbe3e61e1850cf0e983bda7efc10d6693",
+      "retainedSourcePath": "retained-notices/node_modules/@img/sharp-win32-x64/LICENSE",
+      "retainedSha256": "dc1f5d2d43c5531dfe0acaf4e950ea5dbe3e61e1850cf0e983bda7efc10d6693",
+      "destination": "notices/npm/@img/sharp-win32-x64/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/@napi-rs/canvas/LICENSE",
+      "sourceSha256": "8802fecf9da4367bc23bcf20b21cc143785fc6c92b152f3fa7fbe6ce08d344d6",
+      "retainedSourcePath": "retained-notices/node_modules/@napi-rs/canvas/LICENSE",
+      "retainedSha256": "8802fecf9da4367bc23bcf20b21cc143785fc6c92b152f3fa7fbe6ce08d344d6",
+      "destination": "notices/npm/@napi-rs/canvas/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/@xmldom/xmldom/LICENSE",
+      "sourceSha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71",
+      "retainedSourcePath": "retained-notices/node_modules/@xmldom/xmldom/LICENSE",
+      "retainedSha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71",
+      "destination": "notices/npm/@xmldom/xmldom/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/base64-js/LICENSE",
+      "sourceSha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1",
+      "retainedSourcePath": "retained-notices/node_modules/base64-js/LICENSE",
+      "retainedSha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1",
+      "destination": "notices/npm/base64-js/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/core-util-is/LICENSE",
+      "sourceSha256": "33b734d60042d0fe0c92dd1fc1e874193a1c899ec3e276a2eb935d2d0bf5b710",
+      "retainedSourcePath": "retained-notices/node_modules/core-util-is/LICENSE",
+      "retainedSha256": "33b734d60042d0fe0c92dd1fc1e874193a1c899ec3e276a2eb935d2d0bf5b710",
+      "destination": "notices/npm/core-util-is/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/detect-libc/LICENSE",
+      "sourceSha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "retainedSourcePath": "retained-notices/node_modules/detect-libc/LICENSE",
+      "retainedSha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "destination": "notices/npm/detect-libc/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/dingbat-to-unicode/LICENSE",
+      "sourceSha256": "1013cef4b629a3c7eaf737c110fb5bebbf3abbc16e154d769468d71c3653fa37",
+      "retainedSourcePath": "retained-notices/node_modules/dingbat-to-unicode/LICENSE",
+      "retainedSha256": "1013cef4b629a3c7eaf737c110fb5bebbf3abbc16e154d769468d71c3653fa37",
+      "destination": "notices/npm/dingbat-to-unicode/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/duck/LICENSE",
+      "sourceSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "retainedSourcePath": "retained-notices/node_modules/duck/LICENSE",
+      "retainedSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "destination": "notices/npm/duck/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/immediate/LICENSE.txt",
+      "sourceSha256": "809e66de579fb7d92503848bbe6d1f348f4f6521a71e5d294fe7cc0c87a3b4ff",
+      "retainedSourcePath": "retained-notices/node_modules/immediate/LICENSE.txt",
+      "retainedSha256": "809e66de579fb7d92503848bbe6d1f348f4f6521a71e5d294fe7cc0c87a3b4ff",
+      "destination": "notices/npm/immediate/LICENSE.txt",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/inherits/LICENSE",
+      "sourceSha256": "5ffe28e7ade7d8f10d85d5337a73fd793dac5c462fb9a28fbf8c5046c7fbca3b",
+      "retainedSourcePath": "retained-notices/node_modules/inherits/LICENSE",
+      "retainedSha256": "5ffe28e7ade7d8f10d85d5337a73fd793dac5c462fb9a28fbf8c5046c7fbca3b",
+      "destination": "notices/npm/inherits/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/jszip/lib/license_header.js",
+      "sourceSha256": "27873abeec2df3693480a8d1b8fe17dd61bee843d1b39c1c9cfab57ffe93099e",
+      "retainedSourcePath": "retained-notices/node_modules/jszip/lib/license_header.js",
+      "retainedSha256": "27873abeec2df3693480a8d1b8fe17dd61bee843d1b39c1c9cfab57ffe93099e",
+      "destination": "notices/npm/jszip/lib/license_header.js.txt",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/jszip/LICENSE.markdown",
+      "sourceSha256": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
+      "retainedSourcePath": "retained-notices/node_modules/jszip/LICENSE.markdown",
+      "retainedSha256": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
+      "destination": "notices/npm/jszip/LICENSE.markdown",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/lie/license.md",
+      "sourceSha256": "5c81b0caa98593408b03125efa25efe622341ed87ae55561968828cd887d64a4",
+      "retainedSourcePath": "retained-notices/node_modules/lie/license.md",
+      "retainedSha256": "5c81b0caa98593408b03125efa25efe622341ed87ae55561968828cd887d64a4",
+      "destination": "notices/npm/lie/license.md",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/lop/LICENSE",
+      "sourceSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "retainedSourcePath": "retained-notices/node_modules/lop/LICENSE",
+      "retainedSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "destination": "notices/npm/lop/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/mammoth/LICENSE",
+      "sourceSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "retainedSourcePath": "retained-notices/node_modules/mammoth/LICENSE",
+      "retainedSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "destination": "notices/npm/mammoth/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/mammoth/node_modules/argparse/LICENSE",
+      "sourceSha256": "c8442419dc614089ea022b3da6bfc089b41a58fb7b9030d1e651f2f36189dce2",
+      "retainedSourcePath": "retained-notices/node_modules/mammoth/node_modules/argparse/LICENSE",
+      "retainedSha256": "c8442419dc614089ea022b3da6bfc089b41a58fb7b9030d1e651f2f36189dce2",
+      "destination": "notices/npm/mammoth/node_modules/argparse/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/option/LICENSE",
+      "sourceSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "retainedSourcePath": "retained-notices/node_modules/option/LICENSE",
+      "retainedSha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+      "destination": "notices/npm/option/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pako/LICENSE",
+      "sourceSha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539",
+      "retainedSourcePath": "retained-notices/node_modules/pako/LICENSE",
+      "retainedSha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539",
+      "destination": "notices/npm/pako/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/cmaps/LICENSE",
+      "sourceSha256": "aa92ab5a472974865a96fd4a4e9c13bb41bf6fe1b309cb6b8da48bc9e19839a2",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/cmaps/LICENSE",
+      "retainedSha256": "aa92ab5a472974865a96fd4a4e9c13bb41bf6fe1b309cb6b8da48bc9e19839a2",
+      "destination": "notices/npm/pdfjs-dist/cmaps/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/iccs/LICENSE",
+      "sourceSha256": "286e4fd7b447330b2c88e23890e3cd0a9d38cb398d4a59cb247f578ccbda3213",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/iccs/LICENSE",
+      "retainedSha256": "286e4fd7b447330b2c88e23890e3cd0a9d38cb398d4a59cb247f578ccbda3213",
+      "destination": "notices/npm/pdfjs-dist/iccs/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/LICENSE",
+      "sourceSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/LICENSE",
+      "retainedSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "destination": "notices/npm/pdfjs-dist/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/standard_fonts/LICENSE_FOXIT",
+      "sourceSha256": "b578cdd2345840ada550bd12519533812320d5f1d21cf4c1c7e1b1b0a31c98b7",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/standard_fonts/LICENSE_FOXIT",
+      "retainedSha256": "b578cdd2345840ada550bd12519533812320d5f1d21cf4c1c7e1b1b0a31c98b7",
+      "destination": "notices/npm/pdfjs-dist/standard_fonts/LICENSE_FOXIT",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/standard_fonts/LICENSE_LIBERATION",
+      "sourceSha256": "d2c4d5b3e115a519cb58eb691aa64538397e2611f9ebe801392cf9667997e7dc",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/standard_fonts/LICENSE_LIBERATION",
+      "retainedSha256": "d2c4d5b3e115a519cb58eb691aa64538397e2611f9ebe801392cf9667997e7dc",
+      "destination": "notices/npm/pdfjs-dist/standard_fonts/LICENSE_LIBERATION",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_JBIG2",
+      "sourceSha256": "9e66b7f1b934a28b37f3bc4dac97915de1674271e79a0a88182a18ed9731b4d1",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_JBIG2",
+      "retainedSha256": "9e66b7f1b934a28b37f3bc4dac97915de1674271e79a0a88182a18ed9731b4d1",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_JBIG2",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_OPENJPEG",
+      "sourceSha256": "a6af136f3e15038a666b61f376612a07d9a4e48cb7c01adbf3e33b3f14ab49b6",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_OPENJPEG",
+      "retainedSha256": "a6af136f3e15038a666b61f376612a07d9a4e48cb7c01adbf3e33b3f14ab49b6",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_OPENJPEG",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_JBIG2",
+      "sourceSha256": "aad3cce09842e00e9e11ad5e8fef8cc02fbc3a3768fe2f007443b9cee37aaee5",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_JBIG2",
+      "retainedSha256": "aad3cce09842e00e9e11ad5e8fef8cc02fbc3a3768fe2f007443b9cee37aaee5",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_PDFJS_JBIG2",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_OPENJPEG",
+      "sourceSha256": "717fc62da03292dbb4dd0c8280bd4ce7bb8550dcf31d772bc93455fb50313425",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_OPENJPEG",
+      "retainedSha256": "717fc62da03292dbb4dd0c8280bd4ce7bb8550dcf31d772bc93455fb50313425",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_PDFJS_OPENJPEG",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_QCMS",
+      "sourceSha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_PDFJS_QCMS",
+      "retainedSha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_PDFJS_QCMS",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/pdfjs-dist/wasm/LICENSE_QCMS",
+      "sourceSha256": "36d847ae882f6574ebc72f56a4f354e4f104fde4a584373496482e97d52d31bc",
+      "retainedSourcePath": "retained-notices/node_modules/pdfjs-dist/wasm/LICENSE_QCMS",
+      "retainedSha256": "36d847ae882f6574ebc72f56a4f354e4f104fde4a584373496482e97d52d31bc",
+      "destination": "notices/npm/pdfjs-dist/wasm/LICENSE_QCMS",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/process-nextick-args/license.md",
+      "sourceSha256": "ecdccbcf39024f624ded480c01c0b25458e1eca8f26ecf040933865ce56d9a4f",
+      "retainedSourcePath": "retained-notices/node_modules/process-nextick-args/license.md",
+      "retainedSha256": "ecdccbcf39024f624ded480c01c0b25458e1eca8f26ecf040933865ce56d9a4f",
+      "destination": "notices/npm/process-nextick-args/license.md",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/readable-stream/LICENSE",
+      "sourceSha256": "ec62dc96da0099b87f4511736c87309335527fb7031639493e06c95728dc8c54",
+      "retainedSourcePath": "retained-notices/node_modules/readable-stream/LICENSE",
+      "retainedSha256": "ec62dc96da0099b87f4511736c87309335527fb7031639493e06c95728dc8c54",
+      "destination": "notices/npm/readable-stream/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/safe-buffer/LICENSE",
+      "sourceSha256": "c7cc929b57080f4b9d0c6cf57669f0463fc5b39906344dfc8d3bc43426b30eac",
+      "retainedSourcePath": "retained-notices/node_modules/safe-buffer/LICENSE",
+      "retainedSha256": "c7cc929b57080f4b9d0c6cf57669f0463fc5b39906344dfc8d3bc43426b30eac",
+      "destination": "notices/npm/safe-buffer/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/setimmediate/LICENSE.txt",
+      "sourceSha256": "c4b4ad3a5746f1f5249a6dd90396ec519264e1bb02e01e48a6522c48a3a97cb4",
+      "retainedSourcePath": "retained-notices/node_modules/setimmediate/LICENSE.txt",
+      "retainedSha256": "c4b4ad3a5746f1f5249a6dd90396ec519264e1bb02e01e48a6522c48a3a97cb4",
+      "destination": "notices/npm/setimmediate/LICENSE.txt",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/sharp/LICENSE",
+      "sourceSha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "retainedSourcePath": "retained-notices/node_modules/sharp/LICENSE",
+      "retainedSha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "destination": "notices/npm/sharp/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/sharp/node_modules/semver/LICENSE",
+      "sourceSha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+      "retainedSourcePath": "retained-notices/node_modules/sharp/node_modules/semver/LICENSE",
+      "retainedSha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+      "destination": "notices/npm/sharp/node_modules/semver/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/sprintf-js/LICENSE",
+      "sourceSha256": "a4cdda44b5adea4731d53dcae78fb5124f8fd853e994f01e25d8c33a7daf818b",
+      "retainedSourcePath": "retained-notices/node_modules/sprintf-js/LICENSE",
+      "retainedSha256": "a4cdda44b5adea4731d53dcae78fb5124f8fd853e994f01e25d8c33a7daf818b",
+      "destination": "notices/npm/sprintf-js/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/string_decoder/LICENSE",
+      "sourceSha256": "11f2aafb37d06b3ee5bdaf06e9811141d0da05263c316f3d627f45c20d43261b",
+      "retainedSourcePath": "retained-notices/node_modules/string_decoder/LICENSE",
+      "retainedSha256": "11f2aafb37d06b3ee5bdaf06e9811141d0da05263c316f3d627f45c20d43261b",
+      "destination": "notices/npm/string_decoder/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/tslib/LICENSE.txt",
+      "sourceSha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+      "retainedSourcePath": "retained-notices/node_modules/tslib/LICENSE.txt",
+      "retainedSha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+      "destination": "notices/npm/tslib/LICENSE.txt",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/underscore/LICENSE",
+      "sourceSha256": "92905fb54f5d168a27e6d5dc7c2197020add11842be4c70689d084bae3bfe37a",
+      "retainedSourcePath": "retained-notices/node_modules/underscore/LICENSE",
+      "retainedSha256": "92905fb54f5d168a27e6d5dc7c2197020add11842be4c70689d084bae3bfe37a",
+      "destination": "notices/npm/underscore/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/util-deprecate/LICENSE",
+      "sourceSha256": "0154425673db15cdfa80ecba2c9b1f1a867f7197a006764712849bfc3a93cbb7",
+      "retainedSourcePath": "retained-notices/node_modules/util-deprecate/LICENSE",
+      "retainedSha256": "0154425673db15cdfa80ecba2c9b1f1a867f7197a006764712849bfc3a93cbb7",
+      "destination": "notices/npm/util-deprecate/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/xmlbuilder/LICENSE",
+      "sourceSha256": "8ad16994acb18814fcd2ff6d0b559906b842047b995baf33fd0c55e4d24cbac8",
+      "retainedSourcePath": "retained-notices/node_modules/xmlbuilder/LICENSE",
+      "retainedSha256": "8ad16994acb18814fcd2ff6d0b559906b842047b995baf33fd0c55e4d24cbac8",
+      "destination": "notices/npm/xmlbuilder/LICENSE",
+      "kind": "complete installed notice file"
+    },
+    {
+      "sourcePath": "node_modules/readable-stream/node_modules/isarray/README.md",
+      "sourceSha256": "ff138e683771b187f3629c383db72ee7d632009010a36d08e18e8d2a34222ec7",
+      "retainedSourcePath": "retained-supplemental-notices/isarray-MIT-from-README.md",
+      "retainedSha256": "66aa9feab8bb39aceebd69f2a357015d57ceab486d3c7a19ff8d3d4110a6d101",
+      "destination": "notices/supplemental/isarray-MIT-from-README.md",
+      "kind": "previously retained exact extract"
+    },
+    {
+      "sourcePath": "node_modules/pako/lib/zlib/inflate.js",
+      "sourceSha256": "d31799a23f2ae87f0c52d21241c92278b41d23bb5365b452f2706d41b00c4245",
+      "retainedSourcePath": "retained-supplemental-notices/pako-inflate.js.license.txt",
+      "retainedSha256": "54a5ea29bee0daa8883f4e559e8ffe48a37145b7e875612bcebb1f1c7a084939",
+      "destination": "notices/supplemental/pako-inflate.js.license.txt",
+      "kind": "previously retained exact extract"
+    },
+    {
+      "sourcePath": "node_modules/pako/lib/zlib/deflate.js",
+      "sourceSha256": "4b9b71ae7f42e506fe1fb134f1c21b944ef2b7ef79667ba1fe59eb963c353d22",
+      "retainedSourcePath": "retained-supplemental-notices/pako-deflate.js.license.txt",
+      "retainedSha256": "54a5ea29bee0daa8883f4e559e8ffe48a37145b7e875612bcebb1f1c7a084939",
+      "destination": "notices/supplemental/pako-deflate.js.license.txt",
+      "kind": "previously retained exact extract"
+    },
+    {
+      "sourcePath": "node_modules/pako/lib/zlib/trees.js",
+      "sourceSha256": "718adbbf68f4343bf17d61edffd9d0788a96a93e4e191d857459d95257e614cf",
+      "retainedSourcePath": "retained-supplemental-notices/pako-trees.js.license.txt",
+      "retainedSha256": "ad3c862d4cf3acad9a6da823f7c5f808bf5aebbf53b2e9f3a9facb53c98e4f1a",
+      "destination": "notices/supplemental/pako-trees.js.license.txt",
+      "kind": "previously retained exact extract"
+    }
+  ],
+  "completeOriginalNoticeFiles": 42,
+  "exactRetainedExtracts": 4,
+  "nativeLicenseClosureComplete": false,
+  "pdfSourceClosureComplete": false,
+  "linuxAcceptanceVerified": false,
+  "node22AcceptanceVerified": false,
+  "packageInstalled": false,
+  "repositoryEdited": false
+}

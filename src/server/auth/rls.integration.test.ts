@@ -2,27 +2,13 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import postgres from "postgres";
 
-const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const migrationUrl = process.env.TEST_MIGRATION_DATABASE_URL;
+import { enrollTestTotp, verifyTestTotp } from "./permission-test-fixtures";
+import { startRestrictedRehearsal, type RestrictedRehearsal } from "@/server/db/r1-migration-rehearsal";
 
-if (!apiUrl || !anonKey || !serviceRoleKey || !migrationUrl) {
-  throw new Error("R1.3 integration environment is incomplete");
-}
-
-const parsedApiUrl = new URL(apiUrl);
-if (
-  !["127.0.0.1", "localhost", "::1"].includes(parsedApiUrl.hostname) ||
-  parsedApiUrl.port !== "56321"
-) {
-  throw new Error("R1.3 integration tests require the local MMHR API");
-}
-
-const owner = postgres(migrationUrl, { max: 2, prepare: true });
-const admin = createClient(apiUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+let rehearsal: RestrictedRehearsal | undefined;
+let startup: Promise<RestrictedRehearsal> | undefined;
+let apiUrl: string, anonKey: string;
+let owner: ReturnType<typeof postgres>, admin: SupabaseClient;
 
 let userId = "";
 let viewerUserId = "";
@@ -32,6 +18,8 @@ let organizationId = "";
 let otherOrganizationId = "";
 let adminEmail = "";
 let viewerEmail = "";
+let adminFactor: { factorId: string; secret: string };
+let viewerFactor: { factorId: string; secret: string };
 
 async function createConfirmedUser(email: string) {
   const { data, error } = await admin.auth.admin.createUser({
@@ -58,60 +46,87 @@ async function signIn(userEmail: string): Promise<SupabaseClient> {
 
 describe("R1.3 request-scoped grants and RLS", () => {
   beforeAll(async () => {
+    startup = startRestrictedRehearsal("rls");
+    rehearsal = await startup;
+    const api = rehearsal.context.api!;
+    apiUrl = api.url;
+    anonKey = api.publicKey;
+    owner = postgres(rehearsal.context.databaseUrl, { max: 2, prepare: true });
+    admin = createClient(apiUrl, api.adminKey, { auth: { autoRefreshToken: false, persistSession: false } });
     adminEmail = `r13-admin-${Date.now()}@example.com`;
     viewerEmail = `r13-viewer-${Date.now()}@example.com`;
     const user = await createConfirmedUser(adminEmail);
-    const viewer = await createConfirmedUser(viewerEmail);
     userId = user.id;
+    const viewer = await createConfirmedUser(viewerEmail);
     viewerUserId = viewer.id;
 
     const [identity] = await owner`
       INSERT INTO public.identities
-        (auth_user_id, normalized_email, email_verified_at, status, activated_at)
+        (auth_user_id, normalized_email, email_verified_at, status, activated_at, migration_review_required)
       VALUES
-        (${user.id}, ${user.email!.toLowerCase()}, now(), 'active', now())
-      RETURNING id
-    `;
-    const [viewerIdentity] = await owner`
-      INSERT INTO public.identities
-        (auth_user_id, normalized_email, email_verified_at, status, activated_at)
-      VALUES
-        (${viewer.id}, ${viewer.email!.toLowerCase()}, now(), 'active', now())
+        (${user.id}, ${user.email!.toLowerCase()}, now(), 'active', now(), false)
       RETURNING id
     `;
     identityId = identity!.id;
+    const [viewerIdentity] = await owner`
+      INSERT INTO public.identities
+        (auth_user_id, normalized_email, email_verified_at, status, activated_at, migration_review_required)
+      VALUES
+        (${viewer.id}, ${viewer.email!.toLowerCase()}, now(), 'active', now(), false)
+      RETURNING id
+    `;
     viewerIdentityId = viewerIdentity!.id;
 
     const [organization] = await owner`
-      INSERT INTO public.orgs (name, type, status, activated_at)
-      VALUES ('R1.3 customer', 'customer', 'active', now())
-      RETURNING id
-    `;
-    const [otherOrganization] = await owner`
-      INSERT INTO public.orgs (name, type, status, activated_at)
-      VALUES ('R1.3 other', 'vendor', 'active', now())
+      INSERT INTO public.orgs (name, type, status, activated_at, migration_review_required)
+      VALUES ('R1.3 customer', 'customer', 'active', now(), false)
       RETURNING id
     `;
     organizationId = organization!.id;
+    const [otherOrganization] = await owner`
+      INSERT INTO public.orgs (name, type, status, activated_at, migration_review_required)
+      VALUES ('R1.3 other', 'vendor', 'active', now(), false)
+      RETURNING id
+    `;
     otherOrganizationId = otherOrganization!.id;
 
     await owner`
       INSERT INTO public.org_members
-        (org_id, identity_id, user_id, role, role_key, status, activated_at)
+        (org_id, identity_id, user_id, role, role_key, status, activated_at, migration_review_required)
       VALUES
-        (${organizationId}, ${identityId}, ${userId}, 'admin', 'organization_admin', 'active', now()),
-        (${organizationId}, ${viewerIdentityId}, ${viewerUserId}, 'viewer', 'viewer', 'active', now())
+        (${organizationId}, ${identityId}, ${userId}, 'admin', 'organization_admin', 'active', now(), false),
+        (${organizationId}, ${viewerIdentityId}, ${viewerUserId}, 'viewer', 'viewer', 'active', now(), false)
     `;
-  });
+    adminFactor = await enrollTestTotp(await signIn(adminEmail));
+    viewerFactor = await enrollTestTotp(await signIn(viewerEmail));
+  }, 300_000);
 
   afterAll(async () => {
-    await owner`DELETE FROM public.org_members WHERE org_id IN (${organizationId}, ${otherOrganizationId})`;
-    await owner`DELETE FROM public.orgs WHERE id IN (${organizationId}, ${otherOrganizationId})`;
-    await owner`DELETE FROM public.identities WHERE id IN (${identityId}, ${viewerIdentityId})`;
-    if (userId) await admin.auth.admin.deleteUser(userId);
-    if (viewerUserId) await admin.auth.admin.deleteUser(viewerUserId);
-    await owner.end({ timeout: 5 });
-  });
+    const organizationIds = [organizationId, otherOrganizationId].filter(Boolean);
+    const identityIds = [identityId, viewerIdentityId].filter(Boolean);
+    const failures: string[] = [];
+    async function attempt(label: string, action: () => Promise<unknown>) {
+      try { await action(); } catch { failures.push(label); }
+    }
+    await attempt("memberships", async () => {
+      if (organizationIds.length) await owner`DELETE FROM public.org_members WHERE org_id = ANY(${organizationIds}::uuid[])`;
+    });
+    await attempt("organizations", async () => {
+      if (organizationIds.length) await owner`DELETE FROM public.orgs WHERE id = ANY(${organizationIds}::uuid[])`;
+    });
+    await attempt("identities", async () => {
+      if (identityIds.length) await owner`DELETE FROM public.identities WHERE id = ANY(${identityIds}::uuid[])`;
+    });
+    for (const id of [userId, viewerUserId].filter(Boolean)) {
+      await attempt("Auth user", async () => {
+        const result = await admin.auth.admin.deleteUser(id);
+        if (result.error) throw new Error("RLS Auth fixture cleanup failed");
+      });
+    }
+    if (owner) await attempt("owner connection", () => owner.end({ timeout: 5 }));
+    await attempt("isolated stack", async () => { await (rehearsal ?? await startup)?.close(); });
+    if (failures.length) throw new Error(`RLS fixture cleanup failed: ${failures.join(", ")}`);
+  }, 180000);
 
   test("anonymous clients cannot read tables or fixed functions", async () => {
     const anonymous = createClient(apiUrl!, anonKey!);
@@ -120,6 +135,12 @@ describe("R1.3 request-scoped grants and RLS", () => {
 
     const functionRead = await anonymous.rpc("mmhr_get_my_memberships");
     expect(functionRead.error).not.toBeNull();
+    const invitationRead = await anonymous.rpc("mmhr_get_my_invitations");
+    expect(invitationRead.error).not.toBeNull();
+    const authorization = await anonymous.rpc("mmhr_authorize", {
+      permission_key: "workspace.access",
+    });
+    expect(authorization.error).not.toBeNull();
   });
 
   test("active members receive only fixed, field-safe organization data", async () => {
@@ -142,6 +163,10 @@ describe("R1.3 request-scoped grants and RLS", () => {
     expect(memberships.error).toBeNull();
     expect(memberships.data).toHaveLength(1);
     expect(memberships.data[0]).not.toHaveProperty("created_at");
+
+    const invitations = await member.rpc("mmhr_get_my_invitations");
+    expect(invitations.error).toBeNull();
+    expect(invitations.data).toEqual([]);
 
     const audit = await member.rpc("mmhr_get_audit_events", {
       organization_id: organizationId,
@@ -183,9 +208,17 @@ describe("R1.3 request-scoped grants and RLS", () => {
     expect(remove.error).not.toBeNull();
   });
 
-  test("organization admins can read member roles, viewers cannot", async () => {
+  test("organization admins require AAL2 for member roles, viewers remain denied", async () => {
     const adminClient = await signIn(adminEmail);
-    const members = await adminClient.rpc("mmhr_get_organization_members", {
+    const lowAssurance = await adminClient.rpc("mmhr_get_organization_members", {
+      organization_id: organizationId,
+    });
+    expect(lowAssurance.error).toBeNull();
+    expect(lowAssurance.data).toEqual([]);
+
+    const elevatedAdmin = await signIn(adminEmail);
+    await verifyTestTotp(elevatedAdmin, adminFactor.factorId, adminFactor.secret);
+    const members = await elevatedAdmin.rpc("mmhr_get_organization_members", {
       organization_id: organizationId,
     });
     expect(members.error).toBeNull();
@@ -197,6 +230,13 @@ describe("R1.3 request-scoped grants and RLS", () => {
     });
     expect(denied.error).toBeNull();
     expect(denied.data).toEqual([]);
+    const elevatedViewer = await signIn(viewerEmail);
+    await verifyTestTotp(elevatedViewer, viewerFactor.factorId, viewerFactor.secret);
+    const elevatedDenied = await elevatedViewer.rpc("mmhr_get_organization_members", {
+      organization_id: organizationId,
+    });
+    expect(elevatedDenied.error).toBeNull();
+    expect(elevatedDenied.data).toEqual([]);
   });
 
   test("suspending the identity revokes an old active token", async () => {
@@ -229,12 +269,14 @@ describe("R1.3 request-scoped grants and RLS", () => {
           'identity_recovery_requests', 'security_bootstrap_state', 'identities',
           'invitations', 'org_members', 'orgs', 'leads', 'admin_delegation_grants',
           'permission_definitions', 'platform_role_assignments', 'portal_access_grants',
-          'role_definitions', 'role_permission_defaults', 'user_permission_overrides'
+          'role_definitions', 'role_permission_defaults', 'user_permission_overrides',
+          'customer_profiles', 'vendor_profiles', 'products', 'contacts', 'relationships'
+          , 'evaluation_candidates', 'intake_requirements', 'intakes'
         )
       GROUP BY c.relname
       ORDER BY c.relname
     `;
-    expect(rows).toHaveLength(19);
+    expect(rows).toHaveLength(27);
     expect(rows.every((row) => row.policy_count >= 1)).toBe(true);
   });
 
@@ -274,7 +316,22 @@ describe("R1.3 request-scoped grants and RLS", () => {
       WHERE n.nspname = 'public' AND p.proname LIKE 'mmhr_%'
       ORDER BY p.proname
     `;
-    expect(functions).toHaveLength(5);
+    const requiredFunctions = [
+      "mmhr_authorize",
+      "mmhr_get_audit_events",
+      "mmhr_get_my_identity",
+      "mmhr_get_my_memberships",
+      "mmhr_get_my_invitations",
+      "mmhr_get_organization",
+      "mmhr_get_organization_members",
+      "mmhr_prepare_evaluation_publication",
+      "mmhr_publish_evaluation_publication",
+      "mmhr_revoke_evaluation_publication",
+      "mmhr_review_evaluation_publication",
+      "mmhr_get_evaluation_publication",
+    ];
+    expect(functions.length).toBeGreaterThanOrEqual(requiredFunctions.length);
+    expect(functions.map((fn) => fn.proname)).toEqual(expect.arrayContaining(requiredFunctions));
     expect(functions.every((fn) => fn.security_definer)).toBe(true);
     expect(functions.every((fn) => fn.configuration.includes("search_path="))).toBe(true);
   });

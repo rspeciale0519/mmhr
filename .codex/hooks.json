@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\rob\\Documents\\Software\\service-businesses\\mmhr\\.codex\\hooks\\post-tool-use.js'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\rob\\Documents\\Software\\service-businesses\\mmhr\\.codex\\hooks\\session-start.js'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\rob\\Documents\\Software\\service-businesses\\mmhr\\.codex\\hooks\\stop.js'"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,17 +1,23 @@
-import { Azeret_Mono, Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const body = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedLatticeBody = localFont({
+  src: [
+    { path: "../../assets/fonts/bricolage-grotesque/bricolage-grotesque-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = Azeret_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const body = retainedLatticeBody;
+const retainedLatticeMono = localFont({
+  src: [
+    { path: "../../assets/fonts/azeret-mono/azeret-mono-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedLatticeMono;
 
 /**
  * SIGNATURE: the node graph. Coordinates are percentages of a 100x100 SVG
@@ -87,8 +93,8 @@ export default function Lattice() {
               </button>
             </form>
             <p className="la-fine">
-              Free. The vendor pays our commission — the same rate whichever one you
-              choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -269,8 +275,8 @@ export default function Lattice() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by every
-                vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="la-fcol">

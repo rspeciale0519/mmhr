@@ -1,12 +1,14 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { assertRestrictedRehearsal, type RestrictedRehearsal } from "../r1-migration-rehearsal";
 
-export function createTestMigrationOwner() {
+export function createTestMigrationOwner(rehearsal?: RestrictedRehearsal) {
   if (process.env.NODE_ENV !== "test") {
     throw new Error("The migration-owner fixture client is test-only");
   }
 
-  const connectionString = process.env.TEST_MIGRATION_DATABASE_URL;
+  if (rehearsal) assertRestrictedRehearsal(rehearsal);
+  const connectionString = rehearsal?.context.databaseUrl ?? process.env.TEST_MIGRATION_DATABASE_URL;
   if (!connectionString) {
     throw new Error("TEST_MIGRATION_DATABASE_URL is not set");
   }

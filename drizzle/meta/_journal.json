@@ -22,6 +22,1182 @@
       "when": 1787963410361,
       "tag": "0002_r1_request_scoped_access",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788123039473,
+      "tag": "0003_r1_permission_evaluation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788129342942,
+      "tag": "0004_r1_security_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788134915745,
+      "tag": "0005_r1_identity_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788136116243,
+      "tag": "0006_r1_role_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788136839782,
+      "tag": "0007_r1_recovery_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788137408734,
+      "tag": "0008_r1_assignment_deny_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788140145058,
+      "tag": "0009_r1_recovery_mfa",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788143390980,
+      "tag": "0010_r1_identity_worker_dispatch",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788143390981,
+      "tag": "0011_r2b_lead_command",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788143390982,
+      "tag": "0012_r2b_crm_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788143390983,
+      "tag": "0013_r3_intake_matching_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788143390984,
+      "tag": "0014_r2b_activity_task_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1788143390985,
+      "tag": "0015_r4_workflow_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788143390986,
+      "tag": "0016_r2b_deal_vendor_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788143390987,
+      "tag": "0017_r3_scorecard_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788143390988,
+      "tag": "0018_r3_workspace_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788143390989,
+      "tag": "0019_r5_ai_run_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788143390990,
+      "tag": "0020_r6_demo_proposal_handoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788143390991,
+      "tag": "0021_r7_finance_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788143390992,
+      "tag": "0022_r8_customer_success_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788143390993,
+      "tag": "0023_r9_evidence_persistence",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788143390994,
+      "tag": "0024_r1_role_authority_timestamp_repair",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788143390995,
+      "tag": "0025_r1_public_function_acl_repair",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788143390996,
+      "tag": "0026_r1_invitation_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788143390997,
+      "tag": "0027_r2b_crm_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788143390998,
+      "tag": "0028_r2b_crm_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788143390999,
+      "tag": "0029_r2b_crm_exports",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788143391000,
+      "tag": "0030_r2b_crm_duplicates",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788143391001,
+      "tag": "0031_r2b_vendor_evidence_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788143391002,
+      "tag": "0032_r2a_lead_routing",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788143391003,
+      "tag": "0033_r2a_lead_create_ambiguity_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788143391004,
+      "tag": "0034_r3_scorecard_entry_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1788143391005,
+      "tag": "0035_r3_candidate_transition_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788143391006,
+      "tag": "0036_r3_candidate_add_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1788143391007,
+      "tag": "0037_r3_candidate_masking_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1788143391008,
+      "tag": "0038_r3_comparison_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1788143391009,
+      "tag": "0039_r3_intake_save_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1788143391010,
+      "tag": "0040_r3_deterministic_matching",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1788143391011,
+      "tag": "0041_r3_matching_rule_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1788143391012,
+      "tag": "0042_r3_comparison_export_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1788143391013,
+      "tag": "0043_r3_duplicate_product_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1788143391014,
+      "tag": "0044_r3_matching_rule_preview",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1788143391015,
+      "tag": "0045_r3_scorecard_view",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1788143391016,
+      "tag": "0046_r3_initial_evaluation",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1788143391017,
+      "tag": "0047_r3_scorecard_create",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1788143391018,
+      "tag": "0048_r3_requirement_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1788143391019,
+      "tag": "0049_r3_workspace_view",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1788143391020,
+      "tag": "0050_r3_workspace_comments",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1788143391021,
+      "tag": "0051_r4_rfp_create",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1788143391022,
+      "tag": "0052_r4_rfp_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1788143391023,
+      "tag": "0053_r4_rfp_distribution",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1788143391024,
+      "tag": "0054_r4_rfp_clarifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1788143391025,
+      "tag": "0055_r4_response_ingestion",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1788143391026,
+      "tag": "0056_r4_response_normalization",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1788143391027,
+      "tag": "0057_r4_response_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1788143391028,
+      "tag": "0058_r4_response_clarifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1788143391029,
+      "tag": "0059_r4_response_failures",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1788143391030,
+      "tag": "0060_r4_communication_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1788143391031,
+      "tag": "0061_r4_document_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1788143391032,
+      "tag": "0062_r4_job_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1788143391033,
+      "tag": "0063_r6_demo_round_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1788143391034,
+      "tag": "0064_r6_proposal_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1788143391035,
+      "tag": "0065_r6_contract_handoff_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1788143391036,
+      "tag": "0066_r7_commission_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1788143391037,
+      "tag": "0067_r7_payment_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1788143391038,
+      "tag": "0068_r7_invoice_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1788143391039,
+      "tag": "0069_r7_dispute_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1788143391040,
+      "tag": "0070_r7_adjustment_handoff_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1788143391041,
+      "tag": "0071_r7_reconciliation_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1788143391042,
+      "tag": "0072_r8_onboarding_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1788143391043,
+      "tag": "0073_r8_work_item_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1788143391044,
+      "tag": "0074_r8_renewal_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1788143391045,
+      "tag": "0075_r8_project_plan_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1788143391046,
+      "tag": "0076_r8_administration_configuration",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1788143391047,
+      "tag": "0077_r8_approval_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1788143391048,
+      "tag": "0078_r8_follow_up_schedules",
+      "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1788143391049,
+      "tag": "0079_r2b_vendor_fact_overrides",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1788143391050,
+      "tag": "0080_r2b_deal_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1788143391051,
+      "tag": "0081_r2b_relationship_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1788143391052,
+      "tag": "0082_r2b_vendor_source_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1788143391053,
+      "tag": "0083_r4_document_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1788143391054,
+      "tag": "0084_r4_evaluation_routing",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1788143391055,
+      "tag": "0085_r2b_vendor_acquisition",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1788143391056,
+      "tag": "0086_r4_rfp_amendments",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1788143391057,
+      "tag": "0087_r5_ai_run_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1788143391058,
+      "tag": "0088_r5_ai_evaluation_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1788143391059,
+      "tag": "0089_r9_operational_evidence_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1788143391060,
+      "tag": "0090_r9_deletion_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1788143391061,
+      "tag": "0091_r7_commission_contract_uniqueness",
+      "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1788484831882,
+      "tag": "0092_r1_invitation_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1788634135187,
+      "tag": "0093_r7-finance-authorization",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1788637378144,
+      "tag": "0094_r4-mmhr-rfp-authorization",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1788638809379,
+      "tag": "0095_r4-amendment-authorization",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1788640174438,
+      "tag": "0096_r1-invitation-variable-scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1788646889730,
+      "tag": "0097_r1-invitation-review-read",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1788647303869,
+      "tag": "0098_r1-account-setup-read",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1788647904018,
+      "tag": "0099_r1-organization-invitation-read",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788650352392,
+      "tag": "0100_r1-member-read",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788897061120,
+      "tag": "0101_r1_customer_registration",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1788908697292,
+      "tag": "0102_r2a_lead_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1788911618505,
+      "tag": "0103_r3_intake_save_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1788912854022,
+      "tag": "0104_r3_intake_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1788914267943,
+      "tag": "0105_0105_r3_requirement_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1788917231387,
+      "tag": "0106_r3_requirement_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1788922573401,
+      "tag": "0107_r1_identity_sync_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1788923939760,
+      "tag": "0108_r3_customer_intake_draft",
+      "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1788927564496,
+      "tag": "0109_r3_customer_requirement_save",
+      "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1788931391524,
+      "tag": "0110_r3_customer_intake_submit",
+      "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1788934973862,
+      "tag": "0111_r3_candidate_vendor_scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1788936801136,
+      "tag": "0112_r3_approved_vendor_inputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1788936856672,
+      "tag": "0113_r3_matching_approved_inputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1788938596731,
+      "tag": "0114_r3_evaluation_publication_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1788939054822,
+      "tag": "0115_r3_evaluation_publication_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1788939059630,
+      "tag": "0116_r3_evaluation_publication_inputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1788939112814,
+      "tag": "0117_r3_evaluation_publication_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1788943481370,
+      "tag": "0118_r3_initial_selection_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1788943609066,
+      "tag": "0119_r3_initial_selection_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1788943632384,
+      "tag": "0120_r3_initial_selection_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1788944438616,
+      "tag": "0121_r3_current_evaluation_publication",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1788944438617,
+      "tag": "0122_r3_disclosure_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1788947876466,
+      "tag": "0123_r3_disclosure_records",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1788947897276,
+      "tag": "0124_r3_disclosure_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1788947902191,
+      "tag": "0125_r3_disclosure_commands",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1788979742954,
+      "tag": "0126_r3_selection_customer_auth_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1789271181110,
+      "tag": "0127_r3_disclosure_workflow",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1789271865812,
+      "tag": "0128_r4_portal_delivery",
+      "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1789271908187,
+      "tag": "0129_r4_vendor_recipient_scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1789273597800,
+      "tag": "0130_r4_portal_delivery_audit_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1789274638531,
+      "tag": "0131_r4_optional_separate_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1789315906598,
+      "tag": "0132_r3_disclosure_page_filter",
+      "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1789483746224,
+      "tag": "0133_r3_masked_publication_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 134,
+      "version": "7",
+      "when": 1789485614928,
+      "tag": "0134_r3_publication_scoring_format_two",
+      "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1789487359554,
+      "tag": "0135_r3_staff_vendor_evidence_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1789490088350,
+      "tag": "0136_r3_publication_fact_scopes",
+      "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1789491694294,
+      "tag": "0137_r2b_vendor_evidence_renewal",
+      "breakpoints": true
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1789519717977,
+      "tag": "0138_r2b_evidence_source_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 139,
+      "version": "7",
+      "when": 1789532119208,
+      "tag": "0139_r3_selection_option_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1789534128254,
+      "tag": "0140_r2b_product_review_revision",
+      "breakpoints": true
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1789536825439,
+      "tag": "0141_r2b_vendor_catalog_approval",
+      "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1790803665868,
+      "tag": "0142_abandoned_bloodstorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 143,
+      "version": "7",
+      "when": 1790810995367,
+      "tag": "0143_narrow_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1790818879986,
+      "tag": "0144_happy_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1790826587533,
+      "tag": "0145_managed_document_uploads",
+      "breakpoints": true
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1790828097548,
+      "tag": "0146_managed_document_boundaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1790829978947,
+      "tag": "0147_managed_document_worker",
+      "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1790833262462,
+      "tag": "0148_managed_document_reservations",
+      "breakpoints": true
+    },
+    {
+      "idx": 149,
+      "version": "7",
+      "when": 1790835705061,
+      "tag": "0149_managed_document_storage",
+      "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1790837829381,
+      "tag": "0150_managed_document_scan_readers",
+      "breakpoints": true
+    },
+    {
+      "idx": 151,
+      "version": "7",
+      "when": 1790842545063,
+      "tag": "0151_managed_document_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1790848052433,
+      "tag": "0152_managed_document_metadata_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1790874277835,
+      "tag": "0153_r6_portal_proposal_quotes",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1790898465369,
+      "tag": "0154_r6_portal_contract_handoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1790902751576,
+      "tag": "0155_r7_commission_calculation_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1790905184627,
+      "tag": "0156_r4_document_review_and_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1791000961627,
+      "tag": "0157_r7_payment_approval_and_retry_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1791002311168,
+      "tag": "0158_r4_rfp_notification_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1791014335423,
+      "tag": "0159_r8_deal_follow_ups",
+      "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1791035308306,
+      "tag": "0160_r7_finance_source_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1791039324097,
+      "tag": "0161_r7_finance_upload_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1791042763904,
+      "tag": "0162_r7_managed_finance_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1791047312999,
+      "tag": "0163_r8_task_request_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 164,
+      "version": "7",
+      "when": 1791050726234,
+      "tag": "0164_r7_managed_invoice_readiness",
+      "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1791059696279,
+      "tag": "0165_r7_invoice_date_alignment",
+      "breakpoints": true
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1791156664386,
+      "tag": "0166_rfp_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1791156765772,
+      "tag": "0167_staff_audit_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1791178624713,
+      "tag": "0168_rfp_receipt_authorization_time",
+      "breakpoints": true
+    },
+    {
+      "idx": 169,
+      "version": "7",
+      "when": 1791407152538,
+      "tag": "0169_finance_document_deny_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1791409721910,
+      "tag": "0170_launch_hide_excluded_functions",
+      "breakpoints": true
     }
   ]
 }

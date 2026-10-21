@@ -14,14 +14,15 @@ export function Footer() {
               MatchMaker HR
             </div>
             <p>
-              Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-              every vendor — and we say so when we&rsquo;re one of them.
+              Buyer-side HRIS brokerage. Free to buyers. Providers pay us under
+              commission or referral arrangements, and we say so when we&rsquo;re one
+              of them.
             </p>
           </div>
 
           {FOOTER_COLUMNS.map((col) => (
             <div className="pu-fcol" key={col.heading}>
-              <h4>{col.heading}</h4>
+              <h2>{col.heading}</h2>
               <ul>
                 {col.links.map((link) => (
                   <li key={link.href}>

@@ -12,8 +12,9 @@ import {
   startRehearsal,
   stopRehearsal,
 } from "./r1-migration-rehearsal";
+import { applicationMigrationCount } from "./test/application-schema-inventory";
 
-describe("R1.3 local restore rehearsal", () => {
+describe("R1.4 local restore rehearsal", () => {
   let source: RehearsalContext | undefined;
   let target: RehearsalContext | undefined;
 
@@ -58,7 +59,7 @@ describe("R1.3 local restore rehearsal", () => {
         SELECT count(*)::integer AS count
         FROM drizzle.__drizzle_migrations
       `;
-      expect(migrationHistory!.count).toBe(3);
+      expect(migrationHistory!.count).toBe(applicationMigrationCount);
     },
     600_000,
   );

@@ -1,0 +1,87 @@
+# MMHR — Current State
+
+Updated: 2026-10-04 09:40 EDT. Branch: `codex/full-delivery-verification`. No commits.
+
+## Active scope and authority
+- Complete unfinished features and synthetic customer, staff, and vendor rehearsal before real participants or launch.
+- Local implementation and subagents are authorized. Canonical requirements: `docs/PRD.md` and `docs/TECH_STACK.md`.
+- Preserve the existing dirty worktree. No Git write, cloud migration, production action, or provider activation is authorized.
+- Both original package decisions are approved and installed. The latest reply repeats those approvals.
+- The separate maintained braces decision remains pending: `.codex/plans/decision-maintained-braces-security-fix-2026-10-04.md`.
+- The parser isolation image needs its own decision. No image pull, build, or activation is approved.
+
+## Latest completed work and location
+- Current record: `docs/security/parser-and-original-verifier-checks-2026-10-04.md`.
+- Current candidate gates: `docs/security/current-candidate-gates-2026-10-03.md`.
+- Installed exact document notices: `docs/licenses/document-processing/README.md`.
+- Journal: `mmhrbrain/journal/2026-10-04.md`. Displaced state is preserved in `archive/STATE-before-2026-10-04-0735.md`.
+
+## Actual current checks
+- Root parser109 and worker30 focused cases passed. Parser and verification modules remain inactive.
+- Bounded original SQL executor is integrated. Actual root checks passed156cases/eightfiles, full types, and lint.
+- Stream V6 is integrated but inactive. Current root checks passed 84 exact cases, full types, and lint without diagnostics.
+- Current full units failed: 6,117 cases and 475 files passed. One startup error left all 52 managed collection cases absent.
+- The required current roster contains 476 files. Source guards and tracked parent absence passed; no complete acceptance exists.
+- Pre-stream full units also failed with the same missing file. The earlier record remains preserved.
+- Unchanged managed-collection file passed52cases in isolation. This does not replace the full gate or explain the startup error.
+- Pre-stream V6 clean build passed510.650s,93pageentries,5331input/fouroutputguards and source membership.
+- Current isolated build passed in 323.365 seconds with 93 static page entries and unchanged source guards.
+- Generated output is retained. The first build retry failed before child admission; that failure remains recorded.
+- Startup diagnostic passed 83 unchanged cases across two files. Both workers responded and closed; the full failure remains unexplained.
+- Exact TypeScript and ESLint version admission checks passed. This does not prove compiler, lint, or database execution.
+- Vendor receipt V2 fixed a timestamp defect. Independent review found a backward status change; correction remains in scratch.
+- Receipt migration, application integration, genuine Auth tests, and browser checks remain unrun.
+- Build wrapper/tool closed and tracked parent absence passed. All former forks/backend absence remains unproved.
+- Before telemetry change, all472files/6076tests passed in688.182s. This is historical evidence for the earlier source.
+- Sentry build-tool telemetry is disabled through its supported `telemetry:false` configuration.
+- Full type checking and lint passed after that change.
+- Fresh source-only clean package installation passed with unchanged approved package/lock hashes.
+- Default npm script approval warnings remain; no script policy bypass occurred. Audit still reports11HIGHentries.
+- Historical installation, font, and timed-out run failures remain in the journal. Their separate later passes do not clear current gates.
+- Fresh complete unit acceptance remains required. All former fork absence remains unproved.
+- Tracked-file secret scan passed1156files; separate configured-pattern check covered34newTypeScriptfiles. Neither proves exhaustive detection.
+- Eleven owned-loopback release-lock HTTP checks passed. Six browser routes displayed the closed-release notice.
+- Captured browser warning/error logs were empty. Browser network evidence was unavailable.
+- Owned server3033 stopped; exact process and listener absence passed. Port3000 belongs to a Windows service and was left unchanged.
+- Browser stayed open. Release-lock checks do not establish signed-in workflows or launch approval.
+
+## Independent notice and collection work
+- Notice review matched305inputs/52outputs. Root integrated49files containing46exact notice texts;49relative links passed.
+- Native libvips/canvas, PDF font/ICC/WASM source associations, Linux/Node22, and final distribution tracing remain incomplete.
+- Internal notice retention does not approve distribution or release.
+- Original-verifier producer proposal had two blocking SQL defects and a retained chronology gap.
+- CorrectionV3 adds a narrow audit key, stored end-user/live-source predicates, and ordered creation/claim/finish checks.
+- Root byte review matched23inputs/21outputs/3predecessors. Ten source checks and twoJSsyntax checks passed.
+- CorrectionV3 remains unapplied. Actual SQL/Auth/Storage/transaction/performance proof is absent.
+- Further review found missing comparison of additional supporting document observations in inactive human and machine proposals.
+- Review also found that an old queued job can regain stored-actor validity after same-session recovery completes; no runtime bypass was executed.
+- Separate minimal source corrections are being prepared; no active permission or historical predicate will change.
+- Genuine-test draft retains46numbered bodies and bytes-only witnessV2. Root matched317inputs/23outputs.
+- Complete owned receipt/original rehearsal assembly and capture drivers remain source-only and unrun.
+- Candidate roster contains40registrations and29fixtureinstances; original38cases and T03 remain mandatory unrun work.
+- Pure PostgreSQL17.6 helpers passed30reference+20chronologycases, invalidcast22007, privateACL, and ownedcleanup.
+- Earlier logging and locale observation failures remain preserved. Pure helpers do not prove Auth/Storage consumers.
+- Stream V6 preserves integrity, observes late rejections, and aborts its request before cleanup; no authority or worker was activated.
+- Its first lint failed with3unused mock warnings. Typed vi.fn correction preserved production source and all84assertions.
+- Actual original SQL/socket focused checks passed; genuine database cancellation remains unproved.
+- `r7_collection_transaction_ready()` remains false. No permission, provider, database, or workflow was activated.
+
+## Other retained evidence and unfinished requirements
+- Genuine managed invoice34PASS/acceptedtrue/cleanuptrue3680.809s; historical SQL21PASS with owned loopback cleanup.
+- Broad integration baseline:112files/1101PASS/4FAIL. It remains failed until the corrected complete gate runs.
+- Managed finance, task, registry, recovery, and further role browser acceptance remain required.
+- Email simulation does not prove actual application delivery. AgentMail inboxes are test-role addresses, not Supabase credentials.
+- CRM/AI/admin/operations/policy closure and general collection schedules/exceptions/financial closure remain unfinished.
+- All twelveR9release-evidence categories remain blocked. Do not infer project completion from test counts.
+
+## Next work and recovery
+- Finish and review the complete owned rehearsal capture and fixture handshake before local Auth/Storage execution.
+- Diagnose the repeated full-suite startup error. Complete genuine collection checks and the receipt correction.
+- Assemble corrected SQL only after complete source/consumer review; run owned local Auth/Storage/rollback/retry/history checks.
+- Finish isolated parser runtime verification before activation; preserve original files and human review evidence.
+- Review and run a fresh complete suite with unchanged assertions, worker settings, and startup deadlines.
+- Historical V5/V6 incomplete runs remain failed; retained details are in the current evidence documents and dated journal.
+- Run remaining relevant integration and signed-in customer/staff/vendor workflows with synthetic data.
+- Keep release and transaction gates closed while any required check or approval remains missing.
+- No brain consolidation, cross-project access, commit, push, release, cloud action, or real-data rehearsal occurred.
+- Previous state is preserved in `archive/STATE-before-2026-10-04-0940.md`.

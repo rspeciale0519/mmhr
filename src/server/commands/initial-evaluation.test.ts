@@ -1,0 +1,7 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { AuthorizationError, requirePermission } from "@/server/auth/authorization";
+import { createInitialEvaluation, initialEvaluationSchema } from "./initial-evaluation";
+vi.mock("@/server/auth/authorization", async () => { const actual = await vi.importActual<typeof import("@/server/auth/authorization")>("@/server/auth/authorization"); return { ...actual, requirePermission: vi.fn() }; });
+const ids = { assessmentId: "11111111-1111-4111-8111-111111111111", organizationId: "22222222-2222-4222-8222-222222222222", intakeId: "33333333-3333-4333-8333-333333333333", actorIdentityId: "44444444-4444-4444-8444-444444444444", correlationId: "55555555-5555-4555-8555-555555555555", idempotencyKey: "66666666-6666-4666-8666-666666666666" };
+const rpc = vi.fn(); const context = { supabase: { rpc } as never, identityId: ids.actorIdentityId, scope: { kind: "organization", organizationId: ids.organizationId }, assurance: "aal2", correlationId: ids.correlationId } as const;
+describe("initial evaluation command", () => { beforeEach(() => { rpc.mockReset(); vi.mocked(requirePermission).mockReset().mockResolvedValue(context); }); test("requires strict input", () => { expect(initialEvaluationSchema.safeParse({ ...ids, extra: true }).success).toBe(false); }); test("rejects actor mismatch before RPC", async () => { await expect(createInitialEvaluation({ ...ids, actorIdentityId: ids.correlationId })).rejects.toBeInstanceOf(AuthorizationError); expect(rpc).not.toHaveBeenCalled(); }); });

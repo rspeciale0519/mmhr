@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "For software vendors — MatchMaker HR",
-  description:
-    "How HRIS vendors appear in the marketplace, what the flat commission means, and why placement cannot be bought.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/partners/software-vendors",
+  "For software vendors — MatchMaker HR",
+  "How HRIS vendors appear in the marketplace, how provider arrangements work, and why placement cannot be bought.",
+);
 
 export default function SoftwareVendorsPage() {
   return (
@@ -28,8 +27,8 @@ export default function SoftwareVendorsPage() {
             <li>
               <i aria-hidden="true" />
               <span>
-                <strong>A flat commission on closed business</strong> — the same
-                rate we take from every other vendor in the marketplace.
+                <strong>A commission or referral arrangement on closed business</strong>.
+                We disclose the arrangement for your product.
               </span>
             </li>
             <li>
@@ -64,9 +63,9 @@ export default function SoftwareVendorsPage() {
           <SectionHead title="What we will not do" />
           <div className="pu-prose">
             <p>
-              We will not take a higher rate from you than from a competitor, sell
-              you a placement boost, or suppress a capability gap in your profile.
-              All three would make the marketplace worthless to the buyers it
+              We will not accept payment for placement, change ranking because of
+              provider payment, or suppress a capability gap in your profile. All
+              three would make the marketplace worthless to the buyers it
               exists for, and a marketplace buyers do not trust is worth nothing to
               you either.
             </p>

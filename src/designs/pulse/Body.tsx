@@ -1,4 +1,5 @@
 import { ADVANTAGES, CASES, STATS, TOOLS, TRUST, VENDORS } from "../_content";
+import NewsletterForm from "./newsletter-form";
 
 /* A 600-unit heartbeat/oscilloscope trace, repeated once more (offset +600)
    inside a 1200-wide viewBox so the shape is seamless end-to-start — the same
@@ -29,10 +30,13 @@ export function PulseBody() {
               when someone remembers to. This is what that looks like: a live
               signal, not a static list.
             </p>
-            <form className="pu-form" action="#">
+            <form className="pu-form" action="/sign-up" method="get">
               <input
                 className="pu-input"
                 type="email"
+                name="email"
+                required
+                maxLength={254}
                 placeholder="Work email"
                 aria-label="Work email"
               />
@@ -41,8 +45,8 @@ export function PulseBody() {
               </button>
             </form>
             <p className="pu-fine">
-              Free. The vendor pays our commission — the same rate whichever one
-              you choose.
+              Free to buyers. Providers pay us under commission or referral
+              arrangements.
             </p>
           </div>
 
@@ -237,17 +241,7 @@ export function PulseBody() {
             <h2>The Weekly Signal</h2>
             <p>What moved in vendor pricing this week, in one email.</p>
           </div>
-          <form className="pu-form" action="#">
-            <input
-              className="pu-input"
-              type="email"
-              placeholder="Work email"
-              aria-label="Work email for newsletter"
-            />
-            <button className="pu-btn pu-solid pu-lg" type="submit">
-              Subscribe
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
       </section>
     </>

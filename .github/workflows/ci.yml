@@ -1,10 +1,5 @@
 name: CI
 
-# Integration tests (src/**/*.integration.test.ts) are NOT run here: they need a
-# live Supabase stack. They run locally before every checkpoint. Spinning up
-# Supabase in CI lands in Phase 2, alongside the RLS policy test matrix that
-# makes it worth the minutes.
-
 on:
   pull_request:
   push:
@@ -12,6 +7,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  integration:
+    uses: ./.github/workflows/integration.yml
+    with:
+      scope: launch
+    permissions:
+      contents: read
+
+  # Owner decision D9 (October 7, 2026): the excluded finance and document
+  # files run here and report failures, but this job does not block.
+  integration-excluded-features:
+    uses: ./.github/workflows/integration.yml
+    with:
+      scope: excluded-features
+    permissions:
+      contents: read
+
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +34,25 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Check integration matrix
+        run: npm run check:integration-matrix
+
+      - name: Validate R9 evidence manifest
+        run: npm run check:r9-evidence
+
+      - name: Upload R9 evidence manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: r9-release-evidence
+          path: scripts/r9-release-evidence.json
+          if-no-files-found: error
+
+      - name: Dependency audit
+        run: npm run check:dependency-audit
+
+      - name: Secret scan
+        run: npm run check:secrets
 
       - name: Type-check
         run: npm run type-check

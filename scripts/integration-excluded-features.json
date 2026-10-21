@@ -1,0 +1,29 @@
+{
+  "decision": "D9, approved October 7, 2026. Scope record: .codex/plans/build-mvp-p0-baseline-2026-10-07.md Section 3.6.",
+  "reason": "These files test finance and private-document features that are outside the launch (D2, migration 0170). CI runs them in a separate job that reports failures but does not block. The tests and assertions are unchanged.",
+  "files": [
+    "src/server/db/r4-document-controls.integration.test.ts",
+    "src/server/db/r4-document-reads-auth.integration.test.ts",
+    "src/server/db/r4-document-reads.integration.test.ts",
+    "src/server/db/r4-document-reservations-auth.integration.test.ts",
+    "src/server/db/r4-document-reservations.integration.test.ts",
+    "src/server/db/r4-document-search.integration.test.ts",
+    "src/server/db/r4-document-uploads.integration.test.ts",
+    "src/server/db/r4-document-worker.integration.test.ts",
+    "src/server/db/r7-adjustment-handoff.integration.test.ts",
+    "src/server/db/r7-commission-calculation.integration.test.ts",
+    "src/server/db/r7-commission.integration.test.ts",
+    "src/server/db/r7-dispute.integration.test.ts",
+    "src/server/db/r7-finance-auth.integration.test.ts",
+    "src/server/db/r7-finance-document-auth.integration.test.ts",
+    "src/server/db/r7-invoice.integration.test.ts",
+    "src/server/db/r7-managed-finance-auth.integration.test.ts",
+    "src/server/db/r7-managed-invoice-auth.integration.test.ts",
+    "src/server/db/r7-payment.integration.test.ts",
+    "src/server/db/r7-reconciliation.integration.test.ts",
+    "src/server/integrations/documents/document-review-access.integration.test.ts",
+    "src/server/integrations/documents/document-scan-flow.integration.test.ts",
+    "src/server/integrations/documents/supabase-document-storage.integration.test.ts",
+    "src/server/workflows/clamav-document-scanner.integration.test.ts"
+  ]
+}

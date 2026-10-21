@@ -5,25 +5,48 @@ import path from "node:path";
 const windowsWorkerSettings =
   process.platform === "win32"
     ? {
-        // Windows fork workers can time out before they load on constrained hosts.
-        pool: "threads" as const,
+        // The complete Windows browser suite passed in forks after thread
+        // workers repeatedly failed before loading. Keep each file isolated.
+        pool: "forks" as const,
         maxWorkers: 1,
         fileParallelism: false,
       }
     : {};
 
-// Unit / component tests (jsdom). Integration tests that need a live local
-// Supabase run separately via vitest.integration.config.ts.
+// Server contracts do not need a browser. Keep browser globals available for
+// component/client tests without paying jsdom setup cost for every server file.
+// Live Supabase tests remain in vitest.integration.config.ts.
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}"],
-    exclude: ["src/**/*.integration.test.ts", "node_modules/**"],
     ...windowsWorkerSettings,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "server",
+          environment: "node",
+          include: ["src/server/**/*.test.{ts,tsx}"],
+          exclude: ["src/**/*.integration.test.ts", "node_modules/**"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "browser",
+          environment: "jsdom",
+          include: ["src/**/*.test.{ts,tsx}"],
+          exclude: ["src/server/**", "src/**/*.integration.test.ts", "node_modules/**"],
+        },
+      },
+    ],
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      // Vitest runs server modules outside Next's server-component resolver.
+      "server-only": path.resolve(__dirname, "node_modules/next/dist/compiled/server-only/empty.js"),
+    },
   },
 });

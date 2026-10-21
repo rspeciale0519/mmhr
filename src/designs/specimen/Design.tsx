@@ -1,19 +1,25 @@
-import { Fraunces, Work_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+const retainedSpecimenDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/fraunces/fraunces-italic-400-600-latin.woff2", weight: "400 600", style: "italic" },
+    { path: "../../assets/fonts/fraunces/fraunces-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Work_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const display = retainedSpecimenDisplay;
+const retainedSpecimenBody = localFont({
+  src: [
+    { path: "../../assets/fonts/work-sans/work-sans-normal-400-600-latin.woff2", weight: "400 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-body",
 });
+const body = retainedSpecimenBody;
 
 /**
  * The two supporting entries under the main plate, so the signature device
@@ -87,8 +93,8 @@ export default function Specimen() {
             </button>
           </form>
           <p className="sp-fine">
-            Free. The vendor pays our commission &mdash; the same rate
-            whichever one you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
         </div>
 
@@ -271,9 +277,8 @@ export default function Specimen() {
             <div className="sp-fbrand">
               <div className="sp-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor &mdash; and we say so when we&rsquo;re one of
-                them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="sp-fcol">

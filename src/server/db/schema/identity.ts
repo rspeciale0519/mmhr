@@ -55,6 +55,8 @@ export const identities = pgTable(
     suspendedAt: timestamp("suspended_at", { withTimezone: true }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     synchronizedAt: timestamp("synchronized_at", { withTimezone: true }),
+    // A completed recovery must not make a token issued before its reset valid again.
+    authorizationNotBefore: timestamp("authorization_not_before", { withTimezone: true }),
     migrationReviewRequired: boolean("migration_review_required")
       .notNull()
       .default(true),

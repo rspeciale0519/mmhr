@@ -1,23 +1,36 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import localFont from "next/font/local";
 
 import { CookieConsent } from "@/components/cookie-consent";
 import { brand } from "@/lib/brand";
+import { getPublicReleaseRobotsMetadata } from "@/lib/public-release";
+import { getSiteMetadataBase, getSiteSocialMetadata } from "@/lib/site-metadata";
 import { TRPCReactProvider } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
 // Base typography from the shadcn preset. Pulse is selected, but its final
 // typography and theme tokens are not yet codified across every surface.
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const appGeist = localFont({
+  src: [
+    { path: "../assets/fonts/geist/geist-normal-100-900-latin.woff2", weight: "100 900", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-sans",
+});
+const geist = appGeist;
 
 export const metadata: Metadata = {
+  metadataBase: getSiteMetadataBase(),
   title: brand.name,
   description: `${brand.name} — buyer-side HRIS brokerage.`,
-  // The homepage still ships placeholder figures (NPS 74, "310 selections
-  // guided", three invented case studies). Keep the whole site out of search
-  // until approved evidence replaces them under FR-MKT-03.
-  robots: { index: false, follow: false },
+  alternates: { canonical: "/" },
+  ...getSiteSocialMetadata(
+    brand.name,
+    `${brand.name} — buyer-side HRIS brokerage.`,
+  ),
+  // The release gate controls indexing while claims remain unapproved.
+  robots: getPublicReleaseRobotsMetadata(),
 };
 
 export default function RootLayout({

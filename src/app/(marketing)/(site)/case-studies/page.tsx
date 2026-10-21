@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CASE_STUDIES } from "../../_site/data";
 import { CTA, PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Case studies — MatchMaker HR",
-  description:
-    "How buying committees used verified pricing and shared scorecards to shorten evaluations and renegotiate contracts.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/case-studies",
+  "Case studies — MatchMaker HR",
+  "How buying committees used verified pricing and shared scorecards to shorten evaluations and renegotiate contracts.",
+);
 
 export default function CaseStudiesPage() {
   return (
@@ -26,7 +26,7 @@ export default function CaseStudiesPage() {
               <Link className="pu-pcard" href={`/case-studies/${c.slug}`} key={c.slug}>
                 <div className="pu-case-n">{c.stat}</div>
                 <div className="pu-case-nl">{c.statLabel}</div>
-                <h3>{c.title}</h3>
+                <h2>{c.title}</h2>
                 <p>{c.summary}</p>
                 <div className="pu-pcard-more">Read the case →</div>
               </Link>

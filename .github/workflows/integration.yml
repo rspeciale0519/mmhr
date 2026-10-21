@@ -1,0 +1,86 @@
+name: Local Supabase integration
+
+on:
+  workflow_call:
+    inputs:
+      scope:
+        description: "Integration files: all, launch, or excluded-features (owner decision D9)"
+        type: string
+        default: all
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Integration files (owner decision D9)"
+        type: choice
+        options: [all, launch, excluded-features]
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: integration (${{ inputs.scope }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      SUPABASE_TELEMETRY_DISABLED: "1"
+      MMHR_INTEGRATION_SCOPE: ${{ inputs.scope }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.116.0
+
+      - run: npm ci
+
+      - name: Start local Supabase services
+        # Auth and PostgREST are required; db start only starts PostgreSQL.
+        # Keep generated local credentials out of the workflow log.
+        run: supabase start -x studio,edge-runtime,logflare,vector,supavisor > "$RUNNER_TEMP/supabase-start.log" 2>&1
+
+      - name: Configure local integration environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          status_json="$(supabase status -o json)"
+          db_url="$(printf '%s' "$status_json" | jq -er '.DB_URL | select(type == "string" and length > 0)')"
+          api_url="$(printf '%s' "$status_json" | jq -er '.API_URL | select(type == "string" and length > 0)')"
+          anon_key="$(printf '%s' "$status_json" | jq -er '.ANON_KEY | select(type == "string" and length > 0)')"
+          service_key="$(printf '%s' "$status_json" | jq -er '.SERVICE_ROLE_KEY | select(type == "string" and length > 0)')"
+          echo "::add-mask::$db_url"
+          echo "::add-mask::$anon_key"
+          echo "::add-mask::$service_key"
+          echo "MIGRATION_DATABASE_URL=$db_url" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$api_url" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$anon_key" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$service_key" >> "$GITHUB_ENV"
+
+      - name: Apply Drizzle migrations
+        run: npx drizzle-kit migrate
+
+      - name: Check integration matrix
+        run: npm run check:integration-matrix
+
+      - name: Integration tests
+        id: integration-tests
+        # Owner decision D9: the excluded finance and document files report
+        # failures here but do not fail the job. Every other scope blocks.
+        continue-on-error: ${{ inputs.scope == 'excluded-features' }}
+        run: npm run test:integration
+
+      - name: Report excluded-feature failures without blocking
+        if: steps.integration-tests.outcome == 'failure' && inputs.scope == 'excluded-features'
+        run: |
+          echo "::warning title=Excluded-feature integration tests failed::These files test features outside the launch (D2, D9). They do not block CI."
+          echo "Excluded-feature integration tests failed. See the Integration tests step. They do not block CI (owner decision D9)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop disposable CI services
+        if: always()
+        run: supabase stop --no-backup

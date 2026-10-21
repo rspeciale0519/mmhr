@@ -1,6 +1,8 @@
 import { brand } from "@/lib/brand";
 
 const ROBOTS_BLOCK = "noindex, nofollow, noarchive, nosnippet";
+const ROBOTS_DISALLOW_BODY = "User-agent: *\nDisallow: /\n";
+const ROBOTS_ALLOW_BODY = "User-agent: *\nAllow: /\n";
 
 // A future approved release must replace null with a versioned approval ID.
 // The production environment must contain the same ID before routes can open.
@@ -8,8 +10,16 @@ const CHECKED_IN_PUBLIC_RELEASE_ID: string | null = null;
 
 type PublicReleaseEnvironment = {
   NODE_ENV?: string;
+  VERCEL_ENV?: string;
   PUBLIC_RELEASE_APPROVAL_ID?: string;
   PUBLIC_RELEASE_ENABLED?: string;
+};
+
+export type PublicReleaseRobotsMetadata = {
+  index: boolean;
+  follow: boolean;
+  noarchive?: boolean;
+  nosnippet?: boolean;
 };
 
 export function isPublicReleaseBlocked(
@@ -25,6 +35,60 @@ export function isPublicReleaseBlocked(
     environment.PUBLIC_RELEASE_ENABLED === "1" &&
     environment.PUBLIC_RELEASE_APPROVAL_ID === checkedInReleaseId
   );
+}
+
+/**
+ * The gallery review endpoints and the methods each one accepts. They write
+ * only to the separate gallery review database, never to MMHR data.
+ */
+const galleryReviewApi: Readonly<Record<string, readonly string[]>> = {
+  "/api/gallery/feedback": ["GET", "HEAD", "POST", "DELETE"],
+  "/api/gallery/recipes": ["POST"],
+};
+
+/**
+ * Owner decisions, October 10 and 14, 2026: Vercel preview links may show the
+ * design gallery and its review tools while the release gate stays closed for
+ * every other path. Gallery pages and their preview images accept only GET and
+ * HEAD. The two review endpoints accept only their listed methods. Production
+ * deployments never open. Previews stay behind Vercel Authentication, and
+ * gallery pages are noindex.
+ */
+export function isGalleryPreviewRequest(
+  pathname: string,
+  method: string,
+  environment: PublicReleaseEnvironment = process.env,
+) {
+  if (environment.VERCEL_ENV !== "preview") return false;
+  if (pathname === "/gallery" || pathname.startsWith("/gallery/") || pathname.startsWith("/gallery-previews/")) {
+    return method === "GET" || method === "HEAD";
+  }
+  return Object.hasOwn(galleryReviewApi, pathname) && galleryReviewApi[pathname]!.includes(method);
+}
+
+/**
+ * On a Vercel preview, the home page sends visitors to the gallery, so a
+ * shared preview link opens the designs instead of the holding page.
+ * Production and every other path keep the release gate response.
+ */
+export function isGalleryPreviewHomeRequest(
+  pathname: string,
+  method: string,
+  environment: PublicReleaseEnvironment = process.env,
+) {
+  return environment.VERCEL_ENV === "preview" && pathname === "/" && (method === "GET" || method === "HEAD");
+}
+
+/**
+ * Keeps generated page metadata aligned with the production release gate.
+ * The checked-in release ID remains the source of truth for opening production.
+ */
+export function getPublicReleaseRobotsMetadata(
+  blocked = isPublicReleaseBlocked(),
+): PublicReleaseRobotsMetadata {
+  return blocked
+    ? { index: false, follow: false, noarchive: true, nosnippet: true }
+    : { index: true, follow: true };
 }
 
 const commonHeaders = {
@@ -56,9 +120,13 @@ function escapeHtml(value: string) {
 export function createPublicReleaseBlockResponse(
   pathname: string,
   brandName: string = brand.name,
+  method = "GET",
 ) {
-  if (pathname === "/robots.txt") {
-    return new Response("User-agent: *\nDisallow: /\n", {
+  if (
+    pathname === "/robots.txt" &&
+    (method === "GET" || method === "HEAD")
+  ) {
+    return new Response(ROBOTS_DISALLOW_BODY, {
       headers: {
         ...commonHeaders,
         "Content-Type": "text/plain; charset=utf-8",
@@ -94,4 +162,22 @@ export function createPublicReleaseBlockResponse(
       },
     },
   );
+}
+
+/**
+ * Returns crawler rules for the locked or unlocked production state.
+ * This is separate from the release block response because an unlocked site
+ * must expose allow rules without the block-only response status and headers.
+ */
+export function createPublicReleaseRobotsResponse(blocked: boolean) {
+  if (blocked) {
+    return createPublicReleaseBlockResponse("/robots.txt");
+  }
+
+  return new Response(ROBOTS_ALLOW_BODY, {
+    headers: {
+      "Cache-Control": "no-store",
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+  });
 }

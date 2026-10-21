@@ -26,7 +26,129 @@ const normalizePath = (value) => {
 };
 const rehearsalFiles = new Set(
   [
+    "src/server/auth/auth.integration.test.ts",
+    "src/server/auth/rls.integration.test.ts",
+    "src/server/auth/permissions.integration.test.ts",
+    "src/server/auth/r1-security.integration.test.ts",
+    "src/server/db/db.integration.test.ts",
     "src/server/db/r1-empty-migration.integration.test.ts",
+    "src/server/db/r1-account-setup.integration.test.ts",
+    "src/server/db/r1-customer-registration.integration.test.ts",
+    "src/server/db/r2a-lead-rate-limit.integration.test.ts",
+    "src/server/db/r3-intake-read.integration.test.ts",
+    "src/server/db/r3-requirement-read.integration.test.ts",
+    "src/server/db/r3-requirement-write.integration.test.ts",
+    "src/server/db/r1-invitation-command.integration.test.ts",
+    "src/server/db/r1-member-read.integration.test.ts",
+    "src/server/db/r1-permission-migration-failure.integration.test.ts",
+    "src/server/db/r1-security-command.integration.test.ts",
+    "src/server/db/r1-security-command-role-lifetime.integration.test.ts",
+    "src/server/db/r1-security-command-role-revocation.integration.test.ts",
+    "src/server/db/r1-identity-intent.integration.test.ts",
+    "src/server/db/r1-recovery-command.integration.test.ts",
+    "src/server/db/r1-recovery-mfa.integration.test.ts",
+    "src/server/db/r1-recovery-mfa-api.integration.test.ts",
+    "src/server/db/r1-identity-worker.integration.test.ts",
+    "src/server/db/r2b-crm-foundation.integration.test.ts",
+    "src/server/db/r2b-crm-commands.integration.test.ts",
+    "src/server/db/r2b-crm-search.integration.test.ts",
+    "src/server/db/r2b-crm-export.integration.test.ts",
+    "src/server/db/r2b-crm-duplicate.integration.test.ts",
+    "src/server/db/r2b-vendor-evidence.integration.test.ts",
+    "src/server/db/r2a-lead-routing.integration.test.ts",
+      "src/server/db/r3-scorecard-entry.integration.test.ts",
+      "src/server/db/r3-scorecard-view.integration.test.ts",
+      "src/server/db/r3-initial-evaluation.integration.test.ts",
+      "src/server/db/r3-scorecard-create.integration.test.ts",
+      "src/server/db/r3-requirement-metadata.integration.test.ts",
+      "src/server/db/r3-workspace-view.integration.test.ts",
+      "src/server/db/r3-workspace-comment.integration.test.ts",
+      "src/server/db/r4-rfp-create.integration.test.ts",
+      "src/server/db/r4-rfp-approval.integration.test.ts",
+      "src/server/db/r4-rfp-distribution.integration.test.ts",
+      "src/server/db/r4-rfp-clarification.integration.test.ts",
+      "src/server/db/r4-response-ingestion.integration.test.ts",
+      "src/server/db/r4-response-normalization.integration.test.ts",
+      "src/server/db/r4-response-review.integration.test.ts",
+      "src/server/db/r4-portal-response.integration.test.ts",
+      "src/server/db/r4-response-clarifications.integration.test.ts",
+      "src/server/db/r4-response-failures.integration.test.ts",
+      "src/server/db/r4-communication.integration.test.ts",
+      "src/server/db/r4-document-controls.integration.test.ts",
+      "src/server/db/r4-document-uploads.integration.test.ts",
+      "src/server/db/r4-document-reservations.integration.test.ts",
+    "src/server/db/r4-document-reservations-auth.integration.test.ts",
+    "src/server/db/r4-document-reads.integration.test.ts",
+    "src/server/db/r4-document-reads-auth.integration.test.ts",
+      "src/server/integrations/documents/supabase-document-storage.integration.test.ts",
+      "src/server/integrations/documents/document-scan-flow.integration.test.ts",
+      "src/server/integrations/documents/document-review-access.integration.test.ts",
+      "src/server/db/r4-document-worker.integration.test.ts",
+      "src/server/workflows/clamav-document-scanner.integration.test.ts",
+      "src/server/db/r4-job-controls.integration.test.ts",
+      "src/server/db/r6-demo-round.integration.test.ts",
+      "src/server/db/r6-proposal.integration.test.ts",
+      "src/server/db/r6-proposal-quotes.integration.test.ts",
+      "src/server/db/r6-proposal-quotes-auth.integration.test.ts",
+      "src/server/db/r6-contract-handoff.integration.test.ts",
+      "src/server/db/r6-contract-portal.integration.test.ts",
+      "src/server/db/r6-contract-portal-auth.integration.test.ts",
+      "src/server/db/r7-commission.integration.test.ts",
+      "src/server/db/r7-commission-calculation.integration.test.ts",
+      "src/server/db/r7-payment.integration.test.ts",
+    "src/server/db/r7-invoice.integration.test.ts",
+    "src/server/db/r7-finance-auth.integration.test.ts",
+    "src/server/db/r7-finance-document-auth.integration.test.ts",
+    "src/server/db/r7-managed-finance-auth.integration.test.ts",
+    "src/server/db/r7-managed-invoice-auth.integration.test.ts",
+    "src/server/db/r4-rfp-notifications.integration.test.ts",
+    "src/server/db/r8-deal-follow-up-auth.integration.test.ts",
+    "src/server/db/r8-task-historical-request.integration.test.ts",
+    "src/server/db/r4-rfp-receipt-auth.integration.test.ts",
+    "src/server/db/r4-rfp-receipt-history.integration.test.ts",
+    "src/server/audit/staff-audit.integration.test.ts",
+      "src/server/db/r7-dispute.integration.test.ts",
+      "src/server/db/r7-adjustment-handoff.integration.test.ts",
+      "src/server/db/r7-reconciliation.integration.test.ts",
+      "src/server/db/r8-onboarding.integration.test.ts",
+      "src/server/db/r8-work-item.integration.test.ts",
+      "src/server/db/r8-renewal.integration.test.ts",
+      "src/server/db/r8-project-plan.integration.test.ts",
+      "src/server/db/r8-administration-configuration.integration.test.ts",
+      "src/server/db/r8-approval-queue.integration.test.ts",
+      "src/server/db/r8-follow-up-schedule.integration.test.ts",
+      "src/server/db/r2b-vendor-fact-override.integration.test.ts",
+      "src/server/db/r2b-deal.integration.test.ts",
+      "src/server/db/r2b-relationship.integration.test.ts",
+      "src/server/db/r2b-vendor-source.integration.test.ts",
+      "src/server/db/r4-document-search.integration.test.ts",
+      "src/server/db/r4-evaluation-routing.integration.test.ts",
+      "src/server/db/r2b-vendor-acquisition.integration.test.ts",
+      "src/server/db/r4-rfp-amendment.integration.test.ts",
+      "src/server/db/r5-ai-run.integration.test.ts",
+      "src/server/db/r5-ai-evaluation.integration.test.ts",
+      "src/server/db/r9-operational-evidence.integration.test.ts",
+      "src/server/db/r9-deletion-command.integration.test.ts",
+      "src/server/db/r3-candidate-transition.integration.test.ts",
+      "src/server/db/r3-candidate-add.integration.test.ts",
+      "src/server/db/r3-candidate-masking.integration.test.ts",
+      "src/server/db/r3-comparison.integration.test.ts",
+    "src/server/db/r3-intake-save.integration.test.ts",
+    "src/server/db/r3-customer-intake-save.integration.test.ts",
+    "src/server/db/r3-customer-requirement-save.integration.test.ts",
+    "src/server/db/r3-customer-intake-submit.integration.test.ts",
+    "src/server/db/r3-candidate-vendor-scope.integration.test.ts",
+    "src/server/db/r3-candidate-vendor-backfill.integration.test.ts",
+    "src/server/db/r3-approved-vendor-inputs.integration.test.ts",
+    "src/server/db/r3-evaluation-publication.integration.test.ts",
+    "src/server/db/r3-initial-selection.integration.test.ts",
+    "src/server/db/r3-current-publication.integration.test.ts",
+    "src/server/db/r3-disclosure.integration.test.ts",
+      "src/server/db/r3-matching.integration.test.ts",
+      "src/server/db/r3-comparison-export.integration.test.ts",
+      "src/server/db/r3-duplicate-product.integration.test.ts",
+    "src/server/db/r3-intake-matching.integration.test.ts",
+    "src/server/auth/security-command-api.integration.test.ts",
     "src/server/db/r1-populated-migration.integration.test.ts",
     "src/server/db/r1-rollback-compatibility.integration.test.ts",
     "src/server/db/r1-restore.integration.test.ts",
@@ -36,7 +158,11 @@ const integrationFiles = new Set([
   ...rehearsalFiles,
   normalizePath("src/server/auth/auth.integration.test.ts"),
   normalizePath("src/server/auth/rls.integration.test.ts"),
+  normalizePath("src/server/auth/permissions.integration.test.ts"),
+  normalizePath("src/server/auth/r1-security.integration.test.ts"),
   normalizePath("src/server/db/db.integration.test.ts"),
+  normalizePath("src/server/db/r2b-crm-foundation.integration.test.ts"),
+  normalizePath("src/server/db/r3-intake-matching.integration.test.ts"),
 ]);
 const samePath = (left, right) => normalizePath(left) === normalizePath(right);
 const isVitestCommand =
@@ -69,7 +195,7 @@ if (
   throw new Error("The R1 worker wrapper refused an unexpected child command");
 }
 
-if (!isRehearsal) {
+if (!isRehearsal && !isFullIntegrationSuite) {
   dotenv.config({ path: path.join(projectRoot, ".env.local") });
 }
 
@@ -105,6 +231,8 @@ function rehearsalEnvironment() {
       "DOCKER_HOST",
       "HOME",
       "LOCALAPPDATA",
+      // Non-secret file scope for vitest.integration.config.ts (owner decision D9).
+      "MMHR_INTEGRATION_SCOPE",
       "PATH",
       "PATHEXT",
       "PROGRAMDATA",
@@ -151,11 +279,25 @@ function validateLocalMigrationUrl(value) {
   return parsed;
 }
 
+function readLocalApiPort() {
+  const config = readFileSync(
+    path.join(projectRoot, "supabase", "config.toml"),
+    "utf8",
+  );
+  const apiSection = config.match(/\[api\]([\s\S]*?)(?:\r?\n\[|$)/);
+  const port = apiSection?.[1]?.match(/^port\s*=\s*(\d+)\s*$/m)?.[1];
+  if (!port) throw new Error("The local MMHR API port is not configured");
+  return port;
+}
+
 let releaseSignalHandlers = () => undefined;
 let stopActiveChild = () => undefined;
 
 function runChild(environment) {
   const [requestedExecutable, ...args] = command;
+  // The local worker must not expose the development server to the LAN.
+  // Keep the input allowlist exact; callers cannot override this binding.
+  if (isNextDevCommand) args.push("--hostname", "127.0.0.1");
   const executable = requestedExecutable === "node" ? process.execPath : requestedExecutable;
   const child = spawn(executable, args, {
     cwd: projectRoot,
@@ -292,6 +434,7 @@ async function runWithWorker(isIntegrationTest, includeRehearsals) {
     };
     if (isIntegrationTest) {
       childEnvironment.TEST_MIGRATION_DATABASE_URL = migrationUrl.toString();
+      childEnvironment.NEXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${readLocalApiPort()}`;
     } else {
       delete childEnvironment.TEST_MIGRATION_DATABASE_URL;
     }
@@ -326,7 +469,7 @@ async function runWithWorker(isIntegrationTest, includeRehearsals) {
 }
 
 try {
-  if (isRehearsal) {
+  if (isRehearsal || isFullIntegrationSuite) {
     await runRehearsal();
   } else {
     await runWithWorker(isVitestCommand, isFullIntegrationSuite);

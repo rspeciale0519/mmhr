@@ -10,7 +10,7 @@ export type RequestIdentity = {
 
 export type RequestOrganization = {
   id: string;
-  name: string;
+  name: string | null;
   type: "internal" | "customer" | "vendor";
   status: "active";
 };
@@ -36,6 +36,7 @@ export async function createRequestScopedClient(
   organizationId: string,
 ): Promise<RequestScopedContext | null> {
   if (!uuidPattern.test(organizationId)) return null;
+  const normalizedOrganizationId = organizationId.toLowerCase();
 
   const supabase = await createClient();
   const { data: claims, error: claimsError } = await supabase.auth.getClaims();
@@ -47,17 +48,19 @@ export async function createRequestScopedClient(
   );
   if (identityError) return null;
   const identity = firstRow(identityRows as RequestIdentity[] | null);
-  if (!identity || identity.id !== verified.id) return null;
+  // The fixed RPC binds auth.uid() to the stored identity. Its stable ID is
+  // separate from the Auth user ID in the verified JWT subject.
+  if (!identity) return null;
 
   const { data: organizationRows, error: organizationError } =
     await supabase.rpc("mmhr_get_organization", {
-      organization_id: organizationId,
+      organization_id: normalizedOrganizationId,
     });
   if (organizationError) return null;
   const organization = firstRow(
     organizationRows as RequestOrganization[] | null,
   );
-  if (!organization || organization.id !== organizationId) return null;
+  if (!organization || organization.id.toLowerCase() !== normalizedOrganizationId) return null;
 
   return { supabase, identity, organization };
 }

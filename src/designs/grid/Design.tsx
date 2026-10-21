@@ -1,17 +1,23 @@
-import { JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const sans = Schibsted_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedGridSans = localFont({
+  src: [
+    { path: "../../assets/fonts/schibsted-grotesk/schibsted-grotesk-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const sans = retainedGridSans;
+const retainedGridMono = localFont({
+  src: [
+    { path: "../../assets/fonts/jetbrains-mono/jetbrains-mono-normal-400-500-latin.woff2", weight: "400 500", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedGridMono;
 
 export default function Grid() {
   return (
@@ -78,9 +84,9 @@ export default function Grid() {
             <div className="gr-fig">
               <span className="gr-fig-n red">1</span>
               <span className="gr-fig-t">
-                <b>Commission rate</b>
-                The same from every vendor on the list. Steering you cannot pay
-                us more.
+                <b>How we are paid</b>
+                Providers pay a commission or referral fee. Terms can vary by
+                provider, so we disclose them.
               </span>
             </div>
             <div className="gr-fig">
@@ -288,8 +294,8 @@ export default function Grid() {
             <div className="gr-fbrand">
               <div className="gr-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="gr-fc">

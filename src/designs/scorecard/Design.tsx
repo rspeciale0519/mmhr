@@ -1,13 +1,25 @@
-import { IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-sans-d1" });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const retainedScorecardSans = localFont({
+  src: [
+    { path: "../../assets/fonts/instrument-sans/instrument-sans-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+  variable: "--font-sans-d1",
+});
+const sans = retainedScorecardSans;
+const retainedScorecardMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedScorecardMono;
 
 /** Placeholder figures for layout evaluation — not claims. */
 const MATCHES = [
@@ -57,8 +69,8 @@ export default function Scorecard() {
               </button>
             </form>
             <p className="d1-fineprint">
-              Free, and always will be. Vendors pay us the same rate whichever
-              one you choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -110,8 +122,8 @@ export default function Scorecard() {
           <div className="d1-band-head">
             <h2 className="d1-h2">Why this costs you nothing</h2>
             <p>
-              The vendor pays us a commission when you buy &mdash; the same rate
-              from every vendor on the list. We have no reason to steer you.
+              The provider pays us a commission or referral fee when you buy. Terms
+              can vary by provider, and we disclose them before you decide.
             </p>
           </div>
           <div className="d1-grid">

@@ -1,0 +1,71 @@
+.marquee {
+  display: grid;
+  overflow: clip;
+  padding: 0.5rem 0;
+}
+
+.row {
+  overflow: clip;
+  padding: 0.125em 0;
+  font-size: clamp(3.75rem, 13.5vw, 12rem);
+  font-weight: 900;
+  line-height: 0.86;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.row[data-tone="flare"] {
+  background: var(--v-flare);
+  color: var(--v-on-flare);
+}
+
+.row[data-tone="cobalt"] {
+  background: var(--v-cobalt);
+  color: var(--v-on-cobalt);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  transform: skewX(calc(var(--vel) * -14deg));
+}
+
+.phrase {
+  display: flex;
+  flex: none;
+}
+
+/* Scroll speed widens the letters; the variable width axis does the work. */
+.word {
+  padding-inline-end: 0.35em;
+  font-stretch: calc(112% + var(--vel) * 13%);
+  letter-spacing: -0.03em;
+}
+
+/* Stroke under the fill hides the overlapping contours of a variable font. */
+.row[data-tone="outline"] .word {
+  color: var(--v-bg);
+  -webkit-text-stroke: 4px var(--v-ink);
+  paint-order: stroke fill;
+}
+
+.row[data-tone="struck"] .word {
+  text-decoration: line-through;
+  text-decoration-color: var(--v-flare);
+  text-decoration-thickness: 0.09em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .phrase {
+    animation: slide var(--speed) linear infinite;
+  }
+
+  .track[data-reverse] .phrase {
+    animation-direction: reverse;
+  }
+}
+
+@keyframes slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}

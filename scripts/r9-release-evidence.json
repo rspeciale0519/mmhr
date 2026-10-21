@@ -1,0 +1,14 @@
+{
+  "standardCi": { "passed": false, "reference": "pending://ci-run" },
+  "integrationTests": { "passed": false, "reference": "pending://target-database" },
+  "criticalBrowserJourneys": { "passed": false, "reference": "pending://browser-evidence" },
+  "accessibilityEvidence": { "passed": false, "reference": "pending://accessibility-evidence" },
+  "performanceEvidence": { "passed": false, "reference": "pending://performance-evidence" },
+  "availabilityMonitoring": { "passed": false, "reference": "pending://availability-monitoring" },
+  "deletionDrill": { "passed": false, "reference": "pending://deletion-drill" },
+  "restoreDrill": { "passed": false, "reference": "pending://restore-drill" },
+  "securityReview": { "passed": false, "reference": "pending://security-review" },
+  "deploymentSmokeTest": { "passed": false, "reference": "pending://deployment-smoke-test" },
+  "rollbackRehearsal": { "passed": false, "reference": "pending://rollback-rehearsal" },
+  "publicReleaseApproval": { "passed": false, "reference": "pending://public-release-approval" }
+}

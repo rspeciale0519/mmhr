@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-
 import { TRUST } from "@/designs/_content";
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Broker model — MatchMaker HR",
-  description:
-    "How a buyer-side HRIS brokerage works: who pays us, why the rate is identical across every vendor, and how scoring is kept honest.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/broker-model",
+  "Broker model — MatchMaker HR",
+  "How a buyer-side HRIS brokerage works: who pays us, how provider arrangements work, and how scoring is kept honest.",
+);
 
 const STEPS = [
   {
@@ -27,16 +26,16 @@ const STEPS = [
     p: "Send us the quote. We benchmark it against what comparable companies paid, flag unusual terms, and tell you where there is room to move.",
   },
   {
-    h: "The vendor pays our commission",
-    p: "At the same rate, whichever system you chose. Nothing is added to your price and nothing changes hands between you and us.",
+    h: "The provider pays us",
+    p: "Providers pay us under commission or referral arrangements. Customers do not pay MMHR a fee. Those arrangements do not change how we score fit.",
   },
 ];
 
 const COMPARISON = [
   {
     model: "MatchMaker HR",
-    paid: "Vendor, flat rate across all vendors",
-    incentive: "Get the fit right — the fee is identical either way",
+    paid: "Provider, under its commission or referral arrangement",
+    incentive: "Recommendations follow buyer requirements and verified data",
   },
   {
     model: "Percentage-of-contract referrer",
@@ -60,8 +59,8 @@ export default function BrokerModelPage() {
     <>
       <PageHero
         eyebrow="The broker model"
-        title="Free to you, because the incentive is built to be boring."
-        lede="Buyer-side brokerage only works if the broker cannot profit from steering you. Ours cannot: the commission is the same rate from every vendor in the marketplace, so the only thing left to optimise is whether the recommendation is right."
+        title="Free to you because providers pay us."
+        lede="Customers do not pay MMHR a fee. Providers pay us under commission or referral arrangements, and recommendations follow your requirements and verified data."
       />
 
       <section className="pu-sec">

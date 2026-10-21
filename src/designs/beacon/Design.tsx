@@ -1,14 +1,23 @@
-import { Manrope, Sora } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Sora({
-  subsets: ["latin"],
-  weight: ["500", "600"],
+const retainedBeaconDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/sora/sora-normal-500-600-latin.woff2", weight: "500 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Manrope({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const display = retainedBeaconDisplay;
+const retainedBeaconBody = localFont({
+  src: [
+    { path: "../../assets/fonts/manrope/manrope-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedBeaconBody;
 
 export default function Beacon() {
   return (
@@ -317,8 +326,8 @@ export default function Beacon() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we tell you when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="b-fcol">

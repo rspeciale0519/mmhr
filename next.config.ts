@@ -13,6 +13,8 @@ export default withSentryConfig(nextConfig, {
   // Source maps are uploaded only where an auth token exists (CI / Vercel);
   // local builds skip it rather than failing.
   silent: !process.env.CI,
-  disableLogger: true,
+  telemetry: false,
+  // Replaces the deprecated disableLogger option. Turbopack builds ignore it.
+  webpack: { treeshake: { removeDebugLogging: true } },
   widenClientFileUpload: true,
 });

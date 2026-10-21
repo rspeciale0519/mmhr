@@ -1,18 +1,32 @@
-import { IBM_Plex_Mono, Karla, Spectral } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const display = Spectral({
-  subsets: ["latin"],
-  weight: ["500", "600"],
+const retainedLedgerDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/spectral/spectral-normal-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/spectral/spectral-normal-600-latin.woff2", weight: "600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Karla({ subsets: ["latin"] });
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const display = retainedLedgerDisplay;
+const retainedLedgerBody = localFont({
+  src: [
+    { path: "../../assets/fonts/karla/karla-normal-200-800-latin.woff2", weight: "200 800", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedLedgerBody;
+const retainedLedgerMono = localFont({
+  src: [
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/ibm-plex-mono/ibm-plex-mono-normal-500-latin.woff2", weight: "500", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedLedgerMono;
 
 /** Placeholder figures for layout evaluation — not claims. */
 const LINES = [
@@ -60,8 +74,8 @@ export default function Ledger() {
               </button>
             </form>
             <p className="d4-fine">
-              Free to you. The vendor pays our commission &mdash; the same rate
-              whichever one you choose.
+              Free for buyers. Providers pay a commission or referral fee. Terms
+              can vary by provider.
             </p>
           </div>
 
@@ -108,18 +122,16 @@ export default function Ledger() {
         <section className="d4-band">
           <h2 className="d4-h2">How we&rsquo;re paid</h2>
           <p>
-            The vendor you choose pays us a commission &mdash; the identical rate
-            from every vendor on the list. Steering you cannot make us more
-            money, which is the only reason a promise like this is worth
-            anything.
+            The provider you choose pays us a commission or referral fee when you
+            buy. Terms can vary by provider, so we disclose them before you decide.
           </p>
           <div className="d4-notes">
             <div className="d4-note">
               <div className="d4-note-k">Note 1</div>
-              <h3>Same rate, every vendor</h3>
+              <h3>Provider terms, disclosed</h3>
               <p>
-                Published on our pricing page. If it ever changes, it changes for
-                all of them at once.
+                We explain the applicable commission or referral arrangement before
+                you decide.
               </p>
             </div>
             <div className="d4-note">

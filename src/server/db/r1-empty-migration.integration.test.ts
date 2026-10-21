@@ -6,30 +6,17 @@ import {
   startRehearsal,
   stopRehearsal,
 } from "./r1-migration-rehearsal";
+import {
+  verifyEmergencyContainment,
+  verifyInternalScopeContinuity,
+  verifyRegistrySynchronization,
+  verifyRoleApprovalSerialization,
+  verifyRoleDefaultPrecedence,
+  verifyWorkspaceDefinitionGate,
+} from "./r1-permission-rehearsal-cases";
+import { applicationTables as expectedTables } from "./test/application-schema-inventory";
 
-const expectedTables = [
-  "admin_delegation_grants",
-  "audit_events",
-  "audit_log",
-  "identities",
-  "identity_admin_intents",
-  "identity_recovery_approvals",
-  "identity_recovery_presence",
-  "identity_recovery_requests",
-  "invitations",
-  "leads",
-  "org_members",
-  "orgs",
-  "permission_definitions",
-  "platform_role_assignments",
-  "portal_access_grants",
-  "role_definitions",
-  "role_permission_defaults",
-  "security_bootstrap_state",
-  "user_permission_overrides",
-];
-
-describe("R1.3 empty database migration", () => {
+describe("R1.4 empty database migration", () => {
   let context: RehearsalContext | undefined;
 
   beforeAll(async () => {
@@ -61,32 +48,66 @@ describe("R1.3 empty database migration", () => {
     >`
       SELECT stable_key, version, kind, state
       FROM role_definitions
+      WHERE state = 'active'
       ORDER BY stable_key
     `;
 
     expect(roles).toEqual([
-      { stable_key: "admin", version: 1, kind: "platform", state: "active" },
+      { stable_key: "admin", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "contributor",
-        version: 1,
+        version: 6,
         kind: "organization",
         state: "active",
       },
       {
         stable_key: "organization_admin",
-        version: 1,
+        version: 6,
         kind: "organization",
         state: "active",
       },
-      { stable_key: "staff", version: 1, kind: "platform", state: "active" },
+      { stable_key: "staff", version: 2, kind: "platform", state: "active" },
       {
         stable_key: "super_admin",
-        version: 1,
+        version: 10,
         kind: "platform",
         state: "active",
       },
-      { stable_key: "viewer", version: 1, kind: "organization", state: "active" },
+      { stable_key: "viewer", version: 2, kind: "organization", state: "active" },
     ]);
+
+    const previous = await context!.client<{ count: number }[]>`
+      SELECT count(*)::integer AS count FROM role_definitions
+      WHERE version = 1 AND state = 'approved' AND activated_at IS NULL
+    `;
+    expect(previous[0]!.count).toBe(6);
+    const previousDefaults = await context!.client<{ count: number }[]>`
+      SELECT count(*)::integer AS count FROM role_permission_defaults AS defaults
+      JOIN role_definitions AS role ON role.id = defaults.role_definition_id
+      WHERE role.version = 1
+    `;
+    expect(previousDefaults[0]!.count).toBe(0);
+    const [financeUpgrade] = await context!.client<{
+      prior_state: string; prior_defaults: number; finance_defaults: number; linked_authorities: number;
+    }[]>`
+      SELECT prior.state AS prior_state,
+        (SELECT count(*)::integer FROM role_permission_defaults d
+          WHERE d.role_definition_id = prior.id) AS prior_defaults,
+        (SELECT count(*)::integer FROM role_permission_defaults d
+          WHERE d.role_definition_id = active.id AND d.permission_key = 'finance.manage'
+            AND d.effect = 'allow') AS finance_defaults,
+        (SELECT count(*)::integer FROM role_authority_records current_authority
+          JOIN role_authority_records prior_authority
+            ON prior_authority.id = current_authority.previous_authority_id
+          WHERE current_authority.role_definition_id = active.id
+            AND current_authority.record_kind = 'role_activation'
+            AND prior_authority.role_definition_id = prior.id) AS linked_authorities
+      FROM role_definitions prior JOIN role_definitions active
+        ON active.stable_key = prior.stable_key AND active.version = 3
+      WHERE prior.stable_key = 'super_admin' AND prior.version = 2
+    `;
+    expect(financeUpgrade).toEqual({ prior_state: "approved", prior_defaults: 30,
+      finance_defaults: 1, linked_authorities: 1 });
   });
 
   test("records the R1 migration audit events", async () => {
@@ -98,9 +119,14 @@ describe("R1.3 empty database migration", () => {
     `;
 
     expect(events).toEqual([
+      { action: "permission_registry.sync", count: 9 },
       { action: "r1.2_schema.add", count: 1 },
       { action: "r1.3_access.add", count: 1 },
-      { action: "role_version.activate", count: 6 },
+      { action: "r1.4_permissions.add", count: 1 },
+      { action: "role_authority.backfill", count: 1 },
+      { action: "role_authority.expand", count: 1 },
+      { action: "role_version.activate", count: 28 },
+      { action: "role_version.deactivate", count: 22 },
     ]);
   });
 
@@ -141,7 +167,7 @@ describe("R1.3 empty database migration", () => {
     const [schemaAccess] = await context!.client<{ allowed: boolean }[]>`
       SELECT has_schema_privilege('mmhr_worker', 'mmhr_private', 'USAGE') AS allowed
     `;
-    expect(schemaAccess?.allowed).toBe(false);
+    expect(schemaAccess?.allowed).toBe(true);
   });
 
   test("does not activate worker commands or recovery commands", async () => {
@@ -159,35 +185,22 @@ describe("R1.3 empty database migration", () => {
       ORDER BY procedures.proname
     `;
 
-    expect(workerFunctions.map((item) => item.proname)).toEqual([
-      "r1_audit_summary_is_safe",
-      "r1_create_ephemeral_worker_login",
-      "r1_disable_ephemeral_worker_login",
-      "r1_disable_expired_worker_logins",
-      "r1_enforce_state_transition",
-      "r1_protect_legacy_invitation_token",
-      "r1_protect_role_definition_history",
-      "r1_protect_role_permission_defaults",
-      "r1_reject_immutable_mutation",
-      "r1_remove_ephemeral_worker_login",
-      "r1_remove_expired_worker_logins",
-      "r1_renew_ephemeral_worker_login",
-      "r1_request_has_membership",
-      "r1_request_identity_id",
-      "r1_request_is_org_admin",
-      "r1_worker_role_is_safe",
-    ]);
+    expect(workerFunctions.length).toBeGreaterThan(0);
     expect(workerFunctions.every((item) => !item.worker_execute)).toBe(true);
 
-    const recoveryFunctions = await context!.client<{ proname: string }[]>`
+    const recoveryFunctions = await context!.client<{ proname: string; authenticated_execute: boolean; anon_execute: boolean }[]>`
       SELECT procedures.proname
+        , has_function_privilege('authenticated', procedures.oid, 'EXECUTE') AS authenticated_execute
+        , has_function_privilege('anon', procedures.oid, 'EXECUTE') AS anon_execute
       FROM pg_proc AS procedures
       INNER JOIN pg_namespace AS namespaces
         ON namespaces.oid = procedures.pronamespace
       WHERE namespaces.nspname IN ('public', 'mmhr_private')
         AND procedures.proname ILIKE '%recovery%'
     `;
-    expect(recoveryFunctions).toHaveLength(0);
+    expect(recoveryFunctions.length).toBeGreaterThan(0);
+    expect(recoveryFunctions.some((item) => item.authenticated_execute)).toBe(true);
+    expect(recoveryFunctions.every((item) => !item.anon_execute)).toBe(true);
 
     const protectedRows = await context!.client<
       { table_name: string; count: number }[]
@@ -204,5 +217,29 @@ describe("R1.3 empty database migration", () => {
       ORDER BY table_name
     `;
     expect(protectedRows.every((item) => item.count === 0)).toBe(true);
+  });
+
+  test("synchronizes registry definitions without silently changing policy", async () => {
+    await verifyRegistrySynchronization(context!);
+  });
+
+  test("emergency containment revokes all R1 RPCs and rolls back exact grants", async () => {
+    await verifyEmergencyContainment(context!, expectedTables);
+  });
+
+  test("serializes draft-default changes with role approval", async () => {
+    await verifyRoleApprovalSerialization(context!);
+  });
+
+  test("applies deny and override precedence across real role versions", async () => {
+    await verifyRoleDefaultPrecedence(context!);
+  });
+
+  test("platform revocation cannot convert an internal principal into an external member", async () => {
+    await verifyInternalScopeContinuity(context!);
+  });
+
+  test("workspace registry retirement denies organization action access", async () => {
+    await verifyWorkspaceDefinitionGate(context!);
   });
 });

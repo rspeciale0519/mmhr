@@ -1,17 +1,26 @@
 "use client";
 
-import { Geologica, Martian_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { useSyncExternalStore } from "react";
 
 import { Footer } from "./Footer";
 import { Nav, type Theme } from "./Nav";
 
-const body = Geologica({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const mono = Martian_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const siteBody = localFont({
+  src: [
+    { path: "../../../assets/fonts/geologica/geologica-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = siteBody;
+const siteMono = localFont({
+  src: [
+    { path: "../../../assets/fonts/martian-mono/martian-mono-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = siteMono;
 
 const STORAGE_KEY = "mmhr-theme";
 const THEME_EVENT = "mmhr-theme-change";

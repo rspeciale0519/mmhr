@@ -1,14 +1,23 @@
-import { Epilogue, Syne } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const display = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+const retainedMarqueeDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/syne/syne-normal-600-800-latin.woff2", weight: "600 800", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Epilogue({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const display = retainedMarqueeDisplay;
+const retainedMarqueeBody = localFont({
+  src: [
+    { path: "../../assets/fonts/epilogue/epilogue-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedMarqueeBody;
 
 const RECEIPTS = [
   { name: "Rippling", fit: 94, ours: false },
@@ -207,8 +216,8 @@ export default function Marquee() {
         <div className="mq-wrap">
           <h2 className="mq-h2">Free isn&rsquo;t a gimmick. Here&rsquo;s the mechanism.</h2>
           <p className="mq-sub">
-            The vendor you choose pays us a commission — the same rate from every
-            vendor on the list.
+            The provider you choose pays us a commission or referral fee. Terms can
+            vary by provider, so we disclose them before you decide.
           </p>
           <div className="mq-trust">
             {TRUST.map((t, i) => (
@@ -280,8 +289,8 @@ export default function Marquee() {
             <div>
               <div className="mq-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we tell you when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="mq-fc">

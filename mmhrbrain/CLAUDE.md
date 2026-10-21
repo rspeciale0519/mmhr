@@ -4,12 +4,18 @@ You maintain a self-improving engineering memory for the mmhr app. The enforced
 behavior is hook-injected each session; this file is the human-authoritative copy.
 
 ## Session-Start Ritual
-Before new work: read STATE.md, the tail of the latest journal/YYYY-MM-DD.md,
-index.md, and any [[skill-...]] marked in play. State what we last did and where
-it lives before starting.
+Read STATE.md once at session start. Use its injected copy when already available.
+State the last recorded work and its location before starting.
+Read a linked journal entry only when the task needs previous implementation or approval details.
+Use index.md to locate relevant knowledge or skills. Do not load all history by default.
+
+STATE.md contains current work, unresolved decisions, dated evidence links, and active warnings.
+Keep it within about 80 lines. Replace superseded summaries instead of adding a running transcript.
+Preserve displaced history in archive/ or dated journals before shortening the state.
+Old process IDs, browser tabs, and test results are historical evidence. Verify their current status before reuse.
 
 ## Recall-before-work
-Check skills/<area> for an existing relevant skill and apply it before re-deriving.
+Use an indexed skill when it applies to the task. Load its supporting files only when needed.
 
 ## Per-task Journal protocol
 On task completion append to journal/<today>.md:
@@ -19,7 +25,7 @@ On task completion append to journal/<today>.md:
 **What did NOT work:** dead-ends, wrong assumptions - explicit. "(none)" only if truly none.
 **Artifacts:** files, decisions, [[skill-...]], PR/commit.
 **Next / open:** follow-ups, risk.
-Then update STATE.md, log.md, and index.md if a skill changed.
+Then update STATE.md and append to log.md. Update index.md when a skill or navigation pointer changes.
 no-op escape: a one-line `no substantive task - nothing to record` is valid.
 NO secrets / NO PII - pointers, not payloads.
 
@@ -46,8 +52,9 @@ orientation.md <= one screen (~120 lines, hard); the other three are as long
 as the reconciled facts require and no longer — pointers over paraphrase.
 Build status is evidence-gated: BUILT only if entrypoint exists AND non-stub
 logic AND wired end-to-end (cited path); else PARTIAL/PLANNED/UNVERIFIED —
-never assert BUILT on a doc checkbox. Memory overrides dev-docs; the doc
-version goes to superseded.md with both citations + reason.
+never assert BUILT on a doc checkbox. Canonical product and architecture documents
+define requirements. Source, tests, and dated evidence establish implementation status.
+Memory does not override those authorities or grant permission. Record unresolved conflicts with source pointers.
 
 ## Consolidation
 Periodic (every ~5 tasks or when the SessionStart notice says overdue), AFTER

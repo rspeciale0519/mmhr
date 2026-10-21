@@ -1,0 +1,217 @@
+import { sql } from "drizzle-orm";
+import {
+  check,
+  date,
+  foreignKey,
+  bigint,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
+
+import { identities, orgs } from "./identity";
+import { deals } from "./crm-workflow";
+
+export const commissionStructures = pgTable("commission_structures", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  vendorOrganizationId: uuid("vendor_organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  effectiveFrom: timestamp("effective_from", { withTimezone: true }).notNull(),
+  effectiveTo: timestamp("effective_to", { withTimezone: true }),
+  calculationType: text("calculation_type").notNull(),
+  rateBasisPoints: integer("rate_basis_points"),
+  flatAmountMinorUnits: bigint("flat_amount_minor_units", { mode: "number" }),
+  currency: text("currency").notNull(),
+  sourceAgreementId: uuid("source_agreement_id").notNull(),
+  revision: integer("revision").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("commission_structures_organization_id_uq").on(t.organizationId, t.id),
+  index("commission_structures_vendor_effective_idx").on(t.organizationId, t.vendorOrganizationId, t.effectiveFrom),
+  check("commission_structures_scope_ck", sql`${t.organizationId} <> ${t.vendorOrganizationId}`),
+  check("commission_structures_type_ck", sql`${t.calculationType} in ('contract_value_rate', 'flat_amount')`),
+  check("commission_structures_amount_ck", sql`(${t.calculationType} = 'contract_value_rate' and ${t.rateBasisPoints} between 0 and 10000 and ${t.flatAmountMinorUnits} is null) or (${t.calculationType} = 'flat_amount' and ${t.rateBasisPoints} is null and ${t.flatAmountMinorUnits} >= 0)`),
+  check("commission_structures_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
+  check("commission_structures_dates_ck", sql`${t.effectiveTo} is null or ${t.effectiveTo} >= ${t.effectiveFrom}`),
+  check("commission_structures_revision_ck", sql`${t.revision} > 0`),
+]);
+
+export const commissionEvents = pgTable("commission_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  contractId: uuid("contract_id").notNull(),
+  dealId: uuid("deal_id").notNull(),
+  vendorOrganizationId: uuid("vendor_organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  structureId: uuid("structure_id"),
+  sourceMode: text("source_mode").notNull().default("legacy"),
+  eventRevision: integer("event_revision").notNull().default(1),
+  contractCurrency: text("contract_currency"),
+  idempotencyKey: uuid("idempotency_key").notNull(),
+  signedAt: timestamp("signed_at", { withTimezone: true }).notNull(),
+  currency: text("currency"),
+  contractValueMinorUnits: bigint("contract_value_minor_units", { mode: "number" }),
+  commissionAmountMinorUnits: bigint("commission_amount_minor_units", { mode: "number" }),
+  calculationRevision: integer("calculation_revision").notNull(),
+  state: text("state").notNull().default("pending_review"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("commission_events_organization_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("commission_events_contract_identity_uq").on(t.organizationId, t.id, t.contractId),
+  uniqueIndex("commission_events_idempotency_uq").on(t.organizationId, t.idempotencyKey),
+  uniqueIndex("commission_events_contract_uq").on(t.organizationId, t.contractId),
+  foreignKey({ columns: [t.organizationId, t.dealId], foreignColumns: [deals.organizationId, deals.id], name: "commission_events_deal_scope_fk" }),
+  foreignKey({ columns: [t.organizationId, t.structureId], foreignColumns: [commissionStructures.organizationId, commissionStructures.id], name: "commission_events_structure_scope_fk" }),
+  check("commission_events_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
+  check("commission_events_amount_ck", sql`${t.contractValueMinorUnits} >= 0 and ${t.commissionAmountMinorUnits} >= 0`),
+  check("commission_events_source_mode_ck", sql`${t.sourceMode} in ('legacy','managed') and ${t.eventRevision} > 0`),
+  check("commission_events_known_money_ck", sql`(${t.sourceMode} = 'legacy' and ${t.structureId} is not null
+      and ${t.currency} is not null and ${t.contractValueMinorUnits} is not null and ${t.commissionAmountMinorUnits} is not null)
+    or (${t.sourceMode} = 'managed'
+      and (${t.commissionAmountMinorUnits} is null or (${t.currency} is not null and ${t.commissionAmountMinorUnits} <= 9007199254740991))
+      and (${t.contractValueMinorUnits} is null or (${t.contractCurrency} is not null and ${t.contractValueMinorUnits} <= 9007199254740991))
+      and (${t.contractCurrency} is null or ${t.contractCurrency} ~ '^[A-Z]{3}$')
+      and (${t.state} = 'pending_review' or (${t.structureId} is not null and ${t.currency} is not null and ${t.commissionAmountMinorUnits} is not null)))`),
+  check("commission_events_state_ck", sql`${t.state} in ('pending_review', 'approved', 'invoiced', 'partially_paid', 'paid', 'disputed', 'adjusted', 'voided', 'written_off')`),
+  check("commission_events_revision_ck", sql`(${t.sourceMode} = 'legacy' and ${t.calculationRevision} > 0)
+    or (${t.sourceMode} = 'managed' and ${t.calculationRevision} >= 0
+      and (${t.state} = 'pending_review' or ${t.calculationRevision} > 0))`),
+]);
+
+export const commissionEventHistory = pgTable("commission_event_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  commissionEventId: uuid("commission_event_id").notNull(),
+  eventRevision: integer("event_revision"),
+  fromState: text("from_state").notNull(),
+  toState: text("to_state").notNull(),
+  actorIdentityId: uuid("actor_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  reason: text("reason").notNull(),
+  occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
+  correlationId: uuid("correlation_id").notNull(),
+}, (t) => [
+  uniqueIndex("commission_event_history_managed_revision_uq").on(t.commissionEventId, t.eventRevision),
+  check("commission_event_history_managed_revision_ck", sql`${t.eventRevision} is null or ${t.eventRevision} > 0`),
+  index("commission_event_history_scope_time_idx").on(t.organizationId, t.commissionEventId, t.occurredAt),
+  foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "commission_event_history_scope_fk" }),
+  check("commission_event_history_reason_ck", sql`length(btrim(${t.reason})) between 1 and 2000`),
+]);
+
+export const commissionPayments = pgTable("commission_payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  commissionEventId: uuid("commission_event_id").notNull(),
+  amountMinorUnits: bigint("amount_minor_units", { mode: "number" }).notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
+  state: text("state").notNull().default("received"),
+  externalReference: text("external_reference"),
+  recordedByIdentityId: uuid("recorded_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+}, (t) => [
+  uniqueIndex("commission_payments_organization_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "commission_payments_scope_fk" }),
+  check("commission_payments_amount_ck", sql`${t.amountMinorUnits} > 0`),
+  check("commission_payments_state_ck", sql`${t.state} in ('received', 'reversed')`),
+]);
+
+export const financeInvoices = pgTable("finance_invoices", {
+  sourceMode: text("source_mode").notNull().default("legacy"),
+  invoiceRevision: integer("invoice_revision").notNull().default(0),
+  currentPreparationId: uuid("current_preparation_id"),
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  commissionEventId: uuid("commission_event_id").notNull(),
+  vendorOrganizationId: uuid("vendor_organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  currency: text("currency").notNull(),
+  amountMinorUnits: bigint("amount_minor_units", { mode: "number" }).notNull(),
+  status: text("status").notNull().default("draft"),
+  invoiceNumber: text("invoice_number"),
+  issueDate: date("issue_date", { mode: "string" }),
+  dueDate: date("due_date", { mode: "string" }),
+  supportingDocumentReferences: jsonb("supporting_document_references").notNull().default([]),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("finance_invoices_organization_id_uq").on(t.organizationId, t.id),
+  uniqueIndex("finance_invoices_event_identity_uq").on(t.organizationId, t.id, t.commissionEventId),
+  uniqueIndex("finance_invoices_managed_active_uq").on(t.organizationId, t.commissionEventId).where(sql`${t.sourceMode} = 'managed' and ${t.status} <> 'voided'`),
+  check("finance_invoices_managed_mode_ck", sql`(${t.sourceMode} = 'legacy' and ${t.invoiceRevision} = 0 and ${t.currentPreparationId} is null) or (${t.sourceMode} = 'managed' and ${t.invoiceRevision} > 0 and ${t.currentPreparationId} is not null)`),
+  foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_invoices_scope_fk" }),
+  check("finance_invoices_currency_ck", sql`${t.currency} ~ '^[A-Z]{3}$'`),
+  check("finance_invoices_amount_ck", sql`${t.amountMinorUnits} >= 0`),
+  check("finance_invoices_status_ck", sql`${t.status} in ('draft', 'ready', 'issued', 'voided')`),
+  check("finance_invoices_issue_ck", sql`${t.status} <> 'issued' or (${t.invoiceNumber} is not null and ${t.issueDate} is not null and ${t.dueDate} is not null)`),
+  check("finance_invoices_dates_ck", sql`${t.dueDate} is null or ${t.issueDate} is null or ${t.dueDate} >= ${t.issueDate}`),
+  check("finance_invoices_refs_ck", sql`jsonb_typeof(${t.supportingDocumentReferences}) = 'array'`),
+]);
+
+export const financeDisputes = pgTable("finance_disputes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  commissionEventId: uuid("commission_event_id").notNull(),
+  openedByIdentityId: uuid("opened_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  openedAt: timestamp("opened_at", { withTimezone: true }).notNull(),
+  reasonCode: text("reason_code").notNull(),
+  reason: text("reason").notNull(),
+  status: text("status").notNull().default("open"),
+  resolvedByIdentityId: uuid("resolved_by_identity_id").references(() => identities.id, { onDelete: "restrict" }),
+  resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+  resolution: text("resolution"),
+}, (t) => [
+  uniqueIndex("finance_disputes_organization_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_disputes_scope_fk" }),
+  check("finance_disputes_reason_code_ck", sql`${t.reasonCode} in ('amount', 'eligibility', 'duplicate', 'payment', 'other')`),
+  check("finance_disputes_status_ck", sql`${t.status} in ('open', 'resolved', 'rejected')`),
+  check("finance_disputes_resolution_ck", sql`(${t.status} = 'open' and ${t.resolvedByIdentityId} is null and ${t.resolvedAt} is null and ${t.resolution} is null) or (${t.status} <> 'open' and ${t.resolvedByIdentityId} is not null and ${t.resolvedAt} is not null and ${t.resolution} is not null)`),
+  check("finance_disputes_time_ck", sql`${t.resolvedAt} is null or ${t.resolvedAt} >= ${t.openedAt}`),
+]);
+
+export const financeAdjustments = pgTable("finance_adjustments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  commissionEventId: uuid("commission_event_id").notNull(),
+  direction: text("direction").notNull(),
+  amountMinorUnits: bigint("amount_minor_units", { mode: "number" }).notNull(),
+  reason: text("reason").notNull(),
+  approvedByIdentityId: uuid("approved_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("finance_adjustments_organization_id_uq").on(t.organizationId, t.id),
+  foreignKey({ columns: [t.organizationId, t.commissionEventId], foreignColumns: [commissionEvents.organizationId, commissionEvents.id], name: "finance_adjustments_scope_fk" }),
+  check("finance_adjustments_direction_ck", sql`${t.direction} in ('increase', 'decrease')`),
+  check("finance_adjustments_amount_ck", sql`${t.amountMinorUnits} > 0`),
+  check("finance_adjustments_time_ck", sql`${t.approvedAt} >= ${t.createdAt}`),
+]);
+
+export const financeHandoffs = pgTable("finance_handoffs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  destinationReference: text("destination_reference").notNull(),
+  sourceEventIds: jsonb("source_event_ids").notNull(),
+  approvedByIdentityId: uuid("approved_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }).notNull(),
+  reason: text("reason").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("finance_handoffs_organization_id_uq").on(t.organizationId, t.id),
+  check("finance_handoffs_source_ck", sql`jsonb_typeof(${t.sourceEventIds}) = 'array' and jsonb_array_length(${t.sourceEventIds}) between 1 and 10000`),
+]);
+
+export const financeReconciliationReports = pgTable("finance_reconciliation_reports", {
+  id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
+  periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+  periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+  reportRows: jsonb("report_rows").notNull(),
+  createdByIdentityId: uuid("created_by_identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("finance_reconciliation_reports_organization_id_uq").on(t.organizationId, t.id),
+  check("finance_reconciliation_reports_period_ck", sql`${t.periodEnd} > ${t.periodStart}`),
+  check("finance_reconciliation_reports_rows_ck", sql`jsonb_typeof(${t.reportRows}) = 'array' and jsonb_array_length(${t.reportRows}) between 1 and 10000`),
+]);

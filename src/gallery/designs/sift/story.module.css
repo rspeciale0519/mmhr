@@ -1,0 +1,205 @@
+.story {
+  position: relative;
+  background: var(--s-klein);
+  color: #ffffff;
+}
+
+/* The canvas stays pinned while the steps scroll over it. */
+.sticky {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100svh;
+  margin-bottom: -100svh;
+  overflow: clip;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.counter {
+  position: absolute;
+  inset-inline-start: max(1rem, (100% - 82rem) / 2);
+  inset-block-end: 2rem;
+  display: grid;
+  justify-items: start;
+  margin: 0;
+  font-family: var(--sift-display), ui-sans-serif, system-ui, sans-serif;
+  line-height: 0.85;
+}
+
+.counter > span:first-child {
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.counterLabel {
+  margin-top: 0.5rem;
+  font-family: var(--sift-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+@media (max-width: 56.24rem) {
+  .counter {
+    inset-inline-start: auto;
+    inset-inline-end: 1rem;
+    inset-block-start: 4.5rem;
+    inset-block-end: auto;
+    justify-items: end;
+  }
+
+  .counter > span:first-child {
+    font-size: 3rem;
+  }
+
+  .counterLabel {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+.steps {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: flex-end;
+  min-height: 92svh;
+  width: min(100% - 2rem, 82rem);
+  margin-inline: auto;
+  padding-bottom: 1rem;
+}
+
+.step:first-child {
+  min-height: 100svh;
+}
+
+@media (min-width: 56.25rem) {
+  .step {
+    align-items: center;
+    min-height: 100svh;
+    padding-bottom: 0;
+  }
+}
+
+.card {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-height: 44svh;
+  overflow: auto;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: rgb(14 20 66 / 0.82);
+  backdrop-filter: blur(10px);
+}
+
+/* The opening card keeps its buttons in view. */
+.step:first-child .card {
+  max-height: none;
+  overflow: visible;
+}
+
+@media (min-width: 56.25rem) {
+  .card {
+    max-width: 30rem;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    backdrop-filter: none;
+  }
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--sift-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.125rem, 5.4vw, 4.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.stepCount {
+  margin: 0;
+  color: #ffe14d;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--sift-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.625rem, 3.6vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.text {
+  margin: 0;
+  font-size: clamp(1rem, 1.3vw, 1.1875rem);
+  line-height: 1.55;
+  opacity: 0.92;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary {
+  background: #ffe14d;
+  color: #0e1442;
+}
+
+@media (hover: hover) {
+
+.primary:hover {
+  background: #ffffff;
+}
+}
+
+.secondary {
+  border: 2px solid rgb(255 255 255 / 0.7);
+  color: #ffffff;
+}
+
+@media (hover: hover) {
+
+.secondary:hover {
+  border-color: #ffffff;
+  background: rgb(255 255 255 / 0.1);
+}
+}
+
+.story :focus-visible {
+  outline-color: #ffe14d;
+}

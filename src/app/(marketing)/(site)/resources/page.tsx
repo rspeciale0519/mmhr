@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { POSTS } from "../../_site/data";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Resources — MatchMaker HR",
-  description:
-    "The HRIS Landscape Report, the Requirements Builder, the HR service partner finder, and writing on pricing and evaluation.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/resources",
+  "Resources — MatchMaker HR",
+  "The HRIS Landscape Report, the Requirements Builder, the HR service partner finder, and writing on pricing and evaluation.",
+);
 
 const RESOURCES = [
   {
@@ -52,7 +52,7 @@ export default function ResourcesPage() {
             {RESOURCES.map((r) => (
               <Link className="pu-pcard" href={r.href} key={r.href}>
                 <div className="pu-cell-k">{r.k}</div>
-                <h3>{r.h}</h3>
+                <h2>{r.h}</h2>
                 <p>{r.p}</p>
                 <div className="pu-pcard-more">Open →</div>
               </Link>

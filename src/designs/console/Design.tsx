@@ -1,22 +1,31 @@
-import { Hanken_Grotesk, Red_Hat_Mono, Unbounded } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const body = Hanken_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedConsoleBody = localFont({
+  src: [
+    { path: "../../assets/fonts/hanken-grotesk/hanken-grotesk-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const display = Unbounded({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+const body = retainedConsoleBody;
+const retainedConsoleDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/unbounded/unbounded-normal-600-800-latin.woff2", weight: "600 800", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const mono = Red_Hat_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const display = retainedConsoleDisplay;
+const retainedConsoleMono = localFont({
+  src: [
+    { path: "../../assets/fonts/red-hat-mono/red-hat-mono-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedConsoleMono;
 
 const TILES = [
   {
@@ -108,8 +117,8 @@ export default function Console() {
             </button>
           </form>
           <p className="co-micro">
-            Free. The vendor pays our commission — the same rate whichever one
-            you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
 
           {/* SIGNATURE — the console tile wall */}
@@ -289,8 +298,8 @@ export default function Console() {
                 MatchMaker HR
               </div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate
-                by every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="co-fcol">

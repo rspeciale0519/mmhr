@@ -1,6 +1,6 @@
 "use client";
 
-import { Geologica, Martian_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { useState } from "react";
 
 import { Footer } from "@/app/(marketing)/_site/Footer";
@@ -9,12 +9,21 @@ import { PulseBody } from "./Body";
 import "./styles.css";
 import "@/app/(marketing)/_site/site.css";
 
-const body = Geologica({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const mono = Martian_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const retainedPulseBody = localFont({
+  src: [
+    { path: "../../assets/fonts/geologica/geologica-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedPulseBody;
+const retainedPulseMono = localFont({
+  src: [
+    { path: "../../assets/fonts/martian-mono/martian-mono-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedPulseMono;
 
 /**
  * Pulse, complete and self-contained — nav, body, footer, and its own theme

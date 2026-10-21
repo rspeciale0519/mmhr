@@ -1,0 +1,64 @@
+name: Production release gate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standard-ci:
+    name: Run standard CI gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check integration matrix
+        run: npm run check:integration-matrix
+
+      - name: Check tracked secrets
+        run: npm run check:secrets
+
+      - name: Dependency audit
+        run: npm run check:dependency-audit
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+  integration-tests:
+    name: Run integration tests
+    needs: standard-ci
+    uses: ./.github/workflows/integration.yml
+
+  evidence:
+    name: Require approved R9 evidence
+    needs: [standard-ci, integration-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Require release readiness
+        run: npm run check:r9-evidence:release

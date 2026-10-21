@@ -1,17 +1,23 @@
-import { Chivo_Mono, Libre_Franklin } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const sans = Libre_Franklin({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const retainedReportSans = localFont({
+  src: [
+    { path: "../../assets/fonts/libre-franklin/libre-franklin-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
 });
-const mono = Chivo_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const sans = retainedReportSans;
+const retainedReportMono = localFont({
+  src: [
+    { path: "../../assets/fonts/chivo-mono/chivo-mono-normal-400-500-latin.woff2", weight: "400 500", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedReportMono;
 
 /**
  * A price distribution for comparable companies, with the reader's own quote
@@ -83,8 +89,8 @@ export default function Report() {
             </button>
           </form>
           <p className="re-fine">
-            Free. The vendor pays our commission — the same rate whichever one
-            you choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms
+            can vary by provider.
           </p>
         </div>
 
@@ -339,8 +345,8 @@ export default function Report() {
             <div>
               <div className="re-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by
-                every vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="re-fc">

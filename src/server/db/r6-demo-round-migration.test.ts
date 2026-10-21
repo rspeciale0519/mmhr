@@ -1,0 +1,3 @@
+import { readFileSync } from "node:fs"; import { join } from "node:path"; import { describe, expect, test } from "vitest";
+const migration = readFileSync(join(process.cwd(), "drizzle", "0063_r6_demo_round_commands.sql"), "utf8");
+describe("R6 demo round migration", () => { test("enforces lifecycle and scope", () => { expect(migration).toContain("mmhr_record_demo_round"); expect(migration).toContain("Demo transition denied"); expect(migration).toContain("demo_round_history"); }); test("audits replay and bounded feedback", () => { expect(migration).toContain("r1_checked_receipt"); expect(migration).toContain("jsonb_array_length(payload->'evidenceReferences') > 50"); expect(migration).toContain("r1_finish_security_command"); }); });

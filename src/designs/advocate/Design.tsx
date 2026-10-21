@@ -1,14 +1,23 @@
-import { Karla, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./styles.css";
 
-const display = Newsreader({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
+const retainedAdvocateDisplay = localFont({
+  src: [
+    { path: "../../assets/fonts/newsreader/newsreader-italic-300-600-latin.woff2", weight: "300 600", style: "italic" },
+    { path: "../../assets/fonts/newsreader/newsreader-normal-300-600-latin.woff2", weight: "300 600", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-display",
 });
-const body = Karla({ subsets: ["latin"] });
+const display = retainedAdvocateDisplay;
+const retainedAdvocateBody = localFont({
+  src: [
+    { path: "../../assets/fonts/karla/karla-normal-200-800-latin.woff2", weight: "200 800", style: "normal" },
+  ],
+  display: "swap",
+});
+const body = retainedAdvocateBody;
 
 export default function Advocate() {
   return (
@@ -47,8 +56,8 @@ export default function Advocate() {
             </button>
           </form>
           <p className="d2-note">
-            No fee, no upsell, no commitment. Vendors pay us the same rate
-            whichever one you pick.
+            No buyer fee, no upsell, no commitment. Providers pay a commission
+            or referral fee. Terms can vary by provider.
           </p>
         </section>
       </div>
@@ -76,11 +85,11 @@ export default function Advocate() {
           <h2 className="d2-h2">What that actually means</h2>
 
           <div className="d2-promise">
-            <h3>We&rsquo;re paid the same either way</h3>
+            <h3>We disclose how we are paid</h3>
             <p>
-              Every vendor on our list pays the identical commission when you
-              buy. <strong>There is no version of this where steering you pays
-              us more.</strong> The rate is on our pricing page.
+              Providers pay a commission or referral fee when you buy. Terms can
+              vary by provider. <strong>We disclose the arrangement before you
+              decide.</strong>
             </p>
           </div>
 

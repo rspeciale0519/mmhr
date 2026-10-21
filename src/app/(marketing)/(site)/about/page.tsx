@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { CTA, PageHero, SectionHead } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "About — MatchMaker HR",
-  description:
-    "Why a buyer-side HRIS brokerage exists, what we believe about the market, and how the company is structured to stay neutral.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/about",
+  "About — MatchMaker HR",
+  "Why a buyer-side HRIS brokerage exists, what we believe about the market, and how the company is structured to stay neutral.",
+);
 
 const BELIEFS = [
   {

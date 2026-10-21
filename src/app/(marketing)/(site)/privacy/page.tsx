@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
-
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { PageHero } from "../../_site/PageParts";
 
-export const metadata: Metadata = {
-  title: "Privacy policy — MatchMaker HR",
-  description:
-    "What personal data MatchMaker HR collects, why, who it is shared with, and how to exercise your rights over it.",
-};
+export const metadata = getMarketingPageMetadata(
+  "/privacy",
+  "Privacy policy — MatchMaker HR",
+  "What personal data MatchMaker HR collects, why, who it is shared with, and how to exercise your rights over it.",
+);
 
 export default function PrivacyPage() {
   return (

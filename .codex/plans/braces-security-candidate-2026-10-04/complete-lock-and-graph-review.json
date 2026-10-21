@@ -1,0 +1,62 @@
+{
+  "accepted": true,
+  "changedLockRecords": [
+    "",
+    "node_modules/braces"
+  ],
+  "lockRecordsReviewed": 1328,
+  "allOtherRecordsAndTopLevelUnchanged": true,
+  "graph": {
+    "edges": [
+      {
+        "from": "node_modules/chokidar",
+        "rawSpec": "~3.0.2",
+        "spec": "file:vendor/braces/mmhr-braces-3.0.3-mmhr.1.tgz",
+        "valid": true,
+        "error": null,
+        "to": "node_modules/braces",
+        "packageName": "@mmhr/braces",
+        "version": "3.0.3-mmhr.1"
+      },
+      {
+        "from": "node_modules/micromatch",
+        "rawSpec": "^3.0.3",
+        "spec": "file:vendor/braces/mmhr-braces-3.0.3-mmhr.1.tgz",
+        "valid": true,
+        "error": null,
+        "to": "node_modules/braces",
+        "packageName": "@mmhr/braces",
+        "version": "3.0.3-mmhr.1"
+      },
+      {
+        "from": "node_modules/trigger.dev",
+        "rawSpec": "^3.0.3",
+        "spec": "file:vendor/braces/mmhr-braces-3.0.3-mmhr.1.tgz",
+        "valid": true,
+        "error": null,
+        "to": "node_modules/braces",
+        "packageName": "@mmhr/braces",
+        "version": "3.0.3-mmhr.1"
+      }
+    ],
+    "nodes": [
+      {
+        "location": "node_modules/braces",
+        "name": "braces",
+        "packageName": "@mmhr/braces",
+        "version": "3.0.3-mmhr.1"
+      }
+    ],
+    "rootValid": true,
+    "rootError": null,
+    "inventoryCount": 1328
+  },
+  "code": 0,
+  "signal": null,
+  "errorCode": null,
+  "stderr": "",
+  "repoWritten": false,
+  "installationPerformed": false,
+  "networkUsed": false,
+  "fullNpmImplementationBytesFrozen": false
+}

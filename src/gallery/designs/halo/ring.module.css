@@ -1,0 +1,353 @@
+.wrap {
+  display: grid;
+  gap: 1rem;
+}
+
+.stage {
+  --w: clamp(11.5rem, 24vw, 15rem);
+  --ratio: 1.36;
+  position: relative;
+  height: calc(var(--w) * (var(--ratio) + 0.4));
+  overflow: clip;
+  border-radius: 2rem;
+  perspective: 1500px;
+  perspective-origin: 50% 30%;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+/* Narrow cards wrap more text, so they stand taller. */
+@media (max-width: 40rem) {
+  .stage {
+    --ratio: 1.68;
+  }
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+.stage:focus-visible {
+  outline: 3px solid var(--h-accent);
+  outline-offset: 4px;
+}
+
+/* A soft contact shadow on the floor under the ring. */
+.floor {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: 6%;
+  width: calc(var(--w) * 3.2);
+  height: calc(var(--w) * 0.5);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--h-shade) / 0.16), transparent);
+  transform: translateX(-50%);
+}
+
+.ring {
+  --turn: 0deg;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 8%;
+  width: var(--w);
+  height: calc(var(--w) * var(--ratio));
+  margin-inline-start: calc(var(--w) / -2);
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--w) * -1.25)) rotateX(-4deg) rotateY(var(--turn));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ring[data-settling="true"] {
+    transition: transform 300ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+
+  .card {
+    transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .slot::after {
+    transition: opacity 300ms ease;
+  }
+}
+
+.slot {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--i) * 60deg)) translateZ(calc(var(--w) * 1.25));
+}
+
+/* The halo: a rose glow on the floor under a chosen card. */
+.slot::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 8%;
+  inset-inline-end: 8%;
+  inset-block-end: -14%;
+  height: 16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(214 51 108 / 0.45), transparent);
+  opacity: 0;
+  transform: rotateX(90deg);
+}
+
+.slot[data-chosen]::after {
+  opacity: 1;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card[data-flipped] {
+  transform: rotateY(180deg);
+}
+
+.face,
+.back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.625rem;
+  padding: 1.125rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, #ffffff, var(--h-card-end));
+  color: var(--h-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 1px 2px rgb(var(--h-shade) / 0.06),
+    0 18px 40px -16px rgb(var(--h-shade) / 0.28);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+[data-theme="dark"] .face,
+[data-theme="dark"] .back {
+  background: linear-gradient(180deg, #2a2c4a, #22243d);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 18px 40px -16px rgb(0 0 0 / 0.6);
+}
+
+.slot[data-chosen] .face {
+  box-shadow:
+    inset 0 0 0 2px var(--h-accent),
+    0 1px 2px rgb(var(--h-shade) / 0.06),
+    0 18px 40px -16px rgb(214 51 108 / 0.35);
+}
+
+.back {
+  align-content: center;
+  transform: rotateY(180deg);
+}
+
+/* Some renderers ignore backface-visibility, so the hidden face is also
+   switched off halfway through the flip. */
+.back,
+.card[data-flipped] .face {
+  visibility: hidden;
+}
+
+.card[data-flipped] .back {
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .face,
+  .back {
+    transition: visibility 0s linear 300ms;
+  }
+}
+
+/* Side cards dim a little so the front card reads first. A filter here would
+   flatten the 3D context and show the back face through, so a tint is used. */
+.slot:not([data-front]) .face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgb(var(--h-shade) / 0.05);
+  pointer-events: none;
+}
+
+.letter {
+  font-size: calc(var(--w) * 0.24);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+.name {
+  margin: 0;
+  color: var(--h-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Fit as a ring drawn with a conic gradient. */
+.fit {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: calc(var(--w) * 0.36);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--h-card-mid) 78%, transparent 80%),
+    conic-gradient(var(--h-accent) calc(var(--fit) * 360deg), var(--h-track) 0);
+}
+
+.fitValue {
+  font-size: 1.0625rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fitLabel {
+  color: var(--h-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.strengths {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+}
+
+.strengths li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--h-muted);
+}
+
+.strengths span {
+  flex: none;
+  color: var(--h-ink);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: auto;
+}
+
+.ghost,
+.choose {
+  flex: 1;
+  min-height: 2.5rem;
+  padding: 0 0.625rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.ghost {
+  background: var(--h-track);
+  color: var(--h-ink);
+}
+
+.choose {
+  background: var(--h-ink);
+  color: var(--h-bg);
+}
+
+.choose[aria-pressed="true"] {
+  background: var(--h-accent);
+  color: var(--h-on-accent);
+}
+
+.backTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.backText,
+.backMeta {
+  margin: 0;
+  color: var(--h-muted);
+  font-size: 0.8125rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--t-surface);
+  color: var(--h-ink);
+  box-shadow: var(--t-shadow-sm);
+  cursor: pointer;
+}
+
+.arrow svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.dot {
+  position: relative;
+  width: 1.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dot::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--h-line-strong);
+  transform: translate(-50%, -50%);
+}
+
+.dot[data-chosen]::before {
+  background: var(--h-accent);
+}
+
+.dot[aria-current]::before {
+  width: 1.25rem;
+}
+
+.status {
+  margin: 0;
+  color: var(--h-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}

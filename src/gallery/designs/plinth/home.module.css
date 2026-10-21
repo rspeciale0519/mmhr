@@ -1,0 +1,193 @@
+.root {
+  --p-wall: #f3f5f7;
+  --p-floor: #e5e9ee;
+  --p-floor-far: #eef1f4;
+  --p-top: #ffffff;
+  --p-face-top: #ffffff;
+  --p-face: #f1f3f6;
+  --p-side-top: #e7ebf0;
+  --p-side: #dbe0e7;
+  --p-ink: #22262e;
+  --p-muted: #5a606b;
+  --p-line-strong: #8a909b;
+  --p-marigold: #f2b51c;
+  --p-shade: 40 48 64;
+
+  --t-bg: var(--p-wall);
+  --t-surface: #ffffff;
+  --t-raised: #eef1f4;
+  --t-ink: var(--p-ink);
+  --t-muted: var(--p-muted);
+  --t-line: #dde1e6;
+  --t-line-strong: var(--p-line-strong);
+  --t-accent: var(--p-ink);
+  --t-on-accent: #ffffff;
+  --t-accent-soft: #fdf1cf;
+  --t-link: #8a5d00;
+  --t-success: #1d7148;
+  --t-info: #2b55a6;
+  --t-warning: #8a5a00;
+  --t-danger: #b42318;
+  --t-display: var(--plinth-display), Georgia, serif;
+  --t-body: var(--plinth-body), ui-sans-serif, system-ui, sans-serif;
+  --t-display-weight: 400;
+  --t-display-tracking: -0.015em;
+  --t-r-lg: 1.5rem;
+  --t-r-md: 1rem;
+  --t-r-sm: 0.75rem;
+  --t-r-pill: 999px;
+  --t-shadow-sm: 0 1px 2px rgb(var(--p-shade) / 0.06), 0 6px 14px -8px rgb(var(--p-shade) / 0.18);
+  --t-shadow-md: 0 1px 2px rgb(var(--p-shade) / 0.05), 0 22px 40px -24px rgb(var(--p-shade) / 0.3);
+  --t-shadow-lg: 0 2px 6px rgb(var(--p-shade) / 0.05), 0 40px 80px -40px rgb(var(--p-shade) / 0.38);
+  --t-next-bg: #ffffff;
+  --t-next-ink: var(--p-ink);
+  --t-next-danger: #b42318;
+  --t-overlay: rgb(34 38 46 / 0.35);
+  font-synthesis: none;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root *, .root *::before, .root *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+:where(.root) :where(button, a) {
+  touch-action: manipulation;
+}
+
+:where(.root button:not(:disabled):active) {
+  scale: 0.97;
+}
+
+.root[data-theme="dark"] {
+  --p-wall: #171a20;
+  --p-floor: #23272f;
+  --p-floor-far: #1c2027;
+  --p-top: #3a404b;
+  --p-face-top: #343a44;
+  --p-face: #2b3038;
+  --p-side-top: #262b33;
+  --p-side: #20242b;
+  --p-ink: #eceef2;
+  --p-muted: #a8aeb9;
+  --p-line-strong: #6c7380;
+  --p-shade: 0 0 0;
+  --t-surface: #20242b;
+  --t-raised: #2a2f37;
+  --t-line: #30353e;
+  --t-on-accent: #171a20;
+  --t-accent-soft: #3a3016;
+  --t-link: #f2c75c;
+  --t-success: #64d69c;
+  --t-info: #9db8f2;
+  --t-warning: #f0c065;
+  --t-danger: #ff8f85;
+  --t-next-bg: #262b33;
+  --t-next-danger: #ff8f85;
+  --t-overlay: rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+/* Three small plinths of rising height. */
+.mark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 1.125rem;
+}
+
+.mark i {
+  width: 0.3125rem;
+  background: var(--p-ink);
+}
+
+.mark i:nth-child(1) { height: 45%; }
+.mark i:nth-child(2) { height: 100%; background: var(--p-marigold); }
+.mark i:nth-child(3) { height: 70%; }
+
+.hero {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3.5rem, 8vw, 6rem);
+}
+
+.heroCopy {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.heroTitle {
+  max-width: 18ch;
+  margin: 0;
+  font-family: var(--plinth-display), Georgia, serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.heroLede {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--p-muted);
+  font-size: 1.125rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.heroActions > * {
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+}
+
+.caption {
+  max-width: 40rem;
+  margin: 0 auto;
+  color: var(--p-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.root .promises {
+  padding-top: 2rem;
+  border-top: 1px solid var(--t-line);
+}
+
+.root .promiseTitle {
+  font-size: 1.625rem;
+}
+
+.root .step {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--p-ink);
+}
+
+.root .stepNumber {
+  width: auto;
+  height: auto;
+  background: none;
+  color: var(--p-muted);
+  font-family: var(--plinth-display), Georgia, serif;
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.root .closing {
+  background: linear-gradient(180deg, #ffffff, var(--p-wall));
+}
+
+.root[data-theme="dark"] .closing {
+  background: linear-gradient(180deg, #262b33, var(--p-wall));
+}

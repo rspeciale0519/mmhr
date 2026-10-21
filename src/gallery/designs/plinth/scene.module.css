@@ -1,0 +1,258 @@
+.wrap {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.chip {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--p-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--p-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip[data-state="on"] {
+  border-color: var(--p-ink);
+  background: var(--p-ink);
+  color: var(--p-wall);
+}
+
+/* The room */
+
+.stage {
+  --w: clamp(2.125rem, 7.2vw, 5.25rem);
+  --gap: calc(var(--w) * 1.72);
+  position: relative;
+  height: clamp(19rem, 44vw, 30rem);
+  overflow: clip;
+  border-radius: 2rem;
+  background: linear-gradient(180deg, var(--p-wall) 0%, var(--p-wall) 58%, var(--p-floor) 58%, var(--p-floor-far) 100%);
+  perspective: 1700px;
+  perspective-origin: 50% 12%;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+@media (max-width: 40rem) {
+  .stage {
+    --gap: calc(var(--w) * 1.55);
+    height: 17rem;
+  }
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+.stage:focus-visible {
+  outline: 3px solid var(--p-ink);
+  outline-offset: 4px;
+}
+
+.room {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: 24%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-10deg) rotateY(var(--yaw));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .room {
+    transition: transform 160ms ease-out;
+  }
+}
+
+.floor {
+  position: absolute;
+  inset-inline-start: calc(var(--gap) * -4.5);
+  inset-block-end: calc(var(--gap) * -2);
+  width: calc(var(--gap) * 9);
+  height: calc(var(--gap) * 4);
+  background: radial-gradient(closest-side, var(--p-floor), transparent);
+  transform: rotateX(90deg);
+}
+
+.plinth {
+  --hgt: calc(var(--w) * 0.7 + var(--fit) * var(--w) * 3.1);
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: 0;
+  transform-style: preserve-3d;
+  transform: translateX(calc(var(--x) * var(--gap)));
+}
+
+.contact,
+.front,
+.back,
+.left,
+.right,
+.top,
+.sphere {
+  position: absolute;
+  inset-block-end: 0;
+}
+
+/* A soft contact shadow where the plinth meets the floor. */
+.contact {
+  inset-inline-start: calc(var(--w) * -1);
+  inset-block-end: calc(var(--w) * -1);
+  width: calc(var(--w) * 2);
+  height: calc(var(--w) * 2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--p-shade) / 0.28), rgb(var(--p-shade) / 0.08) 60%, transparent);
+  transform: rotateX(90deg) translateY(calc(var(--w) * 0.18));
+}
+
+.front,
+.back,
+.left,
+.right {
+  inset-inline-start: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--hgt);
+}
+
+.front {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding-top: calc(var(--w) * 0.22);
+  background: linear-gradient(180deg, var(--p-face-top), var(--p-face));
+  color: var(--p-ink);
+  transform: translateZ(calc(var(--w) / 2));
+}
+
+.front b {
+  font-family: var(--plinth-display), Georgia, serif;
+  font-size: calc(var(--w) * 0.42);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.back {
+  background: var(--p-face);
+  transform: rotateY(180deg) translateZ(calc(var(--w) / 2));
+}
+
+.right {
+  background: linear-gradient(180deg, var(--p-side-top), var(--p-side));
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+
+.left {
+  background: var(--p-face);
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+
+.top {
+  inset-inline-start: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--w);
+  inset-block-end: calc(var(--hgt) - var(--w) / 2);
+  background: var(--p-top);
+  transform: rotateX(90deg);
+}
+
+/* The chosen marker: a marigold sphere that settles on top. */
+.sphere {
+  inset-inline-start: calc(var(--w) * -0.22);
+  inset-block-end: var(--hgt);
+  width: calc(var(--w) * 0.44);
+  height: calc(var(--w) * 0.44);
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #fff3c4, #f2b51c 45%, #b97800 100%);
+  opacity: 0;
+  transform: rotateY(calc(var(--yaw) * -1)) translateY(calc(var(--w) * -0.9));
+}
+
+.plinth[data-chosen] .sphere {
+  opacity: 1;
+  transform: rotateY(calc(var(--yaw) * -1));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .front,
+  .back,
+  .left,
+  .right {
+    transition: height 300ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+
+  .top,
+  .sphere {
+    transition: bottom 300ms cubic-bezier(0.2, 0.9, 0.25, 1), opacity 300ms ease,
+      transform 300ms cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+}
+
+/* Plaques: the accessible controls, one under each plinth. */
+.plaques {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .plaques {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.plaque {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem;
+  border-radius: 1rem;
+  background: var(--t-surface);
+  box-shadow: var(--t-shadow-sm);
+}
+
+.plaqueName {
+  font-family: var(--plinth-display), Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+}
+
+.plaqueFit {
+  color: var(--p-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.plaqueButton {
+  min-height: 2.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid var(--p-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--p-ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.plaqueButton[aria-pressed="true"] {
+  border-color: var(--p-marigold);
+  background: var(--p-marigold);
+  color: #241a00;
+}

@@ -3,14 +3,15 @@ import { expect, test } from "vitest";
 
 import ContactPage from "@/app/(marketing)/(site)/contact/page";
 
-test("keeps the unwired contact form disabled and free of an action", () => {
+test("renders the public registration fields and explicit consent", () => {
   const { container } = render(<ContactPage />);
   const form = container.querySelector("form");
-  const fieldset = container.querySelector("fieldset");
 
   expect(form).not.toHaveAttribute("action");
-  expect(fieldset).toBeDisabled();
-  expect(
-    screen.getByText(/Online contact is not active yet/i),
-  ).toBeInTheDocument();
+  expect(screen.getByLabelText("Full name")).toBeRequired();
+  expect(screen.getByLabelText("Company")).toBeRequired();
+  expect(screen.getByLabelText("Work email")).toBeRequired();
+  expect(screen.getByLabelText("Direct company phone")).toBeRequired();
+  expect(screen.getByLabelText(/I agree that MatchMaker HR/)).toBeRequired();
+  expect(screen.getByText(/We use your details only to reply/i)).toBeInTheDocument();
 });

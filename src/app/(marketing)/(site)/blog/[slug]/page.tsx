@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { POSTS, getPost } from "../../../_site/data";
 import { CTA } from "../../../_site/PageParts";
 
@@ -16,8 +17,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return { title: "Blog — MatchMaker HR" };
-  return { title: `${post.title} — MatchMaker HR`, description: post.excerpt };
+  if (!post) {
+    return getMarketingPageMetadata(
+      "/blog",
+      "Blog — MatchMaker HR",
+      "Notes on HRIS pricing mechanics, evaluation tactics, and the incentives running underneath the market.",
+    );
+  }
+  return getMarketingPageMetadata(
+    `/blog/${slug}`,
+    `${post.title} — MatchMaker HR`,
+    post.excerpt,
+  );
 }
 
 export default async function PostPage({

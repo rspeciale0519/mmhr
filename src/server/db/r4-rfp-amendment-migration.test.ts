@@ -1,0 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, test } from "vitest";
+const migration = readFileSync(join(process.cwd(), "drizzle", "0086_r4_rfp_amendments.sql"), "utf8");
+const schema = readFileSync(join(process.cwd(), "src", "server", "db", "schema", "workflow-foundation.ts"), "utf8");
+describe("R4 RFP amendment migration", () => { test("keeps amendments additive, versioned, and scoped", () => { expect(migration).toContain("CREATE TABLE public.rfp_amendments"); expect(migration).toContain("rfp_amendments_version_uq"); expect(migration).toContain("rfp_amendments_base_version_scope_fk"); expect(migration).toContain("rfp_amendments_vendor_scope_fk"); }); test("protects raw rows and audits create and approval", () => { expect(migration).toContain("ENABLE ROW LEVEL SECURITY"); expect(migration).toContain("USING (false) WITH CHECK (false)"); expect(migration).toContain("r1_checked_receipt"); expect(migration).toContain("r1_finish_security_command"); expect(migration).toContain("item.created_by_identity_id = v_actor"); }); test("keeps approval reference validation aligned", () => { expect(schema).toContain("rfp_amendments_reference_ck"); }); });

@@ -1,14 +1,24 @@
-import { Courier_Prime, Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ADVANTAGES, CASES, NAV, STATS, TOOLS, TRUST, VENDORS } from "../_content";
 import "./styles.css";
 
-const serif = Source_Serif_4({ subsets: ["latin"], weight: ["400", "600", "700"] });
-const mono = Courier_Prime({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const retainedRedlineSerif = localFont({
+  src: [
+    { path: "../../assets/fonts/source-serif-4/source-serif-4-normal-400-700-latin.woff2", weight: "400 700", style: "normal" },
+  ],
+  display: "swap",
+});
+const serif = retainedRedlineSerif;
+const retainedRedlineMono = localFont({
+  src: [
+    { path: "../../assets/fonts/courier-prime/courier-prime-normal-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/courier-prime/courier-prime-normal-700-latin.woff2", weight: "700", style: "normal" },
+  ],
+  display: "swap",
   variable: "--font-mono",
 });
+const mono = retainedRedlineMono;
 
 /**
  * The mini redline that carries the concept into the advantage section, plus
@@ -80,8 +90,8 @@ export default function Redline() {
             </button>
           </form>
           <p className="rl-fine">
-            Free. The vendor pays our commission — the same rate whichever one you
-            choose.
+            Free for buyers. Providers pay a commission or referral fee. Terms can
+            vary by provider.
           </p>
         </div>
 
@@ -302,8 +312,8 @@ export default function Redline() {
             <div>
               <div className="rl-logo">MatchMaker HR</div>
               <p>
-                Buyer-side HRIS brokerage. Free to buyers, paid the same rate by every
-                vendor — and we say so when we&rsquo;re one of them.
+                Buyer-side HRIS brokerage. Free for buyers. Providers pay a
+                commission or referral fee. Terms can vary by provider.
               </p>
             </div>
             <div className="rl-fc">

@@ -80,4 +80,18 @@ describe("analytics initialisation is gated on consent", () => {
     initAnalytics();
     expect(posthog.init).toHaveBeenCalledTimes(1);
   });
+  test("removes email and token parameters before analytics events leave the browser", () => {
+    grantAnalyticsConsent();
+    initAnalytics();
+    const config = vi.mocked(posthog.init).mock.calls[0]![1]!;
+    expect(config).toMatchObject({ autocapture: false, disable_session_recording: true, disable_capture_url_hashes: true,
+      mask_personal_data_properties: true, custom_personal_data_properties: ["email", "token", "code"] });
+    const filter = config.before_send;
+    if (typeof filter !== "function") throw new Error("Analytics privacy filter missing");
+    const result = filter({ event: "$pageview", uuid: "test-only", timestamp: new Date("2026-09-30T20:00:00Z"),
+      $set_once: { $initial_current_url: "https://example.invalid/sign-up?email=synthetic%40example.invalid" },
+      properties: { $current_url: "https://example.invalid/sign-up?email=synthetic%40example.invalid", $referrer: "https://example.invalid/?code=test-only", safe_count: 1 } });
+    expect(result?.properties).toMatchObject({ $current_url: "https://example.invalid/sign-up", $referrer: "https://example.invalid/", safe_count: 1 });
+    expect(result?.$set_once).toEqual({ $initial_current_url: "https://example.invalid/sign-up" });
+  });
 });
