@@ -400,7 +400,9 @@ describe("Customer deal follow-ups with genuine signed Auth", () => {
     expect(second.events.map(event => event.revision)).toEqual([3, 2, 1]); expect(second.nextRevision).toBeNull();
   }), 120_000);
   test("rejects changed, foreign and malformed queue cursors and refreshes live counts after writes", async () => phase("queue_journey", async () => {
-    for (let index = 0; index < 27; index++) await phase("queue_create", () => write(create()));
+    // Earlier tests leave closed and foreign-owned tasks in the shared org, so edit only a task this test owns.
+    const created: string[] = [];
+    for (let index = 0; index < 27; index++) { const input = create(); created.push(input.taskId); await phase("queue_create", () => write(input)); }
     const first = await phase("queue_first_page", () => queue()); expect(first.items).toHaveLength(25); expect(first.nextCursor).not.toBeNull();
     const cursor = first.nextCursor!;
     for (const change of [{ organizationId: foreignOrg }, { actorIdentityId: other.identityId }, { queue: "assigned" }, { afterId: randomUUID() }]) {
@@ -412,7 +414,7 @@ describe("Customer deal follow-ups with genuine signed Auth", () => {
     const malformed = { organizationId: fixture.organizationId, correlationId: randomUUID(), queue: "all", cursor: { ...cursor, asOf: "invalid" } };
     const rejected = await elevatedClient(owner).rpc("mmhr_get_deal_follow_up_queue", { payload: malformed, correlation_id: malformed.correlationId });
     expect(rejected.error?.code).toBe("22023");
-    await write(change(first.items[0]!.taskId, first.items[0]!.revision, "edit", { priority: "low" }));
+    await write(change(created[0]!, 1, "edit", { priority: "low" }));
     await expect(queue("all", cursor)).rejects.toBeInstanceOf(TaskRevisionConflict);
     expect((await queue()).version).toBeGreaterThan(first.version);
   }), 120_000);
