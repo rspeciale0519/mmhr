@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { task } from "@trigger.dev/sdk";
+import { z } from "zod";
 
 const require = createRequire(import.meta.url);
 const dependencyOf = (name: string) => createRequire(path.join(process.cwd(), "node_modules", name, "package.json"));
@@ -50,5 +51,17 @@ describe("security override compatibility", () => {
     const tracing = dependencyOf("@trigger.dev/core")("@opentelemetry/core") as { W3CBaggagePropagator: new () => { fields: () => string[] } };
     expect(new tracing.W3CBaggagePropagator().fields()).toEqual(["baggage"]);
     expect(typeof require("tar").extract).toBe("function");
+  });
+
+  test("shares the patched zod with trigger.dev CLI option validation", () => {
+    expect(dependencyOf("trigger.dev").resolve("zod")).toBe(require.resolve("zod"));
+    const { fromZodError } = dependencyOf("trigger.dev")("zod-validation-error") as {
+      fromZodError: (error: z.ZodError) => { message: string };
+    };
+    const options = z.object({ logLevel: z.enum(["debug", "info", "log", "warn", "error", "none"]).default("log") });
+    expect(options.parse({})).toEqual({ logLevel: "log" });
+    const result = options.safeParse({ logLevel: "verbose" });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(fromZodError(result.error).message).toContain("logLevel");
   });
 });
