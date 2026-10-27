@@ -1049,7 +1049,16 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-16 01:07 EDT — Task 47 pushed be89df6; Vercel preview czz7wdawp verified (local fonts, saves, images). See journal/2026-10-16.md.
 2026-10-16 09:30 EDT — Lasting partner share link on the branch alias (owner-approved; older temporary links revoked). See journal/2026-10-16.md.
 2026-10-16 09:45 EDT — Short public gallery URL mmhr-gallery.vercel.app (branch domain); Vercel Authentication turned off with owner approval; mmhr.vercel.app found serving the public July build. See journal/2026-10-16.md.
+2026-10-16 10:14 EDT — Task 48 git cleanup: local main fast-forwarded; 2 local branches merged into main deleted; open board and brain files committed 77be1dd (not pushed). See journal/2026-10-16.md.
+2026-10-16 10:19 EDT — Task 48 follow-up: owner-approved delete of GitHub branch feature/foundations (merged into main; restorable from eac413f). See journal/2026-10-16.md.
 2026-10-17 15:25 EDT — Cursor Agent security scan delivered as draft PR #11 from the August develop; report now at docs/security/security-scan-2026-10-17.md. See journal/2026-10-17.md.
+
+## [2026-10-20] authorization | Local vendor reviews
+- Both requested test actions approved. Docker startup failed at Windows service access; no approvals applied. See journal/2026-10-20.md and board task50.
+
+## [2026-10-21] git | PR #10 merged
+- Owner-approved: origin switched to HTTPS (SSH times out); PR #10 merged into develop as aaf9aee; head branch kept for the gallery domain. PR #11 overlaps and needs a rebase. See journal/2026-10-21.md.
+
 2026-10-21 13:36 EDT — PR #11 reviewed and rebuilt on develop in fix/security-scan-2026-10-17 (Next.js 16.4.2, headers, Secure/Lax cookies, email throttle, CI contents:read); gates pass except the 2026-10-20 vite/hono audit findings; waits for owner approval of npm audit fix and the commit. See journal/2026-10-21.md.
 2026-10-21 14:11 EDT — PR #11 rebuild committed as 7aa3940 on fix/security-scan-2026-10-17 after npm audit fix (vite 8.3.5, hono 4.13.13); all gates pass; waits for push approval. See journal/2026-10-21.md.
 2026-10-21 14:23 EDT — PR #11 force-pushed to fb3af2e (lease on 6ebc135) and re-described; CI run 39652014116 in progress; draft stays. See journal/2026-10-21.md.
@@ -1057,3 +1066,13 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 2026-10-21 15:18 EDT — Flaky late-bytes assertion fixed as f22e4d7 (global Uint8Array.prototype.set spy saw Node 22 IPC frames); Node 22 and Node 24 runs pass; pushed to PR #11 with the brain record. See journal/2026-10-21.md.
 2026-10-21 15:21 EDT — Task 51: owner-approved test-only fix applied (uncommitted); type-check, lint pass; r8 file 5/5 runs pass. Commit waits for owner. See journal/2026-10-21.md.
 2026-10-21 16:16 EDT — Task 51: fix e7f740b pushed as PR #12 to develop; checks fail only on vite/hono audit (PR #11 fixes it); owner chose to wait for PR #11, then sync. See journal/2026-10-21.md.
+2026-10-21 16:20 EDT — PR #11 merged into develop as c4dca27 (merge commit); PR branch kept; PR #12 must be updated over the three brain files. See journal/2026-10-21.md.
+
+## [2026-10-24] git | PR #12 merged
+- Owner-approved: PR #12 (r8 queue cursor test fix) merged into develop as 93f4bdd at the CI-tested head 63b031e; head branch kept. Develop CI run 40132440742 started. See journal/2026-10-24.md.
+
+## [2026-10-25] git | PR #13 merged
+- Owner-approved: PR #13 (npm audit fix) merged into develop as 10f910b at the CI-tested head cd997fb. Develop CI run 40225578882 green on all three jobs. See journal/2026-10-25.md.
+
+## [2026-10-27] docs | Brain notes onto develop
+- gh login renewed by the owner. Uncommitted brain notes from the main checkout and the wizardly-tesla worktree combined in time order and sent to develop in one docs PR (owner approved PR and merge). See journal/2026-10-27.md.
