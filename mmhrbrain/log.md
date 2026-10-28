@@ -1076,3 +1076,6 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 
 ## [2026-10-27] docs | Brain notes onto develop
 - gh login renewed by the owner. Uncommitted brain notes from the main checkout and the wizardly-tesla worktree combined in time order and sent to develop in one docs PR (owner approved PR and merge). See journal/2026-10-27.md.
+
+## [2026-10-28] git | Worktree cleanup and checkout on develop
+- Owner-approved: worktrees brain-notes-2026-10-27, dazzling-wright-4b6bf0 and wizardly-tesla-ee0e04 removed; old brain copies kept as stash 989febc and e83d278; main checkout moved to develop 209f078. See journal/2026-10-28.md.

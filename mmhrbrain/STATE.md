@@ -1,6 +1,6 @@
 # MMHR — Current State
 
-Updated: 2026-10-27 17:55 EDT. PRs #10 to #13 merged into `develop` (latest merge 10f910b); develop CI run 40225578882 is green on all three jobs. Brain notes from 2026-10-16 to 2026-10-27 merged through a docs PR (journal/2026-10-27.md). `origin` uses HTTPS. Head branch `codex/full-delivery-verification` kept (mmhr-gallery.vercel.app follows it). Gallery review tools remain live on preview mmhr-czz7wdawp with Neon storage.
+Updated: 2026-10-28 09:42 EDT. PRs #10 to #14 merged into `develop` (latest merge 209f078); develop CI run 40590935361 is green on all three jobs. The main checkout is on `develop`; it is the only worktree (journal/2026-10-28.md). `origin` uses HTTPS. Head branch `codex/full-delivery-verification` kept (mmhr-gallery.vercel.app follows it). Gallery review tools remain live on preview mmhr-czz7wdawp with Neon storage.
 
 ## Current local approval task (October 20)
 - Owner approved five local profiles and UKG-02 evidence. Task50 is blocked by offline Docker; Windows denied service start. No approvals applied.
