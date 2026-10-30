@@ -1,3 +1,4 @@
+@AGENTS.md
 # MMHR Project Instructions
 
 Read [AGENTS.md](AGENTS.md) for the shared MMHR instructions.
