@@ -65,7 +65,8 @@
     "fast-uri@3": "3.1.9",
     "ip-address@10": "10.7.5",
     "dompurify@3": "3.4.17",
-    "braces@3": "$braces"
+    "braces@3": "$braces",
+    "@hono/node-server": "2.1.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

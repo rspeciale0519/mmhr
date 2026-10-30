@@ -64,4 +64,16 @@ describe("security override compatibility", () => {
     expect(result.success).toBe(false);
     if (!result.success) expect(fromZodError(result.error).message).toContain("logLevel");
   });
+
+  test("pins @hono/node-server to the patched 2.1.3+ for trigger.dev MCP", async () => {
+    const entry = dependencyOf("@modelcontextprotocol/sdk").resolve("@hono/node-server");
+    const pkg = JSON.parse(await readFile(path.join(path.dirname(entry), "..", "package.json"), "utf8")) as {
+      name: string;
+      version: string;
+    };
+    expect(pkg.name).toBe("@hono/node-server");
+    const [major, minor, patch] = pkg.version.split(".").map(Number);
+    expect(major).toBeGreaterThanOrEqual(2);
+    expect(minor > 1 || (minor === 1 && patch >= 3)).toBe(true);
+  });
 });
