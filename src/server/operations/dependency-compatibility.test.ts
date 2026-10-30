@@ -64,4 +64,19 @@ describe("security override compatibility", () => {
     expect(result.success).toBe(false);
     if (!result.success) expect(fromZodError(result.error).message).toContain("logLevel");
   });
+
+  // TODO: remove package.json overrides["@hono/node-server"] once trigger.dev /
+  // @modelcontextprotocol/sdk requires @hono/node-server >= 2.1.3.
+  test("pins @hono/node-server to the patched 2.1.3+ for trigger.dev MCP", async () => {
+    const entry = dependencyOf("@modelcontextprotocol/sdk").resolve("@hono/node-server");
+    const pkg = JSON.parse(await readFile(path.join(path.dirname(entry), "..", "package.json"), "utf8")) as {
+      name: string;
+      version: string;
+    };
+    expect(pkg.name).toBe("@hono/node-server");
+    const [major, minor, patch] = pkg.version.split(".").map(Number);
+    const atLeast213 =
+      major > 2 || (major === 2 && (minor > 1 || (minor === 1 && patch >= 3)));
+    expect(atLeast213).toBe(true);
+  });
 });
