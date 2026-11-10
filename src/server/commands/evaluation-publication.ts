@@ -124,7 +124,7 @@ async function readPublication(input: unknown, internal: boolean, options: Autho
   try {
     const context = await authorizedContext(payload.organizationId, correlationId, internal, options);
     const response = await context.supabase.rpc(internal ? "mmhr_review_evaluation_publication" : "mmhr_get_evaluation_publication", {
-      payload: { ...payload, detailsVersion: 1 }, correlation_id: correlationId,
+      payload: { ...payload, detailsVersion: internal ? 1 : 2 }, correlation_id: correlationId,
     });
     if (!response || response.error !== null) {
       throw new EvaluationPublicationError(response?.error?.code === "42501" ? "REJECTED" : "UNAVAILABLE");

@@ -270,3 +270,42 @@ test("displays published estimates with their basis and distinguishes coverage f
   expect(feature.getByRole("cell")).toHaveTextContent("Add-on");
   expect(screen.queryAllByRole("link").every((link) => !link.getAttribute("href")?.startsWith("http"))).toBe(true);
 });
+
+test("asks the customer to review an unsupported feature recorded as a match", () => {
+  const evidence = { basis: "evidence" as const, capturedAt: "2026-09-15T10:00:00Z",
+    reviewedAt: "2026-09-15T11:00:00Z", validUntil: "2026-10-15T10:00:00Z", version: 1 };
+  const option = { ...publication.options[0], eligibility: "eligible" as const, deterministicScore: 10_000,
+    fitReasons: ["payroll"], limitations: [], details: { version: 1 as const,
+      features: [{ requirementKey: "payroll", outcome: "match" as const, coverage: "not_supported" as const,
+        evidence, coverageEvidence: evidence }], annualCost: null, setup: null } };
+  render(view({ requirements: [{ key: "payroll", label: "Payroll", importance: "must" }],
+    publication: { ...publication, optionCount: 1, options: [option] } }));
+
+  const feature = within(screen.getByRole("rowheader", { name: "Payroll Required" }).closest("tr")!).getByRole("cell");
+  expect(feature).toHaveTextContent("Review this match");
+  expect(feature).toHaveTextContent("Not supported");
+  expect(feature).toHaveTextContent("Check whether your requirement asks for this feature or its absence.");
+  expect(feature).not.toHaveTextContent("Match confirmed");
+  const score = within(screen.getByRole("rowheader", { name: /Overall fit/ }).closest("tr")!).getByRole("cell");
+  expect(score).toHaveTextContent("100.0%");
+  expect(score).toHaveTextContent("Review a feature match below.");
+  const required = within(screen.getByRole("rowheader", { name: /Required features met/ }).closest("tr")!).getByRole("cell");
+  expect(required).toHaveTextContent("1 of 1");
+  expect(required).toHaveTextContent("Review a feature match below.");
+  expect(screen.getByRole("columnheader", { name: /Option 1/ })).not.toHaveTextContent("Meets recorded required capabilities");
+  expect(screen.getByRole("checkbox", { name: "Choose Option 1" })).toBeEnabled();
+});
+
+test("does not flag an unsupported feature that is already a mismatch", () => {
+  const evidence = { basis: "evidence" as const, capturedAt: "2026-09-15T10:00:00Z",
+    reviewedAt: "2026-09-15T11:00:00Z", validUntil: "2026-10-15T10:00:00Z", version: 1 };
+  const option = { ...publication.options[0], eligibility: "ineligible" as const, fitReasons: [], limitations: ["payroll"],
+    details: { version: 1 as const, features: [{ requirementKey: "payroll", outcome: "mismatch" as const,
+      coverage: "not_supported" as const, evidence, coverageEvidence: evidence }], annualCost: null, setup: null } };
+  render(view({ requirements: [{ key: "payroll", label: "Payroll", importance: "must" }],
+    publication: { ...publication, optionCount: 1, options: [option] } }));
+  const feature = within(screen.getByRole("rowheader", { name: "Payroll Required" }).closest("tr")!).getByRole("cell");
+  expect(feature).toHaveTextContent("Does not match");
+  expect(feature).toHaveTextContent("Not supported");
+  expect(screen.queryByText("Review a feature match below.")).not.toBeInTheDocument();
+});

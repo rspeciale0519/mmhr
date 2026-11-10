@@ -339,3 +339,25 @@ test("does not submit when secure identifiers are unavailable", async () => {
   expect(await screen.findByRole("alert")).toHaveTextContent("secure save request");
   expect(mutate).not.toHaveBeenCalled();
 });
+
+test("saves a customer decision about partner payroll services", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Would you consider payroll from a partner provider?"), { target: { value: "false" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0].response).toMatchObject({ allowPayrollPartner: false });
+});
+
+test("loads and preserves a saved partner payroll choice while editing", async () => {
+  mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
+  const response = { version: 1, requested: "yes", country: "US", workerType: "employee", stateScope: "single",
+    allowPayrollAddOn: true, allowPayrollPartner: true };
+  renderForm(existingRequirement({ stableKey: "input_payroll", response }));
+  expect(screen.getByLabelText("Would you consider payroll from a partner provider?")).toHaveValue("true");
+  fireEvent.change(screen.getByLabelText("US payroll locations"), { target: { value: "multiple" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0][0].response).toEqual({ ...response, stateScope: "multiple" });
+});

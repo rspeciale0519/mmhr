@@ -120,3 +120,36 @@ test("keeps an existing review read-only", () => {
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(state.decide).not.toHaveBeenCalled();
 });
+
+test.each([
+  ["addon", "comparison_addon_inclusions"],
+  ["limits", "comparison_limitation_reviews"],
+])("records reviewed delivery conditions for %s", async (kind, fieldKey) => {
+  capture(); fillCapture();
+  fireEvent.change(screen.getByLabelText("Record type"), { target: { value: kind } });
+  fireEvent.change(screen.getByLabelText("Capability key"), { target: { value: "payroll_us" } });
+  fireEvent.change(screen.getByLabelText("Reviewed answer"), { target: { value: "true" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Save evidence draft" }).closest("form")!);
+  await waitFor(() => expect(state.record).toHaveBeenCalledTimes(1));
+  const { fact } = state.record.mock.calls[0][0];
+  expect(fact.fieldKey).toBe(fieldKey);
+  expect(JSON.parse(fact.value)).toEqual({ payroll_us: true });
+});
+
+test("supports several reviewed features and rejects duplicate keys", async () => {
+  capture(); fillCapture();
+  fireEvent.change(screen.getByLabelText("Record type"), { target: { value: "addon" } });
+  fireEvent.click(screen.getByRole("button", { name: "Add feature" }));
+  const keys = screen.getAllByLabelText("Capability key"), answers = screen.getAllByLabelText("Reviewed answer");
+  fireEvent.change(keys[0], { target: { value: "payroll_us" } });
+  fireEvent.change(keys[1], { target: { value: "payroll_us" } });
+  fireEvent.change(answers[0], { target: { value: "true" } });
+  fireEvent.change(answers[1], { target: { value: "false" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Save evidence draft" }).closest("form")!);
+  await screen.findByRole("alert");
+  expect(state.record).not.toHaveBeenCalled();
+  fireEvent.change(keys[1], { target: { value: "time_tracking" } });
+  fireEvent.submit(screen.getByRole("button", { name: "Save evidence draft" }).closest("form")!);
+  await waitFor(() => expect(state.record).toHaveBeenCalledTimes(1));
+  expect(JSON.parse(state.record.mock.calls[0][0].fact.value)).toEqual({ payroll_us: true, time_tracking: false });
+});

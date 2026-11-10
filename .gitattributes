@@ -1,0 +1,4 @@
+# Use stable SQL bytes on Windows checkouts.
+drizzle/*.sql text eol=lf
+# This applied migration contains mixed line endings; preserve its recorded hash.
+drizzle/0174_r3_coverage_conditions.sql -text

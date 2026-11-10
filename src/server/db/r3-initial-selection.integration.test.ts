@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
+import { execFile } from "node:child_process";
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { applicationMigrationCount } from "./test/application-schema-inventory";
 
 import {
   initialEvaluationSelectionReadSchema,
@@ -7,6 +12,7 @@ import {
 } from "@/server/commands/evaluation-selection";
 import {
   applyAllMigrations,
+  applyMigrationsBeforeSelectionRetry,
   startRehearsal,
   stopRehearsal,
   type RehearsalContext,
@@ -51,7 +57,7 @@ async function selectInitial(
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: RpcResult }[]>`
       SELECT public.mmhr_select_initial_evaluation_options(
-        ${JSON.stringify(payload)}::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
+        ${JSON.stringify(payload)}::text::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
       ) AS result
     `;
     return row!.result;
@@ -66,7 +72,7 @@ async function readInitialPayload(sql: SecurityTransaction, principal: SecurityP
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: RpcResult }[]>`
       SELECT public.mmhr_get_initial_evaluation_selections(
-        ${JSON.stringify(payload)}::jsonb, ${randomUUID()}::uuid
+        ${JSON.stringify(payload)}::text::jsonb, ${randomUUID()}::uuid
       ) AS result
     `;
     return row!.result;
@@ -142,6 +148,106 @@ async function archiveCandidate(sql: SecurityTransaction, fixture: SecurityComma
     updated_at = clock_timestamp(), updated_by_identity_id = ${fixture.pair[0].identityId}::uuid
     WHERE id = ${candidateId}::uuid AND organization_id = ${fixture.organizationId}::uuid`;
 }
+
+describe("forward migration with historical file differences", () => {
+  let context: RehearsalContext | undefined;
+
+  afterAll(async () => {
+    if (context) await stopRehearsal(context);
+  }, 180_000);
+
+  test("preserves fictional selections and recorded history while applying pending migrations", async () => {
+    context = await startRehearsal("r3-history-review");
+    const journal = JSON.parse(await readFile("drizzle/meta/_journal.json", "utf8")) as {
+      entries: Array<{ idx: number; tag: string; when: number }>;
+      [key: string]: unknown;
+    };
+    expect(journal.entries).toHaveLength(applicationMigrationCount);
+    expect(journal.entries.slice(171, 173).map((entry) => entry.idx)).toEqual([171, 172]);
+    const prefix = journal.entries.slice(0, 171);
+    await applyMigrationsBeforeSelectionRetry(context);
+
+    const target = context;
+    const oldAudit = "jsonb_build_object('version',1,'state','masked'),context.authorization_time";
+    const newAudit = "jsonb_build_object('version',1,'state','completed'),context.authorization_time";
+    const historyTags = ["0001_heavy_kulan_gath", "0002_r1_request_scoped_access", "0026_r1_invitation_commands", "0027_r2b_crm_commands"];
+    const timestamps = historyTags.map((tag) => {
+      const entry = prefix.find((item) => item.tag === tag);
+      if (!entry) throw new Error("Required historical test record is missing");
+      return entry.when;
+    });
+    const seeded = await target.client.begin(async (sql) => {
+      await sql`UPDATE drizzle.__drizzle_migrations SET hash = ${"0".repeat(64)} WHERE created_at = ANY(${timestamps}::bigint[])`;
+      const [definition] = await sql<{ body: string }[]>`
+        SELECT pg_get_functiondef('public.mmhr_create_initial_evaluation(jsonb,uuid,uuid)'::regprocedure) AS body`;
+      expect(definition!.body.split(newAudit)).toHaveLength(2);
+      await sql.unsafe(definition!.body.replace(newAudit, oldAudit));
+      const fixture = await createCommandFixture(sql);
+      const customer = await createSecurityPrincipal(sql);
+      await addContributor(sql, fixture.organizationId, customer);
+      await addPortalGrant(sql, fixture.organizationId, fixture.pair[1].identityId);
+      const comparison = await seedPublishedSelectionFixture(sql, fixture, customer);
+      const publication = (await readPublication(sql, fixture.pair[0], "review", publicationPayload(
+        fixture.organizationId, comparison.intakeId, comparison.publicationId, 0, 50,
+      ))) as { options: Array<Record<string, unknown>> };
+      const input = { organizationId: fixture.organizationId, intakeId: comparison.intakeId,
+        publicationId: comparison.publicationId, expectedDigest: String(comparison.prepared.inputDigest),
+        optionIds: publication.options.slice(0, 5).map((option) => String(option.optionId)) };
+      const correlationId = randomUUID(), idempotencyKey = randomUUID();
+      const created = initialEvaluationSelectionResultSchema.parse(await selectInitial(sql, customer, input, "aal1", correlationId, idempotencyKey));
+      expect(created.items).toHaveLength(5);
+      return { fixture, customer, comparison, input, created, idempotencyKey };
+    });
+    const before = await target.client.begin(async (sql) => ({
+      history: await sql`SELECT created_at::text, hash FROM drizzle.__drizzle_migrations ORDER BY created_at`,
+      artifacts: await selectionArtifacts(sql, seeded.comparison.intakeId),
+      selection: await readInitial(sql, seeded.customer, seeded.fixture.organizationId, seeded.comparison.intakeId),
+      permissions: await sql`SELECT oid::regprocedure::text AS name, proacl::text AS acl FROM pg_proc
+        WHERE oid IN ('public.mmhr_create_initial_evaluation(jsonb,uuid,uuid)'::regprocedure,
+          'mmhr_private.r3_initial_selection_result(uuid,uuid,uuid,text)'::regprocedure) ORDER BY name`,
+    }));
+    expect(before.history).toHaveLength(171);
+    expect(before.history.filter((row) => row.hash === "0".repeat(64))).toHaveLength(4);
+    const address = new URL(target.databaseUrl);
+    expect(address.hostname).toBe("127.0.0.1");
+    expect(Number(address.port)).toBe(target.ports.database);
+    expect(address.port).not.toBe("57022");
+    const configPath = path.join(target.scratchRoot, "history-review-config.cjs");
+    await writeFile(configPath, `module.exports = { dialect: 'postgresql', out: ${JSON.stringify(path.resolve("drizzle"))}, dbCredentials: { url: process.env.MMHR_RECOVERY_TEST_DATABASE_URL } };\n`);
+    try {
+      await promisify(execFile)(process.execPath, [path.resolve("node_modules/drizzle-kit/bin.cjs"), "migrate", "--config", configPath], {
+        cwd: process.cwd(),
+        env: { ...process.env, MMHR_RECOVERY_TEST_DATABASE_URL: target.databaseUrl },
+        timeout: 120_000,
+      });
+    } catch (error) {
+      const code = error && typeof error === "object" && "code" in error ? String(error.code) : "unknown";
+      throw new Error(`The isolated migration command failed (${code})`);
+    }
+    await target.client.begin(async (sql) => {
+      const history = await sql`SELECT created_at::text, hash FROM drizzle.__drizzle_migrations ORDER BY created_at`;
+      expect(history).toHaveLength(applicationMigrationCount);
+      expect(history.slice(0, 171)).toEqual(before.history);
+      expect(await selectionArtifacts(sql, seeded.comparison.intakeId)).toEqual(before.artifacts);
+      expect(await readInitial(sql, seeded.customer, seeded.fixture.organizationId, seeded.comparison.intakeId))
+        .toEqual({ ...before.selection, correlationId: expect.any(String) });
+      const permissions = await sql`SELECT oid::regprocedure::text AS name, proacl::text AS acl FROM pg_proc
+        WHERE oid IN ('public.mmhr_create_initial_evaluation(jsonb,uuid,uuid)'::regprocedure,
+          'mmhr_private.r3_initial_selection_result(uuid,uuid,uuid,text)'::regprocedure) ORDER BY name`;
+      expect(permissions).toEqual(before.permissions);
+      const [auditFunction] = await sql<{ body: string }[]>`
+        SELECT pg_get_functiondef('public.mmhr_create_initial_evaluation(jsonb,uuid,uuid)'::regprocedure) AS body`;
+      expect(auditFunction!.body).toContain(newAudit);
+      expect(auditFunction!.body).not.toContain(oldAudit);
+      const replayCorrelation = randomUUID();
+      const replay = initialEvaluationSelectionResultSchema.parse(await selectInitial(
+        sql, seeded.customer, seeded.input, "aal1", replayCorrelation, seeded.idempotencyKey,
+      ));
+      expect(replay).toEqual({ ...seeded.created, correlationId: replayCorrelation, outcomeCode: "replayed" });
+      expect(await selectionArtifacts(sql, seeded.comparison.intakeId)).toEqual(before.artifacts);
+    });
+  }, 360_000);
+});
 
 describe("R3 initial customer selection RPCs", () => {
   let context: RehearsalContext | undefined;
@@ -268,8 +374,9 @@ describe("R3 initial customer selection RPCs", () => {
       const correlationId = randomUUID();
       const idempotencyKey = randomUUID();
       const created = initialEvaluationSelectionResultSchema.parse(await selectInitial(sql, customerContributor, input, "aal1", correlationId, idempotencyKey));
-      const replayed = initialEvaluationSelectionResultSchema.parse(await selectInitial(sql, customerContributor, input, "aal1", correlationId, idempotencyKey));
-      expect(replayed).toEqual({ ...created, correlationId, outcomeCode: "replayed" });
+      const replayCorrelationId = randomUUID();
+      const replayed = initialEvaluationSelectionResultSchema.parse(await selectInitial(sql, customerContributor, input, "aal1", replayCorrelationId, idempotencyKey));
+      expect(replayed).toEqual({ ...created, correlationId: replayCorrelationId, outcomeCode: "replayed" });
       const [exactArtifacts] = await sql<{ audits: number; receipts: number }[]>`
         SELECT
           (SELECT count(*)::integer FROM public.audit_events WHERE entity_id = ${created.selectionId}) AS audits,

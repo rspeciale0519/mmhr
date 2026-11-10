@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/lib/trpc/client";
 import type { getIntakeRequirementsPage } from "@/server/commands/requirement-read";
 import { ResponseValue } from "./requirement-views";
-import { emptyPayrollAnswer, PayrollAnswerFields, payrollAnswerSchema, type PayrollAnswer } from "./payroll-answer";
+import { emptyPayrollAnswer, PayrollAnswerFields, payrollAnswerForSave, payrollAnswerSchema, type PayrollAnswer } from "./payroll-answer";
 
 type Requirement = Awaited<ReturnType<typeof getIntakeRequirementsPage>>["requirements"][number];
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
@@ -189,7 +189,7 @@ export function CustomerRequirementForm({
     }
     const existingError = answerMode === "existing" ? responseValidationError(existingResponse) : null;
     const checkedPayroll = payrollTemplate ? payrollAnswerSchema.safeParse(payrollAnswer) : null;
-    const response: { response?: JsonValue; error?: string } = checkedPayroll ? checkedPayroll.success ? { response: checkedPayroll.data } : { error: "Check the payroll answers. Use a two-letter country code or leave it blank." }
+    const response: { response?: JsonValue; error?: string } = checkedPayroll ? checkedPayroll.success ? { response: payrollAnswerForSave(checkedPayroll.data) } : { error: "Check the payroll answers. Use a two-letter country code or leave it blank." }
       : existingError ? { error: existingError } : answerMode === "existing" ? { response: existingResponse } : buildResponse(answerMode, answerValue);
     if (response.error || response.response === undefined) {
       setValidationError(response.error ?? "Choose an answer.");

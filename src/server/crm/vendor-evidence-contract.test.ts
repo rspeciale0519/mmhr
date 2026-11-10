@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  vendorEvidenceRecordSchema,
   parseVendorSource,
   resolvePublishedVendorFact,
 } from "./vendor-evidence-contract";
@@ -161,4 +162,15 @@ describe("vendor evidence contract", () => {
       asOf: "2026-09-01T00:00:00.000Z",
     })).toThrow("Vendor evidence scope or approval mismatch");
   });
+});
+
+test.each(["comparison_addon_inclusions", "comparison_limitation_reviews"])("requires product-specific, typed %s evidence", (fieldKey) => {
+  const record = { source, fact: { ...fact, productId: "88888888-8888-4888-8888-888888888888", fieldKey,
+    value: JSON.stringify({ payroll: true }), status: "draft" }, evidence };
+  expect(vendorEvidenceRecordSchema.safeParse(record).success).toBe(true);
+  for (const value of ["not-json", "[]", JSON.stringify({ payroll: "yes" }), JSON.stringify({ Payroll: true }),
+    JSON.stringify({ commission_rate: true })]) {
+    expect(vendorEvidenceRecordSchema.safeParse({ ...record, fact: { ...record.fact, value } }).success).toBe(false);
+  }
+  expect(vendorEvidenceRecordSchema.safeParse({ ...record, fact: { ...record.fact, productId: null } }).success).toBe(false);
 });

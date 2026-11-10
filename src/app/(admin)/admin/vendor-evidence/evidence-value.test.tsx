@@ -25,3 +25,19 @@ test("keeps invalid records visible with an explicit correction message", () => 
   expect(screen.getByRole("alert")).toHaveTextContent("invalid");
   expect(screen.getByText("View stored value")).toBeInTheDocument();
 });
+
+test.each([
+  ["comparison_addon_inclusions", "Included in the reviewed package", "Not confirmed in the reviewed package"],
+  ["comparison_limitation_reviews", "Limits recorded in reviewed conditions", "Limits not confirmed"],
+])("shows readable reviewed delivery values for %s", (fieldKey, yes, no) => {
+  render(<EvidenceValue fieldKey={fieldKey} value={JSON.stringify({ payroll: true, time: false })}/>);
+  expect(screen.getByText("payroll")).toBeInTheDocument();
+  expect(screen.getByText(yes)).toBeInTheDocument();
+  expect(screen.getByText(no)).toBeInTheDocument();
+});
+
+test("warns staff about malformed reviewed delivery values", () => {
+  render(<EvidenceValue fieldKey="comparison_addon_inclusions" value={'{"payroll":"yes"}'}/>);
+  expect(screen.getByRole("alert")).toHaveTextContent("invalid");
+  expect(screen.getByText("View stored value")).toBeInTheDocument();
+});

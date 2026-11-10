@@ -59,6 +59,78 @@ test("creates a new intake with an empty valid answer set", async () => {
   expect(mutate.mock.calls[0]![0].idempotencyKey).toEqual(expect.any(String));
 });
 
+test("saves an optional employee count as a number for estimates", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Number of employees for estimates"), { target: { value: "25" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
+  expect(mutate.mock.calls[0]![0].data.companyContext).toEqual({ estimateEmployeeCountV1: 25 });
+});
+
+test("preserves a saved employee count and other company details", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm(existingIntake({ data: { companyContext: { estimateEmployeeCountV1: 25, sector: "services" } } }));
+  expect(screen.getByLabelText("Number of employees for estimates")).toHaveValue("25");
+  expect(screen.getByLabelText("Company context label 1")).toHaveValue("sector");
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
+  expect(mutate.mock.calls[0]![0].data.companyContext).toEqual({ estimateEmployeeCountV1: 25, sector: "services" });
+});
+
+test("preserves an unusable old count until the customer changes it", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm(existingIntake({ data: { companyContext: { estimateEmployeeCountV1: "unknown" } } }));
+  expect(screen.getByLabelText("Number of employees for estimates")).toHaveValue("");
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
+  expect(mutate.mock.calls[0]![0].data.companyContext).toEqual({ estimateEmployeeCountV1: "unknown" });
+});
+
+test("can replace an unusable old count with a valid one", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm(existingIntake({ data: { companyContext: { estimateEmployeeCountV1: "unknown", sector: "services" } } }));
+  fireEvent.change(screen.getByLabelText("Number of employees for estimates"), { target: { value: "35" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
+  expect(mutate.mock.calls[0]![0].data.companyContext).toEqual({ estimateEmployeeCountV1: 35, sector: "services" });
+});
+
+test("can clear the employee count without removing other answers", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm(existingIntake({ data: { companyContext: { estimateEmployeeCountV1: 25, sector: "services" } } }));
+  fireEvent.change(screen.getByLabelText("Number of employees for estimates"), { target: { value: "" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
+  expect(mutate.mock.calls[0]![0].data.companyContext).toEqual({ sector: "services" });
+});
+
+test("does not let a custom answer overwrite the employee count", async () => {
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Company context label 1"), { target: { value: "estimateEmployeeCountV1" } });
+  fireEvent.change(screen.getByLabelText("Company context answer 1"), { target: { value: "25" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Use the employee count field");
+  expect(mutate).not.toHaveBeenCalled();
+});
+
+test("rejects an out-of-range employee count", async () => {
+  renderForm();
+  fireEvent.change(screen.getByLabelText("Number of employees for estimates"), { target: { value: "0" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save and continue" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Enter a whole number from 1 to 10,000,000");
+  expect(mutate).not.toHaveBeenCalled();
+});
+
+test("does not silently clear a saved count when the new entry is not a number", async () => {
+  mutate.mockResolvedValue(result());
+  renderForm(existingIntake({ data: { companyContext: { estimateEmployeeCountV1: 25 } } }));
+  fireEvent.change(screen.getByLabelText("Number of employees for estimates"), { target: { value: "many" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save and continue" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Enter a whole number from 1 to 10,000,000");
+  expect(mutate).not.toHaveBeenCalled();
+});
+
 test("resumes an in-progress intake with its revision and status", async () => {
   mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated", status: "in_progress" }));
   renderForm(existingIntake({ status: "in_progress" }));

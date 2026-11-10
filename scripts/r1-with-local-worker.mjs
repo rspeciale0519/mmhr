@@ -143,6 +143,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r3-evaluation-publication.integration.test.ts",
     "src/server/db/r3-initial-selection.integration.test.ts",
     "src/server/db/r3-current-publication.integration.test.ts",
+    "src/server/db/r3-coverage-scoring.integration.test.ts",
     "src/server/db/r3-disclosure.integration.test.ts",
       "src/server/db/r3-matching.integration.test.ts",
       "src/server/db/r3-comparison-export.integration.test.ts",

@@ -27,10 +27,11 @@ function config(criteria: Array<{ requirementKey: string; factKey: string; respo
 }
 
 async function evaluateSql(sql: SecurityTransaction, requirements: unknown[], configuration: PublicationConfig, inputs: unknown[]) {
+  // Bind serialized JSON as text so the driver does not encode it twice.
   const [row] = await sql<{ result: Record<string, unknown> }[]>`
     SELECT mmhr_private.r3_evaluate_publication_option(
-      ${JSON.stringify(configuration)}::jsonb, ${JSON.stringify(requirements)}::jsonb,
-      ${JSON.stringify(inputs)}::jsonb
+      ${JSON.stringify(configuration)}::text::jsonb, ${JSON.stringify(requirements)}::text::jsonb,
+      ${JSON.stringify(inputs)}::text::jsonb
     ) AS result
   `;
   return row!.result;
@@ -39,7 +40,7 @@ async function evaluateSql(sql: SecurityTransaction, requirements: unknown[], co
 async function evaluateSqlRaw(sql: SecurityTransaction, requirementsJson: string, configuration: PublicationConfig) {
   const [row] = await sql<{ result: Record<string, unknown> }[]>`
     SELECT mmhr_private.r3_evaluate_publication_option(
-      ${JSON.stringify(configuration)}::jsonb, ${requirementsJson}::jsonb, '[]'::jsonb
+      ${JSON.stringify(configuration)}::text::jsonb, ${requirementsJson}::text::jsonb, '[]'::jsonb
     ) AS result
   `;
   return row!.result;
@@ -175,8 +176,8 @@ async function assertFormatTwoParity(sql: SecurityTransaction) {
     const result = await evaluateSql(sql, saved, scopedRules, facts);
     expectEvaluationParity(result, evaluatePublishedOption(saved, scopedRules, facts));
     const [details] = await sql<{ result: { features: Array<{ outcome: string }> } }[]>`
-      SELECT mmhr_private.r3_masked_publication_details(${JSON.stringify(scopedRules)}::jsonb,
-        ${JSON.stringify(saved)}::jsonb,${JSON.stringify(facts)}::jsonb,${JSON.stringify(result)}::jsonb) AS result`;
+      SELECT mmhr_private.r3_masked_publication_details(${JSON.stringify(scopedRules)}::text::jsonb,
+        ${JSON.stringify(saved)}::text::jsonb,${JSON.stringify(facts)}::text::jsonb,${JSON.stringify(result)}::text::jsonb) AS result`;
     expect(details.result.features[0].outcome).toBe(answer === true ? "match"
       : answer === undefined || answer === null || (typeof answer === "string" && answer.trim() === "") ? "unknown" : "mismatch");
   }

@@ -10,11 +10,16 @@ export const payrollAnswerSchema = z.strictObject({
   workerType: z.enum(["employee", "contractor", "mixed"]).nullable(),
   stateScope: z.enum(["single", "multiple"]).nullable(),
   allowPayrollAddOn: z.boolean().nullable(),
+  allowPayrollPartner: z.boolean().nullable().default(null),
 });
 export type PayrollAnswer = z.infer<typeof payrollAnswerSchema>;
 export const emptyPayrollAnswer: PayrollAnswer = {
-  version: 1, requested: null, country: null, workerType: null, stateScope: null, allowPayrollAddOn: null,
+  version: 1, requested: null, country: null, workerType: null, stateScope: null, allowPayrollAddOn: null, allowPayrollPartner: null,
 };
+export function payrollAnswerForSave(answer: PayrollAnswer) {
+  const { allowPayrollPartner, ...previousFields } = answer;
+  return allowPayrollPartner === null ? previousFields : { ...previousFields, allowPayrollPartner };
+}
 const fieldClass = "min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground";
 
 export function PayrollAnswerSummary({ value, fallback }: { value: unknown; fallback: ReactNode }) {
@@ -27,6 +32,7 @@ export function PayrollAnswerSummary({ value, fallback }: { value: unknown; fall
     ["Workers", answer.workerType === "employee" ? "Employees" : answer.workerType === "contractor" ? "Contractors" : answer.workerType === "mixed" ? "Employees and contractors" : "Not specified"],
     ["US locations", answer.stateScope === "single" ? "One state" : answer.stateScope === "multiple" ? "More than one state" : "Not specified"],
     ["Paid payroll add-on", answer.allowPayrollAddOn === null ? "Not sure yet" : answer.allowPayrollAddOn ? "Would consider" : "Would not consider"],
+    ["Partner payroll provider", answer.allowPayrollPartner === null ? "Not sure yet" : answer.allowPayrollPartner ? "Would consider" : "Would not consider"],
   ];
   return <dl className="space-y-3">{rows.map(([label, text]) => <div key={label}><dt className="font-medium">{label}</dt><dd>{text}</dd></div>)}</dl>;
 }
@@ -56,6 +62,12 @@ export function PayrollAnswerFields({ value, onChange }: { value: PayrollAnswer;
     <label className="block space-y-2 text-sm font-medium">Would you consider a paid payroll add-on?
       <select aria-label="Would you consider a paid payroll add-on?" className={fieldClass} value={value.allowPayrollAddOn === null ? "" : String(value.allowPayrollAddOn)}
         onChange={event => onChange({ ...value, allowPayrollAddOn: event.target.value === "" ? null : event.target.value === "true" })}>
+        <option value="">Not sure yet</option><option value="true">Yes</option><option value="false">No</option>
+      </select></label>
+    <label className="block space-y-2 text-sm font-medium">Would you consider payroll from a partner provider?
+      <span className="block text-xs font-normal text-muted-foreground">A separate company would provide the payroll service.</span>
+      <select aria-label="Would you consider payroll from a partner provider?" className={fieldClass} value={value.allowPayrollPartner === null ? "" : String(value.allowPayrollPartner)}
+        onChange={event => onChange({ ...value, allowPayrollPartner: event.target.value === "" ? null : event.target.value === "true" })}>
         <option value="">Not sure yet</option><option value="true">Yes</option><option value="false">No</option>
       </select></label>
   </section>;

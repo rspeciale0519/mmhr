@@ -1,9 +1,32 @@
 import { factScopeMapSchema, type FactScope } from "@/server/matching/fact-scope";
+import { deliveryBooleanMapSchema } from "@/server/matching/delivery-evidence";
 
 const labels = { plan: "Plan", module: "Purchased module", country: "Country", state: "State",
   worker: "Worker type", delivery: "Delivery method", restriction: "Other restriction" } as const;
 
 export function EvidenceValue({ fieldKey, value }: { fieldKey: string; value: string }) {
+  if (fieldKey === "comparison_addon_inclusions" || fieldKey === "comparison_limitation_reviews") {
+    let reviewed: Record<string, boolean> | undefined;
+    try {
+      const result = deliveryBooleanMapSchema.safeParse(JSON.parse(value));
+      if (result.success) reviewed = result.data;
+    } catch { /* Keep malformed stored evidence available for correction. */ }
+    if (!reviewed) return <div className="space-y-3">
+      <p role="alert" className="text-sm">These stored delivery details are invalid. Correct them before use in a comparison.</p>
+      <details><summary className="cursor-pointer text-sm underline">View stored value</summary>
+        <p className="whitespace-pre-wrap break-all text-sm">{value}</p></details>
+    </div>;
+    const entries = Object.entries(reviewed);
+    return <div className="space-y-3" aria-label="Reviewed delivery details">
+      {!entries.length && <p className="text-sm">No reviewed features are recorded.</p>}
+      {entries.map(([key, confirmed]) => <section key={key} className="min-w-0 rounded-lg bg-muted/40 p-4">
+        <h4 className="break-words text-sm font-semibold">{key}</h4>
+        <p className="mt-2 text-sm">{fieldKey === "comparison_addon_inclusions"
+          ? confirmed ? "Included in the reviewed package" : "Not confirmed in the reviewed package"
+          : confirmed ? "Limits recorded in reviewed conditions" : "Limits not confirmed"}</p>
+      </section>)}
+    </div>;
+  }
   if (fieldKey !== "comparison_fact_scopes") return <p className="whitespace-pre-wrap break-words text-sm leading-6">{value}</p>;
   let scopes: Record<string, FactScope> | undefined;
   try {

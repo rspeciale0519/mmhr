@@ -6,6 +6,7 @@ import { WorkflowCommand, workflowInputClass } from "@/components/workflow-comma
 import { Button } from "@/components/ui/button";
 import type { VendorEvidencePage } from "@/server/crm/vendor-evidence-contract";
 import { ScopeFields, scopeValueFromForm } from "./scope-fields";
+import { DeliveryFields, deliveryValueFromForm } from "./delivery-fields";
 
 type Choice = { recordId: string; label: string };
 export function EvidenceCapture({ organizationId, vendorProfileId, products }: {
@@ -32,8 +33,8 @@ export function EvidenceCapture({ organizationId, vendorProfileId, products }: {
             licenseNote: String(data.get("licenseNote")) || null, capturedAt, active: true,
             captureMethod: "manual", cadenceDays: Number(data.get("cadenceDays")) },
           fact: { factId, organizationId, vendorProfileId, productId,
-            fieldKey: data.get("recordType") === "scope" ? "comparison_fact_scopes" : String(data.get("fieldKey")),
-            value: data.get("recordType") === "scope" ? scopeValueFromForm(data) : String(data.get("value")), observedAt: capturedAt, status: "draft" },
+            fieldKey: data.get("recordType") === "scope" ? "comparison_fact_scopes" : data.get("recordType") === "addon" ? "comparison_addon_inclusions" : data.get("recordType") === "limits" ? "comparison_limitation_reviews" : String(data.get("fieldKey")),
+            value: data.get("recordType") === "scope" ? scopeValueFromForm(data) : data.get("recordType") === "addon" || data.get("recordType") === "limits" ? deliveryValueFromForm(data) : String(data.get("value")), observedAt: capturedAt, status: "draft" },
           evidence: { evidenceId, organizationId, factId, sourceId, version: 1, contentHash: "",
             capturedAt, freshUntil, citation: String(data.get("citation")).trim() },
         };
@@ -49,8 +50,9 @@ export function EvidenceCapture({ organizationId, vendorProfileId, products }: {
       </select></label>
       <label className="block text-sm font-medium">Record type<select name="recordType" value={recordType} onChange={(event) => setRecordType(event.target.value)} className={workflowInputClass}>
         <option value="fact">Capability or estimate</option><option value="scope">Package and regional conditions</option>
+        <option value="addon">Paid addition inclusion</option><option value="limits">Feature limits review</option>
       </select></label>
-      {recordType === "scope" ? <ScopeFields/> : <>
+      {recordType === "scope" ? <ScopeFields/> : recordType === "addon" || recordType === "limits" ? <DeliveryFields key={recordType} kind={recordType}/> : <>
         <label className="block text-sm font-medium">Approved field key<input name="fieldKey" required pattern="[a-z][a-z0-9_]*" maxLength={100} className={workflowInputClass}/></label>
         <label className="block text-sm font-medium">Fact value<textarea name="value" required maxLength={2000} rows={3} className={workflowInputClass}/></label>
       </>}

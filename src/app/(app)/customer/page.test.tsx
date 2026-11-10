@@ -153,6 +153,16 @@ test("reads one scoped intake and renders all seven saved sections", async () =>
   expect(screen.queryByText(otherId, { exact: false })).not.toBeInTheDocument();
 });
 
+test("shows a clear label for the saved employee count", async () => {
+  vi.mocked(getIntake).mockResolvedValue({ ...summary, submittedAt: null,
+    data: { companyContext: { estimateEmployeeCountV1: 25 } } });
+  render(await load({ intake: intakeId }));
+  const company = within(screen.getByRole("region", { name: "Company context" }));
+  expect(company.getByText("Number of employees for estimates")).toBeInTheDocument();
+  expect(company.getByText("25")).toBeInTheDocument();
+  expect(company.queryByText("estimateEmployeeCountV1")).not.toBeInTheDocument();
+});
+
 test("normalizes uppercase query UUIDs without changing the selected scope", async () => {
   const id = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
   vi.mocked(getIntake).mockResolvedValue({ ...summary, intakeId: id, submittedAt: null, data: {} });

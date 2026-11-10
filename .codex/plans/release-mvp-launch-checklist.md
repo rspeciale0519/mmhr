@@ -126,6 +126,8 @@ Do not waive that gate or infer readiness from the passing application checks.
    Approved records also support MVP-02, MVP-05, and MVP-08. Research alone cannot approve vendor facts, scoring, or public claims.
    September 15: Rob approved the [eight-product catalog and scoring policy](decision-phase1-catalog-and-scoring.md). Individual vendor facts still require source and package review.
    September 16: approved local setup created eight catalog workspaces. All eight products are active with individually approved payroll-availability facts. BambooHR also has approved Add-on coverage. The audited profile-review flow is implemented and verified locally with migration0141. ADP, UKG and BambooHR profiles are approved. Automatic approval review rejected Paycom; specific approval for the five remaining local profiles is pending. BambooHR has reviewed scope for a proposed US employee payroll addition; the later staff preview confirms matching fit and Add-on coverage. UKG native payroll delivery is saved as a draft; automatic review requires specific approval. Other structured scopes, remaining delivery coverage and real catalog publication remain open. See [profile review evidence](../../docs/security/phase1-profile-approval-2026-09-16.md). See [catalog controls evidence](../../docs/security/phase1-catalog-controls-2026-09-16.md).
+   November 8: the five remaining local profiles and UKG-02 delivery evidence were approved through the staff interface. A read-only database check confirms all eight profiles approved. Further scope, coverage, comparison publication, and customer selection evidence remain open. See [the fact review record](../../docs/phase1-vendor-fact-review-2026-09-15.md).
+   Later November 8: ADP and UKG scope records were approved. The owner-approved synthetic product retirement preserves seven historical options and one saved choice. An unpublished preview contains exactly eight real products; three match and five need confirmation. Gusto and Rippling reviews remain pending. The historical customer choice remains visible, while its current comparison is stale. See the fact review record above.
 
 2. **MVP-02 — Complete the live comparison data.** Status: Partial.
 
@@ -139,6 +141,7 @@ Do not waive that gate or infer readiness from the passing application checks.
    The actual staff interface published a rules2 synthetic comparison. The previous selection remains stored.
    New evidence records capture source ownership and review intervals; earlier records remain unchanged.
    Approved real records and complete customer browser verification remain open. See the [implementation record](build-phase1-comparison-matrix.md).
+   November 8: the owner approved and staff published an eight-option local comparison for a fictional customer. Three options match; five need confirmation. Prices and setup remain Unknown. Gusto and Rippling review decisions remain pending. See the [fact review record](../../docs/phase1-vendor-fact-review-2026-09-15.md).
 
 3. **MVP-03 — Implement the approved Comparison matrix.** Status: Partial; detailed data and native browser verification remain open.
 
@@ -154,6 +157,9 @@ Do not waive that gate or infer readiness from the passing application checks.
    September 16: native customer testing found and corrected saved-product display across comparison versions with migration0139.
    Selection-history focused88 and integration8 pass. Latest full4100, type, lint, and build71 pass. Existing matrix refresh and narrow-screen checks pass. The new standard payroll form passes typed save, refresh, edit, invalid-input, narrow-screen, and keyboard checks. See [payroll browser evidence](../../docs/security/phase1-payroll-browser-scope-2026-09-16.md).
    See [selection history evidence](../../docs/security/phase1-selection-history-2026-09-16.md). Real catalog publication and new-choice browser save remain open.
+   November 8: the fictional customer viewed all eight published options, saved five choices, and retained them after refresh. The local server rejected a sixth choice; the count remained five. An exact save retry returned the original result, and a changed retry was rejected without adding choices. A separate fictional intake showed the native loading, draft-empty, and submitted-unpublished states. On an older stale comparison, retry kept the saved choice visible and left the error clear; a new reviewed publication remains necessary. At phone width the matrix stayed contained, and keyboard access to the last option passed. The authenticated current-publication response passed provider-identity checks. A direct customer request for the eight product records was denied; full authorization and RLS checks remain open. Browser logs showed no warnings or errors; complete browser network capture and hosted verification remain open. See [local comparison evidence](../../docs/security/phase1-four-option-preview-2026-09-16.md).
+
+   November 10: the comparison warning for an unclear feature match passed 28 focused component tests, type checking, lint, a placeholder build, and a fictional browser preview. The full unit rerun passed 6,478 tests across 505 files. The signed customer creation flow, complete network capture, and the meaning of the conflicting feature evidence remain open. See [the local comparison evidence](../../docs/security/phase1-four-option-preview-2026-09-16.md).
 
 4. **MVP-04 — Complete customer registration and account access.** Status: Partial; account-support decisions open.
 
@@ -205,6 +211,7 @@ Do not waive that gate or infer readiness from the passing application checks.
    **Depends on:** MVP-01 and MVP-07 for actual business practices.
    **Complete when:** Privacy, terms, commission disclosures, data sharing, consent, and retention statements match actual controls and operations.
    Record the required reviews in R0. Verify that customer-facing explanations match the approved scoring method.
+   November 8: the local home page shows claims about 52 monitored systems and repeated verification. The design gallery marks the same design content as placeholder. Verify or replace those claims before launch; local catalog evidence does not establish them.
 
 10. **MVP-10 — Prepare usable staging and the production configuration.** Status: Open.
 
@@ -256,6 +263,8 @@ Do not waive that gate or infer readiness from the passing application checks.
     Review the final diff, migrations, test tooling, and unrelated work. Preserve user edits.
     Obtain approval for commits, pushes, and pull requests. Verify CI against the exact candidate intended for release.
     Record failed or unavailable checks. Earlier passing runs do not certify a changed candidate.
+    November 8: the current develop checkout passed type checking, lint, the tracked-file secret scan, and the 126-file integration inventory. Its standard suite had 6,434 passing and 18 failing tests; the two affected local-service files passed separately with local access. The original production build stalled and was stopped; it remains incomplete. The owner deferred the full integration run until hosted staging.
+    The current develop dependency audit reports 20 advisories, including one high. The owner approved a one-package fix on a separate local branch. That branch passes the high-severity audit threshold, type checking, lint, 6,452 tests, and a production build with local placeholders; 19 lower-severity advisories remain. Its secret scan and 126-file integration inventory also passed. The owner approved and uploaded local commit 84ffdcf. GitHub develop already has the same package version; its exact dependency snapshot passed the high-severity audit threshold with 18 lower-severity findings. The local develop checkout is seven commits behind and has not been synced. An owner-approved separate test copy of GitHub develop at b575c9d passed installation, 6,453 tests, type check, lint, secret scan, inventory, and a build with local placeholders. GitHub still matched that commit after testing. GitHub CI run 41136808619 failed because an Actions budget prevented all three jobs from starting; hosted CI remains open. See [November 8 evidence](../../mmhrbrain/journal/2026-11-08.md).
 
 16. **MVP-16 — Verify hosted access and privacy controls.** Status: Partial; target review open.
 

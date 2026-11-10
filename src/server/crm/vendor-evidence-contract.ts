@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import { factScopeMapSchema } from "@/server/matching/fact-scope";
+import { deliveryBooleanMapSchema } from "@/server/matching/delivery-evidence";
 
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
@@ -117,6 +118,12 @@ export const vendorEvidenceRecordSchema = z.strictObject({
     try { valid = factScopeMapSchema.safeParse(JSON.parse(fact.value)).success; } catch { /* Invalid JSON is rejected below. */ }
     if (!valid || fact.productId === null) context.addIssue({ code: "custom", path: ["fact", "value"],
       message: "Scope evidence requires a product and valid conditions" });
+  }
+  if (fact.fieldKey === "comparison_addon_inclusions" || fact.fieldKey === "comparison_limitation_reviews") {
+    let valid = false;
+    try { valid = deliveryBooleanMapSchema.safeParse(JSON.parse(fact.value)).success; } catch { /* Invalid JSON is rejected below. */ }
+    if (!valid || fact.productId === null) context.addIssue({ code: "custom", path: ["fact", "value"],
+      message: "Delivery evidence requires a product and valid boolean values" });
   }
   if (source.organizationId !== fact.organizationId || source.organizationId !== evidence.organizationId ||
     source.vendorProfileId !== fact.vendorProfileId || fact.status !== "draft" ||

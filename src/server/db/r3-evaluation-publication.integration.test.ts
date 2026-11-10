@@ -335,7 +335,7 @@ describe("R3 evaluation publication RPCs", () => {
       expect(JSON.stringify(detailed)).not.toMatch(/vendor\.example|productId|fact_id|content_hash|source_id|review_id/);
       await expect(readPublication(sql, customerContributor, "get", detailedPayload, "aal1")).rejects.toMatchObject({ code: "42501" });
       await expect(sql.savepoint((probe) => readPublication(probe, fixture.pair[0], "review", {
-        ...payload, detailsVersion: 2,
+        ...payload, detailsVersion: 3,
       }))).rejects.toMatchObject({ code: "22023" });
       await publish(sql, fixture.pair[0], { organizationId: fixture.organizationId, publicationId: prepared.publicationId,
         expectedDigest: prepared.inputDigest, approvalReference: "synthetic-estimate-review", reason: "Review synthetic estimate projection" });

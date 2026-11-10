@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { requirementLabel } from "@/lib/requirement-label";
 import type { MaskedOption } from "@/server/matching/option-publication-contract";
-import { AnnualCost, evidenceDate, EvidenceDates, FeatureDetail, Setup } from "./comparison-details";
+import { AnnualCost, evidenceDate, EvidenceDates, FeatureDetail, featureNeedsReview, Setup } from "./comparison-details";
 
 export type ComparisonRequirement = {
   key: string;
@@ -28,6 +28,14 @@ const eligibilityLabels = {
 const rowHeadingClass = "sticky left-0 z-10 w-28 min-w-28 border-r bg-background px-3 py-5 text-left align-top font-medium sm:w-52 sm:min-w-52 sm:px-4";
 const cellClass = "min-w-36 max-w-48 border-r px-3 py-5 align-top last:border-r-0 sm:min-w-60 sm:max-w-72 sm:px-5";
 const selectedClass = "bg-teal-50/80 dark:bg-teal-950/40";
+
+function optionNeedsReview(option: MaskedOption) {
+  return option.details?.features.some(featureNeedsReview) ?? false;
+}
+
+function ReviewMatchNote({ needed }: { needed: boolean }) {
+  return needed ? <p className="mt-2 text-xs text-muted-foreground">Review a feature match below.</p> : null;
+}
 
 function Evidence({ option, labels }: { option: MaskedOption; labels: Record<string, string> }) {
   return <details className="text-sm">
@@ -59,6 +67,7 @@ function Evidence({ option, labels }: { option: MaskedOption; labels: Record<str
 
 export function ComparisonMatrix({ options, requirements, labels, selectedOptionIds, renderChoice }: Props) {
   const requirementMap = new Map(requirements.map((requirement) => [requirement.key, requirement]));
+  const reviewOptionIds = new Set(options.filter(optionNeedsReview).map((option) => option.optionId));
   // Legacy publications provide matching keys, but cannot distinguish absent facts from failed requirements.
   const keys = [...new Set([...requirements.map((item) => item.key), ...Object.keys(labels),
     ...options.flatMap((option) => [...option.fitReasons, ...option.limitations])])];
@@ -92,20 +101,26 @@ export function ComparisonMatrix({ options, requirements, labels, selectedOption
               className={`${cellClass} border-t-4 text-left ${selectedOptionIds.has(option.optionId)
                 ? `border-t-teal-600 ${selectedClass}` : "border-t-transparent"}`}>
               <h3 className="text-lg font-semibold tracking-tight">{option.maskedLabel}</h3>
-              <p className="mt-2 min-h-12 text-xs font-normal leading-5 text-muted-foreground">{eligibilityLabels[option.eligibility]}</p>
+              <p className="mt-2 min-h-12 text-xs font-normal leading-5 text-muted-foreground">
+                {option.eligibility === "eligible" && reviewOptionIds.has(option.optionId) ? "Review a feature match" : eligibilityLabels[option.eligibility]}
+              </p>
               <div className="mt-4">{renderChoice(option)}</div>
             </th>)}
           </tr>
         </thead>
         <tbody>
-          {row("Overall fit", (option) => <span className="text-3xl font-semibold tabular-nums tracking-tight text-teal-800 dark:text-teal-200">
-            {(option.deterministicScore / 100).toFixed(1)}<span className="ml-0.5 text-base">%</span>
-          </span>, "Based on recorded requirements")}
+          {row("Overall fit", (option) => <div>
+            <span className="text-3xl font-semibold tabular-nums tracking-tight text-teal-800 dark:text-teal-200">
+              {(option.deterministicScore / 100).toFixed(1)}<span className="ml-0.5 text-base">%</span>
+            </span>
+            <ReviewMatchNote needed={reviewOptionIds.has(option.optionId)} />
+          </div>, "Based on recorded requirements")}
           {row("Estimated annual cost", (option) => <AnnualCost estimate={option.details?.annualCost} />, "Approved estimate required")}
           {row("Required features met", (option) => requirements.length === 0
             ? <span className="text-muted-foreground">Unknown</span>
             : required.length === 0 ? "No required features recorded"
-              : <span className="font-semibold tabular-nums">{required.filter((item) => option.fitReasons.includes(item.key)).length} of {required.length}</span>)}
+              : <div><span className="font-semibold tabular-nums">{required.filter((item) => option.fitReasons.includes(item.key)).length} of {required.length}</span>
+                <ReviewMatchNote needed={reviewOptionIds.has(option.optionId)} /></div>)}
           {keys.map((key) => {
             const requirement = requirementMap.get(key);
             return <tr key={key} className="border-b">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { estimateEmployeeCountKey, estimateEmployeeCountLabel } from "@/lib/intake-estimate";
 import type { getIntake, getIntakesPage } from "@/server/commands/intake-read";
 
 type Intake = Awaited<ReturnType<typeof getIntake>>;
@@ -111,7 +112,7 @@ function SavedSection({ title, value }: { title: string; value: string[] | Recor
           <dl className="min-w-0 space-y-4 text-sm leading-6">
             {Object.entries(value).map(([label, entry]) => (
               <div key={label}>
-                <dt className="whitespace-pre-wrap font-medium [overflow-wrap:anywhere]">{label}</dt>
+                <dt className="whitespace-pre-wrap font-medium [overflow-wrap:anywhere]">{title === "Company context" && label === estimateEmployeeCountKey ? estimateEmployeeCountLabel : label}</dt>
                 <dd className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">
                   {typeof entry === "boolean" ? (entry ? "Yes" : "No") : entry === "" ? "Not provided" : entry}
                 </dd>
