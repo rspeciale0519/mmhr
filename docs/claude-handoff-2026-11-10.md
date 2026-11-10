@@ -3,6 +3,7 @@
 ## Start here
 
 Use branch `codex/fix-selection-retry` in `rspeciale0519/mmhr`.
+Code commit `9c47411673a5cabb43e2b2706eee1d7f708d84cf` was pushed and verified on GitHub.
 This branch contains the unique code from the three local fix worktrees and the main checkout's current documents.
 The local development checkout is:
 
@@ -32,7 +33,10 @@ The checks preserved all 197 checked table fingerprints, 174 older migration rec
 After application, the same checks passed and the new migration record matched the exact hash.
 The existing function permissions stayed unchanged; the new private helpers are not callable by application roles.
 
-Four older migration-file checksums still differ from the applied historical records.
+Six older committed migration files differ from the applied historical records. Four original versions remain unrecovered.
+The unrecovered versions are 0001, 0002, 0026, and 0027.
+The 0028 applied bytes match commit `b9507dd9260424a9e069299bf4fdeeb0cb1779bf`.
+The 0046 applied bytes were reconstructed with `masked`; migration 0172 already corrects that installed behavior.
 Their records were preserved. Do not replace those records or reset the database to hide this difference.
 See `docs/security/phase1-four-option-preview-2026-09-16.md` and the November 9 journal for the earlier recovery evidence.
 
@@ -60,12 +64,20 @@ The payroll absence rule remains conservative for string answers unless an expli
 
 - 13 isolated migration tests passed against the final migration file.
 - 83 focused scoring and worker-wrapper tests passed.
-- Type checking and full lint passed before the final narrow scoring and test-registration edits.
+- Type checking passed again after the final code changes. Full lint and the focused lint rerun passed.
 - Integration inventory passed for all 127 files.
-- The secret scan passed for tracked files; final staged-file scanning is part of the push check.
-- Full unit tests and the production build are being rerun with local access.
+- The final staged-file secret scan passed for 2,232 files.
+- The production build passed with placeholder settings. The full unit rerun is still running.
 
 The first full test run and build stalled in the restricted sandbox.
 The first isolated database run could not access Docker and ran no cases.
 These failed attempts are not passing evidence.
 Signed browser verification and the full hosted integration suite remain unverified.
+
+Migration 0174 retains its exact applied bytes. Its final blank line produces a whitespace-only diff warning.
+The Git attributes preserve its mixed line endings so the GitHub file keeps the recorded migration hash.
+
+Nine additional historical SQL files had Git line-ending differences only.
+Their existing working bytes match the database records and are now preserved in Git.
+These are 0130, 0133, 0140, 0142, 0144, 0145, 0150, 0155, and 0156.
+No SQL text or database history changed for this byte-preservation step.
