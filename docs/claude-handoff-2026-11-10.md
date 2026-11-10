@@ -2,8 +2,8 @@
 
 ## Start here
 
-Use branch `codex/fix-selection-retry` in `rspeciale0519/mmhr`.
-Code commit `9c47411673a5cabb43e2b2706eee1d7f708d84cf` was pushed and verified on GitHub.
+Use the latest commit on branch `codex/fix-selection-retry` in `rspeciale0519/mmhr`.
+Initial code commit `9c47411673a5cabb43e2b2706eee1d7f708d84cf` and the following handoff commits are on GitHub.
 This branch contains the unique code from the three local fix worktrees and the main checkout's current documents.
 The local development checkout is:
 
@@ -67,7 +67,10 @@ The payroll absence rule remains conservative for string answers unless an expli
 - Type checking passed again after the final code changes. Full lint and the focused lint rerun passed.
 - Integration inventory passed for all 127 files.
 - The final staged-file secret scan passed for 2,232 files.
-- The production build passed with placeholder settings. The full unit rerun is still running.
+- The production build passed with placeholder settings.
+- The full unit run passed 6,519 tests and failed one outdated migration-count test.
+- The inventory count is corrected to 175. All 15 affected unit checks passed afterward.
+- The full suite was not repeated after this test-inventory correction.
 
 The first full test run and build stalled in the restricted sandbox.
 The first isolated database run could not access Docker and ran no cases.
