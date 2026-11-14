@@ -76,7 +76,7 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 Use these commands:
 
 - Install exactly: `npm ci`
-- Development server: `npm run dev`
+- Development server: `npm run dev:local` (port `3100`)
 - Production build: `npm run build`
 - Production server: `npm run start`
 - Type check: `npm run type-check`
@@ -87,7 +87,7 @@ Use these commands:
 The expected application port is `3100`. Windows port-proxy rules on the owner machine hold ports 3000 to 3005.
 Start the application with `npm run dev:local`. Check the port before starting a server.
 
-CI runs `npm ci`, type checking, lint, unit tests, and the production build.
+CI runs `npm ci`, the `check:integration-matrix`, `check:r9-evidence`, `check:dependency-audit`, and `check:secrets` scripts, type checking, lint, unit tests, and the production build.
 
 For code or configuration changes, run the smallest relevant check first.
 
@@ -238,7 +238,7 @@ When the owner asks "where are we?", read the board files. Answer for both agent
 Give the next milestone and tasks left, what each agent does now, and the age of each heartbeat.
 Also give conflicts, waiting questions, and the suggested next step.
 
-## Working with Claude Opus 5.5
+## Working with Claude models
 
 ### 1. Effort: medium by default
 - Run every session at **medium** effort unless the task says otherwise.
@@ -246,7 +246,7 @@ Also give conflicts, waiting questions, and the suggested next step.
 - Don't raise effort just to be safe. It costs more and runs slower.
 
 ### 2. No "think carefully" lines
-- Don't add "think carefully", "think step by step", "take a deep breath" or similar lines to prompts, skills or these files. Opus 5.5 always thinks, so those lines only slow replies.
+- Don't add "think carefully", "think step by step", "take a deep breath" or similar lines to prompts, skills or these files. Current Claude models always think, so those lines only slow replies.
 - If you find one, remove it as part of normal cleanup.
 
 ### 3. Long unattended runs: checklist + 3 auto-continues max
