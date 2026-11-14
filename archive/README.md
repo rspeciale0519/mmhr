@@ -1,0 +1,27 @@
+# Archive
+
+This folder keeps code and files that the launch does not use.
+The owner approved this "trim" in [docs/LAUNCH.md](../docs/LAUNCH.md): unused code moves here. It is not deleted.
+
+## What this folder is
+
+- Files here stay in Git. Their history stays with them when you move them with `git mv`.
+- Nothing here is built, type-checked, linted, or tested.
+- Nothing here is uploaded to Vercel.
+- The secret scan (`npm run check:secrets`) still scans this folder. Do not put secrets here.
+
+Because nothing checks this code, it can stop working as the rest of the project changes.
+Do not import from `archive/` in application code.
+
+## How to restore something
+
+1. Move it back to its old path with `git mv archive/<path> <old-path>`.
+2. Repair imports and other code that changed since the move.
+3. Run the four checks: `npm run type-check`, `npm run lint`, `npm test`, and `npm run build`.
+
+## Where the exclusion is set
+
+- `tsconfig.json`: `exclude` lists `archive`.
+- `eslint.config.mjs`: `globalIgnores` lists `archive/**`.
+- `.vercelignore`: lists `/archive`.
+- `vitest.config.ts` and `vitest.integration.config.ts` include only `src/**`, so they skip this folder.
