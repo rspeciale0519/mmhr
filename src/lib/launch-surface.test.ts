@@ -44,6 +44,63 @@ describe("launch surface", () => {
     expect(launchAreaForPath(path)).toBe(area);
   });
 
+  test("hides unapproved marketing pages in every candidate", () => {
+    expect(isLaunchAreaEnabled("unapproved-marketing", "A")).toBe(false);
+    expect(isLaunchAreaEnabled("unapproved-marketing", "B")).toBe(false);
+  });
+
+  // The 17 public pages that docs/LAUNCH.md removes from the launch site.
+  const unapprovedMarketingPages = [
+    "/about",
+    "/blog",
+    "/blog/some-post",
+    "/broker-model",
+    "/case-studies",
+    "/case-studies/some-study",
+    "/faq",
+    "/partners/brokers-consultants",
+    "/partners/pe-vc",
+    "/partners/software-vendors",
+    "/platform",
+    "/resources",
+    "/resources/hris-landscape-report",
+    "/resources/partner-finder",
+    "/resources/requirements-builder",
+    "/services",
+    "/transparency",
+  ] as const;
+
+  test.each(unapprovedMarketingPages)("blocks the unapproved marketing page %s", (path) => {
+    expect(launchAreaForPath(path)).toBe("unapproved-marketing");
+    expect(isPathInLaunch(path, "A")).toBe(false);
+    expect(isPathInLaunch(path, "B")).toBe(false);
+  });
+
+  test.each(["/partners", "/blog/some-post/comments", "/resources/partner-finder/extra"])(
+    "blocks the nested or parent marketing path %s",
+    (path) => {
+      expect(isPathInLaunch(path, "A")).toBe(false);
+      expect(isPathInLaunch(path, "B")).toBe(false);
+    },
+  );
+
+  test.each(["/", "/contact", "/privacy", "/terms", "/sign-up", "/sign-in"])(
+    "keeps the launch page %s",
+    (path) => {
+      expect(launchAreaForPath(path)).toBe("core");
+      expect(isPathInLaunch(path, "A")).toBe(true);
+      expect(isPathInLaunch(path, "B")).toBe(true);
+    },
+  );
+
+  test.each(["/platformx", "/blogging", "/aboutus", "/faqs", "/partnership", "/resources-hub", "/servicesx", "/contact/about"])(
+    "does not block the look-alike path %s",
+    (path) => {
+      expect(launchAreaForPath(path)).toBe("core");
+      expect(isPathInLaunch(path, "A")).toBe(true);
+    },
+  );
+
   test("hides tRPC procedures by router, including inside a batch", () => {
     expect(hiddenTrpcProcedures("/api/trpc/intakes.saveDraft", "A")).toEqual([]);
     expect(hiddenTrpcProcedures("/api/trpc/intakes.read,managedFinance.list", "A")).toEqual(["managedFinance.list"]);
