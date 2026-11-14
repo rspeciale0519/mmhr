@@ -23,6 +23,7 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 - Read installed versions from `package.json` and `package-lock.json`.
 - `develop` is the default integration branch. `main` is the production release branch.
 - Use current source, tests, manifests, configuration, and CI as repository truth.
+- Use `docs/LAUNCH.md` for launch scope, task order, and the work rule. It overrides older plans, roadmaps, and checklists on those points.
 - Use `docs/README.md` when project orientation is needed.
 - Treat `docs/PRD.md` as product authority and `docs/TECH_STACK.md` as architecture authority.
 - Read their relevant sections when the task changes product behavior or architecture.
