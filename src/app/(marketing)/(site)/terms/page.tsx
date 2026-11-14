@@ -38,8 +38,7 @@ export default function TermsPage() {
               The provider you select pays us under a commission or referral
               arrangement. Customers do not pay MMHR a fee or subscription. We
               also resell one system, CBIZ Centrally HR, which is labelled wherever
-              it appears. The full disclosure is on the{" "}
-              <a href="/transparency">how we make money</a> page.
+              it appears.
             </p>
 
             <h2>Your account</h2>

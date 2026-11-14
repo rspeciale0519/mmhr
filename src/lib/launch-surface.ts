@@ -8,7 +8,24 @@
  * framework imports so the proxy, route handlers, and pages can share it.
  */
 export type LaunchCandidate = "A" | "B";
-export type LaunchArea = "core" | "candidate-b" | "finance" | "documents";
+export type LaunchArea = "core" | "candidate-b" | "finance" | "documents" | "unapproved-marketing";
+
+/**
+ * Public marketing pages whose claims the owner has not approved (docs/LAUNCH.md,
+ * trim task 6). Only `/`, `/contact`, `/privacy`, and `/terms` stay public.
+ */
+const unapprovedMarketingPrefixes = [
+  "/about",
+  "/blog",
+  "/broker-model",
+  "/case-studies",
+  "/faq",
+  "/partners",
+  "/platform",
+  "/resources",
+  "/services",
+  "/transparency",
+] as const;
 
 const areaPrefixes: ReadonlyArray<readonly [string, LaunchArea]> = [
   ["/admin/finance", "finance"],
@@ -24,6 +41,7 @@ const areaPrefixes: ReadonlyArray<readonly [string, LaunchArea]> = [
   ["/customer/contracts", "candidate-b"],
   ["/vendor/contracts", "candidate-b"],
   ["/admin/contracts", "candidate-b"],
+  ...unapprovedMarketingPrefixes.map((prefix) => [prefix, "unapproved-marketing"] as const),
 ];
 
 const trpcRouterAreas: Readonly<Record<string, LaunchArea>> = {

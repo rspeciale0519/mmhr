@@ -17,4 +17,24 @@ describe("robots route", () => {
 
     expect(robots()).toEqual({ rules: { userAgent: "*", allow: "/" } });
   });
+
+  test("does not advertise launch-hidden pages", () => {
+    vi.stubEnv("NODE_ENV", "development");
+
+    const output = JSON.stringify(robots());
+    for (const hidden of [
+      "/about",
+      "/blog",
+      "/broker-model",
+      "/case-studies",
+      "/faq",
+      "/partners",
+      "/platform",
+      "/resources",
+      "/services",
+      "/transparency",
+    ]) {
+      expect(output, hidden).not.toContain(hidden);
+    }
+  });
 });

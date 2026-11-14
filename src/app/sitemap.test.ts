@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { isPathInLaunch } from "@/lib/launch-surface";
+
 import sitemap, {
   getPublicSitemapPaths,
   PUBLIC_SITEMAP_PATHS,
@@ -34,19 +36,40 @@ describe("sitemap route", () => {
 
     const entries = sitemap();
 
-    expect(entries).toHaveLength(getPublicSitemapPaths().length);
-    expect(entries[0]).toEqual({ url: "http://localhost:3000/" });
-    expect(entries).toContainEqual({
-      url: "http://localhost:3000/resources/requirements-builder",
-    });
-    expect(entries).toContainEqual({
-      url: "http://localhost:3000/blog/what-hris-pricing-actually-looks-like",
-    });
-    expect(entries).toContainEqual({
-      url: "http://localhost:3000/case-studies/northwind-payroll-renegotiation",
-    });
+    expect(entries).toEqual([
+      { url: "http://localhost:3000/" },
+      { url: "http://localhost:3000/contact" },
+      { url: "http://localhost:3000/privacy" },
+      { url: "http://localhost:3000/terms" },
+    ]);
     expect(entries.some(({ url }) => url.includes("/admin"))).toBe(false);
     expect(entries.some(({ url }) => url.includes("/designs"))).toBe(false);
+  });
+
+  test("lists only paths that the launch surface serves in every candidate", () => {
+    for (const pathname of getPublicSitemapPaths()) {
+      for (const candidate of ["A", "B"] as const) {
+        expect(isPathInLaunch(pathname, candidate), `${pathname} (${candidate})`).toBe(true);
+      }
+    }
+  });
+
+  test.each([
+    "/about",
+    "/blog",
+    "/blog/what-hris-pricing-actually-looks-like",
+    "/broker-model",
+    "/case-studies",
+    "/case-studies/northwind-payroll-renegotiation",
+    "/faq",
+    "/partners/pe-vc",
+    "/platform",
+    "/resources",
+    "/resources/requirements-builder",
+    "/services",
+    "/transparency",
+  ])("does not list the launch-hidden page %s", (pathname) => {
+    expect(getPublicSitemapPaths()).not.toContain(pathname);
   });
 
   test("fails closed when production release access is blocked", () => {
@@ -75,13 +98,6 @@ describe("sitemap route", () => {
       expect(readFileSync(file!, "utf8"), pathname).toContain(
         "getMarketingPageMetadata",
       );
-    }
-
-    for (const dynamicPage of ["blog/[slug]/page.tsx", "case-studies/[slug]/page.tsx"]) {
-      expect(
-        readFileSync(path.join(siteRoot, dynamicPage), "utf8"),
-        dynamicPage,
-      ).toContain("getMarketingPageMetadata");
     }
   });
 });

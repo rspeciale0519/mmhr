@@ -406,6 +406,50 @@ describe("launch surface proxy", () => {
     },
   );
 
+  test.each([
+    "/about",
+    "/blog",
+    "/blog/some-post",
+    "/broker-model",
+    "/case-studies",
+    "/case-studies/some-study",
+    "/faq",
+    "/partners/brokers-consultants",
+    "/partners/pe-vc",
+    "/partners/software-vendors",
+    "/platform",
+    "/resources",
+    "/resources/hris-landscape-report",
+    "/resources/partner-finder",
+    "/resources/requirements-builder",
+    "/services",
+    "/transparency",
+  ])("renders not-found for the unapproved marketing page %s in both candidates", async (path) => {
+    for (const candidate of ["A", "B"]) {
+      vi.stubEnv("MMHR_LAUNCH_CANDIDATE", candidate);
+      const response = await proxy(new NextRequest(`https://mmhr.test${path}`));
+
+      expect(response.headers.get("x-middleware-rewrite"), candidate).toBe("https://mmhr.test/__not-in-launch");
+      expect(response.headers.get("x-frame-options")).toBe("DENY");
+    }
+    expect(createServerClient).not.toHaveBeenCalled();
+  });
+
+  test.each(["/", "/contact", "/privacy", "/terms", "/platformx", "/blogging"])(
+    "passes the launch path %s through to session work",
+    async (path) => {
+      vi.mocked(createServerClient).mockReturnValue({
+        auth: { getClaims: vi.fn().mockResolvedValue({ data: null, error: null }) },
+      } as never);
+
+      const response = await proxy(new NextRequest(`https://mmhr.test${path}`));
+
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+      expect(createServerClient).toHaveBeenCalledTimes(1);
+    },
+  );
+
   test("shows Candidate B pages only when Candidate B is selected", async () => {
     vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "B");
     vi.mocked(createServerClient).mockReturnValue({
