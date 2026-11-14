@@ -1,5 +1,8 @@
 # MatchMaker HR (MMHR)
 
+> **Launch scope notice, November 14, 2026.** The product owner approved a reduced launch scope and a light work rule.
+> Use [LAUNCH.md](./LAUNCH.md) for launch scope, task order, and the work rule. It overrides the notices and plans below on those points.
+
 > **Delivery notice, October 7, 2026.** The product owner approved the [MVP complete UI/UX and backend roadmap, version 1.1](../.codex/plans/build-mvp-complete-ui-ux-roadmap-2026-10-06.md).
 > It replaces the October 3 instruction to complete all mandatory software before live use.
 > Launch Candidate A ships after roadmap phase P2. Launch Candidate B adds demos, proposals, and contract handoff after P3.
