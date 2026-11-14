@@ -14,9 +14,6 @@ import { documentsRouter } from "./routers/documents";
 import { proposalsRouter } from "./routers/proposals";
 import { contractsRouter } from "./routers/contracts";
 import { tasksRouter } from "./routers/tasks";
-import { financeDocumentsRouter } from "./routers/finance-documents";
-import { managedFinanceRouter } from "./routers/managed-finance";
-import { managedInvoicesRouter } from "./routers/managed-invoices";
 import { auditRouter } from "./routers/audit";
 
 export const appRouter = router({
@@ -35,9 +32,6 @@ export const appRouter = router({
   proposals: proposalsRouter,
   contracts: contractsRouter,
   tasks: tasksRouter,
-  financeDocuments: financeDocumentsRouter,
-  managedFinance: managedFinanceRouter,
-  managedInvoices: managedInvoicesRouter,
   audit: auditRouter,
 });
 
