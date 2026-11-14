@@ -2428,6 +2428,34 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   "dataPath": "strict role-specific input; current permission and selected workspace; fixed status or audited confirmation RPC",
   "denialEvidence": "rfp-receipt.test.ts; rfp-receipt-controls.test.tsx; r4-rfp-receipt-auth.integration.test.ts; authored only, runtime UNRUN"
 },
+{
+  key: "src/app/(admin)/admin/submissions/page.tsx#default", surface: "/admin/submissions", kind: "page", access: "internal-only",
+  permission: "admin.access with AAL2",
+  scope: "submitted intakes in active customer organizations; routing metadata only",
+  dataPath: "request-scoped fixed queue RPC; strict DTO; newest-first cursor; no intake answers",
+  denialEvidence: "submissions/page.test.tsx; staff-submissions.test.ts; staff-submission-queue.integration.test.ts; migration 0175 unapplied",
+},
+...(["error", "loading"] as const).map((state): EntryPointInventoryRecord => ({
+  key: `src/app/(admin)/admin/submissions/${state}.tsx#default`, surface: `/admin/submissions ${state}`,
+  kind: "boundary", access: "framework", permission: "parent submissions route guard", scope: "parent route",
+  dataPath: "static loading or generic error; no protected data", denialEvidence: "submissions/page.test.tsx; entry-point-inventory.test.ts",
+})),
+{
+  key: "src/app/(admin)/admin/submissions/actions.ts#openStaffCaseAction", surface: "openStaffCaseAction",
+  kind: "server-action", access: "internal-only",
+  permission: "admin.access with AAL2; evaluation.disclose by role after the grant",
+  scope: "server-derived customer organization of one submitted intake",
+  dataPath: "exact-origin action; audited open-case RPC; HttpOnly selection cookie",
+  denialEvidence: "submissions/actions.test.ts; staff-submission-queue.integration.test.ts; migration 0175 unapplied",
+},
+{
+  key: "src/server/commands/staff-submissions.ts#command", surface: "staff submission queue and open case",
+  kind: "command", access: "privileged",
+  permission: "admin.access with AAL2; evaluation.disclose by role for open case",
+  scope: "active customer organizations; organization derived from the intake in SQL",
+  dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited grant",
+  denialEvidence: "staff-submissions.test.ts; staff-submission-queue.integration.test.ts; migration 0175 unapplied",
+},
 ];
 
 function escapeMarkdownCell(value: string) {
