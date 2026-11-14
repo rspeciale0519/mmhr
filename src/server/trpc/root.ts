@@ -10,13 +10,9 @@ import { vendorEvidenceRouter } from "./routers/vendor-evidence";
 import { responsesRouter } from "./routers/responses";
 import { clarificationsRouter } from "./routers/clarifications";
 import { demosRouter } from "./routers/demos";
-import { documentsRouter } from "./routers/documents";
 import { proposalsRouter } from "./routers/proposals";
 import { contractsRouter } from "./routers/contracts";
 import { tasksRouter } from "./routers/tasks";
-import { financeDocumentsRouter } from "./routers/finance-documents";
-import { managedFinanceRouter } from "./routers/managed-finance";
-import { managedInvoicesRouter } from "./routers/managed-invoices";
 import { auditRouter } from "./routers/audit";
 
 export const appRouter = router({
@@ -31,13 +27,9 @@ export const appRouter = router({
   responses: responsesRouter,
   clarifications: clarificationsRouter,
   demos: demosRouter,
-  documents: documentsRouter,
   proposals: proposalsRouter,
   contracts: contractsRouter,
   tasks: tasksRouter,
-  financeDocuments: financeDocumentsRouter,
-  managedFinance: managedFinanceRouter,
-  managedInvoices: managedInvoicesRouter,
   audit: auditRouter,
 });
 

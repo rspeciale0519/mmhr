@@ -2,30 +2,17 @@ name: Local Supabase integration
 
 on:
   workflow_call:
-    inputs:
-      scope:
-        description: "Integration files: all, launch, or excluded-features (owner decision D9)"
-        type: string
-        default: all
   workflow_dispatch:
-    inputs:
-      scope:
-        description: "Integration files (owner decision D9)"
-        type: choice
-        options: [all, launch, excluded-features]
-        default: all
 
 permissions:
   contents: read
 
 jobs:
   integration:
-    name: integration (${{ inputs.scope }})
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
       SUPABASE_TELEMETRY_DISABLED: "1"
-      MMHR_INTEGRATION_SCOPE: ${{ inputs.scope }}
     steps:
       - uses: actions/checkout@v4
 
@@ -69,17 +56,7 @@ jobs:
         run: npm run check:integration-matrix
 
       - name: Integration tests
-        id: integration-tests
-        # Owner decision D9: the excluded finance and document files report
-        # failures here but do not fail the job. Every other scope blocks.
-        continue-on-error: ${{ inputs.scope == 'excluded-features' }}
         run: npm run test:integration
-
-      - name: Report excluded-feature failures without blocking
-        if: steps.integration-tests.outcome == 'failure' && inputs.scope == 'excluded-features'
-        run: |
-          echo "::warning title=Excluded-feature integration tests failed::These files test features outside the launch (D2, D9). They do not block CI."
-          echo "Excluded-feature integration tests failed. See the Integration tests step. They do not block CI (owner decision D9)." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Stop disposable CI services
         if: always()
