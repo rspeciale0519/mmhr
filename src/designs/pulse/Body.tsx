@@ -13,8 +13,7 @@ const MINI_WAVE = "0,24 10,24 16,12 21,34 26,4 32,24 62,24 68,14 73,30 78,24 108
 /**
  * The Pulse homepage, minus nav and footer.
  *
- * Split out so the live site can render it inside the shared site chrome while
- * the design gallery still renders a complete, self-contained Pulse.
+ * Split out so the live site can render it inside the shared site chrome.
  */
 export function PulseBody() {
   return (

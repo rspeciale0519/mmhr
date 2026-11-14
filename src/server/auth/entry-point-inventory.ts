@@ -76,8 +76,6 @@ const publicContentPages = [
   ["/services", "src/app/(marketing)/(site)/services/page.tsx"],
   ["/terms", "src/app/(marketing)/(site)/terms/page.tsx"],
   ["/transparency", "src/app/(marketing)/(site)/transparency/page.tsx"],
-  ["/designs", "src/app/(marketing)/designs/page.tsx"],
-  ["/designs/[slug]", "src/app/(marketing)/designs/[slug]/page.tsx"],
 ] as const;
 
 const checkedInContentPages: EntryPointInventoryRecord[] =
