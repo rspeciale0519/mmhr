@@ -209,8 +209,6 @@ function rehearsalEnvironment() {
       "DOCKER_HOST",
       "HOME",
       "LOCALAPPDATA",
-      // Non-secret file scope for vitest.integration.config.ts (owner decision D9).
-      "MMHR_INTEGRATION_SCOPE",
       "PATH",
       "PATHEXT",
       "PROGRAMDATA",
