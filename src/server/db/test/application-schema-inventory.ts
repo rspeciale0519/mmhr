@@ -142,13 +142,13 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 175;
+export const applicationMigrationCount = 176;
 
 // Private tables have a separate inventory. The existing array is public-only.
 export const applicationPrivateTables = [
   "document_access_grants", "document_scan_lease_owners", "document_scan_readers",
   "finance_document_access_grants", "recovery_policy_state", "rfp_approval_policy", "rfp_notification_attempts",
-  "rfp_notification_outbox", "rfp_notification_receipts", "rfp_receipt_confirmations", "security_authority_guard",
+  "rfp_notification_outbox", "rfp_notification_receipts", "rfp_receipt_confirmations", "security_authority_guard", "staff_case_access_grants",
 ] as const;
 
 export const anonymousPublicFunctions = [
