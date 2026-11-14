@@ -1,8 +1,8 @@
 @AGENTS.md
 # MMHR Project Instructions
 
-Read [AGENTS.md](AGENTS.md) for the shared MMHR instructions.
-It contains project authority, commands, validation, security, and Git requirements.
+[AGENTS.md](AGENTS.md), imported above, holds the shared MMHR instructions:
+project authority, commands, validation, security, and Git requirements.
 Global instructions remain in force.
 
 <!-- brain:pointer -->

@@ -21,7 +21,7 @@ Use an indexed skill when it applies to the task. Load its supporting files only
 On task completion append to journal/<today>.md:
 ### [HH:MM] <task title>   (branch: <branch> · commits: <shas|none>)
 **Synopsis:** 1-3 sentences - goal and outcome.
-**What worked:** concrete + reusable. Evidence: <npm test/lint/typecheck:ui/build, or "manual: <how>">.
+**What worked:** concrete + reusable. Evidence: <npm test/lint/type-check/build, or "manual: <how>">.
 **What did NOT work:** dead-ends, wrong assumptions - explicit. "(none)" only if truly none.
 **Artifacts:** files, decisions, [[skill-...]], PR/commit.
 **Next / open:** follow-ups, risk.
@@ -60,7 +60,7 @@ Memory does not override those authorities or grant permission. Record unresolve
 Periodic (every ~5 tasks or when the SessionStart notice says overdue), AFTER
 the user's current request, time-boxed: distil recurring worked->skill,
 didn't->pitfalls; revise/deprecate contradicted skills; run journal-vs-git gap
-check; trim STATE; refresh index. Never preempt the user's task. Also reconcile knowledge/: run `git log --name-only <lastConsolidationTs>..HEAD` (+ journal entries since the watermark); for every changed path under app/, app/api/, components/, lib/, supabase/, check whether features.md/roadmap.md/orientation.md still hold — any claim the diff contradicts flips to `status: needs-reconcile` and is corrected or flagged; a doc reading like paraphrased dev-docs is trimmed to pointers.
+check; trim STATE; refresh index. Never preempt the user's task. Also reconcile knowledge/: run `git log --name-only <lastConsolidationTs>..HEAD` (+ journal entries since the watermark); for every changed path under src/app/, src/app/api/, src/components/, src/lib/, supabase/, check whether features.md/roadmap.md/orientation.md still hold — any claim the diff contradicts flips to `status: needs-reconcile` and is corrected or flagged; a doc reading like paraphrased dev-docs is trimmed to pointers.
 
 ## Seam
 When a skill is established AND generalizable beyond mmhr, propose an app-agnostic
