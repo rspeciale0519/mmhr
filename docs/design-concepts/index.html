@@ -6,142 +6,136 @@
   <title>MMHR design concepts — five directions</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Franklin:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root { --ink: #16140f; --paper: #f3efe6; --rule: #cfc6b4; }
+    :root { --ink: #1a1a1a; --muted: #5c5c5c; --line: #e6e6e6; --paper: #f7f7f6; }
     * { box-sizing: border-box; }
     html, body { margin: 0; }
-    body { background: var(--paper); color: var(--ink); font-family: "Libre Franklin", sans-serif; line-height: 1.45; }
+    body { background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans", sans-serif; line-height: 1.45; }
     a { color: inherit; }
-    header { padding: 28px 6vw 8px; border-bottom: 2px solid var(--ink); }
-    header p { max-width: 62ch; }
-    h1 { font-size: clamp(32px, 5vw, 52px); margin: 0 0 8px; letter-spacing: -0.03em; }
-    .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-    main { padding: 20px 6vw 72px; display: grid; gap: 22px; }
+    header { padding: 36px 6vw 12px; max-width: 720px; }
+    h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 500; letter-spacing: -0.03em; margin: 8px 0 12px; }
+    .k { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    main { padding: 12px 6vw 80px; display: grid; gap: 28px; }
     article {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 22px;
-      padding: 22px 0;
-      border-bottom: 1px solid var(--rule);
+      display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 24px;
+      padding: 24px 0; border-top: 1px solid var(--line);
     }
-    .swatches { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
-    .swatches i { width: 28px; height: 28px; display: block; border: 1px solid var(--ink); }
-    .name { font-size: 28px; margin: 0; letter-spacing: -0.03em; }
-    .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .name { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; margin: 0 0 8px; }
+    .swatches { display: flex; gap: 6px; margin: 12px 0; }
+    .swatches i { width: 22px; height: 22px; border-radius: 50%; display: block; border: 1px solid var(--line); }
+    .links { display: flex; flex-wrap: wrap; gap: 8px; }
     .links a {
-      display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px;
-      border: 1.5px solid var(--ink); text-decoration: none; font-size: 13px; font-weight: 700;
+      display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px;
+      border: 1px solid var(--ink); border-radius: 999px; text-decoration: none; font-size: 13px;
     }
     .shots { display: grid; grid-template-columns: 1.6fr 0.7fr; gap: 10px; }
     .shots figure { margin: 0; }
-    .shots img { width: 100%; border: 1px solid var(--ink); background: #ddd; display: block; }
-    figcaption { font-size: 11px; margin-top: 4px; }
-    @media (max-width: 800px) {
-      article, .shots { grid-template-columns: 1fr; }
-    }
+    .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; background: #ddd; }
+    figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    @media (max-width: 800px) { article, .shots { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <header>
-    <p class="mono">MMHR · docs/design-concepts · sample only</p>
-    <h1>Five fresh directions</h1>
-    <p>Static HTML previews of MatchMaker HR, a buyer-side HRIS brokerage. Each concept uses the same product story from the PRD: free buyer intake, a masked comparison matrix of every published option, up to five RFP contenders, advisor disclosure, then an approved request. Open any screen on a phone or desktop. No build step.</p>
+    <p class="k">MMHR · docs/design-concepts · sample only</p>
+    <h1>Five airy directions</h1>
+    <p>One brief: high-end, soft-technology software. Light grounds, whitespace, refined sans-serif type, restrained accents. Each direction still differs in palette temperature, layout, type pairing, and surface. Same four PRD screens in every concept.</p>
   </header>
   <main>
     <article>
       <div>
-        <p class="mono">Concept 1</p>
-        <h2 class="name">Docket</h2>
-        <p>Records office. The selection is a case file: exhibit stamps, manila stock, a vertical docket rail.</p>
-        <p>Cormorant Garamond + Karla. Manila, ink, docket red, binder green.</p>
-        <div class="swatches"><i style="background:#faf6f0"></i><i style="background:#efe3cc"></i><i style="background:#1c1916"></i><i style="background:#9b1b1b"></i><i style="background:#1f4d3a"></i></div>
+        <p class="k">Concept 1 · cool mist · flat</p>
+        <h2 class="name">Haze</h2>
+        <p>Cool ice-white and steel blue. Hairline borders, a floating pill nav, a flat comparison strip in the hero. Almost no shadow.</p>
+        <p>Sora + Source Sans 3.</p>
+        <div class="swatches"><i style="background:#f5f8fb"></i><i style="background:#ffffff"></i><i style="background:#1a2433"></i><i style="background:#3e6f8a"></i><i style="background:#e3ecf3"></i></div>
         <div class="links">
-          <a href="concept-1-docket/landing.html">Landing</a>
-          <a href="concept-1-docket/needs.html">Needs</a>
-          <a href="concept-1-docket/compare.html">Compare</a>
-          <a href="concept-1-docket/workspace.html">Workspace</a>
+          <a href="concept-1-haze/landing.html">Landing</a>
+          <a href="concept-1-haze/needs.html">Needs</a>
+          <a href="concept-1-haze/compare.html">Compare</a>
+          <a href="concept-1-haze/workspace.html">Workspace</a>
         </div>
       </div>
       <div class="shots">
-        <figure><img src="screenshots/docket-landing-1440.jpg" alt="Docket landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
-        <figure><img src="screenshots/docket-landing-390.jpg" alt="Docket landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+        <figure><img src="screenshots/haze-landing-1440.jpg" alt="Haze landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/haze-landing-390.jpg" alt="Haze landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
       </div>
     </article>
     <article>
       <div>
-        <p class="mono">Concept 2</p>
-        <h2 class="name">Wayfind</h2>
-        <p>Transit operations. Stages read as departures. Sodium lamps on enamel, condensed type, a live board.</p>
-        <p>Barlow Condensed + Barlow. Night navy, sodium amber, enamel, signal green.</p>
-        <div class="swatches"><i style="background:#0b1c2c"></i><i style="background:#f5b942"></i><i style="background:#f4f1ea"></i><i style="background:#2fa36b"></i><i style="background:#102536"></i></div>
+        <p class="k">Concept 2 · warm sand · soft depth</p>
+        <h2 class="name">Pearl</h2>
+        <p>Pearl and terracotta. Oversized type, an uneven bento, large radii and a warm ambient glow. Depth without glass.</p>
+        <p>Plus Jakarta Sans + Figtree.</p>
+        <div class="swatches"><i style="background:#fbf6ef"></i><i style="background:#fffaf5"></i><i style="background:#2c2620"></i><i style="background:#b56a4a"></i><i style="background:#f3e6d6"></i></div>
         <div class="links">
-          <a href="concept-2-wayfind/landing.html">Landing</a>
-          <a href="concept-2-wayfind/needs.html">Needs</a>
-          <a href="concept-2-wayfind/compare.html">Compare</a>
-          <a href="concept-2-wayfind/workspace.html">Workspace</a>
+          <a href="concept-2-pearl/landing.html">Landing</a>
+          <a href="concept-2-pearl/needs.html">Needs</a>
+          <a href="concept-2-pearl/compare.html">Compare</a>
+          <a href="concept-2-pearl/workspace.html">Workspace</a>
         </div>
       </div>
       <div class="shots">
-        <figure><img src="screenshots/wayfind-landing-1440.jpg" alt="Wayfind landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
-        <figure><img src="screenshots/wayfind-landing-390.jpg" alt="Wayfind landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+        <figure><img src="screenshots/pearl-landing-1440.jpg" alt="Pearl landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/pearl-landing-390.jpg" alt="Pearl landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
       </div>
     </article>
     <article>
       <div>
-        <p class="mono">Concept 3</p>
-        <h2 class="name">Kiln</h2>
-        <p>Ceramic studio. Soft tiles, human advisor voice, clay and celadon. White-glove without a private club.</p>
-        <p>Fraunces + Outfit. Biscuit, clay, soot, celadon glaze.</p>
-        <div class="swatches"><i style="background:#f3e6d8"></i><i style="background:#c9784a"></i><i style="background:#2a221c"></i><i style="background:#3f6f62"></i><i style="background:#7ba89a"></i></div>
+        <p class="k">Concept 3 · sage · glass</p>
+        <h2 class="name">Still</h2>
+        <p>Sage and porcelain. A frosted app rail on every screen, translucent panels, blur. Product chrome, not a marketing poster.</p>
+        <p>Be Vietnam Pro + Nunito Sans.</p>
+        <div class="swatches"><i style="background:#f3f6f3"></i><i style="background:#fafcfb"></i><i style="background:#1c2a24"></i><i style="background:#4f7a64"></i><i style="background:#e4ede6"></i></div>
         <div class="links">
-          <a href="concept-3-kiln/landing.html">Landing</a>
-          <a href="concept-3-kiln/needs.html">Needs</a>
-          <a href="concept-3-kiln/compare.html">Compare</a>
-          <a href="concept-3-kiln/workspace.html">Workspace</a>
+          <a href="concept-3-still/landing.html">Landing</a>
+          <a href="concept-3-still/needs.html">Needs</a>
+          <a href="concept-3-still/compare.html">Compare</a>
+          <a href="concept-3-still/workspace.html">Workspace</a>
         </div>
       </div>
       <div class="shots">
-        <figure><img src="screenshots/kiln-landing-1440.jpg" alt="Kiln landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
-        <figure><img src="screenshots/kiln-landing-390.jpg" alt="Kiln landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+        <figure><img src="screenshots/still-landing-1440.jpg" alt="Still landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/still-landing-390.jpg" alt="Still landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
       </div>
     </article>
     <article>
       <div>
-        <p class="mono">Concept 4</p>
-        <h2 class="name">Cut</h2>
-        <p>Editorial magazine. Crop marks, process color, and censor bars over vendor names until disclosure.</p>
-        <p>Syne + Source Serif 4. Newsprint, carbon, magenta, cyan, crop yellow.</p>
-        <div class="swatches"><i style="background:#ede8de"></i><i style="background:#111111"></i><i style="background:#e11d48"></i><i style="background:#0077b6"></i><i style="background:#f4d35e"></i></div>
+        <p class="k">Concept 4 · lavender-gray · wash</p>
+        <h2 class="name">Veil</h2>
+        <p>Dusty steel-lilac, not a purple gradient. Full-bleed horizontal chapters, a sticky frosted header, pale wash behind type.</p>
+        <p>Urbanist + Outfit.</p>
+        <div class="swatches"><i style="background:#f6f5f8"></i><i style="background:#ffffff"></i><i style="background:#24232b"></i><i style="background:#5e6a88"></i><i style="background:#eae8f0"></i></div>
         <div class="links">
-          <a href="concept-4-cut/landing.html">Landing</a>
-          <a href="concept-4-cut/needs.html">Needs</a>
-          <a href="concept-4-cut/compare.html">Compare</a>
-          <a href="concept-4-cut/workspace.html">Workspace</a>
+          <a href="concept-4-veil/landing.html">Landing</a>
+          <a href="concept-4-veil/needs.html">Needs</a>
+          <a href="concept-4-veil/compare.html">Compare</a>
+          <a href="concept-4-veil/workspace.html">Workspace</a>
         </div>
       </div>
       <div class="shots">
-        <figure><img src="screenshots/cut-landing-1440.jpg" alt="Cut landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
-        <figure><img src="screenshots/cut-landing-390.jpg" alt="Cut landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+        <figure><img src="screenshots/veil-landing-1440.jpg" alt="Veil landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/veil-landing-390.jpg" alt="Veil landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
       </div>
     </article>
     <article>
       <div>
-        <p class="mono">Concept 5</p>
-        <h2 class="name">Survey</h2>
-        <p>Cadastral map. The market is a plat. Buyers stake up to five parcels. Forest border, orange flags, field-book type.</p>
-        <p>League Spartan + Libre Franklin. Cream, forest, survey orange, water blue.</p>
-        <div class="swatches"><i style="background:#f4efe4"></i><i style="background:#1b4332"></i><i style="background:#e85d04"></i><i style="background:#4a7c8c"></i><i style="background:#fffdf7"></i></div>
+        <p class="k">Concept 5 · monochrome · champagne</p>
+        <h2 class="name">Gleam</h2>
+        <p>Near-white, one gold accent, a narrow measure. One glass product window; everything else is flat and spare.</p>
+        <p>Space Grotesk + IBM Plex Sans.</p>
+        <div class="swatches"><i style="background:#fafafa"></i><i style="background:#ffffff"></i><i style="background:#171717"></i><i style="background:#9a7b4f"></i><i style="background:#e7e7e7"></i></div>
         <div class="links">
-          <a href="concept-5-survey/landing.html">Landing</a>
-          <a href="concept-5-survey/needs.html">Needs</a>
-          <a href="concept-5-survey/compare.html">Compare</a>
-          <a href="concept-5-survey/workspace.html">Workspace</a>
+          <a href="concept-5-gleam/landing.html">Landing</a>
+          <a href="concept-5-gleam/needs.html">Needs</a>
+          <a href="concept-5-gleam/compare.html">Compare</a>
+          <a href="concept-5-gleam/workspace.html">Workspace</a>
         </div>
       </div>
       <div class="shots">
-        <figure><img src="screenshots/survey-landing-1440.jpg" alt="Survey landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
-        <figure><img src="screenshots/survey-landing-390.jpg" alt="Survey landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+        <figure><img src="screenshots/gleam-landing-1440.jpg" alt="Gleam landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/gleam-landing-390.jpg" alt="Gleam landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
       </div>
     </article>
   </main>

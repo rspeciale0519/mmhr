@@ -5,16 +5,11 @@ import { fileURLToPath } from "node:url";
 const root = dirname(fileURLToPath(import.meta.url));
 
 const fonts = {
-  docket:
-    "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@500;700&family=Karla:wght@400;500;700&display=swap",
-  wayfind:
-    "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap",
-  kiln:
-    "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Outfit:wght@400;500;600;700&display=swap",
-  cut:
-    "https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Syne:wght@500;700;800&display=swap",
-  survey:
-    "https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;700&family=Libre+Franklin:wght@400;500;600;700&display=swap",
+  haze: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+  pearl: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap",
+  still: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap",
+  veil: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Urbanist:wght@500;600;700&display=swap",
+  gleam: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap",
 };
 
 const screens = [
@@ -39,24 +34,24 @@ const journey = [
 ];
 
 const vendors = [
-  { id: "a", name: "Vendor A", fit: "92", cost: "Quote on file", start: true },
-  { id: "b", name: "Vendor B", fit: "88", cost: "Range on file", start: true },
-  { id: "c", name: "Vendor C", fit: "84", cost: "Quote on file", start: false },
-  { id: "d", name: "Vendor D", fit: "79", cost: "Quote required", start: false },
-  { id: "e", name: "Vendor E", fit: "74", cost: "Quote on file", start: false },
-  { id: "f", name: "Vendor F", fit: "68", cost: "Quote on file", start: false },
+  { id: "a", name: "Vendor A", fit: "92", start: true },
+  { id: "b", name: "Vendor B", fit: "88", start: true },
+  { id: "c", name: "Vendor C", fit: "84", start: false },
+  { id: "d", name: "Vendor D", fit: "79", start: false },
+  { id: "e", name: "Vendor E", fit: "74", start: false },
+  { id: "f", name: "Vendor F", fit: "68", start: false },
 ];
 
 const rows = [
-  { label: "Overall fit", key: "fit", vals: ["92", "88", "84", "79", "74", "68"] },
-  { label: "Estimated annual cost", key: "cost", vals: ["On file", "Range on file", "On file", "Unknown", "On file", "On file"] },
-  { label: "Payroll in three states", key: "pay", vals: ["Met", "Met", "Limited", "Met", "Add-on", "Limited"] },
-  { label: "Benefits administration", key: "ben", vals: ["Met", "Met", "Met", "Limited", "Met", "Missing"] },
-  { label: "Time and attendance", key: "time", vals: ["Met", "Met", "Unknown", "Met", "Limited", "Limited"] },
-  { label: "ACA compliance reporting", key: "aca", vals: ["Met", "Met", "Met", "Limited", "Unknown", "Limited"] },
-  { label: "Applicant tracking", key: "ats", vals: ["Nice", "Met", "Limited", "Met", "Limited", "Unknown"] },
-  { label: "Live within 90 days", key: "live", vals: ["Met", "Limited", "Met", "Missing", "Limited", "Met"] },
-  { label: "Evidence coverage", key: "ev", vals: ["Demo notes", "Docs + call", "Statement", "Public docs", "Under review", "Statement"] },
+  { label: "Overall fit", vals: ["92", "88", "84", "79", "74", "68"] },
+  { label: "Estimated annual cost", vals: ["On file", "Range on file", "On file", "Unknown", "On file", "On file"] },
+  { label: "Payroll in three states", vals: ["Met", "Met", "Limited", "Met", "Add-on", "Limited"] },
+  { label: "Benefits administration", vals: ["Met", "Met", "Met", "Limited", "Met", "Missing"] },
+  { label: "Time and attendance", vals: ["Met", "Met", "Unknown", "Met", "Limited", "Limited"] },
+  { label: "ACA compliance reporting", vals: ["Met", "Met", "Met", "Limited", "Unknown", "Limited"] },
+  { label: "Applicant tracking", vals: ["Nice", "Met", "Limited", "Met", "Limited", "Unknown"] },
+  { label: "Live within 90 days", vals: ["Met", "Limited", "Met", "Missing", "Limited", "Met"] },
+  { label: "Evidence coverage", vals: ["Demo notes", "Docs + call", "Statement", "Public docs", "Under review", "Statement"] },
 ];
 
 const stages = [
@@ -103,11 +98,13 @@ function foot(note) {
 
 function navLinks(current) {
   return screens
-    .map(
-      (s) =>
-        `<a href="${s.file}"${s.file === current ? ' aria-current="page"' : ""}>${s.label}</a>`,
-    )
+    .map((s) => `<a href="${s.file}"${s.file === current ? ' aria-current="page"' : ""}>${s.label}</a>`)
     .join("");
+}
+
+function chromeNav(current, extraClass = "links") {
+  return `<button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+  <nav class="${extraClass} nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a href="../index.html">Gallery</a></nav>`;
 }
 
 function needsForm() {
@@ -152,7 +149,7 @@ function matrix() {
     .map((row) => {
       const cells = row.vals
         .map((val, i) => {
-          const cls = val === "Unknown" || val === "Quote required" ? ' class="unknown"' : "";
+          const cls = val === "Unknown" ? ' class="unknown"' : "";
           return `<td data-col="${vendors[i].id}"${cls}>${val}</td>`;
         })
         .join("");
@@ -173,19 +170,17 @@ function matrix() {
 </div>`;
 }
 
-function workspaceBody(extra = "", stageMarkup) {
+function workspaceBody() {
   const pills = stages
     .map(([name, state]) => `<span${state ? ` data-state="${state}"` : ""}>${name}</span>`)
     .join("");
-  const stageBlock = stageMarkup ?? `<div class="stages" aria-label="Case stages">${pills}</div>`;
   return `
 <section class="workspace">
   <article class="card">
     <p class="kicker">Sample case</p>
     <h1>Fernwood Dental Group</h1>
     <p>240 employees. Replace payroll and benefits with one platform.</p>
-    ${stageBlock}
-    ${extra}
+    <div class="stages" aria-label="Case stages">${pills}</div>
     <h2>Recent activity</h2>
     <ol class="activity">
       <li><time>Oct 14</time><span>Advisor sent the RFP draft for approval.</span></li>
@@ -214,244 +209,82 @@ function workspaceBody(extra = "", stageMarkup) {
 </section>`;
 }
 
+function needsBlock(kicker, title, lede) {
+  return `<p class="kicker">${kicker}</p><h1>${title}</h1><p class="lede">${lede}</p>${needsForm()}`;
+}
+
+function compareBlock(kicker, title) {
+  return `<p class="kicker">${kicker}</p><h1>${title}</h1>${matrix()}`;
+}
+
 const concepts = [
   {
-    id: "concept-1-docket",
-    key: "docket",
-    name: "Docket",
-    note: "Concept 1 of 5 · records office",
+    id: "concept-1-haze",
+    key: "haze",
+    name: "Haze",
+    note: "Concept 1 of 5 · cool mist, flat",
     chrome(current) {
-      return `<div class="frame">
-<aside class="rail" aria-hidden="true">Exhibit file · MMHR-2026-014 · Sample</aside>
-<div class="page">
-<header class="top">
-  <a class="brand" href="landing.html"><b>MMHR</b><small>Docket</small></a>
-  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
-  <nav class="tabs nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a class="gallery-link" href="../index.html">All concepts</a></nav>
+      return `<div class="shell">
+<header class="nav">
+  <a class="brand" href="landing.html"><b>MMHR</b><small>Haze</small></a>
+  ${chromeNav(current)}
 </header>
 <main id="main">`;
     },
-    close: `</main></div></div>`,
+    close: `</main></div>`,
     landing() {
       return `
 <div class="wrap">
   <section class="hero">
     <div>
       <p class="kicker">Buyer-side HRIS brokerage</p>
-      <h1>The case file for choosing HR software.</h1>
-      <p class="lede">MatchMaker HR runs a private selection process for registered buyers. You describe what the company needs. We keep a complete record from intake through a direct contract with the provider you choose.</p>
+      <h1>HR software, compared before the names appear.</h1>
+      <p class="lede">MatchMaker HR is a private selection process for registered buyers. You describe what the company needs. We keep a complete record from intake through a direct contract with the provider you choose.</p>
       <div class="actions">
-        <a class="btn" href="needs.html">Open an intake</a>
-        <a class="btn ghost" href="compare.html">Read a sample comparison</a>
+        <a class="btn" href="needs.html">Start an intake</a>
+        <a class="btn ghost" href="compare.html">Open a sample comparison</a>
       </div>
       <p class="fine">Free to buyers. Providers pay MMHR under commission or referral arrangements. Sample layout only.</p>
     </div>
-    <aside class="exhibits" aria-label="Process exhibits">
-      <header><span>File 014</span><span>Sample</span></header>
+    <aside class="preview" aria-label="Sample masked options">
+      <header><span>Published options</span><span>Masked</span></header>
       <ol>
-        <li><b>Ex. A</b><div>Needs worksheet, saved with revision history</div></li>
-        <li><b>Ex. B</b><div>Masked comparison of every published option</div></li>
-        <li><b>Ex. C</b><div>Recorded name disclosure after advisor review</div></li>
-        <li><b>Ex. D</b><div>Approved RFP issued to selected providers</div></li>
+        <li><span>Vendor A</span><span class="muted">On file</span><span class="fit">92</span></li>
+        <li><span>Vendor B</span><span class="muted">Range</span><span class="fit">88</span></li>
+        <li><span>Vendor C</span><span class="muted">On file</span><span class="fit">84</span></li>
+        <li><span>Vendor D</span><span class="muted">Unknown</span><span class="fit">79</span></li>
       </ol>
     </aside>
   </section>
   <section class="section">
-    <div class="section-head"><h2>How the file moves</h2><span class="stamp">Sample</span></div>
-    <div class="journey">${journey.map((j) => `<article><div><h3>${j.t}</h3><p>${j.b}</p></div></article>`).join("")}</div>
-  </section>
-  <section class="section">
-    <div class="section-head"><h2>Standing rules</h2></div>
-    <div class="principles">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
-  </section>
-</div>`;
-    },
-    needs() {
-      return `<div class="wrap"><p class="kicker">Working worksheet</p><h1>Describe what the team needs</h1><p class="lede">Save a draft now. You can return later. This preview does not store data on a server.</p>${needsForm()}</div>`;
-    },
-    compare() {
-      return `<div class="wrap"><p class="kicker">Exhibit B · masked</p><h1>Compare every published option</h1>${matrix()}</div>`;
-    },
-    workspace() {
-      return `<div class="wrap">${workspaceBody(`<p class="fine">Case owner on file. Next action, due date, and decision history stay with the record.</p>`)}</div>`;
-    },
-  },
-  {
-    id: "concept-2-wayfind",
-    key: "wayfind",
-    name: "Wayfind",
-    note: "Concept 2 of 5 · transit board",
-    chrome(current) {
-      return `<div class="station">
-<header class="mast">
-  <a class="brand" href="landing.html"><b>MMHR</b><small>Wayfind</small></a>
-  <div class="clock" aria-hidden="true">14:20</div>
-  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
-  <nav class="links nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a href="../index.html">Gallery</a></nav>
-</header>
-<main id="main">`;
-    },
-    close: `</main></div>`,
-    landing() {
-      return `
-<div class="wrap">
-  <section class="hero">
-    <div>
-      <p class="kicker">Departures · HR software selection</p>
-      <h1>Your search has a timetable.</h1>
-      <p class="lede">A buyer-side brokerage that routes companies to HRIS vendors. One intake, one comparison, one approved request — instead of forty sales calls.</p>
-      <div class="actions"><a class="btn" href="needs.html">Start intake</a><a class="btn ghost" href="compare.html">See the board</a></div>
-      <p class="fine">Customers never pay MMHR. Providers pay a referral fee after you sign with them.</p>
-    </div>
-    <div>
-      <div class="board" aria-label="Selection timetable">
-        <div class="board-head"><span>Time</span><span>Stage</span><span>Status</span><span>Gate</span></div>
-        <div class="row"><span>08:00</span><span class="dots">Needs</span><span class="status-on">Live</span><span>A</span></div>
-        <div class="row"><span>09:20</span><span class="dots">Compare</span><span class="status-on">Live</span><span>B</span></div>
-        <div class="row"><span>11:00</span><span class="dots">Disclose</span><span class="status-hold">Hold</span><span>C</span></div>
-        <div class="row"><span>13:40</span><span class="dots">RFP</span><span class="status-hold">Staff</span><span>D</span></div>
-        <div class="row"><span>16:10</span><span class="dots">Contract</span><span>Direct</span><span>E</span></div>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <h2>Platform stops</h2>
-    <div class="split">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
-  </section>
-  <section class="section">
-    <h2>The route</h2>
-    <div class="journey" style="display:grid;gap:12px">${journey.map((j, i) => `<article class="card"><h3>0${i + 1} ${j.t}</h3><p class="muted">${j.b}</p></article>`).join("")}</div>
-  </section>
-</div>`;
-    },
-    needs() {
-      return `<div class="wrap"><p class="kicker">Gate A · intake</p><h1>File the destination</h1><p class="lede">Company context through decision process. Saved drafts keep their revision number.</p>${needsForm()}</div>`;
-    },
-    compare() {
-      return `<div class="wrap"><p class="kicker">Gate B · all published options</p><h1>Read the board before the names</h1>${matrix()}</div>`;
-    },
-    workspace() {
-      const rows = stages
-        .map(
-          ([name, state], i) =>
-            `<div data-state="${state}"><span>${String(8 + i).padStart(2, "0")}:00</span><span>${name}</span><span class="mark">${state === "now" ? "Now" : state === "done" ? "Clear" : "Hold"}</span></div>`,
-        )
-        .join("");
-      return `<div class="wrap">${workspaceBody("", `<div class="stages" aria-label="Case stages">${rows}</div>`)}</div>`;
-    },
-  },
-  {
-    id: "concept-3-kiln",
-    key: "kiln",
-    name: "Kiln",
-    note: "Concept 3 of 5 · ceramic studio",
-    chrome(current) {
-      return `<div class="studio">
-<header class="nav">
-  <a class="brand" href="landing.html"><b>MMHR Kiln</b></a>
-  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
-  <nav class="links nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a href="../index.html">Gallery</a></nav>
-</header>
-<main id="main">`;
-    },
-    close: `</main></div>`,
-    landing() {
-      return `
-<div class="wrap">
-  <section class="hero">
-    <div>
-      <p class="kicker">White-glove HRIS selection</p>
-      <h1>A human process, fired until it <em>fits</em>.</h1>
-      <p class="lede">MatchMaker HR is the advisor in the room. You bring the company’s needs. We keep the catalog current, the scores independent of fees, and the names hidden until you are ready.</p>
-      <div class="actions"><a class="btn" href="needs.html">Begin the worksheet</a><a class="btn ghost" href="workspace.html">Open a sample case</a></div>
-      <p class="fine">Buyers never pay MMHR. Sample preview — not a performance claim.</p>
-    </div>
-    <div class="shelf" aria-label="What the studio holds">
-      <article class="tile clay"><h3>Intake</h3><p>Company, systems, compliance, budget, timeline, people who decide.</p></article>
-      <article class="tile"><h3>Matrix</h3><p>Every published option. Up to five contenders.</p></article>
-      <article class="tile glaze"><h3>Advisor</h3><p>Disclosure, RFP approval, demos, then a direct contract.</p></article>
-      <article class="tile"><h3>Record</h3><p>Complete history. Nothing consequential leaves as unapproved AI.</p></article>
-    </div>
-  </section>
-  <section class="section">
-    <h2>The firing schedule</h2>
-    <div class="journey">${journey.map((j, i) => `<article><div class="mark">${i + 1}</div><div><h3>${j.t}</h3><p>${j.b}</p></div></article>`).join("")}</div>
-  </section>
-  <section class="section">
-    <h2>What we will not glaze over</h2>
-    <div class="principles">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
-  </section>
-</div>`;
-    },
-    needs() {
-      return `<div class="wrap"><p class="kicker">Worksheet</p><h1>What should this platform hold?</h1><p class="lede">Answer in your own words. Save often. MMHR staff review before a comparison is published.</p>${needsForm()}</div>`;
-    },
-    compare() {
-      return `<div class="wrap"><p class="kicker">Shelf · names still in the kiln</p><h1>Every option, still unnamed</h1>${matrix()}</div>`;
-    },
-    workspace() {
-      return `<div class="wrap">${workspaceBody("")}</div>`;
-    },
-  },
-  {
-    id: "concept-4-cut",
-    key: "cut",
-    name: "Cut",
-    note: "Concept 4 of 5 · editorial",
-    chrome(current) {
-      return `<div class="spread">
-<header class="mast">
-  <div class="issue">Vol. 01 / Sample</div>
-  <a class="brand" href="landing.html">MMHR</a>
-  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
-  <nav class="links nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a href="../index.html">Gallery</a></nav>
-</header>
-<main id="main">`;
-    },
-    close: `</main></div>`,
-    landing() {
-      return `
-<div class="wrap">
-  <section class="hero">
-    <div class="hero-copy">
-      <p class="kicker">The selection issue</p>
-      <h1>Compare the <span>evidence.</span> Names come later.</h1>
-      <p class="lede">MatchMaker HR is a buyer-side brokerage for HR and workforce software. The opening spread is a masked matrix, not a vendor ad.</p>
-      <div class="actions"><a class="btn" href="compare.html">Open the matrix</a><a class="btn ghost" href="needs.html">File needs</a></div>
-      <p class="fine">Customers never pay. Provider names stay behind the bar until an advisor records disclosure.</p>
-    </div>
-    <aside class="crop" aria-hidden="true"><strong><span>Vendor names</span><span class="bar-mask">██████</span><span>until the interview</span></strong></aside>
-  </section>
-  <section class="section grid3">
-    ${principles.map((p, i) => `<article class="panel ${["magenta", "cyan", "yellow"][i]}"><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}
-  </section>
-  <section class="section">
-    <h2>The story, in five cuts</h2>
+    <h2>How it works</h2>
     <div class="journey">${journey.map((j, i) => `<article><b>0${i + 1}</b><div><h3>${j.t}</h3><p>${j.b}</p></div></article>`).join("")}</div>
   </section>
+  <section class="section">
+    <div class="principles">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
+  </section>
 </div>`;
     },
     needs() {
-      return `<div class="wrap"><p class="kicker">Reporter notes</p><h1>Facts before the shortlist</h1><p class="lede">Company context, systems, compliance, budget, timeline, stakeholders, decision process.</p>${needsForm()}</div>`;
+      return `<div class="wrap">${needsBlock("Intake", "Describe what the team needs", "Save a draft now. You can return later. This preview does not store data on a server.")}</div>`;
     },
     compare() {
-      return `<div class="wrap"><p class="kicker">The matrix</p><h1>Six columns. No masthead logos.</h1>${matrix()}</div>`;
+      return `<div class="wrap">${compareBlock("Masked comparison", "Every published option")}</div>`;
     },
     workspace() {
-      return `<div class="wrap">${workspaceBody("")}</div>`;
+      return `<div class="wrap">${workspaceBody()}</div>`;
     },
   },
   {
-    id: "concept-5-survey",
-    key: "survey",
-    name: "Survey",
-    note: "Concept 5 of 5 · cadastral map",
+    id: "concept-2-pearl",
+    key: "pearl",
+    name: "Pearl",
+    note: "Concept 2 of 5 · warm sand, soft depth",
     chrome(current) {
-      return `<div class="plat">
+      return `<div class="shell">
 <header class="nav">
-  <a class="brand" href="landing.html"><span class="north" aria-hidden="true">N</span><b>MMHR Survey</b></a>
-  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
-  <nav class="links nav-panel" data-nav-panel data-open="false" aria-label="Concept screens">${navLinks(current)}<a href="../index.html">Gallery</a></nav>
+  <a class="brand" href="landing.html">MMHR<small>Pearl</small></a>
+  ${chromeNav(current)}
 </header>
 <main id="main">`;
     },
@@ -460,40 +293,182 @@ const concepts = [
       return `
 <div class="wrap">
   <section class="hero">
-    <div>
-      <p class="kicker">Plat of the HRIS market</p>
-      <h1>Map the market. Stake your five.</h1>
-      <p class="lede">MatchMaker HR surveys approved HR and workforce software, then lets buyers stake up to five parcels for an RFP. Names stay off the map until the advisor walk-through.</p>
-      <div class="actions"><a class="btn" href="needs.html">Record the site</a><a class="btn ghost" href="compare.html">Read the plat</a></div>
-      <p class="fine">Sample map. Not a ranking and not a complete catalog.</p>
-    </div>
-    <div class="map" aria-label="Sample market parcels">
-      <div class="parcel"><small>Parcel A</small><strong>Masked</strong><span>Fit 92</span></div>
-      <div class="parcel"><small>Parcel B · flagged</small><strong>Masked</strong><span>Fit 88 · selected</span></div>
-      <div class="parcel"><small>Parcel C</small><strong>Masked</strong><span>Fit 84</span></div>
-      <div class="parcel"><small>Parcel D</small><strong>Masked</strong><span>Unknown cost</span></div>
-      <div class="parcel"><small>Remaining published options</small><strong>Shown, not capped</strong><span>Five stakes maximum</span></div>
-      <span class="scale">Scale · sample only</span>
-    </div>
+    <p class="kicker">Free for buyers</p>
+    <h1>A quiet way to choose HR software.</h1>
+    <p class="lede">A buyer-side brokerage. You capture needs, compare every approved option with names still hidden, then take up to five contenders into an approved request.</p>
+    <div class="actions"><a class="btn" href="needs.html">Begin the intake</a><a class="btn ghost" href="workspace.html">View a sample case</a></div>
+    <p class="fine">Customers never pay MMHR. Providers pay a referral fee after you sign with them.</p>
   </section>
+  <div class="bento">
+    ${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}
+  </div>
   <section class="section">
-    <h2>Survey notes</h2>
-    <div class="principles">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
+    <h2>The process</h2>
+    <div class="journey">${journey.map((j, i) => `<article><div class="mark">${i + 1}</div><div><h3>${j.t}</h3><p>${j.b}</p></div></article>`).join("")}</div>
   </section>
+</div>`;
+    },
+    needs() {
+      return `<div class="wrap">${needsBlock("Saved worksheet", "What should this platform cover?", "Company context through decision process. MMHR staff review before a comparison is published.")}</div>`;
+    },
+    compare() {
+      return `<div class="wrap">${compareBlock("All published options", "Compare on evidence")}</div>`;
+    },
+    workspace() {
+      return `<div class="wrap">${workspaceBody()}</div>`;
+    },
+  },
+  {
+    id: "concept-3-still",
+    key: "still",
+    name: "Still",
+    note: "Concept 3 of 5 · sage glass",
+    chrome(current) {
+      return `<div class="app">
+<aside class="rail">
+  <a class="brand" href="landing.html">MMHR<small>Still</small></a>
+  ${chromeNav(current)}
+</aside>
+<main id="main">`;
+    },
+    close: `</main></div>`,
+    landing() {
+      return `
+<div class="wrap">
+  <section class="hero">
+    <p class="kicker">Masked until disclosure</p>
+    <h1>See every fit. Take five forward.</h1>
+    <p class="lede">MatchMaker HR keeps the catalog current and the scores independent of fees. Names stay hidden until you review requirements with an advisor.</p>
+    <div class="actions"><a class="btn" href="needs.html">Open intake</a><a class="btn ghost" href="compare.html">Preview the matrix</a></div>
+    <p class="fine">Buyers never pay MMHR. Sample preview — not a performance claim.</p>
+  </section>
+  <div class="glass">
+    <div class="glass-row">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
+  </div>
   <section class="section">
-    <h2>Traverse</h2>
+    <h2>From intake to a direct contract</h2>
     <div class="journey">${journey.map((j) => `<article><h3>${j.t}</h3><p>${j.b}</p></article>`).join("")}</div>
   </section>
 </div>`;
     },
     needs() {
-      return `<div class="wrap"><p class="kicker">Field book</p><h1>Record the site conditions</h1><p class="lede">This worksheet is the survey before the plat. MMHR publishes a comparison only after review.</p>${needsForm()}</div>`;
+      return `<div class="wrap">${needsBlock("Workspace intake", "Capture the requirements", "Save often. Revision history stays with the record.")}</div>`;
     },
     compare() {
-      return `<div class="wrap"><p class="kicker">Plat book</p><h1>Every published parcel</h1>${matrix()}</div>`;
+      return `<div class="wrap">${compareBlock("Published catalog", "Select up to five contenders")}</div>`;
     },
     workspace() {
-      return `<div class="wrap">${workspaceBody("")}</div>`;
+      return `<div class="wrap">${workspaceBody()}</div>`;
+    },
+  },
+  {
+    id: "concept-4-veil",
+    key: "veil",
+    name: "Veil",
+    note: "Concept 4 of 5 · lavender-gray wash",
+    chrome(current) {
+      return `<div class="shell">
+<header class="nav">
+  <a class="brand" href="landing.html">MMHR<small>Veil</small></a>
+  ${chromeNav(current)}
+</header>
+<main id="main">`;
+    },
+    close: `</main></div>`,
+    landing() {
+      return `
+<section class="band">
+  <div class="wrap hero">
+    <div>
+      <p class="kicker">Approved catalog</p>
+      <h1>Compare on evidence. Disclose when you are ready.</h1>
+      <p class="lede">MatchMaker HR is a buyer-side brokerage for HR and workforce software. The first view is a masked matrix, not a vendor advertisement.</p>
+      <div class="actions"><a class="btn" href="compare.html">Open the matrix</a><a class="btn ghost" href="needs.html">Start with needs</a></div>
+      <p class="fine">Customers never pay. Provider names appear after an advisor records disclosure.</p>
+    </div>
+    <aside class="stat" aria-label="Sample options">
+      <ol>
+        <li><span>Vendor A</span><span>Fit 92</span></li>
+        <li><span>Vendor B</span><span>Fit 88</span></li>
+        <li><span>Vendor C</span><span>Fit 84</span></li>
+        <li><span>Remaining options</span><span>Shown, not capped</span></li>
+      </ol>
+    </aside>
+  </div>
+</section>
+<section class="band alt">
+  <div class="wrap">
+    <h2>Standing rules</h2>
+    <div class="principles" style="margin-top:28px">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
+  </div>
+</section>
+<section class="band">
+  <div class="wrap">
+    <h2>Five steps</h2>
+    <div class="journey" style="margin-top:28px">${journey.map((j, i) => `<article><b>0${i + 1}</b><h3>${j.t}</h3><p>${j.b}</p></article>`).join("")}</div>
+  </div>
+</section>`;
+    },
+    needs() {
+      return `<div class="wrap page-pad">${needsBlock("Intake", "Facts before the shortlist", "Company context, systems, compliance, budget, timeline, stakeholders, decision process.")}</div>`;
+    },
+    compare() {
+      return `<div class="wrap page-pad">${compareBlock("Masked matrix", "Six columns. No logos.")}</div>`;
+    },
+    workspace() {
+      return `<div class="wrap page-pad">${workspaceBody()}</div>`;
+    },
+  },
+  {
+    id: "concept-5-gleam",
+    key: "gleam",
+    name: "Gleam",
+    note: "Concept 5 of 5 · monochrome, champagne accent",
+    chrome(current) {
+      return `<div class="shell">
+<header class="nav">
+  <a class="brand" href="landing.html">MMHR</a>
+  ${chromeNav(current)}
+</header>
+<main id="main">`;
+    },
+    close: `</main></div>`,
+    landing() {
+      return `
+<div class="wrap">
+  <section class="hero">
+    <p class="kicker">Sample preview</p>
+    <h1>The comparison is the product.</h1>
+    <p class="lede">One intake. Every published option, names still hidden. Up to five contenders, then an approved request and a contract you sign with the provider.</p>
+    <div class="actions"><a class="btn" href="needs.html">Start</a><a class="btn ghost" href="compare.html">Comparison</a></div>
+    <p class="fine">Free to buyers. Fees never enter the ranking.</p>
+  </section>
+  <aside class="window" aria-label="Sample product frame">
+    <header><i></i><i></i><i></i><span>Masked comparison · sample</span></header>
+    <div class="window-body">
+      <div><span>Vendor A</span><strong>92</strong></div>
+      <div><span>Vendor B</span><strong>88</strong></div>
+      <div><span>Vendor C</span><strong>84</strong></div>
+      <div><span>Selected</span><span>2 of 5</span></div>
+    </div>
+  </aside>
+  <section class="section">
+    <div class="principles">${principles.map((p) => `<article><h3>${p.t}</h3><p>${p.b}</p></article>`).join("")}</div>
+  </section>
+  <section class="section">
+    <h2>Process</h2>
+    <div class="journey">${journey.map((j, i) => `<article><b>0${i + 1}</b><div><h3>${j.t}</h3><p>${j.b}</p></div></article>`).join("")}</div>
+  </section>
+</div>`;
+    },
+    needs() {
+      return `<div class="wrap">${needsBlock("Intake", "Describe the need", "A single column. Save a draft and continue when you are ready.")}</div>`;
+    },
+    compare() {
+      return `<div class="wide">${compareBlock("Matrix", "Every published option")}</div>`;
+    },
+    workspace() {
+      return `<div class="wide">${workspaceBody()}</div>`;
     },
   },
 ];
