@@ -3,8 +3,6 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import {
   createPublicReleaseBlockResponse,
-  isGalleryPreviewHomeRequest,
-  isGalleryPreviewRequest,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
 import { isPathInLaunch } from "@/lib/launch-surface";
@@ -42,18 +40,6 @@ export async function proxy(request: NextRequest) {
 
 async function handleRequest(request: NextRequest): Promise<Response> {
   if (isPublicReleaseBlocked()) {
-    // The design gallery is static sample content; it needs no session work.
-    if (isGalleryPreviewRequest(request.nextUrl.pathname, request.method)) {
-      const response = NextResponse.next();
-      response.headers.set("x-robots-tag", "noindex, nofollow, noarchive, nosnippet");
-      return response;
-    }
-    if (isGalleryPreviewHomeRequest(request.nextUrl.pathname, request.method)) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/gallery";
-      url.search = "";
-      return NextResponse.redirect(url, { headers: { "cache-control": "no-store" } });
-    }
     return createPublicReleaseBlockResponse(
       request.nextUrl.pathname,
       undefined,
@@ -79,28 +65,6 @@ async function handleRequest(request: NextRequest): Promise<Response> {
       });
     }
     return NextResponse.rewrite(new URL("/__not-in-launch", request.url));
-  }
-
-  // GALLERY_ONLY builds (the public design-review deployment) serve nothing but
-  // /designs. The app and admin routes never render, and sign-up is unreachable
-  // — so a public URL can't be used to create accounts against a real Supabase
-  // project. Auth is skipped entirely here: there is nothing to authenticate.
-  if (process.env.GALLERY_ONLY === "1") {
-    const { pathname } = request.nextUrl;
-    if (pathname === "/robots.txt") {
-      return createPublicReleaseBlockResponse(
-        pathname,
-        undefined,
-        request.method,
-      );
-    }
-    if (pathname === "/designs" || pathname.startsWith("/designs/")) {
-      return NextResponse.next();
-    }
-    const url = request.nextUrl.clone();
-    url.pathname = "/designs";
-    url.search = "";
-    return NextResponse.redirect(url);
   }
 
   let response = NextResponse.next({ request });

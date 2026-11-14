@@ -544,7 +544,7 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     permission: "none",
     scope: "none",
     dataPath:
-      "R0 release gate, launch surface allowlist, GALLERY_ONLY routing, Server Action validation, session refresh",
+      "R0 release gate, launch surface allowlist, Server Action validation, session refresh",
     denialEvidence: "proxy tests; never the authorization boundary",
   },
   {
