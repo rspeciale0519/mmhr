@@ -19,6 +19,8 @@ const eslintConfig = defineConfig([
     // linting them only ever produces unfixable no-require-imports errors.
     ".claude/**",
     ".codex/**",
+    // Archived code is kept in Git but is not built, linted, or tested.
+    "archive/**",
   ]),
 ]);
 
