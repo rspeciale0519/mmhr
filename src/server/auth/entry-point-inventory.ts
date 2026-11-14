@@ -196,12 +196,6 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
       scope:"current organization and assigned recipient or customer intake",dataPath:"request-scoped immutable quote and comparison RPCs",
       denialEvidence:"proposal-quotes.test.ts; r6-proposal-quotes.integration.test.ts",
     })),
-  {
-    key: "src/app/(app)/documents/actions.ts#searchWorkspaceDocumentsAction", surface: "Private workspace file-name search", kind: "server-action", access: "privileged",
-    permission: "workspace.access and exact trusted origin", scope: "server-selected organization and paged managed workspace metadata",
-    dataPath: "strict form to request-scoped metadata RPC; no object or extracted content access",
-    denialEvidence: "documents/actions.test.ts; r4-document-reads-auth.integration.test.ts",
-  },
   ...(["customer", "vendor", "staff"] as const).flatMap((view) => (["error", "loading"] as const).map((state): EntryPointInventoryRecord => ({
     key: `src/app/${view === "staff" ? "(admin)/admin" : `(app)/${view}`}/demos/${state}.tsx#default`,
     surface: `${view === "staff" ? "/admin/demos" : `/${view}/demos`} ${state}`, kind: "boundary",
@@ -225,12 +219,6 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     key: "src/server/commands/demo-coordination.ts#command", surface: "Customer, vendor, and staff demo coordination", kind: "command", access: "privileged",
     permission: "portal.customer.access or portal.vendor.access or rfp.approve and admin.access", scope: "customer or vendor organization and coordinated demo",
     dataPath: "request-scoped demo RPCs; database-bound actor and immutable revisions", denialEvidence: "demo-coordination.test.ts; r4-portal-response.integration.test.ts",
-  },
-  {
-    key: "src/server/commands/document-reservations.ts#command", surface: "Private workspace document reservation and upload completion", kind: "command", access: "privileged",
-    permission: "workspace.access and current writer membership or AAL2 staff authority", scope: "current organization and exact managed document version",
-    dataPath: "request-scoped RPCs; actual-byte inspection and private object verification; database-bound actor; no downloads",
-    denialEvidence: "document-reservations.test.ts; r4-document-reservations.integration.test.ts",
   },
   ...(["customer", "vendor", "staff", "customerHistory", "vendorHistory", "staffHistory", "create", "customerAvailability", "vendorAvailability", "confirm", "reopen", "complete", "cancel", "noShow"] as const)
     .map((name): EntryPointInventoryRecord => ({
@@ -1674,26 +1662,6 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "evaluation-route.test.ts; evaluation-routing migration review and authenticated isolation rehearsal",
   },
   {
-    key: "src/server/commands/workflow-document.ts#command",
-    surface: "workflow document control command boundary",
-    kind: "command",
-    access: "privileged",
-    permission: "workspace.access; exact organization scope",
-    scope: "one organization and immutable document version",
-    dataPath: "strict quarantined metadata DTO; fixed audited upload, scan, approval, and archive RPC; bounded size and hash",
-    denialEvidence: "workflow-document.test.ts; document-controls migration review and authenticated isolation rehearsal",
-  },
-  {
-    key: "src/server/commands/workflow-document-search.ts#command",
-    surface: "workflow document search command boundary",
-    kind: "command",
-    access: "privileged",
-    permission: "workspace.access; exact organization scope; actor identity match",
-    scope: "one organization and approved document metadata or extracted content",
-    dataPath: "strict search and approved-content DTOs; fixed audited content update and search RPCs; bounded query and result size",
-    denialEvidence: "workflow-document-search.test.ts; document-search migration review and authenticated isolation rehearsal",
-  },
-  {
     key: "src/server/commands/workflow-job.ts#command",
     surface: "workflow job control command boundary",
     kind: "command",
@@ -2121,94 +2089,6 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   permission: "audit.export and admin.access", scope: "vendor organization and evidence review",
   surface: "Staff evidence decision", dataPath: "request-scoped existing approval RPC; server-bound reviewer",
   denialEvidence: "vendor-evidence.test.ts; r2b-vendor-evidence.integration.test.ts",
-},
-{
-  key: "src/server/commands/workspace-documents.ts#command", kind: "command", access: "privileged",
-  permission: "workspace.access", scope: "selected organization and managed workspace document version",
-  surface: "Document status and immutable history", dataPath: "request-scoped bounded metadata RPCs",
-  denialEvidence: "workspace-documents.test.ts; r4-document-reads.integration.test.ts; r4-document-reads-auth.integration.test.ts",
-},
-{
-  key: "src/server/commands/workspace-document-review.ts#command", kind: "command", access: "privileged",
-  permission: "workspace.access; manual review also requires admin.access and rfp.approve with AAL2", scope: "current workspace document version and original Auth session",
-  surface: "Independent document review and bounded access", dataPath: "request-scoped review and 60-second access RPCs; current permission and immutable audit",
-  denialEvidence: "workspace-document-review.test.ts; document-review-access.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#review", kind: "trpc-procedure", access: "internal-only",
-  permission: "workspace.access, admin.access, and rfp.approve with AAL2", scope: "server-selected workspace and original document version",
-  surface: "Independent document review", dataPath: "scoped metadata RPC; no unsafe bytes or private decision reasons",
-  denialEvidence: "documents.test.ts; document-review-access.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#decide", kind: "trpc-procedure", access: "internal-only",
-  permission: "workspace.access, admin.access, and rfp.approve with AAL2", scope: "server-selected workspace and expected original version revision",
-  surface: "Document review decision", dataPath: "exact-origin POST; separate uploader and reviewer; immutable audit and replay",
-  denialEvidence: "documents.test.ts; document-review-access.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#issueAccess", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access; review requires assigned AAL2 staff", scope: "server-selected workspace, current original version, and live Auth session",
-  surface: "Bounded document access request", dataPath: "exact-origin POST; scoped 60-second capability; no provider signing",
-  denialEvidence: "documents.test.ts; document-review-access.integration.test.ts",
-},
-{
-  key: "src/app/api/documents/access/route.ts#POST", kind: "route-handler", access: "privileged",
-  permission: "workspace.access and current scoped document access grant", scope: "server-selected workspace, exact version, and original Auth session",
-  surface: "Private document download", dataPath: "exact-origin POST; bounded request; scoped Storage download; hash validation and final authorization",
-  denialEvidence: "documents/access/route.test.ts; document-review-access.integration.test.ts",
-},
-{
-  key: "src/app/(app)/documents/review/page.tsx#default", kind: "page", access: "internal-only",
-  permission: "workspace.access, admin.access, and rfp.approve with AAL2", scope: "server-selected workspace and exact document version",
-  surface: "Independent document review screen", dataPath: "scoped review metadata; separate uploader; bounded current file access",
-  denialEvidence: "documents/review/page.test.tsx; document-review-access.integration.test.ts",
-},
-{
-  key: "src/server/commands/document-upload-preparation.ts#command", kind: "command", access: "privileged",
-  permission: "workspace.access and live document writer", scope: "organization and immutable workspace version",
-  surface: "Untrusted file manifest reservation", dataPath: "scoped reserve RPC; quarantine only; no byte safety or approval claim",
-  denialEvidence: "document-upload-preparation.test.ts; supabase-document-storage.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#prepareUpload", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access and live document writer", scope: "server-selected organization and immutable workspace version",
-  surface: "Private upload preparation", dataPath: "exact-origin POST; scoped reservation; bounded untrusted manifest",
-  denialEvidence: "documents.test.ts; supabase-document-storage.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#completeUpload", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access and live document writer", scope: "server-selected organization and actual private original",
-  surface: "Private upload completion", dataPath: "exact-origin POST; actual object metadata; scan queue and audit",
-  denialEvidence: "documents.test.ts; supabase-document-storage.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#list", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access", scope: "selected organization and document page", surface: "Document status",
-  dataPath: "request-scoped bounded metadata RPC", denialEvidence: "documents.test.ts; r4-document-reads-auth.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#versions", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access", scope: "selected organization and document", surface: "Document versions",
-  dataPath: "request-scoped bounded metadata RPC", denialEvidence: "documents.test.ts; r4-document-reads-auth.integration.test.ts",
-},
-{
-  key: "src/server/trpc/routers/documents.ts#history", kind: "trpc-procedure", access: "privileged",
-  permission: "workspace.access", scope: "selected organization, document, and version", surface: "Document history",
-  dataPath: "request-scoped bounded history RPC", denialEvidence: "documents.test.ts; r4-document-reads-auth.integration.test.ts",
-},
-{
-  key: "src/app/(app)/documents/page.tsx#default", kind: "page", access: "privileged", permission: "workspace.access",
-  scope: "server-selected organization and managed workspace document", surface: "Workspace document status, versions, and history",
-  dataPath: "request-scoped metadata and history RPCs", denialEvidence: "documents/page.test.tsx; r4-document-reads-auth.integration.test.ts",
-},
-{
-  key: "src/app/(app)/documents/loading.tsx#default", kind: "boundary", access: "public", permission: "none",
-  scope: "generic loading state", surface: "Document loading", dataPath: "generic state only", denialEvidence: "documents/page.test.tsx",
-},
-{
-  key: "src/app/(app)/documents/error.tsx#default", kind: "boundary", access: "public", permission: "none",
-  scope: "generic failure state", surface: "Document failure", dataPath: "generic state only", denialEvidence: "documents/page.test.tsx",
 },
 {
   key: "src/server/commands/rfp-notifications.ts#command", kind: "command", access: "privileged",

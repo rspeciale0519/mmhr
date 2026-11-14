@@ -10,7 +10,6 @@ import { vendorEvidenceRouter } from "./routers/vendor-evidence";
 import { responsesRouter } from "./routers/responses";
 import { clarificationsRouter } from "./routers/clarifications";
 import { demosRouter } from "./routers/demos";
-import { documentsRouter } from "./routers/documents";
 import { proposalsRouter } from "./routers/proposals";
 import { contractsRouter } from "./routers/contracts";
 import { tasksRouter } from "./routers/tasks";
@@ -28,7 +27,6 @@ export const appRouter = router({
   responses: responsesRouter,
   clarifications: clarificationsRouter,
   demos: demosRouter,
-  documents: documentsRouter,
   proposals: proposalsRouter,
   contracts: contractsRouter,
   tasks: tasksRouter,
