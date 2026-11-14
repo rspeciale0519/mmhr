@@ -1079,3 +1079,228 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 
 ## [2026-10-28] git | Worktree cleanup and checkout on develop
 - Owner-approved: worktrees brain-notes-2026-10-27, dazzling-wright-4b6bf0 and wizardly-tesla-ee0e04 removed; old brain copies kept as stash 989febc and e83d278; main checkout moved to develop 209f078. See journal/2026-10-28.md.
+
+## [2026-11-08] verification | Restore local review environment
+- Docker healthy and local app started. Approved reviews await a separate local browser window. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Pending UKG evidence
+- UKG draft and December 15 freshness verified read-only. Local browser window still needed. See journal/2026-11-08.md.
+
+## [2026-11-08] review | ADP and UKG plan sources
+- Official current plan pages rechecked; existing local UKG approval still pending. See journal/2026-11-08.md.
+
+## [2026-11-08] approval | Local catalog and UKG evidence
+- Five approved profiles and UKG-02 evidence saved and verified locally. Phase1 remains incomplete. See journal/2026-11-08.md.
+
+## [2026-11-08] evidence | UKG scope and comparison preview
+- UKG-03 scope saved as draft; nine-option preview includes one synthetic product. See journal/2026-11-08.md.
+
+## [2026-11-08] approval | ADP and UKG payroll scope
+- UKG-03 and ADP-02/03 approved and locally verified. Updated preview still includes a synthetic product. See journal/2026-11-08.md.
+
+## [2026-11-08] evidence | Gusto Plus drafts
+- Two local source-backed drafts saved; approval pending. Synthetic retirement is not exposed through staff controls. See journal/2026-11-08.md.
+
+## [2026-11-08] review | Synthetic product lifecycle
+- Exact local test product has seven historical option references. Gusto drafts and test product retirement await owner decisions. See journal/2026-11-08.md.
+
+## [2026-11-08] implementation | Retire local synthetic option
+- Owner-approved audited retirement preserves seven options and one choice. Eight-real-product preview verified. Rippling drafts await review. See journal/2026-11-08.md.
+
+## [2026-11-08] research | Remaining provider sources
+- Reviewed Paylocity, Paycom, and isolved multi-state sources with configuration limits. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Historical customer choice
+- Saved choice remains visible; old current comparison is stale under current catalog inputs. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Estimate scope
+- Synthetic read-only check shows estimate employee basis is not matched to customer input. No real numeric estimates are published. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Eight-product mobile matrix
+- Staff preview passes narrow layout and keyboard evidence checks. Publication and customer choice remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Matching unit tests
+- Current checkout: 8 files and 107 tests passed. Publication and customer workflow remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Comparison and selection unit tests
+- Current checkout: 3 files and 58 tests passed. Database and customer workflow remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] diagnosis | Estimate data flow
+- Customer labels are free-form; estimate display does not bind its employee basis to the intake. Historical read compatibility requires review. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Current project checks
+- Type check, lint, tracked-file secret scan, and integration inventory passed. Dependency audit found 20 advisories including one high. Full tests and build were still running. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Production dependency audit
+- Production-only audit reports 12 advisories, including one high. Package update approval remains pending. See journal/2026-11-08.md.
+
+## [2026-11-08] implementation | Approved local dependency fix
+- Separate codex/fix-systeminformation worktree updates one package. Install, high-threshold audit and 165 focused tests passed. No integration into develop. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Full suite and fix checks
+- Original full suite: 6,434 passed, 18 local-service failures; both affected files passed separately with access. Fix-branch types and lint passed. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Fix branch build
+- Separate dependency fix branch passed its production build with local placeholder settings. Full suite remains active; fix is not integrated. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Worktree migration bytes
+- Windows checkout altered line endings in the separate fix worktree. Original bytes were restored; 37 affected tests passed. Full suite is running. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Original build stopped
+- Stalled original build was stopped and remains incomplete. Separate fix branch passed with local placeholders. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Corrected fix-branch full suite
+- Separate package fix passed 503 files and 6,452 tests. Build, type, lint, audit threshold, inventory and secret scan also passed. No integration into develop. See journal/2026-11-08.md.
+
+## [2026-11-08] implementation | Local package fix commit
+- Owner-approved commit 84ffdcf contains only the tested package lockfile update. It remains on a separate local branch. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Local customer comparison
+- Owner-approved eight-option comparison was published locally. Five fictional choices survived refresh; the server rejected a sixth. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Customer phone and publication response
+- The local customer matrix passed phone-width keyboard checks. The authenticated current-publication response passed the stated identity checks. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Selection retries
+- The local customer selection replayed without duplicates; a changed retry was rejected. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Direct customer product access
+- The fictional customer received 42501 and no records when requesting eight masked products directly. This is not complete RLS evidence. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Native loading and empty states
+- A fictional customer intake showed correct loading, draft-empty, and submitted-unpublished comparison states. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Native stale comparison retry
+- The old fictional comparison remained unavailable after retry, while its saved choice remained visible. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Local themes and current GitHub dependencies
+- Local home and Pulse themes switched. Current GitHub develop already has the package fix and passes the high audit threshold; the local checkout remains behind. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Newer GitHub test copy
+- Owner-approved separate copy at b575c9d passed installation, 171 focused tests, type, lint, secret scan and inventory. Full suite and placeholder build are running. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Newer GitHub build
+- Separate b575c9d test copy built successfully with local placeholders. Its full suite remains running. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Newer GitHub full suite
+- Exact GitHub develop b575c9d passed 503 files and 6,453 tests in a separate copy. Local develop remains unchanged and behind. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | GitHub Actions budget
+- GitHub did not start any of the three CI jobs on b575c9d because an Actions budget prevented use. Local checks passed; hosted CI remains open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Read-only scoring comparison
+- A corrected scratch helper passed fictional SQL/application parity cases in a read-only transaction. The original helper failed because the database received a JSON string. Full integration remains open. See journal/2026-11-08.md.
+
+## [2026-11-08] repair | Scoring test helper
+- A separate test copy contains a proposed helper repair. Read-only fictional parity, type check, and lint passed. Full integration remains deferred. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Scoring helper unit suite
+- Separate proposed helper repair passed 503 files and 6,453 unit tests. Full database integration and other fixtures remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Scoring helper build
+- The separate helper repair passed a production build with local placeholders. Hosted settings and full database integration remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Modeled organization permission
+- A read-only modeled customer permission check allowed the fictional customer's organization and denied a different catalog organization. This does not prove public endpoint, signed-token, cross-customer, or complete RLS behavior. See journal/2026-11-08.md.
+
+## [2026-11-08] research | Additional provider sources
+- Official Paycom, Paylocity, and isolved sources clarify payroll and service scope. These are unapproved research findings, not customer-specific offers. See journal/2026-11-08.md and docs/phase1-vendor-fact-review-2026-09-15.md.
+
+## [2026-11-08] verification | Saved publication scoring
+- Read-only recomputation matched all eight options in fictional published version 7, including fit, coverage, evidence dates, and format-2 ordering. This is not hosted or full integration evidence. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Saved evidence expiry
+- Every saved evidence input across eight fictional options was present just before its recorded expiry and absent at expiry in a read-only resolver check. Full integration remains open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Saved publication freshness
+- Fictional version 7 matched its current snapshot and its snapshot just before first evidence expiry. The snapshot changed at expiry. The public endpoint and hosted behavior remain unverified. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Paginated fictional customer reads
+- Three modeled authenticated database pages returned all eight masked options with correct cursors; a foreign catalog organization was denied. The transaction rolled back and five saved choices remained. Signed-token, cross-customer, and hosted checks remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Pagination boundaries
+- A rolled-back fictional customer database test passed the end-of-results case and rejected seven invalid page inputs. Five saved choices remained. Signed-token, cross-customer, and hosted checks remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Local RFP approval policy
+- Local policy has separate-staff approval off. The installed approval command retains a staff permission check and audit command. This does not verify production or repeat the full workflow. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Cross-customer database access
+- Two existing fictional customer accounts passed a positive own-publication control and five cross-customer denial checks. The transaction rolled back and five saved choices remained. Signed-token, reverse-direction, and hosted tests remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Signed local cross-customer reads
+- A verified fictional local session was denied four reads of another customer's comparison and selections. The new session was closed; earlier sessions and five saved choices remained. Reverse-direction and hosted checks remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Signed local selection authority
+- A verified fictional local customer with its own selection permission was denied a cross-customer selection at the authority check. The test session closed and prior sessions and saved choices remained. Reverse-direction and hosted checks remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Signed customer access in both directions
+- Two existing fictional local customers accessed their own records and were denied the other organization's record using verified sessions. The second record is an audited unpublished draft. Both new sessions closed and prior sessions remained. Reverse access to a published second comparison and hosted checks remain open. See journal/2026-11-08.md.
+
+## [2026-11-08] verification | Second fictional submitted intake
+- The second fictional local customer submitted one payroll requirement. History and audit checks passed; no comparison was published. Fictional staff currently lack access to this organization. See journal/2026-11-08.md.
+
+## [2026-11-08] investigation | Second test customer staff access
+- The two fictional test staff cannot grant access to each other under current authority rules; no other verified fictional staff session was found. No permission, membership, MFA, invitation, or publication changed. See journal/2026-11-08.md.
+- 2026-11-08: simultaneous selection retry fixture stopped before sign-in; reconstructed request did not match its receipt. See journal/2026-11-08.md.
+- 2026-11-08: simultaneous local retries preserved saved choices but returned the first request reference. A temporary correction passed and rolled back; a fix is drafted. See journal/2026-11-08.md.
+- 2026-11-08: signed local comparison, saved-choice, and empty-disclosure responses hid the eight checked provider and product identities; staff disclosure review was denied. See journal/2026-11-08.md.
+- 2026-11-08: app source shows normal retries keep the original reference; a retry with a new reference is rejected. Estimate inputs have no controlled customer-count field. See journal/2026-11-08.md.
+- 2026-11-08: 64 focused selection-command and customer-interface tests passed; database changed-reference replay remains a draft repair. See journal/2026-11-08.md.
+- 2026-11-08: 144 fictional commercial variations did not change the eight saved scoring results. Relevant-fact controls changed scores in both methods. See journal/2026-11-08.md.
+- 2026-11-08: temporary retry repair passed modeled saved-selection and denial controls; all changes rolled back. Permanent migration remains untested. See journal/2026-11-08.md.
+- 2026-11-08: verified all 50 inventory entries and updated the catalog packet's current local status; four scope and coverage drafts remain unreviewed. See journal/2026-11-08.md.
+- 2026-11-08: a fresh customer browser view showed eight masked options and five saved choices; table and observed asset checks passed. Network response capture remains unavailable. See journal/2026-11-08.md.
+- 2026-11-08: authenticated local customer page HTML and embedded data hid the eight checked provider identities and source domains. Full browser network capture remains open. See journal/2026-11-08.md.
+- 2026-11-08: signed app API pagination and masking passed; two fictional customers were denied each other's intakes. The second has no publication. See journal/2026-11-08.md.
+- 2026-11-08: two simultaneous exact retries passed through the local app. A new request reference reproduced the known HTTP 500 defect. See journal/2026-11-08.md.
+- 2026-11-08: local fictional staff created and approved the same RFP draft in a rolled-back test; customer approval was denied and MMHR audit checks passed. See journal/2026-11-08.md.
+- 2026-11-08: a temporary on-setting simulation denied RFP self-approval and allowed another staff reviewer; the real local setting stayed off. The app has no setting switch. See journal/2026-11-08.md.
+- 2026-11-08: the signed local app denied stale comparison reads and selections while preserving the earlier saved choice. See journal/2026-11-08.md.
+- 2026-11-08: a rolled-back fictional disclosure test confirmed discussion checks, staff authority, selected-provider reveal, and audit. No real discussion or provider contact occurred. See journal/2026-11-08.md.
+- 2026-11-08: a read-only simulation showed conflicting feature labels can pass response validation; no conflict appeared in eight saved local options. See journal/2026-11-08.md.
+- 2026-11-08: positive and negative synthetic requirements showed that match plus not supported needs context; a blanket rejection would break a valid case. See journal/2026-11-08.md.
+- 2026-11-08: synthetic delivery and module conditions passed, but coverage labels alone do not enforce them. One saved matched add-on needs package-evidence review. See journal/2026-11-08.md.
+- 2026-11-08: the saved BambooHR add-on has approved scope and coverage; its restriction checks the fictional customer's willingness. Yes/no/unknown controls passed. See journal/2026-11-08.md.
+- 2026-11-08: the drafted selection retry regression passed a full project type check when supplied in memory. Migration and integration execution remain open. See journal/2026-11-08.md.
+- 2026-11-08: the retry migration draft changes one response expression; the installed body and restricted permissions passed a read-only review. See journal/2026-11-08.md.
+- 2026-11-08: a fictional estimate-scope model passed ten count and package cases; the model is not connected to the app. See journal/2026-11-08.md.
+- 2026-11-08: a read-only SQL estimate-gate expression agreed with the model in eleven fictional cases; it is not installed. See journal/2026-11-08.md.
+- 2026-11-08: an estimate-only count added as a scored requirement reduced synthetic fit and changed eligibility; a separate controlled path is needed. See journal/2026-11-08.md.
+- 2026-11-08: a fictional separate estimate context preserved eight scores but changed the publication fingerprint; old-format compatibility is required. See journal/2026-11-08.md.
+- 2026-11-08: owner approved two local fix branches; scoring and exact rolled-back retry checks passed. Five older local migration checksums need review before applying the new migration. See journal/2026-11-08.md.
+- 2026-11-08: simultaneous retry rollback passed; the first broad suite failed on migration count and checkout formatting. Corrections passed 41 focused tests; a full rerun is active. See journal/2026-11-08.md.
+- 2026-11-08: the installed retry command matched source and permissions; Git status was refreshed without staging. A stalled build was stopped and needs retry. See journal/2026-11-08.md.
+- 2026-11-08: five older local migration checksums did not match the checked Git reflog blobs or common line-ending variants. See journal/2026-11-08.md.
+- 2026-11-08: the retry branch full unit rerun passed 504 files and 6,455 tests; the local build was restarted. See journal/2026-11-08.md.
+- 2026-11-08: both approved local fix branches passed focused checks; the retry branch passed 6,455 unit tests and a placeholder build. The local migration is not applied. See journal/2026-11-08.md.
+- 2026-11-08: the isolated retry database test installed the branch migrations and passed all eight cases. The existing local database still needs migration-history review. See journal/2026-11-08.md.
+- 2026-11-09: reproduced the 0046 historical checksum and prepared a tested forward fix for its rejected audit value. Four older checksums remain unexplained. See journal/2026-11-09.md.
+- 2026-11-09: proved the historical evaluation command fails its audit constraint; the 0172 repair passed creation, replay, and rollback checks. Full unit rerun remains active. See journal/2026-11-09.md.
+- 2026-11-09: the retry branch passed 504 unit files and 6,455 tests in the approved scratch environment. Four old migration versions remain missing. See journal/2026-11-09.md.
+- 2026-11-09: applied migrations 0171 and 0172 locally after isolated and rollback rehearsals. All 171 old history rows and 197 data-table fingerprints were preserved. Four historical file differences remain unresolved. See journal/2026-11-09.md.
+# 2026-11-10
+
+- Investigated the modeled evaluation denial and verified the current no-MFA customer comparison path. See journal/2026-11-10.md.
+- Tested fictional customer draft creation with rollback. Local server startup awaits approval to remove one expired worker login. See journal/2026-11-10.md.
+- Extended the isolated no-MFA test through customer intake creation. Seven focused tests passed. See journal/2026-11-10.md.
+- Verified that saved company context is already in the comparison snapshot. Estimate scope remains open. See journal/2026-11-10.md.
+- Implemented scoped estimate reads and customer count in the worktree. Migration 0173 passed a rolled-back local rehearsal; final checks remain open. See journal/2026-11-10.md.
+- Placeholder build passed. Isolated failed-test resources were removed; selection-history and full unit failures need diagnosis. See journal/2026-11-10.md.
+- Historical migration test passed; eight selection cases timed out during setup. Fixed and rechecked the comparison format test. See journal/2026-11-10.md.
+- Moved selection-history migration setup into a guarded rehearsal helper. Focused checks passed; full suite and integration need a clean rerun. See journal/2026-11-10.md.
+- All nine saved-choice and migration-history integration tests passed after the guarded helper repair. A full unit rerun is active. See journal/2026-11-10.md.
+- Applied local estimate migration 0173. Checked old history, 197 data tables, five choices, and public permissions were preserved. See journal/2026-11-10.md.
+- After local migration 0173, a rolled-back modeled customer read preserved eight options, matching scores, and five saved choices. Browser verification remains open. See journal/2026-11-10.md.
+- Repaired the scoring parity test helper; the local read-only check and nine isolated publication integration tests passed. See journal/2026-11-10.md.
+- After the scoring helper repair, all 6,476 unit tests and nine isolated publication tests passed. Browser verification remains open. See journal/2026-11-10.md.
+- Verified two isolated published customer comparisons and saved choices, including cross-customer and mixed-ID denials. Signed browser and hosted checks remain open. See journal/2026-11-10.md.
+- Prepared four review items for Paylocity, Paycom, and isolved from official sources; no catalog records or approvals changed. See journal/2026-11-10.md.
+- Added an unclear feature-match warning; focused checks and a fictional browser preview passed. Full units and signed customer verification remain open. See journal/2026-11-10.md.
+- The latest full unit session became unavailable without a final result. Its process state and the signed customer browser flow remain unverified. See journal/2026-11-10.md.
+- The replacement full unit run passed 6,478 tests across 505 files; signed customer browser verification remains open. See journal/2026-11-10.md.
+- Checked the separate local stack option. Fixed ports, project-ID validation, schema setup, synthetic permissions, and browser access need a verified setup. No service or data changed. See journal/2026-11-10.md.
+- Started an internal versioned coverage-scoring prototype; 66 focused tests pass. Migration 0174 is guarded and unapplied; database parity and browser checks remain open. See journal/2026-11-10.md.
+- Draft format 3 database scoring passed four isolated parity tests and 68 focused application tests. Migration 0174 remains guarded and unapplied; publication wiring remains open. See journal/2026-11-10.md.
+- Format 3 draft passed 12 isolated database tests and focused application checks. The goal was cleared; migration 0174 remains guarded and signed browser verification is open. See journal/2026-11-10.md.
+- Migration 0174 is applied locally. All 175 entries are present; 197 tables and nine legacy results stayed unchanged. Preparing the authorized GitHub handoff. See docs/claude-handoff-2026-11-10.md.
+- GitHub handoff code is pushed; all 175 local migrations are complete. Full units found one outdated count; the correction passed 15 checks. See docs/claude-handoff-2026-11-10.md.

@@ -79,12 +79,12 @@ export async function seedSubmittedIntake(
   await asAuthenticated(sql, principal, async (probe) => {
     await probe`
       SELECT public.mmhr_save_customer_intake_requirement(
-        ${JSON.stringify(requirement)}::jsonb, ${randomUUID()}::uuid, ${randomUUID()}::uuid
+        ${JSON.stringify(requirement)}::text::jsonb, ${randomUUID()}::uuid, ${randomUUID()}::uuid
       )
     `;
     await probe`
       SELECT public.mmhr_submit_customer_intake(
-        ${JSON.stringify({ organizationId: fixture.organizationId, intakeId, expectedRevision: 1 })}::jsonb,
+        ${JSON.stringify({ organizationId: fixture.organizationId, intakeId, expectedRevision: 1 })}::text::jsonb,
         ${randomUUID()}::uuid, ${randomUUID()}::uuid
       )
     `;
@@ -173,7 +173,7 @@ export async function prepare(sql: SecurityTransaction, principal: SecurityPrinc
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: RpcResult }[]>`
       SELECT public.mmhr_prepare_evaluation_publication(
-        ${JSON.stringify(payload)}::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
+        ${JSON.stringify(payload)}::text::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
       ) AS result
     `;
     return row!.result;
@@ -184,7 +184,7 @@ export async function publish(sql: SecurityTransaction, principal: SecurityPrinc
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: RpcResult }[]>`
       SELECT public.mmhr_publish_evaluation_publication(
-        ${JSON.stringify(payload)}::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
+        ${JSON.stringify(payload)}::text::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
       ) AS result
     `;
     return row!.result;
@@ -195,7 +195,7 @@ export async function revoke(sql: SecurityTransaction, principal: SecurityPrinci
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: RpcResult }[]>`
       SELECT public.mmhr_revoke_evaluation_publication(
-        ${JSON.stringify(payload)}::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
+        ${JSON.stringify(payload)}::text::jsonb, ${correlationId}::uuid, ${idempotencyKey}::uuid
       ) AS result
     `;
     return row!.result;
@@ -213,12 +213,12 @@ export async function readPublication(
     const [row] = functionName === "review"
       ? await probe<{ result: RpcResult }[]>`
           SELECT public.mmhr_review_evaluation_publication(
-            ${JSON.stringify(payload)}::jsonb, ${randomUUID()}::uuid
+            ${JSON.stringify(payload)}::text::jsonb, ${randomUUID()}::uuid
           ) AS result
         `
       : await probe<{ result: RpcResult }[]>`
           SELECT public.mmhr_get_evaluation_publication(
-            ${JSON.stringify(payload)}::jsonb, ${randomUUID()}::uuid
+            ${JSON.stringify(payload)}::text::jsonb, ${randomUUID()}::uuid
           ) AS result
         `;
     return row!.result;

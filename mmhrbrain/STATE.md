@@ -1,8 +1,78 @@
 # MMHR — Current State
 
-Updated: 2026-10-28 09:42 EDT. PRs #10 to #14 merged into `develop` (latest merge 209f078); develop CI run 40590935361 is green on all three jobs. The main checkout is on `develop`; it is the only worktree (journal/2026-10-28.md). `origin` uses HTTPS. Head branch `codex/full-delivery-verification` kept (mmhr-gallery.vercel.app follows it). Gallery review tools remain live on preview mmhr-czz7wdawp with Neon storage.
+Updated: 2026-10-28 09:42 EDT. PRs #10 to #14 merged into `develop` (latest merge 209f078); develop CI run 40590935361 is green on all three jobs. At that time the main checkout was on `develop` and was the only worktree (journal/2026-10-28.md). A separate local package-fix worktree now exists. `origin` uses HTTPS. Head branch `codex/full-delivery-verification` kept (mmhr-gallery.vercel.app follows it). Gallery review tools remain live on preview mmhr-czz7wdawp with Neon storage.
 
-## Current local approval task (October 20)
+## Customer comparison investigation
+- November 10: the previously denied modeled request used an older command, not the customer screen. An isolated seven-test database file passed a no-MFA customer flow from intake creation through five choices. A modeled existing fictional customer also created a draft in a rolled-back local test. Browser verification waits for the expired worker-login decision. A separate local stack needs additional isolation, setup, and browser verification; see journal/2026-11-10.md.
+
+## Current project checks
+- November 8: type check, lint, secret scan and integration inventory passed. Audit found one high advisory. Owner approved a local package fix and branch; the separate fix passes the high audit threshold, type check, lint, 6,452 tests, and a build with local placeholders. Commit 84ffdcf was uploaded; GitHub develop already includes the same fix. Local develop is seven commits behind and remains unchanged. Owner approved a separate test copy at b575c9d; 6,453 tests and the placeholder build passed. GitHub still matched that commit after testing. All three GitHub CI jobs failed to start because an Actions budget prevented use. Original suite: 6,434 passed and 18 local-service tests failed; both affected files passed separately with access. Original build stalled and was stopped. The corrected fix-branch suite passed 6,452 tests. The owner approved and uploaded local commit 84ffdcf. GitHub develop already has the same package version; its dependency snapshot passes the high audit threshold with 18 lower-severity findings. Fix-worktree status still lists SQL paths despite no normal content diff. See journal/2026-11-08.md.
+
+## Read-only scoring check
+- November 10: the unchanged parity helper passed an isolated integration run but failed a direct local read-only check. The approved helper repair passed both paths; nine isolated publication tests, types, lint, and 57 access checks passed. The full unit rerun passed 6,476 tests. See journal/2026-11-10.md.
+
+## Conflicting feature evidence
+- November 10: the customer matrix now flags a match with unsupported coverage for review. The score is unchanged; the correct meaning, scoring and historical compatibility remain open. A fictional browser preview and a replacement full unit run of 6,478 tests passed. The signed customer flow remains unverified. See journal/2026-11-10.md.
+
+## New coverage scoring prototype
+- November 10: migration 0174 is now applied locally after review, 13 isolated tests, and a rollback rehearsal. All 175 migrations are recorded; 197 table fingerprints and nine legacy comparison results stayed unchanged. Staff format 3 wiring and signed browser verification remain open. The owner requested a GitHub handoff to Claude. See docs/claude-handoff-2026-11-10.md.
+
+## Delivery and module conditions
+- November 8: synthetic checks showed labels alone do not enforce delivery or module conditions. The saved BambooHR add-on has approved scope and coverage; a restriction requires the customer's saved willingness. Yes/no/unknown controls passed. General enforcement and partner cases remain open. See journal/2026-11-08.md.
+
+## Estimate scope prototype
+- November 10: worktree code adds customer count and versioned estimate reads. Migration 0173 was applied locally after a rollback rehearsal; 197 checked table fingerprints, five choices, prior history, and checked permissions remained unchanged. A clean full unit rerun passed 6,476 tests after repairs. Nine isolated saved-choice and migration-history tests passed. Browser verification awaits the local worker-login decision. See journal/2026-11-10.md.
+
+## Modeled organization permission
+- November 8: a read-only permission check allowed the fictional customer organization and denied a separate catalog organization. This is not a public endpoint or full cross-customer isolation test. See journal/2026-11-08.md.
+
+## Saved publication scoring
+- November 8: eight fictional version 7 options matched application scoring, evidence dates, and format-2 ordering. Their results were unchanged across 144 fictional commercial variations; relevant-fact controls changed scores. Expiry and saved-digest boundaries passed. Other customers and hosted behavior remain unverified. See journal/2026-11-08.md.
+
+## Paginated customer database reads
+- November 8: signed local app reads returned eight masked options over three pages and five saved choices. Both fictional customers read their own intakes and were denied each other through the app. Only one intake has a publication. Two published comparisons and hosted checks remain open. See journal/2026-11-08.md.
+
+## Signed customer masking
+- November 8: signed customer API and page HTML hid eight checked identities. A rolled-back simulated discussion revealed only the selected provider and preserved audit. The browser showed eight options and five choices. Signed disclosure, full browser network capture, and hosted behavior remain open. See journal/2026-11-08.md.
+
+## Simultaneous selection retry
+- November 9: the retry and evaluation audit repairs are applied locally. All 171 old history rows and fingerprints of 197 data tables remain unchanged. Modeled fictional customer and staff checks passed. Four old file checksums remain unexplained; signed browser and hosted checks remain open. See journal/2026-11-09.md.
+
+## Local RFP approval policy
+- November 8: rolled-back tests confirmed staff self-approval with the local setting off and simulated a different reviewer with it on. The actual setting remained off. The app displays the setting but cannot change it. Signed and hosted checks remain open. See journal/2026-11-08.md.
+
+## Cross-customer database access
+- November 8: modeled claims passed an own-publication control and five cross-customer denials in a rolled-back transaction. Verified local sessions received four cross-customer read denials and a selection authority denial. Both fictional customers accessed their own records and were denied the other direction. The second record is now a submitted fictional intake with one payroll requirement and no publication. New sessions were closed, earlier sessions and five saved choices remained. The second test customer is submitted but neither fictional staff account has access; current authority rules prevent the two staff from granting access to each other. November 10: an isolated test passed with two published fictional comparisons and saved choices, including cross-customer and mixed-ID denials. Signed two-publication and hosted tests remain open. See journal/2026-11-08.md.
+
+## Current matching tests
+- November 8: 11 matching, comparison and selection unit files and 165 tests passed. This does not verify database integration or customer publication. See journal/2026-11-08.md.
+
+## Historical customer check
+- November 8: the signed local app denied a stale version 2 comparison and new selection while preserving the version 1 choice. The source of staleness and recovery by republishing remain unverified. See journal/2026-11-08.md.
+
+## Remaining provider source review
+- November 10: reviewed Paylocity, Paycom, and isolved official sources and recorded four proposed review items with summary hashes. No catalog records were created or approved. Configuration, service path, jurisdictions, permitted source use, and terms remain open. See docs/phase1-vendor-fact-review-2026-09-15.md.
+
+## Active Gusto review
+- GUSTO-02/03 and RIPPLING-02/03 remain unreviewed drafts. Owner-approved synthetic workflow_product_1 was retired through an audited staff-authorized command; seven options and one choice remain. No staff retirement UI exists. See journal/2026-11-08.md.
+
+## Eight-product staff preview
+- At 320px, document305/305 and matrix255/1264. Keyboard scrolling and last-option evidence open/close pass. The owner approved local publication. Fictional customer selections and the five-choice server limit passed; hosted behavior remains unverified. See docs/security/phase1-four-option-preview-2026-09-16.md.
+
+## Estimate scope
+- Read-only synthetic check returned a 25-person estimate for both 10- and 250-person inputs. UI shows estimate basis, but publication details do not match it to saved customer answers. Intake labels are free-form; historical read compatibility needs review. No real product has a published numeric estimate. Keep unsupported values Unknown. See journal/2026-11-08.md.
+
+## Active comparison work (November 8)
+- UKG-03 and ADP-02/03 are approved locally. Version 7 was published locally with eight real products, three matches and five unknown. Five fictional choices survived refresh; the server rejected a sixth. The customer phone view and current-publication response passed the stated masking checks. Exact retry replayed without duplicates; a changed retry was rejected. Direct customer product access returned 42501 and no records; full RLS verification remains open. Native loading and draft/submitted empty states passed on a separate fictional intake. Synthetic product retirement preserved history. See journal/2026-11-08.md and board task22.
+
+## Current source check
+- November 8 official ADP and UKG plan pages still support the recorded payroll plan facts. See docs/phase1-vendor-fact-review-2026-09-15.md. Saved approvals and source dates remain unchanged.
+
+## Local approval task (November 8)
+- November 8: eight local profiles and basic payroll facts are approved. All 50 research candidates remain listed. Four Gusto and Rippling scope and coverage records remain unreviewed drafts. See docs/phase1-vendor-fact-review-2026-09-15.md and journal/2026-11-08.md.
+- Other scope and coverage remain open. Local fictional customer publication and selection passed later on November 8. No production action occurred.
+
+## Historical local approval task (October 20)
 - Owner approved five local profiles and UKG-02 evidence. Task50 is blocked by offline Docker; Windows denied service start. No approvals applied.
 - Start Docker with Windows permission, then resume only these actions. Do not ask again. See journal/2026-10-20.md and shared board.
 

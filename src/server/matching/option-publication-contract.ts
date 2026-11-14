@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { requirementResponseSchema } from "@/server/matching/requirement-input";
 import { maskedPublicationDetailsSchema } from "./masked-publication-details";
+import { deliveryBooleanMapSchema, deliveryCoverageMapSchema } from "./delivery-evidence";
 import { evaluateFactScope, factScopeMapSchema } from "./fact-scope";
 
 const uuidSchema = z.uuid().transform((value) => value.toLowerCase());
@@ -17,7 +18,7 @@ const criterionSchema = z.strictObject({
   responsePath: z.array(z.string().min(1).max(100)).max(5),
 });
 
-export const publicationConfigSchema = z.strictObject({
+const legacyPublicationConfigSchema = z.strictObject({
   version: z.union([z.literal(1), z.literal(2)]),
   criteria: z.array(criterionSchema).min(1).max(2_000),
 }).superRefine((config, context) => {
@@ -33,6 +34,28 @@ export const publicationConfigSchema = z.strictObject({
   });
 });
 
+// Format 3 requires the matching database migration before use in publication.
+const format3ConfigSchema = z.strictObject({
+  version: z.literal(3),
+  criteria: z.array(criterionSchema.extend({
+    capabilityMeaning: z.literal("presence").optional(),
+    partnerAcceptance: z.strictObject({
+      requirementKey: stableKeySchema.refine(
+        (value) => !/^(commission|payout|referral|payment_status|commercial|sponsorship|advertising|paid_placement|partner_status)/.test(value),
+        "Commercial fields cannot define partner acceptance",
+      ),
+      responsePath: z.array(z.string().min(1).max(100)).max(5),
+    }).optional(),
+  })).min(1).max(2_000),
+}).superRefine((config, context) => {
+  const base = legacyPublicationConfigSchema.safeParse({ version: 2,
+    criteria: config.criteria.map(({ requirementKey, factKey, responsePath }) => ({ requirementKey, factKey, responsePath })) });
+  if (!base.success) context.addIssue({ code: "custom", message: "Invalid format 3 criteria" });
+});
+
+export const publicationConfigSchema = z.union([legacyPublicationConfigSchema, format3ConfigSchema]);
+
+type EvaluationConfig = PublicationConfig;
 const publicationRequirementSchema = z.strictObject({
   requirementId: uuidSchema,
   revision: z.number().int().positive(),
@@ -151,7 +174,7 @@ function parseRequirements(requirements: readonly unknown[]): PublicationRequire
   return parsed.data;
 }
 
-function parseConfig(config: unknown): PublicationConfig {
+function parseConfig(config: unknown): EvaluationConfig {
   const parsed = publicationConfigSchema.safeParse(config);
   if (!parsed.success) fail("configuration is invalid");
   return parsed.data;
@@ -213,6 +236,10 @@ export function evaluatePublishedOption(
 ): PublishedOptionEvaluation {
   const parsedRequirements = parseRequirements(requirements);
   const parsedConfig = parseConfig(config);
+  if (parsedConfig.version === 3 && requirements.some((item, index) =>
+    typeof item !== "object" || item === null || !("key" in item) || item.key !== parsedRequirements[index].key)) {
+    fail("format 3 requirement keys must be canonical");
+  }
   const parsedInputs = parseInputs(inputs);
   const criteria = new Map(parsedConfig.criteria.map((criterion) => [criterion.requirementKey, criterion]));
   const requirementKeys = new Set(parsedRequirements.map((requirement) => requirement.key));
@@ -221,10 +248,31 @@ export function evaluatePublishedOption(
   }
 
   const relevantInputs = parsedInputs.filter((input) => parsedConfig.criteria.some((criterion) => criterion.factKey === input.field_key));
-  const scopeInputs = parsedConfig.version === 2
+  const scopeInputs = parsedConfig.version !== 1
     ? parsedInputs.filter((input) => input.field_key === "comparison_fact_scopes") : [];
   if (scopeInputs.length > 1) fail("duplicate approved fact scopes");
   const scopes = scopeInputs.length ? factScopeMapSchema.parse(JSON.parse(scopeInputs[0].value)) : {};
+  const deliveryInputs = parsedConfig.version === 3 ? parsedInputs.filter((input) =>
+    input.field_key === "comparison_feature_coverage" || input.field_key === "comparison_addon_inclusions" ||
+    input.field_key === "comparison_limitation_reviews") : [];
+  const readDeliveryMap = <T>(key: string, schema: z.ZodType<T>): T | undefined => {
+    const records = deliveryInputs.filter((input) => input.field_key === key);
+    if (records.length > 1) fail(`duplicate approved ${key}`);
+    if (records.length === 0) return undefined;
+    try { return schema.parse(JSON.parse(records[0].value)); }
+    catch { return fail(`invalid approved ${key}`); }
+  };
+  const coverage = readDeliveryMap("comparison_feature_coverage", deliveryCoverageMapSchema);
+  const inclusions = readDeliveryMap("comparison_addon_inclusions", deliveryBooleanMapSchema);
+  const reviewedLimits = readDeliveryMap("comparison_limitation_reviews", deliveryBooleanMapSchema);
+  const relevantKeys = parsedConfig.criteria.filter((criterion) =>
+    relevantInputs.some((input) => input.field_key === criterion.factKey)).map((criterion) => criterion.factKey);
+  const usedDeliveryInputs = deliveryInputs.filter((input) => relevantKeys.some((key) => {
+    if (input.field_key === "comparison_feature_coverage") return coverage !== undefined && Object.hasOwn(coverage, key);
+    if (input.field_key === "comparison_addon_inclusions") return coverage?.[key] === "add_on" &&
+      inclusions !== undefined && Object.hasOwn(inclusions, key);
+    return coverage?.[key] === "limited" && reviewedLimits !== undefined && Object.hasOwn(reviewedLimits, key);
+  }));
   const orderedRequirements = [...parsedRequirements].sort((left, right) => left.key < right.key ? -1 : left.key > right.key ? 1 : 0);
   const totalWeight = parsedRequirements.reduce((sum, requirement) => sum + requirement.weight, 0);
   let satisfiedWeight = 0;
@@ -237,10 +285,32 @@ export function evaluatePublishedOption(
     const criterion = criteria.get(requirement.key);
     if (!criterion) fail(`missing criterion for ${requirement.key}`);
     const matchingInputs = relevantInputs.filter((input) => input.field_key === criterion.factKey);
-    const scope = parsedConfig.version === 1 ? "match" : evaluateFactScope(
+    let scope = parsedConfig.version === 1 ? "match" : evaluateFactScope(
       Object.prototype.hasOwnProperty.call(scopes, criterion.factKey) ? scopes[criterion.factKey] : undefined,
       parsedRequirements,
     );
+    if (parsedConfig.version === 3 && scope === "match") {
+      const delivery = coverage?.[criterion.factKey];
+      if (delivery === "add_on") {
+        if (inclusions?.[criterion.factKey] !== true) scope = "unknown";
+      } else if (delivery === "partner") {
+        const acceptance = "partnerAcceptance" in criterion ? criterion.partnerAcceptance : undefined;
+        const answer = acceptance && parsedRequirements.find((item) => item.key === acceptance.requirementKey);
+        const value = answer && acceptance ? readScalar(answer.response, acceptance.responsePath) : null;
+        scope = value === true ? "match" : value === false ? "mismatch" : "unknown";
+      } else if (delivery === "limited") {
+        if (reviewedLimits?.[criterion.factKey] !== true ||
+          !scopes[criterion.factKey]?.conditions.some((condition) => condition.kind === "restriction")) scope = "unknown";
+      } else if (delivery === "not_supported") {
+        const meaning = "capabilityMeaning" in criterion ? criterion.capabilityMeaning : undefined;
+        const desired = readScalar(requirement.response, criterion.responsePath);
+        if (meaning !== "presence" || typeof desired !== "boolean" || matchingInputs.length === 0 ||
+          matchingInputs.some((input) => serializedScalar(input.value) !== "false")) scope = "unknown";
+      } else if (delivery !== "native") {
+        // Coverage alone cannot establish whether the requirement asks for absence.
+        scope = "unknown";
+      }
+    }
     if (matchingInputs.length > 0 && scope !== "unknown") {
       coveredWeight += requirement.weight;
       knownRequirements.add(requirement.key);
@@ -271,7 +341,7 @@ export function evaluatePublishedOption(
     confidenceBasisPoints: Math.round((coveredWeight / totalWeight) * 10_000),
     fitReasons,
     limitations,
-    evidenceFreshAt: oldestTimestamp([...relevantInputs, ...scopeInputs], "captured_at"),
-    validUntil: oldestTimestamp([...relevantInputs, ...scopeInputs], "valid_until"),
+    evidenceFreshAt: oldestTimestamp([...relevantInputs, ...scopeInputs, ...usedDeliveryInputs], "captured_at"),
+    validUntil: oldestTimestamp([...relevantInputs, ...scopeInputs, ...usedDeliveryInputs], "valid_until"),
   };
 }

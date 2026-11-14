@@ -99,7 +99,7 @@ describe("option publication contract", () => {
       .toMatchObject({ eligibility: "eligible", deterministicScore: 0, confidenceBasisPoints: 2500 });
     expect(evaluatePublishedOption(optional, { ...config, version: 2 }, []))
       .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
-    expect(publicationConfigSchema.safeParse({ ...config, version: 3 }).success).toBe(false);
+    expect(publicationConfigSchema.safeParse({ ...config, version: 4 }).success).toBe(false);
     expect(publicationConfigSchema.safeParse({ ...config, version: "2" }).success).toBe(false);
   });
 
@@ -219,3 +219,152 @@ describe("option publication contract", () => {
     expect(maskedOptionSchema.safeParse({ optionId: id("36"), ordinal: 1, maskedLabel: "Option 2", ...evaluatePublishedOption(requirements, config, []) }).success).toBe(false);
   });
 });
+
+describe("format 3 reviewed delivery conditions", () => {
+  const saved = (accepted?: boolean) => [{ ...requirements[0], response: { required: true,
+    ...(accepted === undefined ? {} : { acceptPartner: accepted }) } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"],
+    partnerAcceptance: { requirementKey: "payroll", responsePath: ["acceptPartner"] } }] };
+  const scopes = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [] } }), "991");
+  const coverage = (kind: string) => input("comparison_feature_coverage", JSON.stringify({ payroll: kind }), "992");
+  const inclusions = (included: boolean) => input("comparison_addon_inclusions", JSON.stringify({ payroll: included }), "993");
+  const capability = input("payroll", "true", "994");
+
+  test("does not credit a paid addition without reviewed package inclusion", () => {
+    for (const extra of [[], [inclusions(false)]]) {
+      expect(evaluatePublishedOption(saved(), rules, [capability, scopes, coverage("add_on"), ...extra]))
+        .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+    }
+    expect(evaluatePublishedOption(saved(), rules, [capability, scopes, coverage("add_on"), inclusions(true)]))
+      .toMatchObject({ eligibility: "eligible", deterministicScore: 10000, confidenceBasisPoints: 10000 });
+  });
+
+  test("requires the saved customer decision before crediting partner delivery", () => {
+    const inputs = [capability, scopes, coverage("partner")];
+    expect(evaluatePublishedOption(saved(), rules, inputs))
+      .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+    expect(evaluatePublishedOption(saved(false), rules, inputs))
+      .toMatchObject({ eligibility: "ineligible", deterministicScore: 0, confidenceBasisPoints: 10000 });
+    expect(evaluatePublishedOption(saved(true), rules, inputs))
+      .toMatchObject({ eligibility: "eligible", deterministicScore: 10000, confidenceBasisPoints: 10000 });
+  });
+});
+
+describe("format 3 coverage evidence boundaries", () => {
+  const saved = [{ ...requirements[0], response: { required: true, country: "US" } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"] }] };
+  const capability = input("payroll", "true", "971");
+  const scope = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [] } }), "972");
+  const coverage = (value: string) => input("comparison_feature_coverage", value, "973");
+
+  test.each([
+    [undefined, "unknown"], ["unknown", "unknown"], ["limited", "unknown"],
+    ["not_supported", "unknown"], ["partner", "unknown"], ["native", "eligible"],
+  ])("keeps %s coverage conservative", (kind, eligibility) => {
+    const inputs = [capability, scope, ...(kind ? [coverage(JSON.stringify({ payroll: kind }))] : [])];
+    expect(evaluatePublishedOption(saved, rules, inputs).eligibility).toBe(eligibility);
+  });
+
+  test("keeps an established scope mismatch when delivery evidence is absent", () => {
+    const restricted = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [
+      { kind: "country", requirementKey: "payroll", responsePath: ["country"], allowedValues: ["CA"] },
+    ] } }), "974");
+    expect(evaluatePublishedOption(saved, rules, [capability, restricted]))
+      .toMatchObject({ eligibility: "ineligible", deterministicScore: 0, confidenceBasisPoints: 10000 });
+  });
+
+  test("rejects malformed or duplicate delivery evidence", () => {
+    const valid = coverage(JSON.stringify({ payroll: "native" }));
+    expect(() => evaluatePublishedOption(saved, rules, [capability, scope, valid, valid])).toThrow();
+    expect(() => evaluatePublishedOption(saved, rules, [capability, scope, coverage("not-json")])).toThrow();
+    expect(() => evaluatePublishedOption(saved, rules, [capability, scope, coverage(JSON.stringify({ payroll: "invented" }))])).toThrow();
+  });
+
+  test("includes delivery evidence in the freshness boundary", () => {
+    const older = { ...coverage(JSON.stringify({ payroll: "native" })), valid_until: "2026-09-20T00:00:00.000Z" };
+    expect(evaluatePublishedOption(saved, rules, [capability, scope, older]).validUntil).toBe(older.valid_until);
+  });
+});
+
+test("format 3 does not infer a limited feature's restrictions from an unrelated scope condition", () => {
+  const saved = [{ ...requirements[0], response: { required: true, country: "US" } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"] }] };
+  const scope = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [
+    { kind: "country", requirementKey: "payroll", responsePath: ["country"], allowedValues: ["US"] },
+  ] } }), "961");
+  const coverage = input("comparison_feature_coverage", JSON.stringify({ payroll: "limited" }), "962");
+  expect(evaluatePublishedOption(saved, rules, [input("payroll", "true", "963"), scope, coverage]))
+    .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+});
+
+test("format 3 rejects noncanonical or commercial delivery evidence keys", () => {
+  const saved = [{ ...requirements[0], response: { required: true } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"] }] };
+  const scope = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [] } }), "951");
+  for (const key of ["Payroll", " payroll ", "commission_rate"]) {
+    const coverage = input("comparison_feature_coverage", JSON.stringify({ [key]: "native" }), "952");
+    expect(() => evaluatePublishedOption(saved, rules, [input("payroll", "true", "953"), scope, coverage])).toThrow();
+  }
+});
+
+describe("format 3 reviewed limits and absent capabilities", () => {
+  const scopes = (value: unknown) => input("comparison_fact_scopes", JSON.stringify({ payroll: value }), "941");
+  const coverage = (value: string) => input("comparison_feature_coverage", JSON.stringify({ payroll: value }), "942");
+  const restricted = { version: 1, conditions: [{ kind: "restriction", requirementKey: "payroll",
+    responsePath: ["workers"], allowedValues: ["employees"] }] };
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"],
+    capabilityMeaning: "presence" }] };
+  const saved = (required: boolean) => [{ ...requirements[0], response: { required, workers: "employees" } }];
+
+  test("credits a limited feature only when reviewed limits are represented and matched", () => {
+    const inputs = [input("payroll", "true", "943"), scopes(restricted), coverage("limited")];
+    expect(evaluatePublishedOption(saved(true), rules, inputs).eligibility).toBe("unknown");
+    const reviewed = input("comparison_limitation_reviews", JSON.stringify({ payroll: true }), "944");
+    expect(evaluatePublishedOption(saved(true), rules, [...inputs, reviewed]))
+      .toMatchObject({ eligibility: "eligible", deterministicScore: 10000, confidenceBasisPoints: 10000 });
+  });
+
+  test("distinguishes a requested capability from a requested absence when meaning is explicit", () => {
+    const inputs = [input("payroll", "false", "945"), scopes({ version: 1, conditions: [] }), coverage("not_supported")];
+    expect(evaluatePublishedOption(saved(true), rules, inputs))
+      .toMatchObject({ eligibility: "ineligible", deterministicScore: 0, confidenceBasisPoints: 10000 });
+    expect(evaluatePublishedOption(saved(false), rules, inputs))
+      .toMatchObject({ eligibility: "eligible", deterministicScore: 10000, confidenceBasisPoints: 10000 });
+    expect(evaluatePublishedOption(saved(false), rules, [...inputs, input("payroll", "true", "946")]))
+      .toMatchObject({ eligibility: "unknown", deterministicScore: 0, confidenceBasisPoints: 0 });
+  });
+});
+
+test("format 3 ignores unrelated add-on evidence when determining freshness", () => {
+  const saved = [{ ...requirements[0], response: { required: true } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"] }] };
+  const scope = input("comparison_fact_scopes", JSON.stringify({ payroll: { version: 1, conditions: [] } }), "931");
+  const coverage = input("comparison_feature_coverage", JSON.stringify({ payroll: "native" }), "932");
+  const unrelated = { ...input("comparison_addon_inclusions", JSON.stringify({ another_feature: true }), "933"),
+    valid_until: "2026-09-16T00:00:00.000Z" };
+  expect(evaluatePublishedOption(saved, rules, [input("payroll", "true", "934"), scope, coverage, unrelated]).validUntil)
+    .toBe(coverage.valid_until);
+});
+
+test("format 3 rejects noncanonical saved requirement keys", () => {
+  const saved = [{ ...requirements[0], key: "Payroll", response: { required: true } }];
+  const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"] }] };
+  expect(() => evaluatePublishedOption(saved, rules, [])).toThrow();
+});
+
+test("accepts the reviewed format 3 configuration for publication", () => {
+  const next = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"],
+    capabilityMeaning: "presence", partnerAcceptance: { requirementKey: "payroll", responsePath: ["allowPayrollPartner"] } }] };
+  expect(publicationConfigSchema.safeParse(next).success).toBe(true);
+  expect(publicationConfigSchema.safeParse({ ...next, criteria: [{ ...next.criteria[0], factKey: "commission_rate" }] }).success).toBe(false);
+  expect(publicationConfigSchema.safeParse({ ...next, criteria: [{ ...next.criteria[0], extra: true }] }).success).toBe(false);
+});
+
+test.each(["commission_rate", "payout_total", "referral_fee", "payment_status", "commercial_relationship",
+  "sponsorship", "advertising", "paid_placement", "partner_status", " COMMISSION_RATE "])(
+  "rejects commercial partner acceptance source %s", (requirementKey) => {
+    const rules = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll", responsePath: ["required"],
+      partnerAcceptance: { requirementKey, responsePath: [] } }] };
+    expect(publicationConfigSchema.safeParse(rules).success).toBe(false);
+  },
+);

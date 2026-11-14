@@ -40,12 +40,18 @@ export function EvidenceDates({ evidence }: { evidence: MaskedEvidence }) {
   </div>;
 }
 
+export function featureNeedsReview(feature: PublishedFeatureDetail) {
+  return feature.outcome === "match" && feature.coverage === "not_supported";
+}
+
 export function FeatureDetail({ feature }: { feature: PublishedFeatureDetail }) {
+  const needsReview = featureNeedsReview(feature);
   return <div className="space-y-2">
-    <p className={feature.outcome === "match" ? "font-medium text-teal-800 dark:text-teal-200" : "font-medium"}>
-      {outcomeLabels[feature.outcome]}
+    <p className={feature.outcome === "match" && !needsReview ? "font-medium text-teal-800 dark:text-teal-200" : "font-medium"}>
+      {needsReview ? "Review this match" : outcomeLabels[feature.outcome]}
     </p>
     <p className="text-xs text-muted-foreground">{coverageLabels[feature.coverage]}</p>
+    {needsReview && <p className="text-xs text-muted-foreground">Check whether your requirement asks for this feature or its absence.</p>}
   </div>;
 }
 

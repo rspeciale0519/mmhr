@@ -1,0 +1,14 @@
+# Use stable SQL bytes on Windows checkouts.
+drizzle/*.sql text eol=lf
+# This applied migration contains mixed line endings; preserve its recorded hash.
+drizzle/0174_r3_coverage_conditions.sql -text
+# Preserve the original bytes that match these existing local migration records.
+drizzle/0130_r4_portal_delivery_audit_fix.sql -text
+drizzle/0133_r3_masked_publication_details.sql -text
+drizzle/0140_r2b_product_review_revision.sql -text
+drizzle/0142_abandoned_bloodstorm.sql -text
+drizzle/0144_happy_lethal_legion.sql -text
+drizzle/0145_managed_document_uploads.sql -text
+drizzle/0150_managed_document_scan_readers.sql -text
+drizzle/0155_r7_commission_calculation_receipts.sql -text
+drizzle/0156_r4_document_review_and_access.sql -text

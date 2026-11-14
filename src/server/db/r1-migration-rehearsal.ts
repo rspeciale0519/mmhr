@@ -579,6 +579,47 @@ export async function applyAllMigrations(context: RehearsalContext) {
   });
 }
 
+/** Builds the fixed history prefix only in its owned, disposable test database. */
+export async function applyMigrationsBeforeSelectionRetry(context: RehearsalContext) {
+  const owned = activeRehearsalContexts.get(context);
+  if (process.env.NODE_ENV !== "test" || process.env.R1_MIGRATION_REHEARSAL !== "1" || !owned) {
+    throw new Error("An active owned selection-history rehearsal is required");
+  }
+  const address = new URL(owned.databaseUrl);
+  const scratchRoot = path.resolve(owned.scratchRoot);
+  if (owned.label !== "r3-history-review" || !/^mmhr-r1-r3historyr-[0-9a-f]{8}$/.test(owned.projectId)
+    || context.projectId !== owned.projectId || context.databaseUrl !== owned.databaseUrl
+    || context.ports.database !== owned.databasePort || context.db !== owned.db || context.client !== owned.client
+    || context.scratchRoot !== owned.scratchRoot || context.configDigest !== owned.configDigest
+    || !scratchRoot.startsWith(`${path.resolve(tmpdir())}${path.sep}`) || !path.basename(scratchRoot).startsWith("mmhr-r1-")
+    || address.protocol !== "postgresql:" || address.hostname !== "127.0.0.1" || address.port !== String(owned.databasePort)
+    || address.pathname !== "/postgres" || address.username !== "postgres" || address.search || address.hash
+    || [3000, 5432, 57022].includes(owned.databasePort)) {
+    throw new Error("An active owned selection-history rehearsal is required");
+  }
+  const config = await readFile(path.join(scratchRoot, "supabase/config.toml"), "utf8");
+  if (createHash("sha256").update(config).digest("hex") !== owned.configDigest) {
+    throw new Error("Owned selection-history rehearsal configuration changed");
+  }
+  const source = path.join(projectRoot, "drizzle");
+  const journal = JSON.parse(await readFile(path.join(source, "meta/_journal.json"), "utf8")) as {
+    entries: { tag: string }[];
+  };
+  const boundary = journal.entries.findIndex(entry => entry.tag === "0171_r3_selection_retry_reference");
+  if (boundary !== 171 || journal.entries[170]?.tag !== "0170_launch_hide_excluded_functions") {
+    throw new Error("Unexpected selection-history migration sequence");
+  }
+  const entries = journal.entries.slice(0, boundary);
+  if (entries.some(entry => !/^\d{4}_[a-z0-9_-]+$/.test(entry.tag))) throw new Error("Invalid reviewed migration tag");
+  const target = path.join(scratchRoot, "history-review-prefix");
+  await mkdir(path.join(target, "meta"), { recursive: true });
+  for (const entry of entries) {
+    await copyFile(path.join(source, `${entry.tag}.sql`), path.join(target, `${entry.tag}.sql`));
+  }
+  await writeFile(path.join(target, "meta/_journal.json"), JSON.stringify({ ...journal, entries }), "utf8");
+  await migrate(context.db, { migrationsFolder: target });
+}
+
 export async function prepareTaskRequestEvidenceMigration(context: RehearsalContext) {
   async function assertOwnedTarget() {
     const owned = activeRehearsalContexts.get(context);

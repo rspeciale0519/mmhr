@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { estimateEmployeeCountKey, isEstimateEmployeeCount } from "@/lib/intake-estimate";
 
 const scalar = z.union([z.string().min(1).max(2_000), z.number().finite(), z.boolean()]);
 const condition = z.strictObject({
@@ -59,4 +60,21 @@ export function evaluateFactScope(
     if (!rule.allowedValues.some((allowed) => allowed === answer.data)) return "mismatch";
   }
   return unknown ? "unknown" : "match";
+}
+
+/** Uses the saved customer count and reviewed package scope without affecting fit scoring. */
+export function evaluateEstimateScope(input: {
+  estimateEmployeeCount: number;
+  companyContext: unknown;
+  scope: unknown;
+  requirements: readonly { key: string; response: unknown }[];
+}): ScopeResult {
+  if (!isEstimateEmployeeCount(input.estimateEmployeeCount)) throw new Error("Invalid estimate employee count");
+  const context = input.companyContext;
+  const count = context !== null && typeof context === "object" && !Array.isArray(context) &&
+    Object.prototype.hasOwnProperty.call(context, estimateEmployeeCountKey)
+    ? (context as Record<string, unknown>)[estimateEmployeeCountKey] : undefined;
+  const scope = evaluateFactScope(input.scope, input.requirements);
+  if ((isEstimateEmployeeCount(count) && count !== input.estimateEmployeeCount) || scope === "mismatch") return "mismatch";
+  return isEstimateEmployeeCount(count) && scope === "match" ? "match" : "unknown";
 }

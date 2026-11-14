@@ -76,7 +76,7 @@ test.each([
   expect(rpc).not.toHaveBeenCalled();
 });
 
-test.each([1, 2])("rejects commercial criteria in new format %i preparations", async (version) => {
+test.each([1, 2, 3])("rejects commercial criteria in new format %i preparations", async (version) => {
   for (const factKey of ["commercial_relationship", "sponsorship", "advertising", "paid_placement", "partner_status"]) {
     await expect(prepareEvaluationPublication({
       ...prepare,
@@ -87,6 +87,17 @@ test.each([1, 2])("rejects commercial criteria in new format %i preparations", a
   expect(rpc).not.toHaveBeenCalled();
 });
 
+test("passes reviewed delivery settings to the publication command", async () => {
+  const reviewed = { version: 3, criteria: [{ requirementKey: "payroll", factKey: "payroll",
+    responsePath: ["required"], capabilityMeaning: "presence", partnerAcceptance: {
+      requirementKey: "payroll", responsePath: ["allowPayrollPartner"] } }] };
+  await expect(prepareEvaluationPublication({ ...prepare, configuration: reviewed }, { supabase }))
+    .resolves.toMatchObject({ state: "prepared" });
+  expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_prepare_evaluation_publication", {
+    payload: { organizationId, intakeId, expectedRevision: 2, configuration: reviewed },
+    correlation_id: correlationId, idempotency_key: idempotencyKey,
+  });
+});
 test.each([
   { scope: { kind: "organization", organizationId: otherId } }, { correlationId: otherId },
 ])("rejects mismatched primary authority %#", async (patch) => {
@@ -141,7 +152,7 @@ test("reads more than five options using only current customer portal authority"
   await expect(getEvaluationPublication(read)).resolves.toMatchObject({ optionCount: 8 });
   expect(requirePermission).toHaveBeenCalledExactlyOnceWith("portal.customer.access", context.scope, { correlationId });
   expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_get_evaluation_publication", {
-    payload: { organizationId, intakeId, publicationId, afterOrdinal: 0, limit: 25, detailsVersion: 1 }, correlation_id: correlationId,
+    payload: { organizationId, intakeId, publicationId, afterOrdinal: 0, limit: 25, detailsVersion: 2 }, correlation_id: correlationId,
   });
 });
 
@@ -149,6 +160,9 @@ test("requires internal authority to review a prepared version", async () => {
   rpc.mockResolvedValue({ data: page({ state: "prepared" }), error: null });
   await expect(reviewEvaluationPublication(read)).resolves.toMatchObject({ state: "prepared" });
   expect(requirePermission).toHaveBeenCalledTimes(2);
+  expect(rpc).toHaveBeenCalledWith("mmhr_review_evaluation_publication", {
+    payload: { organizationId, intakeId, publicationId, afterOrdinal: 0, limit: 25, detailsVersion: 1 }, correlation_id: correlationId,
+  });
 });
 
 test("keeps page boundaries exact across a partial final page", async () => {

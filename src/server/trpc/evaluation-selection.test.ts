@@ -115,6 +115,6 @@ test("discovers the current comparison through the customer permission without a
   await expect(caller({ transport: { method: "GET", origin: null } }).current(read)).resolves.toEqual(current);
   expect(rpc.mock.calls.filter(([name]) => name === "mmhr_authorize").every(([, args]) => args.permission_key === "portal.customer.access")).toBe(true);
   expect(rpc).toHaveBeenLastCalledWith("mmhr_get_current_evaluation_publication", {
-    payload: { organizationId, intakeId, limit: 25, detailsVersion: 1 }, correlation_id: correlationId,
+    payload: { organizationId, intakeId, limit: 25, detailsVersion: 2 }, correlation_id: correlationId,
   });
 });

@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { estimateEmployeeCountKey, estimateEmployeeCountLabel, isEstimateEmployeeCount } from "@/lib/intake-estimate";
 import { useTRPC } from "@/lib/trpc/client";
 import type { getIntake } from "@/server/commands/intake-read";
 
@@ -45,18 +46,23 @@ const sectionHelp: Record<SectionKey, string> = {
 const selectClass = "min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 const textareaClass = "min-h-28 w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-base leading-6 text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 const formButtonClass = "transition-colors";
+const estimateCountKey = estimateEmployeeCountKey;
 
 function newRow(): MapRow { return { key: "", value: "", kind: "string" }; }
 function valueKind(value: Scalar): MapKind { return typeof value === "boolean" ? "boolean" : typeof value === "number" ? "number" : "string"; }
 function rowFromEntry([key, value]: [string, Scalar]): MapRow { return { key, value: String(value), kind: valueKind(value) }; }
 function mapRows(value: Record<string, Scalar> | undefined): MapRow[] { return value ? Object.entries(value).map(rowFromEntry) : [newRow()]; }
+function companyRows(value: Record<string, Scalar> | undefined): MapRow[] {
+  const rows = value ? Object.entries(value).filter(([key]) => key !== estimateCountKey).map(rowFromEntry) : [];
+  return rows.length ? rows : [newRow()];
+}
 function listValues(value: string[] | undefined): string[] { return value ? [...value] : [""]; }
 function makePresence(data: Intake["data"]): Presence {
   return Object.fromEntries((Object.keys(sectionLabels) as SectionKey[]).map((key) => [key, Object.prototype.hasOwnProperty.call(data, key)])) as Presence;
 }
 function makeState(data: Intake["data"]): FormState {
   return {
-    companyContext: mapRows(data.companyContext), currentSystems: listValues(data.currentSystems), complianceNeeds: listValues(data.complianceNeeds),
+    companyContext: companyRows(data.companyContext), currentSystems: listValues(data.currentSystems), complianceNeeds: listValues(data.complianceNeeds),
     budget: mapRows(data.budget), timeline: mapRows(data.timeline), stakeholders: listValues(data.stakeholders), decisionProcess: mapRows(data.decisionProcess),
   };
 }
@@ -138,8 +144,13 @@ export function CustomerIntakeForm({ organizationId, intake }: { organizationId:
   const router = useRouter();
   const save = useMutation(trpc.intakes.saveDraft.mutationOptions({ retry: false }));
   const initialData = intake?.data ?? {};
+  const initialCount = initialData.companyContext?.[estimateCountKey];
+  const initialCountPresent = Object.prototype.hasOwnProperty.call(initialData.companyContext ?? {}, estimateCountKey);
+  const validInitialCount = isEstimateEmployeeCount(initialCount);
   const [state, setState] = useState<FormState>(() => makeState(initialData));
   const [presence, setPresence] = useState<Presence>(() => makePresence(initialData));
+  const [employeeCount, setEmployeeCount] = useState(validInitialCount ? String(initialCount) : "");
+  const [employeeCountChanged, setEmployeeCountChanged] = useState(false);
   const [locked, setLocked] = useState(false);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
   const [confirmedIntakeId, setConfirmedIntakeId] = useState<string | null>(null);
@@ -174,6 +185,19 @@ export function CustomerIntakeForm({ organizationId, intake }: { organizationId:
     if (submitting.current || save.isPending || locked || saveConfirmed || !editable) return;
     const built = buildData(state, presence);
     if (!built.data) { setValidationError(built.error ?? "Check your answers and try again."); return; }
+    const companyContext = built.data.companyContext as Record<string, Scalar> | undefined;
+    if (companyContext && Object.prototype.hasOwnProperty.call(companyContext, estimateCountKey)) {
+      setValidationError("Use the employee count field for this answer."); return;
+    }
+    let count: Scalar | undefined = !employeeCountChanged && initialCountPresent ? initialCount : undefined;
+    if (employeeCountChanged && employeeCount !== "") {
+      const number = Number(employeeCount);
+      if (!/^\d+$/.test(employeeCount) || !isEstimateEmployeeCount(number)) {
+        setValidationError("Enter a whole number from 1 to 10,000,000 for the employee count."); return;
+      }
+      count = number;
+    }
+    if (count !== undefined) built.data.companyContext = { ...companyContext, [estimateCountKey]: count };
     const localError = validateData(built.data);
     if (localError) { setValidationError(localError); return; }
     const correlationId = requestId(); const idempotencyKey = requestId();
@@ -196,7 +220,12 @@ export function CustomerIntakeForm({ organizationId, intake }: { organizationId:
     <fieldset disabled={save.isPending || locked} className="space-y-10">
       {(["companyContext", "currentSystems", "complianceNeeds", "budget", "timeline", "stakeholders", "decisionProcess"] as SectionKey[]).map((key) => {
         const isList = listKeys.includes(key as ListKey);
-        return <section key={key} aria-labelledby={`${key}-heading`} className="grid gap-5 border-b pb-8 sm:grid-cols-[minmax(10rem,0.32fr)_minmax(0,1fr)] sm:gap-10"><div><h3 id={`${key}-heading`} className="text-base font-semibold">{sectionLabels[key]}</h3><p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">{sectionHelp[key]}</p></div>{isList ? <ListEditor section={key as ListKey} values={state[key as ListKey]} onChange={(index, value) => updateList(key as ListKey, index, value)} onAdd={() => addList(key as ListKey)} onRemove={(index) => removeList(key as ListKey, index)} /> : <MapEditor section={key as MapKey} rows={state[key as MapKey]} onChange={(index, patch) => updateMap(key as MapKey, index, patch)} onAdd={() => addMap(key as MapKey)} onRemove={(index) => removeMap(key as MapKey, index)} />}</section>;
+        return <section key={key} aria-labelledby={`${key}-heading`} className="grid gap-5 border-b pb-8 sm:grid-cols-[minmax(10rem,0.32fr)_minmax(0,1fr)] sm:gap-10"><div><h3 id={`${key}-heading`} className="text-base font-semibold">{sectionLabels[key]}</h3><p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">{sectionHelp[key]}</p></div>{isList ? <ListEditor section={key as ListKey} values={state[key as ListKey]} onChange={(index, value) => updateList(key as ListKey, index, value)} onAdd={() => addList(key as ListKey)} onRemove={(index) => removeList(key as ListKey, index)} /> : <div className="flex flex-col gap-5">
+          {key === "companyContext" && <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">{estimateEmployeeCountLabel}
+            <Input aria-label={estimateEmployeeCountLabel} type="text" inputMode="numeric" value={employeeCount}
+              className="min-h-11 text-foreground" onChange={(event) => { setEmployeeCount(event.target.value); setEmployeeCountChanged(true); setValidationError(null); }} />
+          </label>}
+          <MapEditor section={key as MapKey} rows={state[key as MapKey]} onChange={(index, patch) => updateMap(key as MapKey, index, patch)} onAdd={() => addMap(key as MapKey)} onRemove={(index) => removeMap(key as MapKey, index)} /></div>}</section>;
       })}
     </fieldset>
     {save.isPending && <p role="status" aria-live="polite" className="text-sm text-muted-foreground">Saving your answers…</p>}
