@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+/* Archived code is not built, so its class names must not add CSS. */
+@source not "../../archive";
 
 @custom-variant dark (&:is(.dark *));
 
