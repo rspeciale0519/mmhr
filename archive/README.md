@@ -25,3 +25,19 @@ Do not import from `archive/` in application code.
 - `eslint.config.mjs`: `globalIgnores` lists `archive/**`.
 - `.vercelignore`: lists `/archive`.
 - `vitest.config.ts` and `vitest.integration.config.ts` include only `src/**`, so they skip this folder.
+- `src/app/globals.css`: `@source not "../../archive"` stops Tailwind from reading this folder.
+
+## What is archived
+
+Trim task 8 (the two design galleries):
+
+- `src/gallery/`: the 20 candidate designs, their kit, and the review tools.
+- `src/app/gallery/`: the `/gallery` pages.
+- `src/app/api/gallery/`: the gallery review endpoints.
+- `public/gallery-previews/`: the gallery preview images.
+- `src/designs/<name>/`: the 21 older designs. Pulse stays in `src/designs/pulse/`.
+- `src/designs/registry.ts`, `registry.test.ts`, and `commission-copy.test.ts`: the older gallery list and its tests.
+- `src/designs/pulse/Design.tsx`: the standalone Pulse that only `/designs/pulse` used.
+- `src/app/(marketing)/designs/`: the `/designs` pages.
+
+The archived designs load fonts from `src/assets/fonts/`. Those fonts stay in `src/`, so a restored design finds them.

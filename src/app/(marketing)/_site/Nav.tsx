@@ -9,8 +9,8 @@ export type Theme = "dark" | "light";
 
 /**
  * Site nav. Extracted from the Pulse homepage so every page carries the same
- * chrome — the gallery's standalone Pulse renders this too, which is why the
- * theme is passed in rather than owned here.
+ * chrome. The theme is passed in rather than owned here, because SiteChrome
+ * owns it so it survives navigation.
  */
 export function Nav({
   theme,

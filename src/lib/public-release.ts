@@ -10,7 +10,6 @@ const CHECKED_IN_PUBLIC_RELEASE_ID: string | null = null;
 
 type PublicReleaseEnvironment = {
   NODE_ENV?: string;
-  VERCEL_ENV?: string;
   PUBLIC_RELEASE_APPROVAL_ID?: string;
   PUBLIC_RELEASE_ENABLED?: string;
 };
@@ -35,48 +34,6 @@ export function isPublicReleaseBlocked(
     environment.PUBLIC_RELEASE_ENABLED === "1" &&
     environment.PUBLIC_RELEASE_APPROVAL_ID === checkedInReleaseId
   );
-}
-
-/**
- * The gallery review endpoints and the methods each one accepts. They write
- * only to the separate gallery review database, never to MMHR data.
- */
-const galleryReviewApi: Readonly<Record<string, readonly string[]>> = {
-  "/api/gallery/feedback": ["GET", "HEAD", "POST", "DELETE"],
-  "/api/gallery/recipes": ["POST"],
-};
-
-/**
- * Owner decisions, October 10 and 14, 2026: Vercel preview links may show the
- * design gallery and its review tools while the release gate stays closed for
- * every other path. Gallery pages and their preview images accept only GET and
- * HEAD. The two review endpoints accept only their listed methods. Production
- * deployments never open. Previews stay behind Vercel Authentication, and
- * gallery pages are noindex.
- */
-export function isGalleryPreviewRequest(
-  pathname: string,
-  method: string,
-  environment: PublicReleaseEnvironment = process.env,
-) {
-  if (environment.VERCEL_ENV !== "preview") return false;
-  if (pathname === "/gallery" || pathname.startsWith("/gallery/") || pathname.startsWith("/gallery-previews/")) {
-    return method === "GET" || method === "HEAD";
-  }
-  return Object.hasOwn(galleryReviewApi, pathname) && galleryReviewApi[pathname]!.includes(method);
-}
-
-/**
- * On a Vercel preview, the home page sends visitors to the gallery, so a
- * shared preview link opens the designs instead of the holding page.
- * Production and every other path keep the release gate response.
- */
-export function isGalleryPreviewHomeRequest(
-  pathname: string,
-  method: string,
-  environment: PublicReleaseEnvironment = process.env,
-) {
-  return environment.VERCEL_ENV === "preview" && pathname === "/" && (method === "GET" || method === "HEAD");
 }
 
 /**

@@ -7,9 +7,7 @@ import "@/designs/pulse/styles.css";
 import "../_site/site.css";
 
 /**
- * Chrome for the public site. Deliberately a route group so /designs stays
- * outside it — the gallery has its own review chrome and must not inherit the
- * marketing nav.
+ * Chrome for the public site.
  */
 export default function SiteLayout({
   children,
