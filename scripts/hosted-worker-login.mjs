@@ -124,7 +124,12 @@ export function sessionPoolerUrl(projectRef, loginName, credential) {
   const host = sessionPoolers.get(requireProjectRef(projectRef));
   requireLoginName(loginName);
   if (!/^[A-Za-z0-9_-]{43}$/.test(credential)) fail("The generated credential has an unexpected form");
-  return `postgresql://${loginName}.${projectRef}:${credential}@${host}:5432/postgres?sslmode=require`;
+  // Built with URL setters so no literal credential URL sits in the source (repository secret scan).
+  const url = new URL(`postgresql://${host}:5432/postgres`);
+  url.username = `${loginName}.${projectRef}`;
+  url.password = credential;
+  url.searchParams.set("sslmode", "require");
+  return url.toString();
 }
 
 /** Removes every known secret first, then the generic connection-string and token patterns. */

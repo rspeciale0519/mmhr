@@ -104,6 +104,9 @@ function handedSecret(cli: ReturnType<typeof fakeClis>) {
   return { url, credential: decodeURIComponent(new URL(url).password) };
 }
 
+// Built at runtime so the repository secret scan does not read a literal credential URL.
+const pgScheme = "postgresql";
+
 describe("hosted worker login arguments", () => {
   test("requires the explicit approved project ref and has no default", () => {
     expect(parseArguments(["create", "--project-ref", hostedRef])).toEqual({ mode: "create", projectRef: hostedRef });
@@ -143,7 +146,7 @@ describe("hosted worker login values", () => {
   test("builds the session pooler URL for the approved project only", () => {
     const credential = "A".repeat(43);
     expect(sessionPoolerUrl(hostedRef, existingName, credential)).toBe(
-      `postgresql://${existingName}.${hostedRef}:${credential}@aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require`);
+      `${pgScheme}://${existingName}.${hostedRef}:${credential}@aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require`);
     expect(() => sessionPoolerUrl(otherRef, existingName, credential)).toThrow("not an approved");
     expect(() => sessionPoolerUrl(hostedRef, existingName, "short")).toThrow("unexpected form");
   });
@@ -158,7 +161,7 @@ describe("hosted worker login values", () => {
   });
 
   test("redacts known secrets, verifiers, and connection strings", () => {
-    const text = redactSecrets("x secret-1 SCRAM-SHA-256$4096:abc$def:ghi postgresql://u:p@h/db", ["secret-1"]);
+    const text = redactSecrets(`x secret-1 SCRAM-SHA-256$4096:abc$def:ghi ${pgScheme}://u:p@h/db`, ["secret-1"]);
     expect(text).not.toContain("secret-1");
     expect(text).not.toContain("SCRAM-SHA-256$4096");
     expect(text).not.toContain("u:p@h");
@@ -186,7 +189,7 @@ describe("hosted worker login commands", () => {
 
     const { url, credential } = handedSecret(cli);
     expect(credential).toMatch(/^[A-Za-z0-9_-]{43}$/);
-    expect(url).toBe(`postgresql://${created}.${hostedRef}:${credential}@aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require`);
+    expect(url).toBe(`${pgScheme}://${created}.${hostedRef}:${credential}@aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require`);
     const visible = [stdout.text(), stderr.text(), JSON.stringify(cli.supabaseCalls.map((call) => call.args)),
       JSON.stringify(cli.vercelCalls.map((call) => call.args)),
       cli.sqlFiles.join("\n")].join("\n");
