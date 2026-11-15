@@ -8,6 +8,8 @@ import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { requireTrustedServerActionOrigin } from "@/server/auth/server-action-request";
 import { AccountSetupError, completeAccountSetup } from "@/server/auth/account-setup";
+import { emailConfirmationUrl } from "@/server/auth/email-confirmation";
+import { signedInDestination } from "@/server/auth/workspace-entry";
 import { createLead, LeadCreateError } from "@/server/commands/lead-create";
 import { z } from "zod";
 
@@ -75,19 +77,23 @@ export async function signUp(
     return { error: "We could not complete registration. Please try again later." };
   }
 
+  let destination;
   try {
-    const response = await supabase.auth.signUp({ email, password });
+    const response = await supabase.auth.signUp({
+      email, password, options: { emailRedirectTo: emailConfirmationUrl() },
+    });
     if (!response || response.error || !response.data?.user) return { error: signUpFailureMessage };
     if (!response.data.session) {
       return { success: "Check your email to confirm your account. Then sign in." };
     }
     await completeAccountSetup(supabase);
+    destination = await signedInDestination(supabase);
   } catch (error) {
     return authenticationFailure(error, signUpFailureMessage);
   }
 
   revalidatePath("/", "layout");
-  redirect("/home");
+  redirect(destination);
 }
 
 export async function signIn(
@@ -98,6 +104,7 @@ export async function signIn(
 
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  let destination;
   try {
     const supabase = await createClient({ requireCookieWrites: true });
     const response = await supabase.auth.signInWithPassword({ email, password });
@@ -105,12 +112,13 @@ export async function signIn(
       return { error: signInFailureMessage };
     }
     await completeAccountSetup(supabase);
+    destination = await signedInDestination(supabase);
   } catch (error) {
     return authenticationFailure(error, signInFailureMessage);
   }
 
   revalidatePath("/", "layout");
-  redirect("/home");
+  redirect(destination);
 }
 
 export async function signOut() {

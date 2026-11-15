@@ -1,14 +1,16 @@
 /**
- * Shared marketing content for the design explorations, so the three directions
- * differ in *expression* rather than in what they say.
+ * Shared Pulse homepage content.
  *
- * Section order mirrors FR-MKT-02 and OutSail's proven homepage
- * skeleton): hero + lead capture, vendor wall, six-tool tour, broker-model
- * explainer, stats, case studies, newsletter, footer.
- *
- * All figures below are PLACEHOLDERS for layout evaluation, not claims.
+ * FR-MKT-03: public claims must be approved and traceable, and placeholder
+ * claims must not ship. Every statement here restates the launch path in
+ * docs/LAUNCH.md or the approved customer journey in docs/PRD.md. Do not add
+ * figures, freshness or "verified" claims, or vendor names without owner approval.
  */
 
+/**
+ * Named vendors are not approved for the homepage. Only the blocked /platform
+ * page still reads this list; trim task 6 removes that page.
+ */
 export const VENDORS = [
   "Rippling",
   "Workday",
@@ -28,134 +30,105 @@ export const VENDORS = [
   "SAP SuccessFactors",
 ];
 
+/** The customer launch path, in order (docs/LAUNCH.md, "The launch path"). */
 export const TOOLS = [
   {
-    key: "marketplace",
-    name: "Vendor Marketplace",
-    blurb:
-      "52 HRIS profiles with verified pricing, module-level capability scores, and honest pros and cons.",
-    detail:
-      "Filter by what you actually need. Every profile carries the date its pricing was last verified.",
+    key: "account",
+    name: "Create a free account",
+    blurb: "You get a private workspace for your organization.",
+    detail: "Customers never pay MMHR.",
   },
   {
-    key: "requirements",
-    name: "Requirements Builder",
-    blurb:
-      "Tag ~200 HRIS features as must-have, nice-to-have, or irrelevant.",
-    detail:
-      "Your answers drive every match score you see. Export the list for your RFP.",
+    key: "needs",
+    name: "Describe your needs",
+    blurb: "Enter your HR software needs and submit them.",
+    detail: "Your needs stay in your private workspace.",
   },
   {
-    key: "scorecards",
-    name: "Scorecards",
-    blurb:
-      "Weighted criteria, expert question banks, and live scoring during demos.",
-    detail:
-      "Your whole team scores independently. Aggregate views show where you disagree.",
+    key: "compare",
+    name: "Compare options",
+    blurb: "See all published vendor options in the comparison matrix.",
+    detail: "Vendor names are hidden at this step.",
   },
   {
-    key: "plans",
-    name: "Project Plans",
-    blurb: "Set a go-live date and get a phased timeline with owners and tasks.",
-    detail:
-      "Every step has a guide. Check things off, reassign, re-date as reality shifts.",
+    key: "select",
+    name: "Choose up to five",
+    blurb: "Select a maximum of five options for your RFP.",
+    detail: "MMHR staff then talk with you about your choices.",
   },
   {
-    key: "team",
-    name: "Team Collaboration",
-    blurb: "Invite HR, finance, IT, and the execs who sign. Roles and permissions included.",
-    detail:
-      "Everyone sees the same requirements, the same scores, the same plan.",
+    key: "discuss",
+    name: "Talk with MMHR staff",
+    blurb: "Staff discuss your required capabilities with you.",
+    detail: "Vendor names become visible after this discussion. Staff record the disclosure.",
   },
   {
-    key: "advisor",
-    name: "Advisor",
-    blurb:
-      "A dedicated expert who has run hundreds of these. Chat, meet, get proposals reviewed.",
-    detail:
-      "Send us a quote and we'll tell you what comparable companies actually paid.",
+    key: "respond",
+    name: "Get vendor responses",
+    blurb: "Staff approve your RFP and issue it to the vendors you selected.",
+    detail: "Each vendor reads the RFP in the portal and submits a response.",
   },
 ] as const;
 
+/** Protections from docs/LAUNCH.md, "Five protections that must hold". */
 export const ADVANTAGES = [
   {
-    title: "Market expertise",
-    lead: "Become an HRIS expert overnight.",
-    body: "Pricing, service models, geography, module depth — for every system worth considering, kept current by an automated research pipeline rather than a stale spreadsheet.",
+    title: "Private workspace",
+    tag: "WORKSPACE",
+    lead: "Your data stays with your organization.",
+    body: "One customer cannot see the data of a different customer.",
     points: [
-      "52 HRIS profiles",
-      "Verified pricing estimates",
-      "Module capability scores",
-      "Ranked against your needs",
+      "Free customer account",
+      "Private workspace",
+      "Needs saved in your workspace",
     ],
   },
   {
-    title: "Evaluation tools",
-    lead: "Run the process a consultant would run.",
-    body: "Requirements, weighted scorecards, expert-written vendor questions, and a project plan your whole buying committee works from.",
+    title: "Names hidden",
+    tag: "MATRIX",
+    lead: "Compare options before you see vendor names.",
+    body: "You see all published vendor options in the comparison matrix. Vendor names stay hidden until staff record the disclosure.",
     points: [
-      "Team roles & permissions",
-      "Expert question bank",
-      "Shared scorecards",
-      "Project plans & timelines",
+      "All published options",
+      "Vendor names hidden",
+      "Up to five selections",
     ],
   },
   {
-    title: "Advisor support",
-    lead: "Lean on someone who's done this before.",
-    body: "A dedicated advisor reviews your proposals, benchmarks the price, and tells you plainly when a vendor is wrong for you — including ours.",
+    title: "Private responses",
+    tag: "RFP",
+    lead: "Vendors reply in the portal.",
+    body: "Each vendor reads the RFP in the portal and submits a response. One vendor cannot see the replies of a competitor.",
     points: [
-      "Dedicated HRIS expert",
-      "Proposal review",
-      "Negotiation guidance",
-      "Implementation readiness",
+      "RFP issued by MMHR staff",
+      "Responses in the vendor portal",
+      "Competitor replies kept private",
     ],
   },
 ] as const;
 
+/** Payment roles from docs/PRD.md, "Approved Customer Journey", and FR-MAT-04. */
 export const TRUST = [
   {
-    title: "Provider arrangements are disclosed",
-    body: "Customers do not pay MMHR a fee. Providers pay us under commission or referral arrangements, and recommendations follow your requirements and verified data.",
+    title: "Customers never pay MMHR",
+    body: "Customers do not pay MMHR a fee. Providers pay us under commission or referral arrangements.",
   },
   {
-    title: "No cost, ever, to you",
-    body: "Not a fee, not a subscription, and not passed along in the price the vendor quotes you.",
+    title: "Rates can differ",
+    body: "Providers pay MMHR a commission or referral fee. This does not imply identical rates.",
   },
   {
-    title: "We say when we're the vendor",
-    body: "We resell one system, CBIZ Centrally HR. It's labelled wherever it appears and ranks on the same data as everything else.",
+    title: "Commission does not change a score",
+    body: "Commission amounts stay hidden and do not change a score.",
   },
 ] as const;
 
-/** Placeholder figures — not claims. */
+/** Plain facts of the launch path, not performance figures. */
 export const STATS = [
-  { n: "52", label: "HRIS in the marketplace" },
-  { n: "74", label: "Net promoter score" },
-  { n: "310", label: "Selections guided" },
-  { n: "$0", label: "What buyers pay us" },
-] as const;
-
-/** Placeholder case studies — not claims. */
-export const CASES = [
-  {
-    stat: "40%",
-    statLabel: "off annual payroll fees",
-    title: "How Northwind cut payroll spend without switching payroll providers",
-    body: "A 900-person manufacturer used our benchmarks to renegotiate mid-contract.",
-  },
-  {
-    stat: "75%",
-    statLabel: "less evaluation time",
-    title: "How Vantage shortlisted three vendors in nine days",
-    body: "Requirements in, scores out. The committee agreed on the first pass.",
-  },
-  {
-    stat: "3",
-    statLabel: "best-fit vendors in 48h",
-    title: "How Copperline found the right HRIS before year-end close",
-    body: "250 employees, a hard deadline, and no time for a six-month RFP.",
-  },
+  { n: "Free", label: "Customer accounts" },
+  { n: "Private", label: "Workspace for each customer" },
+  { n: "Hidden", label: "Vendor names until disclosure" },
+  { n: "Five", label: "Most options you can select" },
 ] as const;
 
 export const NAV = ["Platform", "Broker model", "Case studies", "Resources"];

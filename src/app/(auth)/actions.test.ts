@@ -222,6 +222,8 @@ describe("auth Server Actions", () => {
     expect(signUpRequest).toHaveBeenCalledWith({
       email: "member@example.test",
       password: "local-test-password",
+      // The confirmation link lands on the PKCE route, not on the public home page.
+      options: { emailRedirectTo: "http://localhost:3000/auth/confirm" },
     });
   });
 
