@@ -1,6 +1,6 @@
 import { brand } from "@/lib/brand";
 
-const ROBOTS_BLOCK = "noindex, nofollow, noarchive, nosnippet";
+export const PUBLIC_RELEASE_ROBOTS_TAG = "noindex, nofollow, noarchive, nosnippet";
 const ROBOTS_DISALLOW_BODY = "User-agent: *\nDisallow: /\n";
 const ROBOTS_ALLOW_BODY = "User-agent: *\nAllow: /\n";
 
@@ -12,6 +12,8 @@ type PublicReleaseEnvironment = {
   NODE_ENV?: string;
   PUBLIC_RELEASE_APPROVAL_ID?: string;
   PUBLIC_RELEASE_ENABLED?: string;
+  VERCEL_ENV?: string;
+  MMHR_PREVIEW_RELEASE_ENABLED?: string;
 };
 
 export type PublicReleaseRobotsMetadata = {
@@ -21,7 +23,13 @@ export type PublicReleaseRobotsMetadata = {
   nosnippet?: boolean;
 };
 
-export function isPublicReleaseBlocked(
+/**
+ * True while crawlers must not index the site: every production build until
+ * the checked-in release ID and the environment approval match. An opened
+ * preview stays in this state, so robots.txt, the sitemap, page metadata, and
+ * X-Robots-Tag keep their blocked form there.
+ */
+export function isPublicIndexingBlocked(
   environment: PublicReleaseEnvironment = process.env,
   checkedInReleaseId: string | null = CHECKED_IN_PUBLIC_RELEASE_ID,
 ) {
@@ -37,11 +45,31 @@ export function isPublicReleaseBlocked(
 }
 
 /**
- * Keeps generated page metadata aligned with the production release gate.
+ * True while the proxy must answer every request with the holding response.
+ * The only exception to the indexing lock is a Vercel Preview deployment with
+ * MMHR_PREVIEW_RELEASE_ENABLED set to exactly "1". VERCEL_ENV is set by Vercel,
+ * so the flag can never open a Production deployment.
+ */
+export function isPublicReleaseBlocked(
+  environment: PublicReleaseEnvironment = process.env,
+  checkedInReleaseId: string | null = CHECKED_IN_PUBLIC_RELEASE_ID,
+) {
+  if (!isPublicIndexingBlocked(environment, checkedInReleaseId)) {
+    return false;
+  }
+
+  return !(
+    environment.VERCEL_ENV === "preview" &&
+    environment.MMHR_PREVIEW_RELEASE_ENABLED === "1"
+  );
+}
+
+/**
+ * Keeps generated page metadata aligned with the indexing lock.
  * The checked-in release ID remains the source of truth for opening production.
  */
 export function getPublicReleaseRobotsMetadata(
-  blocked = isPublicReleaseBlocked(),
+  blocked = isPublicIndexingBlocked(),
 ): PublicReleaseRobotsMetadata {
   return blocked
     ? { index: false, follow: false, noarchive: true, nosnippet: true }
@@ -52,7 +80,7 @@ const commonHeaders = {
   "Cache-Control": "no-store",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
-  "X-Robots-Tag": ROBOTS_BLOCK,
+  "X-Robots-Tag": PUBLIC_RELEASE_ROBOTS_TAG,
 };
 
 function escapeHtml(value: string) {

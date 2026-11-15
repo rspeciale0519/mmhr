@@ -79,6 +79,16 @@ describe("sitemap route", () => {
     expect(sitemap()).toEqual([]);
   });
 
+  test("stays empty on an opened develop preview", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("PUBLIC_RELEASE_ENABLED", "0");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://develop.mmhr.test");
+
+    expect(sitemap()).toEqual([]);
+  });
+
   test("fails closed when no canonical application origin is configured", () => {
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "");

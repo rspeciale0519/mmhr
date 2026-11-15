@@ -3,7 +3,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import {
   createPublicReleaseBlockResponse,
+  isPublicIndexingBlocked,
   isPublicReleaseBlocked,
+  PUBLIC_RELEASE_ROBOTS_TAG,
 } from "@/lib/public-release";
 import { isPathInLaunch } from "@/lib/launch-surface";
 import { APPLICATION_SECURITY_HEADERS } from "@/lib/security-headers";
@@ -35,7 +37,12 @@ function withApplicationSecurityHeaders<T extends Response>(response: T): T {
  * and admin protection belongs with the canonical IAM and RLS implementation.
  */
 export async function proxy(request: NextRequest) {
-  return withApplicationSecurityHeaders(await handleRequest(request));
+  const response = withApplicationSecurityHeaders(await handleRequest(request));
+  // An opened preview serves pages but must stay out of search indexes.
+  if (isPublicIndexingBlocked() && !response.headers.has("x-robots-tag")) {
+    response.headers.set("X-Robots-Tag", PUBLIC_RELEASE_ROBOTS_TAG);
+  }
+  return response;
 }
 
 async function handleRequest(request: NextRequest): Promise<Response> {

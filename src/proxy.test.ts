@@ -13,6 +13,8 @@ describe("public-release middleware", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("PUBLIC_RELEASE_ENABLED", "0");
     vi.stubEnv("PUBLIC_RELEASE_APPROVAL_ID", "");
+    vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "");
     vi.mocked(createServerClient).mockClear();
   });
 
@@ -118,6 +120,63 @@ describe("public-release middleware", () => {
   test("an environment flag cannot bypass the checked-in release gate", async () => {
     vi.stubEnv("PUBLIC_RELEASE_ENABLED", "1");
     vi.stubEnv("PUBLIC_RELEASE_APPROVAL_ID", "unreviewed-release");
+
+    const response = await proxy(new NextRequest("https://mmhr.test/"));
+
+    expect(response.status).toBe(503);
+    expect(createServerClient).not.toHaveBeenCalled();
+  });
+
+  test("opens pages on a develop preview with the exact flag and keeps no-index", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
+    vi.mocked(createServerClient).mockReturnValue({
+      auth: { getClaims: vi.fn().mockResolvedValue({ data: null, error: null }) },
+    } as never);
+
+    const response = await proxy(new NextRequest("https://mmhr.test/"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("x-robots-tag")).toBe(
+      "noindex, nofollow, noarchive, nosnippet",
+    );
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(createServerClient).toHaveBeenCalledTimes(1);
+  });
+
+  test("keeps launch-hidden pages hidden and no-index on an opened preview", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
+    vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "");
+
+    const response = await proxy(new NextRequest("https://mmhr.test/admin/finance/invoices"));
+
+    expect(response.headers.get("x-middleware-rewrite")).toBe("https://mmhr.test/__not-in-launch");
+    expect(response.headers.get("x-robots-tag")).toContain("noindex");
+    expect(createServerClient).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    ["preview", ""],
+    ["preview", "true"],
+    ["preview", "0"],
+    ["production", "1"],
+    ["", "1"],
+  ])("keeps VERCEL_ENV=%j with flag %j behind the release gate", async (vercelEnvironment, flag) => {
+    vi.stubEnv("VERCEL_ENV", vercelEnvironment);
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", flag);
+
+    const response = await proxy(new NextRequest("https://mmhr.test/"));
+
+    expect(response.status).toBe(503);
+    expect(await response.text()).toContain("This site is not available yet.");
+    expect(createServerClient).not.toHaveBeenCalled();
+  });
+
+  test("keeps the preview flag from opening a deployment with VERCEL_ENV removed", async () => {
+    vi.stubEnv("VERCEL_ENV", undefined);
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
 
     const response = await proxy(new NextRequest("https://mmhr.test/"));
 
@@ -391,6 +450,8 @@ describe("launch surface proxy", () => {
 
       expect(response.headers.get("x-middleware-rewrite")).toBeNull();
       expect(response.headers.get("x-middleware-next")).toBe("1");
+      // Local development keeps its indexable state.
+      expect(response.headers.get("x-robots-tag")).toBeNull();
       expect(createServerClient).toHaveBeenCalledTimes(1);
     },
   );

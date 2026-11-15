@@ -2,14 +2,13 @@ import type { MetadataRoute } from "next";
 
 import {
   getPublicReleaseRobotsMetadata,
-  isPublicReleaseBlocked,
+  isPublicIndexingBlocked,
 } from "@/lib/public-release";
 
 export const dynamic = "force-dynamic";
 
 export default function robots(): MetadataRoute.Robots {
-  const blocked = isPublicReleaseBlocked();
-  const metadata = getPublicReleaseRobotsMetadata(blocked);
+  const metadata = getPublicReleaseRobotsMetadata(isPublicIndexingBlocked());
 
   return {
     rules: {
