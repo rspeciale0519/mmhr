@@ -796,6 +796,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "deterministic SQL-to-journal reconciliation and schema check",
   },
   {
+    key: "scripts/cloud-migration-install.mjs#command",
+    surface: "hosted Supabase migration install",
+    kind: "command",
+    access: "system-only",
+    permission: "operator Supabase CLI login with database write access",
+    scope: "one explicitly named hosted development project",
+    dataPath: "checked-in Drizzle SQL and matching journal rows; redacted CLI errors",
+    denialEvidence: "explicit project ref and CLI target check; empty-or-prefix journal and hash checks; per-file transaction",
+  },
+  {
     key: "src/server/commands/security.ts#command",
     surface: "security command clients",
     kind: "command",
