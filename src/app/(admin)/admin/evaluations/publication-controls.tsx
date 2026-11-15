@@ -30,6 +30,7 @@ export function PublicationControls({organizationId,intakeId,revision,requiremen
     <p className="text-sm leading-6">Match each customer requirement to an approved vendor evidence field. Review the result before publication.</p>
     {!complete && <p role="status" className="text-sm">Load all requirements before preparing the comparison.</p>}
     <WorkflowCommand<Parameters<typeof prepare.mutateAsync>[0]> label="Prepare comparison" success="Comparison prepared. Review the options below."
+      invalidMessage="The server did not accept the field matches. Each approved vendor field must start with a lowercase letter and use only lowercase letters, numbers, and underscores. Commercial, sponsorship, advertising, paid placement, and partner status fields cannot be used."
       disabled={!complete || active.length===0 || active.some(r=>r.choices.length===0)} execute={async(input)=>{const result=await prepare.mutateAsync(input);setPrepared(result);}}
       prepare={(data)=>({organizationId,intakeId,expectedRevision:revision,configuration:{version:2,criteria:active.map((r)=>{
         const choice=r.choices.length===1?r.choices[0]:r.choices.find((_,index)=>String(index)===data.get(`${r.stableKey}:answer`));
@@ -61,6 +62,7 @@ export function PublicationControls({organizationId,intakeId,revision,requiremen
           setReviewedCount(count=>count+review.data.options.length);setAfterOrdinal(review.data.nextOrdinal);
         }}>Reviewed this page · Next options</Button>}
         <WorkflowCommand<Parameters<typeof publish.mutateAsync>[0]> label="Publish masked comparison" success="Masked comparison published for the customer."
+          invalidMessage="The server did not accept the publication fields. Fill in the review reference (up to 500 characters) and the reason (up to 2,000 characters). Spaces alone are not accepted."
           disabled={review.isFetching || review.data.nextOrdinal!==null || reviewedCount+review.data.options.length!==prepared.optionCount || prepared.optionCount===0 || review.data.inputDigest!==prepared.inputDigest}
           execute={(input)=>publish.mutateAsync(input)} prepare={(data)=>({organizationId,publicationId:prepared.publicationId,
             expectedDigest:prepared.inputDigest,approvalReference:String(data.get("reference")),reason:String(data.get("reason")),...commandIds()})}>
