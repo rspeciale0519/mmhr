@@ -261,6 +261,13 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "callback tests; invalid code, identity mismatch and setup failure denied",
   },
   {
+    key: "src/app/auth/confirm/route.ts#GET",
+    surface: "GET /auth/confirm", kind: "route-handler", access: "public",
+    permission: "browser-bound PKCE exchange of the email confirmation code", scope: "caller identity",
+    dataPath: "strict session cookies; caller-only account setup; single-workspace selection after workspace.access; fixed redirect",
+    denialEvidence: "confirm route tests; expired link, failed exchange and setup failure go to sign-in",
+  },
+  {
     key: "src/app/(auth)/agentid-actions.ts#signInWithAgentId",
     surface: "signInWithAgentId", kind: "server-action", access: "public",
     permission: "exact origin; feature enabled", scope: "browser PKCE flow",

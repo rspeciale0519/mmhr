@@ -1,24 +1,16 @@
 import Link from "next/link";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { requirePageIdentity } from "@/server/auth/page-guards";
+import { membershipRowsSchema, type MembershipRows } from "@/server/auth/workspace-memberships";
 import { selectOrganizationAction } from "./actions";
-
-const membershipRowsSchema = z.array(z.strictObject({
-  organization_id: z.uuid(),
-  organization_name: z.string().trim().min(1).max(200).nullable(),
-  organization_type: z.enum(["internal", "customer", "vendor"]),
-  organization_status: z.literal("active"),
-  role_key: z.enum(["organization_admin", "contributor", "viewer"]).nullable(),
-})).refine((rows) => new Set(rows.map((row) => row.organization_id)).size === rows.length);
 
 const organizationLabels = { internal: "MMHR", customer: "Customer", vendor: "Vendor" };
 
 export default async function WorkspacesPage() {
   await requirePageIdentity();
-  let memberships: z.output<typeof membershipRowsSchema> | null = null;
+  let memberships: MembershipRows | null = null;
   try {
     const supabase = await createClient();
     // This fixed RPC applies current workspace access and field permissions in SQL.
@@ -55,9 +47,7 @@ export default async function WorkspacesPage() {
                 <input type="hidden" name="organizationId" value={membership.organization_id} />
                 <div className="min-w-0 space-y-1">
                   <p className="text-xs font-medium text-muted-foreground">{organizationLabels[membership.organization_type]}</p>
-                  <h2 className="break-words text-lg font-semibold">{membership.organization_name ?? "Organization name restricted"}</h2>
-                  <p className="break-all font-mono text-xs text-muted-foreground">{membership.organization_id}</p>
-                </div>
+                  <h2 className="break-words text-lg font-semibold">{membership.organization_name ?? "Organization name restricted"}</h2>                </div>
                 <Button type="submit" className="min-h-11 shrink-0 transition-colors"
                   aria-label={`Open ${membership.organization_name ?? membership.organization_id}`}>
                   Open workspace
