@@ -381,8 +381,8 @@ async function runSession(api, io) {
   const verified = await client.auth.mfa.challengeAndVerify({ factorId, code });
   if (verified.error) fail("The code was not accepted. Wait for the next code and run the step again.");
 
-  const { data } = await client.auth.getSession();
-  const token = data?.session?.access_token;
+  // The verify response carries the new AAL2 access token; getClaims below verifies it.
+  const token = verified.data?.access_token;
   if (typeof token !== "string") fail("No session was returned");
   const claims = await verifiedAal2Claims(client, token, api.issuer);
   const sync = await client.rpc("mmhr_sync_my_identity", { correlation_id: randomUUID() });

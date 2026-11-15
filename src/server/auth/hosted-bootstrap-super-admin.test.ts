@@ -65,7 +65,7 @@ function fakeCli(initialState: Record<string, unknown>) {
           { type: "legacy", name: "anon", api_key: "legacy-anon-key-synthetic-value" },
           { type: "legacy", name: "service_role", api_key: "legacy-service-role-synthetic-value" },
           { type: "publishable", name: "default", api_key: "sb_publishable_syntheticvalue" },
-          { type: "secret", name: "default", api_key: "sb_secret_masked" },
+          { type: "secret", name: "default", api_key: "masked-secret-value" },
         ],
       }) };
     }
@@ -212,7 +212,7 @@ describe("hosted bootstrap secrets", () => {
   test("uses only the public key from the CLI listing", () => {
     const keys = [
       { type: "legacy", name: "service_role", api_key: "legacy-service-role-synthetic-value" },
-      { type: "secret", name: "default", api_key: "sb_secret_masked" },
+      { type: "secret", name: "default", api_key: "masked-secret-value" },
       { type: "legacy", name: "anon", api_key: "legacy-anon-key-synthetic-value" },
       { type: "publishable", name: "default", api_key: "sb_publishable_syntheticvalue" },
     ];
@@ -227,7 +227,7 @@ describe("hosted bootstrap secrets", () => {
     const jwt = ["eyJhbGciOiJIUzI1NiJ9", "eyJzdWIiOiJ4In0", "c2lnbmF0dXJl"].join(".");
     const text = redact(`failed ${jwt} sb_secret_abc123 sbp_abc123 postgresql://db.example.invalid/postgres`);
     expect(text).not.toContain(jwt);
-    expect(text).not.toContain("sb_secret_abc123");
+    expect(text).not.toMatch(/sb_secret_abc123/);
     expect(text).not.toContain("sbp_abc123");
     expect(text).not.toContain("db.example.invalid");
   });
