@@ -793,6 +793,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "local-only endpoint, input, claim, and single-use checks",
   },
   {
+    key: "scripts/hosted-bootstrap-super-admin.mjs#command",
+    surface: "hosted Super Admin bootstrap",
+    kind: "command",
+    access: "system-only",
+    permission: "owner Supabase CLI login, approved project ref, and two current AAL2 identities",
+    scope: "named hosted development project only",
+    dataPath: "bootstrap state, caller identity sync, and redacted completion status",
+    denialEvidence: "project-ref allowlist, consumed-state guard, stdin-only tokens, claim and SQL value checks",
+  },
+  {
     key: "scripts/reconcile-drizzle-journal.mjs#command",
     surface: "Drizzle journal reconciliation",
     kind: "command",
