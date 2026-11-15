@@ -15,6 +15,7 @@ export default async function AdminHome() {
       <h1 className="text-2xl font-semibold">Administration</h1>
       <p className="text-sm">You have access to internal administration.</p>
       {auditHref && <Link href={auditHref} className="inline-flex min-h-11 items-center underline">Search audit events</Link>}
+      <Link href="/admin/submissions" className="inline-flex min-h-11 items-center underline">Open submitted customer intakes</Link>
       <Link href="/workspaces" className="inline-flex min-h-11 items-center underline">Select a customer workspace</Link>
       <Link href="/admin/evaluations" className="inline-flex min-h-11 items-center underline">Review customer evaluations and RFPs</Link>
       <Link href="/admin/vendor-evidence" className="inline-flex min-h-11 items-center underline">Review vendor evidence</Link>
