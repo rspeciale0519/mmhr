@@ -106,12 +106,18 @@ describe("staff submission queue and open case", () => {
       await expect(readIntake(sql, fixture.pair[0], organizationId, intakeId)).rejects.toMatchObject({ code: "42501" });
       const result = await openCase(sql, fixture.pair[0], intakeId);
       expect(result).toMatchObject({ intakeId, organizationId, outcomeCode: "opened" });
-      const [audit] = await sql<{ actor: string; org: string; reason: string; occurred: Date }[]>`
-        SELECT actor_identity_id AS actor, organization_id AS org, reason, occurred_at AS occurred
-        FROM public.audit_events WHERE action = 'staff.case.open' AND entity_id = ${String(result.grantId)}`;
-      expect(audit).toMatchObject({ actor: fixture.pair[0].identityId, org: organizationId });
+      // The fixture client returns timestamptz as text, so compare times in SQL and parse the text.
+      const [audit] = await sql<{ actor: string; org: string; reason: string; occurred: string;
+        matchesOpen: boolean; recent: boolean }[]>`
+        SELECT e.actor_identity_id AS actor, e.organization_id AS org, e.reason, e.occurred_at::text AS occurred,
+          e.occurred_at = g.opened_at AS "matchesOpen",
+          e.occurred_at <= clock_timestamp() AND e.occurred_at > clock_timestamp() - interval '10 minutes' AS recent
+        FROM public.audit_events e
+        JOIN mmhr_private.staff_case_access_grants g ON g.id::text = e.entity_id
+        WHERE e.action = 'staff.case.open' AND e.entity_id = ${String(result.grantId)}`;
+      expect(audit).toMatchObject({ actor: fixture.pair[0].identityId, org: organizationId, matchesOpen: true, recent: true });
       expect(audit!.reason.length).toBeGreaterThan(0);
-      expect(audit!.occurred).toBeInstanceOf(Date);
+      expect(Number.isFinite(Date.parse(audit!.occurred.replace(" ", "T").replace(/([+-]\d{2})$/, "$1:00")))).toBe(true);
       await expect(readIntake(sql, fixture.pair[0], organizationId, intakeId)).resolves.toHaveLength(1);
       const page = await readQueue(sql, fixture.pair[0]);
       expect(page.items.find((item) => item.intakeId === intakeId)).toMatchObject({ callerHasAccess: true, staffWithAccess: 1 });
