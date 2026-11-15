@@ -126,6 +126,32 @@ export async function openDocumentRehearsalWorker(context: RehearsalContext, log
   }
 }
 
+export type RehearsalClient = postgres.Sql;
+export type RehearsalTransaction = postgres.TransactionSql;
+
+/** Opens one disposable hosted worker login on the owned hosted-worker rehearsal only. */
+export function openHostedWorkerRehearsalLogin(context: RehearsalContext, loginName: string, credential: string): RehearsalClient {
+  const owned = activeRehearsalContexts.get(context);
+  if (process.env.NODE_ENV !== "test" || process.env.R1_MIGRATION_REHEARSAL !== "1" || !owned) {
+    throw new Error("An active owned hosted worker rehearsal is required");
+  }
+  const address = new URL(owned.databaseUrl);
+  if (owned.label !== "hosted-worker-login" || !/^mmhr-r1-hostedwork-[0-9a-f]{8}$/.test(owned.projectId)
+    || context.projectId !== owned.projectId || context.databaseUrl !== owned.databaseUrl
+    || context.ports.database !== owned.databasePort || address.protocol !== "postgresql:"
+    || address.hostname !== "127.0.0.1" || address.port !== String(owned.databasePort)
+    || address.pathname !== "/postgres" || address.username !== "postgres" || address.search || address.hash
+    || [3000, 5432, 57022].includes(owned.databasePort)) {
+    throw new Error("An active owned hosted worker rehearsal is required");
+  }
+  if (!/^mmhr_hosted_worker_[0-9a-f]{32}$/.test(loginName) || !/^[A-Za-z0-9_-]{43}$/.test(credential)) {
+    throw new Error("Invalid disposable hosted worker credentials");
+  }
+  address.username = loginName;
+  address.password = credential;
+  return postgres(address.toString(), { max: 1, max_lifetime: 60, connect_timeout: 10 });
+}
+
 export function openDocumentRehearsalObserver(context: RehearsalContext) {
   const owned = assertDocumentRehearsal(context, "observer");
   const client = postgres(owned.databaseUrl, { max: 1 });

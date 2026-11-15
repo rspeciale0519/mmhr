@@ -139,3 +139,40 @@ dashboard under **Authentication > URL Configuration** and **Authentication > Em
 
 Do not run `supabase config push` with the repository `supabase/config.toml`. That file holds local values
 (for example `site_url = "http://127.0.0.1:3100"`), and the command writes every value that the file declares.
+
+## Hosted runtime database login
+
+The app server must connect as a restricted worker login, never as `postgres`.
+A Vercel preview has no process that renews the short local worker login.
+It uses one `mmhr_hosted_worker_<hex>` login instead. That login has the same rights as the local worker login.
+It expires after 90 days. At most two exist at one time, so you can rotate without downtime.
+
+The command makes the password on your computer and sends only its SCRAM verifier to the database.
+It gives the connection string to the Vercel CLI on standard input. It never prints the password or the connection string.
+If the Vercel step fails, the command removes the new login again.
+
+Do these steps from the repository root, after Part 1 steps 2 and 3:
+
+1. Type `npx vercel login`. Finish the login in the browser.
+2. Type `npx vercel link`. Select the MMHR project.
+   Success: the folder `.vercel` exists in the repository root.
+3. Type `node scripts/hosted-worker-login.mjs create --project-ref mslbuffwyuckfmgoyivj`.
+   Success: the terminal shows `Created hosted worker login mmhr_hosted_worker_...` and the expiry time.
+   `DATABASE_URL` for **Preview** (branch `develop`) now uses the session pooler and the new login.
+4. Redeploy the `develop` preview. Open the preview and make sure that the pages that read data work.
+5. Type `node scripts/hosted-worker-login.mjs list --project-ref mslbuffwyuckfmgoyivj` to see the logins and their expiry.
+
+Rotate the login before it expires, at least every 80 days:
+
+6. Do step 3 again. The command replaces `DATABASE_URL` and shows the name of the old login.
+7. Do step 4 again.
+8. Remove the old login: `node scripts/hosted-worker-login.mjs remove <old login name> --project-ref mslbuffwyuckfmgoyivj`.
+   A deployment that still uses the old login can no longer connect after this step.
+
+| Message | What to do |
+|---|---|
+| `not linked to Vercel` | Do steps 1 and 2 again. |
+| `Two hosted worker logins already exist` | Do step 8 for the older login. Then do step 3 again. |
+| `The Vercel CLI refused DATABASE_URL` | The new login was removed. Do steps 1 and 2 again, then step 3. |
+| `could not be removed` | Run the `remove` command that the message shows. |
+| `Shared worker role is missing or unsafe` | Stop. Ask an engineer to check the `mmhr_worker` role. |
