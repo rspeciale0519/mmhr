@@ -24,6 +24,10 @@ test("shows the authorized audit link and preserves existing workflow navigation
   expect(screen.getByRole("link", { name: "Search audit events" })).toHaveAttribute("href", "/admin/audit?scope=workspace");
   expect(screen.getByRole("link", { name: "Review customer evaluations and RFPs" })).toHaveAttribute("href", "/admin/evaluations");
 });
+test("links to the submitted customer intake queue", async () => {
+  render(await AdminHome());
+  expect(screen.getByRole("link", { name: "Open submitted customer intakes" })).toHaveAttribute("href", "/admin/submissions");
+});
 
 afterEach(cleanup);
 
