@@ -1,16 +1,13 @@
 import { spawn } from "node:child_process";
-import {
-  createHash,
-  createHmac,
-  pbkdf2Sync,
-  randomBytes,
-} from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import dotenv from "dotenv";
 import postgres from "postgres";
+
+import { createScramVerifier } from "./scram-verifier.mjs";
 
 const separator = process.argv.indexOf("--");
 const command = separator >= 0 ? process.argv.slice(separator + 1) : [];
@@ -49,6 +46,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r1-recovery-mfa.integration.test.ts",
     "src/server/db/r1-recovery-mfa-api.integration.test.ts",
     "src/server/db/r1-identity-worker.integration.test.ts",
+    "src/server/db/hosted-worker-login.integration.test.ts",
     "src/server/db/r2b-crm-foundation.integration.test.ts",
     "src/server/db/r2b-crm-commands.integration.test.ts",
     "src/server/db/r2b-crm-search.integration.test.ts",
@@ -184,20 +182,6 @@ function safeError(error) {
   return message
     .replace(/postgres(?:ql)?:\/\/[^\s]+/gi, "[database-url]")
     .replace(/SCRAM-SHA-256\$[^\s'";]+/gi, "[scram-verifier]");
-}
-
-function createScramVerifier(password) {
-  const iterations = 4096;
-  const salt = randomBytes(16);
-  const saltedPassword = pbkdf2Sync(password, salt, iterations, 32, "sha256");
-  const clientKey = createHmac("sha256", saltedPassword)
-    .update("Client Key")
-    .digest();
-  const storedKey = createHash("sha256").update(clientKey).digest("base64");
-  const serverKey = createHmac("sha256", saltedPassword)
-    .update("Server Key")
-    .digest("base64");
-  return `SCRAM-SHA-256$${iterations}:${salt.toString("base64")}$${storedKey}:${serverKey}`;
 }
 
 function rehearsalEnvironment() {
