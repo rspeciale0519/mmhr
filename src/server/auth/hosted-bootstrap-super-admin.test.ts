@@ -9,11 +9,14 @@ import {
   checkBootstrapState,
   checkTokenOrder,
   completeSql,
+  createRunner,
   main,
   parseArguments,
   parseBootstrapInput,
   parseVerifiedClaims,
   prepareSql,
+  queryRows,
+  readBootstrapState,
   redact,
   selectPublicApiKey,
   sqlReference,
@@ -230,6 +233,64 @@ describe("hosted bootstrap secrets", () => {
     expect(text).not.toMatch(/sb_secret_abc123/);
     expect(text).not.toContain("sbp_abc123");
     expect(text).not.toContain("db.example.invalid");
+  });
+});
+
+describe("hosted bootstrap CLI output shapes", () => {
+  /** A fake CLI that prints one fixed stdout for every query. */
+  function runnerWithStdout(stdout: string, status = 0) {
+    const spawn = () => ({ status, stdout, stderr: `Target: project mmhr (${hostedRef}) · production` });
+    return createRunner(hostedRef, { spawn: spawn as never, env: { NODE_ENV: "test" } });
+  }
+
+  const stateRow = { state: { rows: 0, state: null, activePlatformRoles: 0 } };
+  const bootstrapStateSqlProbe = "SELECT 1;\n";
+
+  test.each([
+    ["a bare array in a human terminal", JSON.stringify([stateRow])],
+    ["a boundary object in an agent environment", JSON.stringify({ boundary: "ab12", rows: [stateRow], warning: "untrusted" })],
+  ])("reads rows from %s", (_name, stdout) => {
+    const runner = runnerWithStdout(stdout);
+    try {
+      expect(runner.query(bootstrapStateSqlProbe, { readOnly: true })).toEqual([stateRow]);
+      expect(readBootstrapState(runner)).toEqual(stateRow.state);
+    } finally {
+      runner.close();
+    }
+  });
+
+  test.each([
+    ["an object without rows", "{}"],
+    ["a string", JSON.stringify("rows")],
+    ["null", "null"],
+    ["a non-array rows field", JSON.stringify({ rows: { state: {} } })],
+  ])("fails closed on %s", (_name, stdout) => {
+    const runner = runnerWithStdout(stdout);
+    try {
+      expect(() => runner.query(bootstrapStateSqlProbe, { readOnly: true })).toThrow("no query rows");
+    } finally {
+      runner.close();
+    }
+  });
+
+  test("keeps the CLI error checks for the object shape", () => {
+    for (const [stdout, status] of [
+      [JSON.stringify({ _tag: "Error", message: "denied" }), 0],
+      [JSON.stringify({ error: { message: "permission denied" } }), 0],
+      [JSON.stringify([stateRow]), 1],
+    ] as const) {
+      const runner = runnerWithStdout(stdout, status);
+      try {
+        expect(() => runner.query(bootstrapStateSqlProbe, { readOnly: true })).toThrow("refused");
+      } finally {
+        runner.close();
+      }
+    }
+  });
+
+  test("returns an empty row array unchanged", () => {
+    expect(queryRows([])).toEqual([]);
+    expect(queryRows({ boundary: "ab12", rows: [] })).toEqual([]);
   });
 });
 

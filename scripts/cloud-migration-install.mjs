@@ -14,7 +14,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsRoot = path.join(projectRoot, "drizzle");
@@ -75,10 +75,19 @@ function redact(text) {
     .replace(/<!DOCTYPE[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*/i, "HTML error page: $1");
 }
 
-function createRunner(projectRef) {
+// `supabase db query --output-format json` prints a bare row array in a terminal, but
+// `{ boundary, rows, warning }` when it detects an AI agent environment. Any other shape fails closed.
+export function queryRows(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === "object" && Array.isArray(parsed.rows)) return parsed.rows;
+  // Thrown, not returned: after a write, an unreadable result does not show whether it committed.
+  fail("unexpected CLI output: no query rows were found; the result is unknown. Re-run to verify the journal.");
+}
+
+export function createRunner(projectRef, { spawn = spawnSync, env = process.env } = {}) {
   // An empty work directory keeps the CLI away from the repository supabase/config.toml.
   const workdir = mkdtempSync(path.join(tmpdir(), "mmhr-cloud-install-"));
-  const environment = { ...process.env };
+  const environment = { ...env };
   // A stale exported token overrides the operator's CLI login on the owner machine.
   delete environment.SUPABASE_ACCESS_TOKEN;
   delete environment.SUPABASE_YES;
@@ -90,7 +99,7 @@ function createRunner(projectRef) {
     writeFileSync(file, sql, "utf8");
     const args = ["db", "query", `--remote=${projectRef}`, "--workdir", workdir, "--output-format", "json", "-f", file];
     args.push(readOnly ? "--read-only" : "--yes");
-    const result = spawnSync("supabase", args, {
+    const result = spawn("supabase", args, {
       cwd: workdir,
       env: environment,
       encoding: "utf8",
@@ -111,11 +120,11 @@ function createRunner(projectRef) {
     } catch {
       return { ok: false, message: `unreadable CLI output (exit ${result.status}): ${redact(`${result.stdout}\n${stderr}`.trim())}` };
     }
-    if (result.status !== 0 || parsed._tag === "Error" || parsed.error) {
-      const message = parsed.error?.message ?? JSON.stringify(parsed);
+    if (result.status !== 0 || parsed?._tag === "Error" || parsed?.error) {
+      const message = parsed?.error?.message ?? JSON.stringify(parsed);
       return { ok: false, message: redact(message) };
     }
-    return { ok: true, rows: parsed.rows ?? [] };
+    return { ok: true, rows: queryRows(parsed) };
   }
 
   return {
@@ -274,10 +283,13 @@ function main() {
   }
 }
 
-try {
-  main();
-} catch (error) {
-  const message = error instanceof InstallError ? error.message : redact(error?.stack ?? error);
-  console.error(`cloud-migration-install: ${message}`);
-  process.exitCode = 1;
+// Run only as a command, so tests can import the runner without starting an install.
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  try {
+    main();
+  } catch (error) {
+    const message = error instanceof InstallError ? error.message : redact(error?.stack ?? error);
+    console.error(`cloud-migration-install: ${message}`);
+    process.exitCode = 1;
+  }
 }

@@ -205,6 +205,14 @@ function cliEnvironment(env) {
   return environment;
 }
 
+// `supabase db query --output-format json` prints a bare row array in a terminal, but
+// `{ boundary, rows, warning }` when it detects an AI agent environment. Any other shape fails closed.
+export function queryRows(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === "object" && Array.isArray(parsed.rows)) return parsed.rows;
+  fail("Unexpected CLI output: no query rows were found");
+}
+
 function runCli(spawn, args, env, workdir) {
   const result = spawn("supabase", [...args, "--workdir", workdir, "--output-format", "json"], {
     cwd: workdir, env: cliEnvironment(env), encoding: "utf8", maxBuffer: 16 * 1024 * 1024, windowsHide: true,
@@ -239,10 +247,10 @@ export function createRunner(projectRef, { spawn = spawnSync, env = process.env 
       } catch {
         fail(`Unreadable CLI output (exit ${result.status}): ${redact(stderr.trim())}`);
       }
-      if (result.status !== 0 || parsed._tag === "Error" || parsed.error) {
-        fail(`The query was refused: ${redact(parsed.error?.message ?? JSON.stringify(parsed))}`);
+      if (result.status !== 0 || parsed?._tag === "Error" || parsed?.error) {
+        fail(`The query was refused: ${redact(parsed?.error?.message ?? JSON.stringify(parsed))}`);
       }
-      return parsed.rows ?? [];
+      return queryRows(parsed);
     },
     close() {
       rmSync(workdir, { recursive: true, force: true });
