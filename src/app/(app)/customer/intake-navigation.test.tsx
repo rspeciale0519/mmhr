@@ -1,8 +1,28 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, expect, test } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
 import { CustomerFrame, IntakeDetails } from "./intake-views";
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
+
+const menuLinks = () => {
+  render(<CustomerFrame><p>Document</p></CustomerFrame>);
+  return within(screen.getByRole("navigation", { name: "Customer workspace" })).getAllByRole("link")
+    .map((link) => [link.textContent, link.getAttribute("href")]);
+};
+
+test("hides demo, proposal, contract, and document links in Candidate A", () => {
+  vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "A");
+  expect(menuLinks()).toEqual([["Home", "/home"], ["Your intakes", "/customer"], ["Change workspace", "/workspaces"]]);
+});
+
+test("shows the Candidate B areas and never the archived documents link", () => {
+  vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "B");
+  expect(menuLinks()).toEqual([
+    ["Home", "/home"], ["Your intakes", "/customer"], ["Proposals and pricing", "/customer/proposals"],
+    ["Vendor selection and contracts", "/customer/contracts"], ["Change workspace", "/workspaces"],
+    ["Demo coordination", "/customer/demos"],
+  ]);
+});
 test("keeps staff intake details separate from customer-only navigation", () => {
   render(<IntakeDetails staffView intake={{organizationId:"org",intakeId:"intake",status:"submitted",revision:2,
     createdAt:"2026-09-13T10:00:00Z",updatedAt:"2026-09-13T10:00:00Z",submittedAt:"2026-09-13T10:00:00Z",data:{}}} />);
