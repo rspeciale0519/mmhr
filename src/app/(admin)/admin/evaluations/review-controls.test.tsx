@@ -1,18 +1,20 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { RfpControls } from "./review-controls";
+import { RfpControls, approvalReferenceInvalidMessage } from "./review-controls";
 import type { RfpWorkflow } from "@/server/commands/rfp-portal";
+
+const state = vi.hoisted(() => ({ mutate: vi.fn() }));
 
 vi.mock("./rfp-notification-controls", () => ({ RfpNotificationControls: ({ organizationId, rfpId, version }: {
   organizationId: string; rfpId: string; version: number;
 }) => <div aria-label="Vendor email notifications" data-organization={organizationId} data-rfp={rfpId} data-version={version}/> }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
-vi.mock("@tanstack/react-query", () => ({ useMutation: () => ({ mutateAsync: vi.fn() }) }));
+vi.mock("@tanstack/react-query", () => ({ useMutation: () => ({ mutateAsync: state.mutate }) }));
 vi.mock("@/lib/trpc/client", () => ({ useTRPC: () => ({ rfps: {
   create: { mutationOptions: vi.fn() }, approve: { mutationOptions: vi.fn() }, deliver: { mutationOptions: vi.fn() },
 } }) }));
-afterEach(cleanup);
+afterEach(() => { cleanup(); state.mutate.mockReset(); });
 const author = "10000000-0000-4000-8000-000000000001";
 function workflow(requiresSeparateApproval: boolean): RfpWorkflow {
   return { organizationId: author, intakeId: author, correlationId: author, requiresSeparateApproval,
@@ -52,5 +54,42 @@ describe("RFP separate approval policy", () => {
     const value = workflow(false); value.rfps[0].status = "approved";
     render(<RfpControls workflow={value} revision={1} identityId={author}/>);
     expect(screen.queryByLabelText("Vendor email notifications")).not.toBeInTheDocument();
+  });
+});
+
+describe("RFP approval record reference", () => {
+  function approvalForm(reference: string) {
+    render(<RfpControls workflow={workflow(false)} revision={1} identityId={author}/>);
+    const input = screen.getByLabelText("Approval record reference") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: reference } });
+    fireEvent.click(screen.getByLabelText("I reviewed the full questionnaire and approve this version."));
+    return input;
+  }
+  test("states the accepted characters before submit", () => {
+    const input = approvalForm("");
+    expect(input).toHaveAccessibleDescription(/letters, numbers, and \. _ : \/ - only\. No spaces\./);
+    expect(input).toHaveAttribute("title", expect.stringContaining("No spaces"));
+  });
+  test("uses a pattern the browser compiles, so spaces fail browser validation", () => {
+    // jsdom compiles `pattern` with the `v` flag, as browsers do; an invalid pattern never mismatches.
+    const input = approvalForm("Trim task 3 local test approval");
+    expect(input.validity.patternMismatch).toBe(true);
+    fireEvent.change(input, { target: { value: "ticket-1042/review:2.a_b" } });
+    expect(input.validity.patternMismatch).toBe(false);
+  });
+  test("stops a reference with spaces before the request when browser validation is skipped", async () => {
+    const input = approvalForm("Trim task 3 local test approval");
+    fireEvent.submit(input.form!);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Check the approval record reference. Use 1 to 256 characters");
+    expect(state.mutate).not.toHaveBeenCalled();
+  });
+  test("shows the field rule, not a connection message, when the server rejects the reference", async () => {
+    state.mutate.mockRejectedValueOnce(Object.assign(new Error("Bad request"), { data: { code: "BAD_REQUEST", httpStatus: 400 } }));
+    const input = approvalForm("ticket-1042");
+    fireEvent.submit(input.form!);
+    expect(await screen.findByRole("alert")).toHaveTextContent(approvalReferenceInvalidMessage);
+    expect(screen.queryByText(/could not confirm/)).not.toBeInTheDocument();
+    expect(state.mutate).toHaveBeenCalledWith(expect.objectContaining({ approvalReference: "approval:ticket-1042" }));
+    expect(input).toBeEnabled();
   });
 });
