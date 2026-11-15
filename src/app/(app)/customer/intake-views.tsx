@@ -1,11 +1,20 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatMapAnswer, mapQuestionLabel, orderedMapEntries, sectionLabels, type ListSectionKey, type MapSectionKey } from "@/lib/intake-questions";
+import { launchVisibleLinks } from "@/lib/launch-surface";
 import type { getIntake, getIntakesPage } from "@/server/commands/intake-read";
 
 type Intake = Awaited<ReturnType<typeof getIntake>>;
 type IntakePage = Awaited<ReturnType<typeof getIntakesPage>>;
 const linkStyle = "inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold underline underline-offset-4 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
+const customerLinks = [
+  { href: "/home", label: "Home" },
+  { href: "/customer", label: "Your intakes" },
+  { href: "/customer/proposals", label: "Proposals and pricing" },
+  { href: "/customer/contracts", label: "Vendor selection and contracts" },
+  { href: "/workspaces", label: "Change workspace" },
+  { href: "/customer/demos", label: "Demo coordination" },
+] as const;
 const statusLabels: Record<Intake["status"], string> = {
   draft: "Draft", in_progress: "In progress", submitted: "Submitted",
   under_review: "Under review", completed: "Completed", archived: "Archived",
@@ -25,13 +34,8 @@ export function CustomerFrame({ children, title = "Your software needs", descrip
     <main className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
       <header className="mb-10 border-b pb-6">
         <nav aria-label="Customer workspace" className="mb-8 flex flex-wrap gap-2">
-          <Link href="/home" prefetch={false} className={linkStyle}>Home</Link>
-          <Link href="/customer" prefetch={false} className={linkStyle}>Your intakes</Link>
-          <Link href="/customer/proposals" prefetch={false} className={linkStyle}>Proposals and pricing</Link>
-          <Link href="/customer/contracts" prefetch={false} className={linkStyle}>Vendor selection and contracts</Link>
-          <Link href="/workspaces" prefetch={false} className={linkStyle}>Change workspace</Link>
-          <Link href="/customer/demos" prefetch={false} className={linkStyle}>Demo coordination</Link>
-          <Link href="/documents" prefetch={false} className={linkStyle}>Workspace documents</Link>
+          {launchVisibleLinks(customerLinks).map(({ href, label }) =>
+            <Link key={href} href={href} prefetch={false} className={linkStyle}>{label}</Link>)}
         </nav>
         <p className="mb-2 text-sm font-medium text-muted-foreground">Customer workspace</p>
         <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
