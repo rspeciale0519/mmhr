@@ -57,9 +57,8 @@ function renderForm(requirement?: Requirement, href = returnHref) {
 test("creates a requirement with strict customer fields and generated identifiers", async () => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "SSO support" } });
-  fireEvent.change(screen.getByLabelText("Answer type"), { target: { value: "text" } });
-  fireEvent.change(screen.getByLabelText("Text answer"), { target: { value: "SAML" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "SSO support" } });
+  fireEvent.change(screen.getByLabelText("Details (optional)"), { target: { value: "SAML" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
   expect(mutate.mock.calls[0]![0]).toEqual({
@@ -74,7 +73,7 @@ test("preserves existing complex answers and metadata by default", async () => {
   const response = { source: "legacy", nested: ["Keep this", { count: 2 }] };
   renderForm(existingRequirement({ response, label: "Legacy label" }));
   expect(screen.getByText("Keep this")).toBeInTheDocument();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Updated label" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Updated label" } });
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
   expect(mutate.mock.calls[0]![0]).toMatchObject({
@@ -86,7 +85,7 @@ test("preserves existing complex answers and metadata by default", async () => {
 test("saves standard payroll answers with reusable scope keys and no assumed answers", async () => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Type of requirement"), { target: { value: "payroll" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
   expect(mutate.mock.calls[0][0]).toMatchObject({ stableKey: "input_payroll", label: "Payroll processing", requirementType: "structured",
@@ -96,7 +95,7 @@ test("saves standard payroll answers with reusable scope keys and no assumed ans
 test("saves typed payroll restrictions without turning a no into an unknown", async () => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Type of requirement"), { target: { value: "payroll" } });
   fireEvent.change(screen.getByLabelText("Do you need payroll processing?"), { target: { value: "yes" } });
   fireEvent.change(screen.getByLabelText("Payroll country code"), { target: { value: "us" } });
   fireEvent.change(screen.getByLabelText("Who will you pay?"), { target: { value: "employee" } });
@@ -119,7 +118,7 @@ test("edits standard payroll answers without changing the stable key or revision
 
 test("rejects invalid payroll country input without submitting", () => {
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Type of requirement"), { target: { value: "payroll" } });
   fireEvent.change(screen.getByLabelText("Payroll country code"), { target: { value: "1" } });
   fireEvent.submit(screen.getByRole("form", { name: "Add intake requirement" }));
   expect(screen.getByRole("alert")).toHaveTextContent("two-letter country code");
@@ -142,45 +141,69 @@ test("requires an explicit replacement before changing a complex answer", async 
   expect(screen.getByRole("button", { name: "Replace answer" })).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Replace answer" }));
   expect(screen.getByRole("button", { name: "Keep saved answer" })).toBeInTheDocument();
-  fireEvent.change(screen.getByLabelText("Text answer"), { target: { value: "New answer" } });
+  fireEvent.change(screen.getByLabelText("Details (optional)"), { target: { value: "New answer" } });
   fireEvent.click(screen.getByRole("button", { name: "Keep saved answer" }));
   expect(screen.getByRole("button", { name: "Replace answer" })).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Replace answer" }));
-  fireEvent.change(screen.getByLabelText("Text answer"), { target: { value: "New answer" } });
+  fireEvent.change(screen.getByLabelText("Details (optional)"), { target: { value: "New answer" } });
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
   expect(mutate.mock.calls[0]![0].response).toBe("New answer");
 });
 
 test.each([
-  ["none", null], ["text", "Plain text"], ["number", 42], ["boolean", false],
-] as const)("writes a %s answer without stringifying it", async (mode, expected) => {
+  ["", null], ["   ", null], ["Plain text", "Plain text"],
+] as const)("saves the details %j as %j", async (details, expected) => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Answer format" } });
-  fireEvent.change(screen.getByLabelText("Answer type"), { target: { value: mode } });
-  if (mode === "text") fireEvent.change(screen.getByLabelText("Text answer"), { target: { value: "Plain text" } });
-  if (mode === "number") fireEvent.change(screen.getByLabelText("Number answer"), { target: { value: "42" } });
-  if (mode === "boolean") fireEvent.change(screen.getByLabelText("Yes or no answer"), { target: { value: "false" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Answer format" } });
+  fireEvent.change(screen.getByLabelText("Details (optional)"), { target: { value: details } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
   expect(mutate.mock.calls[0]![0].response).toBe(expected);
 });
 
-test("rejects invalid labels, weights, and numbers before saving", async () => {
+test("asks plain questions and no answer type or requirement type for a new requirement", () => {
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Valid label" } });
-  fireEvent.change(screen.getByLabelText("Weight"), { target: { value: "101" } });
+  for (const label of ["Type of requirement", "What do you need?", "How important is this?", "How much should this count?", "Details (optional)"]) {
+    expect(screen.getByLabelText(label)).toBeInTheDocument();
+  }
+  expect(screen.getByLabelText("What do you need?")).toHaveAccessibleDescription(/Describe one need in a few words/);
+  expect(screen.queryByLabelText("Answer type")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("Requirement type")).not.toBeInTheDocument();
+});
+
+test.each([42, false])("keeps a saved %j answer until the customer replaces it", async (response) => {
+  mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
+  renderForm(existingRequirement({ response, requirementType: "custom" }));
+  expect(screen.getByText("Your saved answer is kept")).toBeInTheDocument();
+  expect(screen.queryByLabelText("Details (optional)")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0]![0]).toMatchObject({ response, requirementType: "custom" });
+});
+
+test("keeps a saved text answer and saved empty text unchanged", async () => {
+  mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
+  renderForm(existingRequirement({ response: "" }));
+  expect(screen.getByLabelText("Details (optional)")).toHaveValue("");
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+  expect(mutate.mock.calls[0]![0].response).toBe("");
+});
+
+test("rejects invalid labels and weights before saving", async () => {
+  renderForm();
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Valid label" } });
+  fireEvent.change(screen.getByLabelText("How much should this count?"), { target: { value: "101" } });
   fireEvent.submit(screen.getByRole("form", { name: "Add intake requirement" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("1 to 100");
   expect(mutate).not.toHaveBeenCalled();
 
-  fireEvent.change(screen.getByLabelText("Weight"), { target: { value: "1" } });
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Valid" } });
-  fireEvent.change(screen.getByLabelText("Answer type"), { target: { value: "number" } });
-  fireEvent.change(screen.getByLabelText("Number answer"), { target: { value: "not a number" } });
+  fireEvent.change(screen.getByLabelText("How much should this count?"), { target: { value: "1" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "   " } });
   fireEvent.submit(screen.getByRole("form", { name: "Add intake requirement" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("valid number");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Describe what you need in 1 to 200 characters.");
   expect(mutate).not.toHaveBeenCalled();
 });
 
@@ -188,12 +211,12 @@ test("blocks duplicate saves while the first request is pending", async () => {
   let finish!: (value: unknown) => void;
   mutate.mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Pending save" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Pending save" } });
   const button = screen.getByRole("button", { name: "Save requirement" });
   fireEvent.click(button);
   fireEvent.click(button);
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
-  expect(screen.getByLabelText("Requirement label")).toBeDisabled();
+  expect(screen.getByLabelText("What do you need?")).toBeDisabled();
   finish(result());
   await waitFor(() => expect(screen.getByRole("heading", { name: "Save confirmed" })).toBeInTheDocument());
 });
@@ -201,11 +224,11 @@ test("blocks duplicate saves while the first request is pending", async () => {
 test("retries the exact locked request after an uncertain result", async () => {
   mutate.mockRejectedValueOnce(new Error("private failure")).mockResolvedValueOnce(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Retry me" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Retry me" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByText(/It may have succeeded/);
   const firstInput = mutate.mock.calls[0]![0];
-  expect(screen.getByLabelText("Requirement label")).toBeDisabled();
+  expect(screen.getByLabelText("What do you need?")).toBeDisabled();
   fireEvent.click(screen.getByRole("button", { name: "Retry unchanged request" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledTimes(2));
   expect(mutate.mock.calls[1]![0]).toBe(firstInput);
@@ -214,14 +237,14 @@ test("retries the exact locked request after an uncertain result", async () => {
 test("unlocks a first BAD_REQUEST so the user can correct and create a new request", async () => {
   mutate.mockRejectedValueOnce(serverError("BAD_REQUEST")).mockResolvedValueOnce(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "First value" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "First value" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("server rejected");
-  expect(screen.getByLabelText("Requirement label")).not.toBeDisabled();
+  expect(screen.getByLabelText("What do you need?")).not.toBeDisabled();
   expect(screen.queryByRole("button", { name: "Retry unchanged request" })).not.toBeInTheDocument();
   const firstInput = mutate.mock.calls[0]![0];
 
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Corrected value" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Corrected value" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledTimes(2));
   expect(mutate.mock.calls[1]![0]).not.toBe(firstInput);
@@ -234,19 +257,19 @@ test.each(["NOT_FOUND", "FORBIDDEN", "UNAUTHORIZED"]) (
   async (code) => {
     mutate.mockRejectedValueOnce(serverError(code));
     renderForm();
-    fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Rejected" } });
+    fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Rejected" } });
     fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
     expect(await screen.findByText("This save was rejected. Return to the requirements list to check current access and saved values.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Return to requirements" })).toHaveAttribute("href", returnHref);
     expect(screen.queryByRole("button", { name: "Retry unchanged request" })).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Requirement label")).toBeDisabled();
+    expect(screen.getByLabelText("What do you need?")).toBeDisabled();
   },
 );
 
 test("keeps the exact request uncertain after a network failure then a deterministic rejection", async () => {
   mutate.mockRejectedValueOnce(new Error("network down")).mockRejectedValueOnce(serverError("BAD_REQUEST"));
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Maybe saved" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Maybe saved" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByText(/It may have succeeded/);
   const firstInput = mutate.mock.calls[0]![0];
@@ -261,10 +284,10 @@ test("does not trust a spoofed error data property", async () => {
   const spoofed = Object.assign(new Error("network down"), { data: { code: "BAD_REQUEST" } });
   mutate.mockRejectedValueOnce(spoofed);
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Spoofed" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Spoofed" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByText(/It may have succeeded/);
-  expect(screen.getByLabelText("Requirement label")).toBeDisabled();
+  expect(screen.getByLabelText("What do you need?")).toBeDisabled();
   expect(screen.getByRole("button", { name: "Retry unchanged request" })).toBeInTheDocument();
 });
 
@@ -272,7 +295,7 @@ test("keeps the confirmed view when navigation fails", async () => {
   mutate.mockResolvedValue(result());
   router.replace.mockImplementationOnce(() => { throw new Error("navigation failed"); });
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Confirmed" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Confirmed" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByRole("heading", { name: "Save confirmed" });
   expect(screen.getByRole("link", { name: "Return to requirements" })).toHaveAttribute("href", returnHref);
@@ -283,7 +306,7 @@ test("keeps the confirmed view when navigation fails", async () => {
 test("refreshes after a confirmed save", async () => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Refresh" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Refresh" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByRole("heading", { name: "Save confirmed" });
   expect(router.replace).toHaveBeenCalledWith(returnHref);
@@ -294,7 +317,7 @@ test("keeps the confirmed view when refresh fails", async () => {
   mutate.mockResolvedValue(result());
   router.refresh.mockImplementationOnce(() => { throw new Error("refresh failed"); });
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Refresh failure" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Refresh failure" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByRole("heading", { name: "Save confirmed" });
   expect(screen.getByRole("link", { name: "Return to requirements" })).toHaveAttribute("href", returnHref);
@@ -309,7 +332,7 @@ test.each([
 ])("rejects an unsafe return link: %s", async (href) => {
   mutate.mockResolvedValue(result());
   renderForm(undefined, href);
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "Safe link" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "Safe link" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await screen.findByRole("heading", { name: "Save confirmed" });
   expect(screen.getByRole("link", { name: "Return to requirements" })).toHaveAttribute("href", "/customer");
@@ -318,13 +341,13 @@ test.each([
 test("shows an oversized saved answer and requires replacement", async () => {
   const oversized = { first: "é".repeat(2_000), second: "é".repeat(2_000), third: "é".repeat(2_000) };
   renderForm(existingRequirement({ response: oversized }));
-  expect(screen.getByText("Existing answer is preserved")).toBeInTheDocument();
+  expect(screen.getByText("Your saved answer is kept")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("too large to save again");
   expect(mutate).not.toHaveBeenCalled();
 
   fireEvent.click(screen.getByRole("button", { name: "Replace answer" }));
-  fireEvent.change(screen.getByLabelText("Text answer"), { target: { value: "Replacement" } });
+  fireEvent.change(screen.getByLabelText("Details (optional)"), { target: { value: "Replacement" } });
   mutate.mockResolvedValue(result({ revision: 4, outcomeCode: "updated" }));
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
@@ -334,7 +357,7 @@ test("shows an oversized saved answer and requires replacement", async () => {
 test("does not submit when secure identifiers are unavailable", async () => {
   vi.stubGlobal("crypto", { randomUUID: undefined });
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement label"), { target: { value: "No UUID" } });
+  fireEvent.change(screen.getByLabelText("What do you need?"), { target: { value: "No UUID" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("secure save request");
   expect(mutate).not.toHaveBeenCalled();
@@ -343,7 +366,7 @@ test("does not submit when secure identifiers are unavailable", async () => {
 test("saves a customer decision about partner payroll services", async () => {
   mutate.mockResolvedValue(result());
   renderForm();
-  fireEvent.change(screen.getByLabelText("Requirement template"), { target: { value: "payroll" } });
+  fireEvent.change(screen.getByLabelText("Type of requirement"), { target: { value: "payroll" } });
   fireEvent.change(screen.getByLabelText("Would you consider payroll from a partner provider?"), { target: { value: "false" } });
   fireEvent.click(screen.getByRole("button", { name: "Save requirement" }));
   await waitFor(() => expect(mutate).toHaveBeenCalledOnce());

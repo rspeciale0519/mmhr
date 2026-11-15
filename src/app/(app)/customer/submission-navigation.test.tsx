@@ -22,10 +22,11 @@ vi.mock("@/server/commands/requirement-read", async (original) => ({
 vi.mock("./intake-form", () => ({ CustomerIntakeForm: () => <form aria-label="Customer intake form" /> }));
 vi.mock("./requirement-form", () => ({ CustomerRequirementForm: () => <form aria-label="Customer requirement form" /> }));
 vi.mock("./intake-submit", () => ({
-  CustomerIntakeSubmit: ({ organizationId, intakeId, expectedRevision }: {
-    organizationId: string; intakeId: string; expectedRevision: number;
+  CustomerIntakeSubmit: ({ organizationId, intakeId, expectedRevision, requiresRequirement, hasRequirement }: {
+    organizationId: string; intakeId: string; expectedRevision: number; requiresRequirement?: boolean; hasRequirement?: boolean;
   }) => <div data-testid="customer-intake-submit" data-organization={organizationId}
-    data-intake={intakeId} data-revision={expectedRevision} />,
+    data-intake={intakeId} data-revision={expectedRevision}
+    data-requires-requirement={String(Boolean(requiresRequirement))} data-has-requirement={String(Boolean(hasRequirement))} />,
 }));
 vi.mock("next/navigation", () => ({ forbidden: () => { throw new Error("Forbidden"); } }));
 
@@ -147,6 +148,23 @@ test("hides submission at the maximum revision", async () => {
   vi.mocked(getIntake).mockResolvedValue({ ...summary, revision: 2_147_483_647, submittedAt: null, data: {} });
   render(await load({ intake: intakeId }));
   expect(screen.queryByTestId("customer-intake-submit")).not.toBeInTheDocument();
+});
+
+test.each([
+  { importance: "must", requires: "false", has: "true" },
+  { importance: "nice", requires: "false", has: "true" },
+  { importance: "not_applicable", requires: "true", has: "false" },
+] as const)("passes requirement state for a $importance requirement", async ({ importance, requires, has }) => {
+  allowSubmit();
+  vi.mocked(getIntakeRequirementsPage).mockResolvedValue({ requirements: [{
+    requirementId: otherId, organizationId, intakeId, stableKey: "need_one", label: "One need", importance, weight: 1,
+    response: null, status: "active", requirementType: "custom", revision: 1,
+    createdAt: summary.createdAt, updatedAt: summary.updatedAt,
+  }], nextCursor: null } as never);
+  render(await load({ intake: intakeId }));
+  const submit = screen.getByTestId("customer-intake-submit");
+  expect(submit).toHaveAttribute("data-requires-requirement", requires);
+  expect(submit).toHaveAttribute("data-has-requirement", has);
 });
 
 test("keeps submission available when a later requirement page is empty", async () => {

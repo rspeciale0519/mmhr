@@ -121,6 +121,7 @@ export default async function CustomerHome({ searchParams }: {
             expectedRevision={result.intake.revision}
             requiresRequirement={!query.data.requirementsAfter && !result.requirements.nextCursor &&
               !result.requirements.requirements.some((requirement) => requirement.importance === "must" || requirement.importance === "nice")}
+            hasRequirement={result.requirements.requirements.some((requirement) => requirement.importance === "must" || requirement.importance === "nice")}
             key={`${organizationId}:${result.intake.intakeId}:${result.intake.revision}`} />}
       </>
         : result.kind === "list" ? <IntakeList page={result.page} hasCursor={query.data.after !== undefined} canCreate={canSave} />

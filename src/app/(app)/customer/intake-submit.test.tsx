@@ -65,10 +65,36 @@ test("requires review and an explicit confirmation before submitting", () => {
   expect(screen.queryByText(/all current saved answers and active requirements/i)).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Review submission" }));
   expect(screen.getByText(/all current saved answers and active requirements/i)).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Submit saved intake" })).toBeDisabled();
   fireEvent.click(screen.getByRole("checkbox", { name: "Submit all current saved answers and requirements" }));
   expect(screen.getByRole("button", { name: "Submit saved intake" })).not.toBeDisabled();
   expect(mutate).not.toHaveBeenCalled();
+});
+
+test("explains an empty confirmation box instead of doing nothing", () => {
+  renderSubmit();
+  fireEvent.click(screen.getByRole("button", { name: "Review submission" }));
+  const checkbox = screen.getByRole("checkbox", { name: "Submit all current saved answers and requirements" });
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Submit saved intake" }));
+  const alert = screen.getByRole("alert");
+  expect(alert).toHaveTextContent("Tick the box above to confirm");
+  expect(checkbox).toHaveAttribute("aria-invalid", "true");
+  expect(checkbox).toHaveAccessibleDescription(alert.textContent!);
+  expect(checkbox).toHaveFocus();
+  expect(mutate).not.toHaveBeenCalled();
+  fireEvent.click(checkbox);
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(checkbox).not.toHaveAttribute("aria-invalid");
+});
+
+test("shows the requirement hint only when a qualifying requirement is not confirmed", () => {
+  const hint = /needs at least one saved must-have or nice-to-have requirement/;
+  const { unmount } = renderSubmit();
+  expect(screen.getByText(hint)).toBeInTheDocument();
+  unmount();
+  renderSubmit({ hasRequirement: true });
+  expect(screen.queryByText(hint)).not.toBeInTheDocument();
+  expect(screen.getByText("You can still edit your saved answers and requirements now.")).toBeInTheDocument();
 });
 
 test("returns to editing without sending a request", () => {
