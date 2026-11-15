@@ -20,6 +20,7 @@ test("renders the empty invitation state", async () => {
   await expect(InvitationAcceptancePage()).resolves.toMatchObject({ type: "main" });
   const page = await InvitationAcceptancePage();
   expect(JSON.stringify(page)).toContain("No pending invitations");
+  expect(JSON.stringify(page)).toContain("must set up two-step sign-in at /mfa before accepting");
 });
 
 test("renders safe invitation details and an acceptance form", async () => {
