@@ -12,6 +12,15 @@ describe("robots route", () => {
     expect(robots()).toEqual({ rules: { userAgent: "*", disallow: "/" } });
   });
 
+  test("disallows crawlers on an opened develop preview", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("PUBLIC_RELEASE_ENABLED", "0");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
+
+    expect(robots()).toEqual({ rules: { userAgent: "*", disallow: "/" } });
+  });
+
   test("allows crawlers outside the production quarantine", () => {
     vi.stubEnv("NODE_ENV", "development");
 

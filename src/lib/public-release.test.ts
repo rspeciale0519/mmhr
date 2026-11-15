@@ -1,11 +1,94 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
   createPublicReleaseBlockResponse,
   createPublicReleaseRobotsResponse,
   getPublicReleaseRobotsMetadata,
+  isPublicIndexingBlocked,
   isPublicReleaseBlocked,
 } from "@/lib/public-release";
+
+describe("develop preview release flag", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  test("opens pages on a Vercel preview with the exact flag, but keeps indexing blocked", () => {
+    const environment = {
+      NODE_ENV: "production",
+      VERCEL_ENV: "preview",
+      MMHR_PREVIEW_RELEASE_ENABLED: "1",
+    };
+
+    expect(isPublicReleaseBlocked(environment)).toBe(false);
+    expect(isPublicIndexingBlocked(environment)).toBe(true);
+  });
+
+  test.each([undefined, "", "true", "0", " 1", "1 ", "yes"])(
+    "keeps a preview blocked when the flag is %j",
+    (flag) => {
+      expect(
+        isPublicReleaseBlocked({
+          NODE_ENV: "production",
+          VERCEL_ENV: "preview",
+          MMHR_PREVIEW_RELEASE_ENABLED: flag,
+        }),
+      ).toBe(true);
+    },
+  );
+
+  test.each([undefined, "", "production", "development", "Preview", "staging"])(
+    "keeps VERCEL_ENV %j blocked even with the flag set",
+    (vercelEnvironment) => {
+      const environment = {
+        NODE_ENV: "production",
+        VERCEL_ENV: vercelEnvironment,
+        MMHR_PREVIEW_RELEASE_ENABLED: "1",
+      };
+
+      expect(isPublicReleaseBlocked(environment)).toBe(true);
+      expect(isPublicIndexingBlocked(environment)).toBe(true);
+    },
+  );
+
+  test("the flag cannot replace the checked-in production approval", () => {
+    expect(
+      isPublicReleaseBlocked(
+        {
+          NODE_ENV: "production",
+          VERCEL_ENV: "production",
+          MMHR_PREVIEW_RELEASE_ENABLED: "1",
+          PUBLIC_RELEASE_ENABLED: "1",
+          PUBLIC_RELEASE_APPROVAL_ID: "unreviewed-release",
+        },
+        "r2a-approved",
+      ),
+    ).toBe(true);
+  });
+
+  test("does not change local development", () => {
+    const environment = {
+      NODE_ENV: "development",
+      VERCEL_ENV: "preview",
+      MMHR_PREVIEW_RELEASE_ENABLED: "0",
+    };
+
+    expect(isPublicReleaseBlocked(environment)).toBe(false);
+    expect(isPublicIndexingBlocked(environment)).toBe(false);
+  });
+
+  test("page metadata stays no-index on an opened preview", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("MMHR_PREVIEW_RELEASE_ENABLED", "1");
+
+    expect(isPublicReleaseBlocked()).toBe(false);
+    expect(getPublicReleaseRobotsMetadata()).toEqual({
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+    });
+  });
+});
 
 describe("public release control", () => {
   test("does not block local development", () => {

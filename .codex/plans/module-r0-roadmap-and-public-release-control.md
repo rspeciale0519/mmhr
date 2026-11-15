@@ -86,6 +86,7 @@ Repository controls:
 - `PUBLIC_RELEASE_APPROVAL_ID` must match a versioned ID committed in reviewed code.
 - Blocked responses use `no-store` and `X-Robots-Tag` crawler controls.
 - `/robots.txt` returns `Disallow: /` while the block is active.
+- `MMHR_PREVIEW_RELEASE_ENABLED=1` opens pages only on a Vercel Preview deployment (`VERCEL_ENV=preview`); robots, sitemap, metadata, and `X-Robots-Tag` stay in the blocked form there, and the value must never be set in Production.
 - `src/app/layout.tsx` keeps site-wide `noindex` and `nofollow` metadata.
 - Static build assets can load, but they do not expose an application page.
 - `.github/workflows/production-release-gate.yml` requires the complete R9

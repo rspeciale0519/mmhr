@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { isPublicReleaseBlocked } from "@/lib/public-release";
+import { isPublicIndexingBlocked } from "@/lib/public-release";
 import { getSiteMetadataBase } from "@/lib/site-metadata";
 
 // Keep this list limited to the public pages in the launch scope
@@ -18,8 +18,8 @@ export function getPublicSitemapPaths(): string[] {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // A blocked production release must not advertise routes to crawlers.
-  if (isPublicReleaseBlocked()) return [];
+  // A locked production release, or an opened preview, must not advertise routes to crawlers.
+  if (isPublicIndexingBlocked()) return [];
 
   const base = getSiteMetadataBase();
   if (!base) return [];
