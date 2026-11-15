@@ -1,4 +1,4 @@
-import { ADVANTAGES, CASES, STATS, TOOLS, TRUST, VENDORS } from "../_content";
+import { ADVANTAGES, STATS, TOOLS, TRUST } from "../_content";
 import NewsletterForm from "./newsletter-form";
 
 /* A 600-unit heartbeat/oscilloscope trace, repeated once more (offset +600)
@@ -22,12 +22,12 @@ export function PulseBody() {
       <section className="pu-hero">
         <div className="pu-wrap pu-hero-in">
           <div className="pu-hero-copy">
-            <div className="pu-eyebrow">AUTOMATED RESEARCH PIPELINE</div>
-            <h1 className="pu-h1">Pricing that&rsquo;s verified continuously, not once.</h1>
+            <div className="pu-eyebrow">HR SOFTWARE SELECTION</div>
+            <h1 className="pu-h1">Compare HR software options with vendor names hidden.</h1>
             <p className="pu-lede">
-              Every vendor in the marketplace gets re-checked on a schedule — not
-              when someone remembers to. This is what that looks like: a live
-              signal, not a static list.
+              Create a free account and describe your software needs. MMHR
+              compares approved vendor options with names hidden, then sends
+              your RFP to the vendors you select.
             </p>
             <form className="pu-form" action="/sign-up" method="get">
               <input
@@ -49,14 +49,10 @@ export function PulseBody() {
             </p>
           </div>
 
-          {/* SIGNATURE — the live verification signal */}
+          {/* SIGNATURE — the first steps of the launch path */}
           <div className="pu-signal">
             <div className="pu-signal-head">
-              <span className="pu-signal-label">VERIFICATION SIGNAL — LAST 24H</span>
-              <span className="pu-live">
-                <i className="pu-live-dot" aria-hidden="true" />
-                LIVE
-              </span>
+              <span className="pu-signal-label">How you start</span>
             </div>
 
             <div className="pu-signal-scope">
@@ -72,42 +68,30 @@ export function PulseBody() {
               </svg>
             </div>
 
-            <ul className="pu-legend">
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">Rippling</span>
-                <span className="pu-legend-meta">re-verified 14m ago</span>
-              </li>
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">BambooHR</span>
-                <span className="pu-legend-meta">re-verified 41m ago</span>
-              </li>
-              <li>
-                <i className="pu-dot" aria-hidden="true" />
-                <span className="pu-legend-name">Paycor</span>
-                <span className="pu-legend-meta">re-verified 2h ago</span>
-              </li>
-            </ul>
+            <ol className="pu-legend">
+              {TOOLS.slice(0, 3).map((step, i) => (
+                <li key={step.key}>
+                  <i className="pu-dot" aria-hidden="true" />
+                  <span className="pu-legend-name">{step.name}</span>
+                  <span className="pu-legend-meta">Step {i + 1}</span>
+                </li>
+              ))}
+            </ol>
 
             <div className="pu-readout">
-              52 systems monitored · 1 check every 6h · 0 stale profiles
+              Customers never pay MMHR. Providers pay MMHR a commission or referral fee.
             </div>
           </div>
         </div>
       </section>
 
-      {/* vendor wall */}
+      {/* category band (docs/PRD.md: initial category scope) */}
       <section className="pu-vwall">
         <div className="pu-wrap pu-vwall-in">
-          <span className="pu-vwall-label">Monitored</span>
+          <span className="pu-vwall-label">Category</span>
           <div className="pu-vwall-list">
-            {VENDORS.slice(0, 12).map((v) => (
-              <span className="pu-vchip" key={v}>
-                {v}
-              </span>
-            ))}
-            <span className="pu-vchip pu-vchip-more">+ 40 more</span>
+            <span className="pu-vchip">HR software</span>
+            <span className="pu-vchip">Workforce software</span>
           </div>
         </div>
       </section>
@@ -116,11 +100,11 @@ export function PulseBody() {
       <section className="pu-sec">
         <div className="pu-wrap">
           <div className="pu-head">
-            <div className="pu-eye">The instrument panel</div>
-            <h2 className="pu-h2">Six gauges on one dashboard</h2>
+            <div className="pu-eye">How it works</div>
+            <h2 className="pu-h2">From your needs to vendor responses</h2>
             <p className="pu-sub">
-              Everything a buying committee needs to run a real evaluation,
-              instrumented instead of improvised.
+              You compare vendor options with names hidden. MMHR staff send
+              your RFP to the vendors you choose.
             </p>
           </div>
           <div className="pu-tools">
@@ -140,8 +124,8 @@ export function PulseBody() {
       <section className="pu-sec pu-sec-surface">
         <div className="pu-wrap">
           <div className="pu-head">
-            <div className="pu-eye">The broker advantage</div>
-            <h2 className="pu-h2">Why the signal never goes stale</h2>
+            <div className="pu-eye">Protections</div>
+            <h2 className="pu-h2">What stays private</h2>
           </div>
 
           {ADVANTAGES.map((a, i) => (
@@ -156,7 +140,7 @@ export function PulseBody() {
               <div className="pu-adv-panel">
                 <div className="pu-adv-panel-h">
                   <span>CH.{String(i + 1).padStart(2, "0")}</span>
-                  <span className="pu-adv-status">ONLINE</span>
+                  <span className="pu-adv-status">{a.tag}</span>
                 </div>
                 <svg
                   className="pu-mini-wave"
@@ -213,32 +197,12 @@ export function PulseBody() {
         </div>
       </section>
 
-      {/* case studies */}
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-head">
-            <div className="pu-eye">Signal history</div>
-            <h2 className="pu-h2">What continuous verification is worth</h2>
-          </div>
-          <div className="pu-cases">
-            {CASES.map((c) => (
-              <article className="pu-case" key={c.title}>
-                <div className="pu-case-n">{c.stat}</div>
-                <div className="pu-case-nl">{c.statLabel}</div>
-                <h3>{c.title}</h3>
-                <p>{c.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* newsletter */}
       <section className="pu-wrap pu-news-wrap">
         <div className="pu-news">
           <div>
             <h2>The Weekly Signal</h2>
-            <p>What moved in vendor pricing this week, in one email.</p>
+            <p>Email updates from MatchMaker HR.</p>
           </div>
           <NewsletterForm />
         </div>
