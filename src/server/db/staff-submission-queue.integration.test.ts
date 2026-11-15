@@ -45,7 +45,7 @@ async function vendorUser(sql: SecurityTransaction, fixture: SecurityCommandFixt
 function readQueue(sql: SecurityTransaction, principal: SecurityPrincipal, assurance: "aal1" | "aal2" = "aal2") {
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ page: Queue }[]>`
-      SELECT public.mmhr_get_staff_submission_queue(${probe.json({ limit: 50 })}::jsonb) AS page`;
+      SELECT public.mmhr_get_staff_submission_queue(${JSON.stringify({ limit: 50 })}::text::jsonb) AS page`;
     return row!.page;
   }, assurance);
 }
@@ -54,7 +54,7 @@ function openCase(sql: SecurityTransaction, principal: SecurityPrincipal, intake
   idempotencyKey = randomUUID(), assurance: "aal1" | "aal2" = "aal2") {
   return asAuthenticated(sql, principal, async (probe) => {
     const [row] = await probe<{ result: Record<string, unknown> }[]>`
-      SELECT public.mmhr_open_staff_case(${probe.json({ intakeId })}::jsonb, ${randomUUID()}::uuid,
+      SELECT public.mmhr_open_staff_case(${JSON.stringify({ intakeId })}::text::jsonb, ${randomUUID()}::uuid,
         ${idempotencyKey}::uuid) AS result`;
     return row!.result;
   }, assurance);
