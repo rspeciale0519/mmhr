@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { FOOTER_COLUMNS, LEGAL_LINKS } from "./links";
 
-/** Site footer. Shared by every page and by the gallery's standalone Pulse. */
+/** Site footer. Shared by every page. */
 export function Footer() {
   return (
     <footer className="pu-foot">

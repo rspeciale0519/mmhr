@@ -55,7 +55,8 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 - `src/server/` contains database code and tRPC routers.
 - `src/lib/` contains shared clients, analytics, branding, and utilities.
 - `src/components/ui/` contains shadcn/ui components.
-- `src/designs/` contains the retained design gallery.
+- `src/designs/` contains the Pulse design (`pulse/`) and the shared marketing content (`_content.ts`).
+- Both design galleries are in `archive/`. They are not routes.
 - `src/trigger/` contains Trigger.dev tasks.
 - `drizzle/` contains SQL migrations and generated metadata.
 - `supabase/` contains local Supabase configuration.
@@ -65,9 +66,8 @@ Global instructions remain in force. This file adds only MMHR-specific facts and
 - Use route handlers for public endpoints and webhooks.
 - Keep Vitest tests near the behavior they test.
 - Use camelCase in TypeScript and snake_case for database column names.
-- Pulse renders at `/` and `/designs/pulse`.
-- Verify both routes when shared Pulse code changes.
-- Keep the design gallery unless the user requests a change.
+- Pulse renders at `/`.
+- Verify `/` when shared Pulse code changes.
 - Never publish placeholder claims or copied evidence from `docs/temp/`.
 - Do not claim authorization is complete without RLS policies and supporting tests.
 

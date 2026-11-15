@@ -90,62 +90,29 @@ describe("public-release middleware", () => {
     expect(await response.json()).toEqual({ error: "service_unavailable" });
   });
 
-  test("serves the gallery on a Vercel preview without session work", async () => {
+  test("does not redirect the preview home page to the archived gallery", async () => {
     vi.stubEnv("VERCEL_ENV", "preview");
-
-    const gallery = await proxy(new NextRequest("https://mmhr.test/gallery/lumen"));
-    expect(gallery.status).toBe(200);
-    expect(gallery.headers.get("x-robots-tag")).toContain("noindex");
-    expect(gallery.headers.get("x-frame-options")).toBe("DENY");
-    expect(createServerClient).not.toHaveBeenCalled();
 
     const home = await proxy(new NextRequest("https://mmhr.test/?_vercel_share=x"));
-    expect(home.status).toBe(307);
-    expect(home.headers.get("location")).toBe("https://mmhr.test/gallery");
+    expect(home.status).toBe(503);
+    expect(home.headers.get("location")).toBeNull();
     expect(home.headers.get("x-frame-options")).toBe("DENY");
-
-    const signIn = await proxy(new NextRequest("https://mmhr.test/sign-in"));
-    expect(signIn.status).toBe(503);
-
-    const previewImage = await proxy(new NextRequest("https://mmhr.test/gallery-previews/stack.jpg"));
-    expect(previewImage.headers.get("x-middleware-next")).toBe("1");
-
-    const post = await proxy(new NextRequest("https://mmhr.test/gallery", { method: "POST", headers: { "next-action": "x" } }));
-    expect(post.status).toBe(503);
+    expect(createServerClient).not.toHaveBeenCalled();
   });
 
-  test("passes the gallery review endpoints on a preview without session work", async () => {
+  test.each([
+    ["GET", "/gallery"],
+    ["GET", "/gallery/lumen"],
+    ["GET", "/gallery-previews/stack.jpg"],
+    ["POST", "/api/gallery/feedback"],
+    ["POST", "/api/gallery/recipes"],
+  ])("no longer passes %s %s through the release gate on a preview", async (method, path) => {
     vi.stubEnv("VERCEL_ENV", "preview");
 
-    const save = await proxy(new NextRequest("https://mmhr.test/api/gallery/feedback", { method: "POST" }));
-    expect(save.status).toBe(200);
-    expect(save.headers.get("x-middleware-next")).toBe("1");
+    const response = await proxy(new NextRequest(`https://mmhr.test${path}`, { method }));
+    expect(response.status).toBe(503);
+    expect(response.headers.get("x-middleware-next")).toBeNull();
     expect(createServerClient).not.toHaveBeenCalled();
-
-    const recipe = await proxy(new NextRequest("https://mmhr.test/api/gallery/recipes", { method: "POST" }));
-    expect(recipe.headers.get("x-middleware-next")).toBe("1");
-
-    const listRecipes = await proxy(new NextRequest("https://mmhr.test/api/gallery/recipes"));
-    expect(listRecipes.status).toBe(503);
-
-    const otherApi = await proxy(new NextRequest("https://mmhr.test/api/leads", { method: "POST" }));
-    expect(otherApi.status).toBe(503);
-  });
-
-  test("keeps the gallery review endpoints closed on production deployments", async () => {
-    vi.stubEnv("VERCEL_ENV", "production");
-
-    const response = await proxy(new NextRequest("https://mmhr.test/api/gallery/feedback", { method: "POST" }));
-    expect(response.status).toBe(503);
-  });
-
-  test("keeps the gallery closed on production deployments", async () => {
-    vi.stubEnv("VERCEL_ENV", "production");
-
-    const response = await proxy(new NextRequest("https://mmhr.test/gallery"));
-    expect(response.status).toBe(503);
-    const home = await proxy(new NextRequest("https://mmhr.test/"));
-    expect(home.status).toBe(503);
   });
 
   test("an environment flag cannot bypass the checked-in release gate", async () => {
@@ -181,7 +148,6 @@ describe("session refresh middleware", () => {
 
   beforeEach(() => {
     vi.stubEnv("NODE_ENV", "development");
-    vi.stubEnv("GALLERY_ONLY", "0");
     vi.mocked(createServerClient).mockReset();
     getClaims.mockReset();
   });
@@ -289,26 +255,6 @@ describe("session refresh middleware", () => {
     expect(response.status).toBe(200);
     expect(getClaims).toHaveBeenCalledTimes(1);
   });
-
-  test.each(["/designs", "/home"])(
-    "keeps GALLERY_ONLY session-free for %s",
-    async (path) => {
-      vi.stubEnv("GALLERY_ONLY", "1");
-
-      const response = await proxy(
-        new NextRequest(`https://mmhr.test${path}`),
-      );
-
-      expect(createServerClient).not.toHaveBeenCalled();
-      if (path === "/home") {
-        expect(response.headers.get("location")).toBe(
-          "https://mmhr.test/designs",
-        );
-      } else {
-        expect(response.headers.get("location")).toBeNull();
-      }
-    },
-  );
 });
 
 describe("Server Action request middleware", () => {
@@ -319,8 +265,8 @@ describe("Server Action request middleware", () => {
 
   beforeEach(() => {
     vi.stubEnv("NODE_ENV", "development");
-    vi.stubEnv("GALLERY_ONLY", "0");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+    vi.mocked(createServerClient).mockReset();
     vi.mocked(createServerClient).mockReturnValue({
       auth: { getClaims },
     } as never);
@@ -373,7 +319,6 @@ describe("Server Action request middleware", () => {
 describe("launch surface proxy", () => {
   beforeEach(() => {
     vi.stubEnv("NODE_ENV", "development");
-    vi.stubEnv("GALLERY_ONLY", "0");
     vi.stubEnv("MMHR_LAUNCH_CANDIDATE", "");
     vi.mocked(createServerClient).mockReset();
   });
