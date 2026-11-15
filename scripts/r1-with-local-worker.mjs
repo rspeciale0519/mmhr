@@ -89,6 +89,7 @@ const rehearsalFiles = new Set(
     "src/server/db/r4-rfp-receipt-history.integration.test.ts",
     "src/server/audit/staff-audit.integration.test.ts",
     "src/server/db/staff-submission-queue.integration.test.ts",
+    "src/server/db/staff-vendor-setup.integration.test.ts",
       "src/server/db/r8-onboarding.integration.test.ts",
       "src/server/db/r8-work-item.integration.test.ts",
       "src/server/db/r8-renewal.integration.test.ts",

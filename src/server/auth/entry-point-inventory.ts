@@ -2149,6 +2149,36 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited grant",
   denialEvidence: "staff-submissions.test.ts; staff-submission-queue.integration.test.ts; migration 0175 unapplied",
 },
+{
+  key: "src/app/(admin)/admin/vendors/page.tsx#default", surface: "/admin/vendors", kind: "page", access: "internal-only",
+  permission: "admin.access with AAL2",
+  scope: "vendor organizations that are pending, active, or suspended; setup metadata and invited emails only",
+  dataPath: "request-scoped fixed directory RPC; strict DTO; no customer, RFP, response, or commission data",
+  denialEvidence: "vendors/page.test.tsx; staff-vendors.test.ts; staff-vendor-setup.integration.test.ts; migration 0177 unapplied",
+},
+...(["error", "loading"] as const).map((state): EntryPointInventoryRecord => ({
+  key: `src/app/(admin)/admin/vendors/${state}.tsx#default`, surface: `/admin/vendors ${state}`,
+  kind: "boundary", access: "framework", permission: "parent vendors route guard", scope: "parent route",
+  dataPath: "static loading or generic error; no protected data", denialEvidence: "vendors/page.test.tsx; entry-point-inventory.test.ts",
+})),
+...([
+  ["createVendorAction", "new pending vendor organization; no staff membership"],
+  ["enableVendorPortalAction", "one pending or active vendor organization; vendor portal grant only"],
+  ["inviteVendorAdminAction", "one pending or active vendor organization; organization_admin invitation only"],
+] as const).map(([name, scope]): EntryPointInventoryRecord => ({
+  key: `src/app/(admin)/admin/vendors/actions.ts#${name}`, surface: name, kind: "server-action", access: "internal-only",
+  permission: "admin.access with AAL2", scope,
+  dataPath: "exact-origin action; audited idempotent staff vendor RPC; no email sent",
+  denialEvidence: "vendors/actions.test.ts; staff-vendor-setup.integration.test.ts; migration 0177 unapplied",
+})),
+{
+  key: "src/server/commands/staff-vendors.ts#command", surface: "staff vendor directory, add vendor, vendor portal, and invitation",
+  kind: "command", access: "privileged",
+  permission: "admin.access with AAL2; first-admin acceptance needs a verified MFA factor and the capacity check",
+  scope: "vendor organizations only; organization type and status checked in SQL",
+  dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited commands",
+  denialEvidence: "staff-vendors.test.ts; staff-vendor-setup.integration.test.ts; migration 0177 unapplied",
+},
 ];
 
 function escapeMarkdownCell(value: string) {

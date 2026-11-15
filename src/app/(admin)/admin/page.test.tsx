@@ -28,6 +28,10 @@ test("links to the submitted customer intake queue", async () => {
   render(await AdminHome());
   expect(screen.getByRole("link", { name: "Open submitted customer intakes" })).toHaveAttribute("href", "/admin/submissions");
 });
+test("links to vendor setup", async () => {
+  render(await AdminHome());
+  expect(screen.getByRole("link", { name: "Add vendors and invite vendor users" })).toHaveAttribute("href", "/admin/vendors");
+});
 
 afterEach(cleanup);
 

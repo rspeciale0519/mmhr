@@ -24,6 +24,9 @@ export default async function InvitationAcceptancePage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">Your invitations</h1>
+      <p className="text-sm">
+        The first administrator of a new vendor must set up two-step sign-in at /mfa before accepting.
+      </p>
       {invitations.length === 0 ? (
         <p className="text-sm" role="status">No pending invitations are available for this account.</p>
       ) : (
