@@ -99,6 +99,8 @@ test("shows loading without queue controls", () => {
 test("shows empty contacts without claiming notification completion", () => {
   state.contacts.data = { items: [] }; mount();
   expect(screen.getByText(/No current verified vendor contacts/)).toBeInTheDocument();
+  expect(screen.getByText(/administrator of that vendor workspace invites the person from Invitations/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Change workspace" })).toHaveAttribute("href", "/workspaces");
   expect(screen.queryByRole("button", { name: "Queue email notification" })).not.toBeInTheDocument();
 });
 

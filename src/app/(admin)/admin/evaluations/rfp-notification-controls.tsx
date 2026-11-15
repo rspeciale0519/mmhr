@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/lib/trpc/client";
@@ -33,7 +34,11 @@ export function RfpNotificationControls({ organizationId, rfpId, version }: {
     {(recipients.isPending || status.isPending) && <p role="status" className="text-sm">Loading notification contacts and status.</p>}
     {(recipients.isError || status.isError) && <p role="alert" className="text-sm">Notification records could not be loaded. Refresh to check current access and saved state.</p>}
     {!recipients.isError && !status.isError && contacts && notifications && <>
-      {contacts.length === 0 && <p className="text-sm">No current verified vendor contacts are available for this request.</p>}
+      {contacts.length === 0 && <div className="space-y-2 text-sm leading-6">
+        <p>No current verified vendor contacts are available for this request.</p>
+        <p className="max-w-2xl text-muted-foreground">A verified contact is an active member of the delivered vendor organization with a confirmed email address and vendor portal access. To add one, an administrator of that vendor workspace invites the person from Invitations, and the person accepts with the invited email address.</p>
+        <Link href="/workspaces" className="inline-flex min-h-11 items-center underline">Change workspace</Link>
+      </div>}
       <ul className="space-y-4">{contacts.map(contact => {
         const existing = notifications.find(item => item.recipientId === contact.recipientId && item.membershipId === contact.membershipId);
         return <li key={`${contact.recipientId}:${contact.membershipId}`} className="space-y-3 rounded-lg border p-4">
