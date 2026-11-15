@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/lib/trpc/client";
@@ -13,9 +13,11 @@ export type CustomerIntakeSubmitProps = {
   intakeId: string;
   expectedRevision: number;
   requiresRequirement?: boolean;
+  /** True only when the page has confirmed a saved must-have or nice-to-have requirement. */
+  hasRequirement?: boolean;
 };
 
-type SubmitInput = CustomerIntakeSubmitProps & {
+type SubmitInput = Pick<CustomerIntakeSubmitProps, "organizationId" | "intakeId" | "expectedRevision"> & {
   correlationId: string;
   idempotencyKey: string;
 };
@@ -35,7 +37,7 @@ function classifyRejection(error: unknown): Rejection {
     ? "fresh-review" : null;
 }
 
-export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevision, requiresRequirement = false }: CustomerIntakeSubmitProps) {
+export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevision, requiresRequirement = false, hasRequirement = false }: CustomerIntakeSubmitProps) {
   const trpc = useTRPC();
   const router = useRouter();
   const submit = useMutation(trpc.intakes.submit.mutationOptions({ retry: false }));
@@ -45,6 +47,9 @@ export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevisio
   const [rejected, setRejected] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [confirmMissing, setConfirmMissing] = useState(false);
+  const confirmErrorId = useId();
+  const checkbox = useRef<HTMLInputElement>(null);
   const attempt = useRef<SubmitInput | null>(null);
   const uncertainAttempt = useRef(false);
   const submitting = useRef(false);
@@ -77,7 +82,12 @@ export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevisio
   }
 
   function submitConfirmed() {
-    if (submitting.current || submit.isPending || locked || confirmed || !checked) return;
+    if (submitting.current || submit.isPending || locked || confirmed) return;
+    if (!checked) {
+      setConfirmMissing(true);
+      checkbox.current?.focus();
+      return;
+    }
     const correlationId = requestId();
     const idempotencyKey = requestId();
     if (!correlationId || !idempotencyKey) {
@@ -110,7 +120,7 @@ export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevisio
     <div className="max-w-2xl">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ready for review</p>
       <h2 id="submit-intake-heading" className="mt-2 text-balance text-2xl font-semibold tracking-tight">Submit your saved intake</h2>
-      <p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">Before you submit, add at least one must-have or nice-to-have requirement. You can still edit your saved answers and requirements now.</p>
+      <p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">{hasRequirement ? "" : "Submission needs at least one saved must-have or nice-to-have requirement. "}You can still edit your saved answers and requirements now.</p>
     </div>
 
     {locked ? <section className="flex flex-wrap items-center justify-between gap-4 border-l-2 border-destructive pl-5" role="alert">
@@ -131,13 +141,17 @@ export function CustomerIntakeSubmit({ organizationId, intakeId, expectedRevisio
         <p>Editing stops after submission. It does not send an RFP, contact providers, or create an assessment.</p>
       </div>
       <label className="flex min-h-11 items-start gap-3 text-sm leading-6">
-        <input type="checkbox" checked={checked} disabled={submit.isPending} className="mt-1 size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" onChange={(event) => setChecked(event.target.checked)} />
+        <input ref={checkbox} type="checkbox" checked={checked} disabled={submit.isPending} aria-invalid={confirmMissing || undefined}
+          aria-describedby={confirmMissing ? confirmErrorId : undefined}
+          className="mt-1 size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          onChange={(event) => { setChecked(event.target.checked); if (event.target.checked) setConfirmMissing(false); }} />
         <span>Submit all current saved answers and requirements</span>
       </label>
+      {confirmMissing && <p id={confirmErrorId} role="alert" className="border-l-2 border-destructive pl-4 text-sm leading-6">Tick the box above to confirm. Then select Submit saved intake again.</p>}
       {message && <p role="alert" className="border-l-2 border-destructive pl-4 text-sm leading-6">{message}</p>}
       <div className="flex flex-wrap gap-3">
-        <Button type="button" className={buttonClass} disabled={!checked || submit.isPending} onClick={submitConfirmed}>{submit.isPending ? "Submitting…" : "Submit saved intake"}</Button>
-        {!submit.isPending && <Button type="button" variant="outline" className={buttonClass} onClick={() => { setReviewing(false); setChecked(false); }}>Return to editing</Button>}
+        <Button type="button" className={buttonClass} disabled={submit.isPending} onClick={submitConfirmed}>{submit.isPending ? "Submitting…" : "Submit saved intake"}</Button>
+        {!submit.isPending && <Button type="button" variant="outline" className={buttonClass} onClick={() => { setReviewing(false); setChecked(false); setConfirmMissing(false); }}>Return to editing</Button>}
       </div>
     </section>}
   </section>;
