@@ -6,9 +6,21 @@ import {
   isPathInLaunch,
   launchAreaForPath,
   launchCandidate,
+  launchVisibleLinks,
 } from "./launch-surface";
 
 describe("launch surface", () => {
+  test("keeps only navigation links whose area is enabled", () => {
+    const links = [
+      { href: "/home" }, { href: "/customer?new=1" }, { href: "/customer/proposals" },
+      { href: "/vendor/demos" }, { href: "/documents" }, { href: "/admin/finance/documents" },
+    ];
+    expect(launchVisibleLinks(links, "A")).toEqual([{ href: "/home" }, { href: "/customer?new=1" }]);
+    expect(launchVisibleLinks(links, "B")).toEqual([
+      { href: "/home" }, { href: "/customer?new=1" }, { href: "/customer/proposals" }, { href: "/vendor/demos" },
+    ]);
+  });
+
   test("defaults to Candidate A and rejects unknown candidates", () => {
     expect(launchCandidate(undefined)).toBe("A");
     expect(launchCandidate("")).toBe("A");

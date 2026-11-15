@@ -76,6 +76,18 @@ export function launchAreaForPath(pathname: string): LaunchArea {
   return "core";
 }
 
+/**
+ * Keeps only the navigation links whose area the launch candidate enables, so
+ * menus never offer a page that the proxy answers with 404.
+ */
+export function launchVisibleLinks<T extends { readonly href: string }>(
+  links: readonly T[],
+  candidate: LaunchCandidate = launchCandidate(),
+): T[] {
+  return links.filter(({ href }) =>
+    isLaunchAreaEnabled(launchAreaForPath(new URL(href, "http://launch.invalid").pathname), candidate));
+}
+
 /** Returns the requested tRPC procedure names that the launch candidate hides. */
 export function hiddenTrpcProcedures(pathname: string, candidate: LaunchCandidate = launchCandidate()): string[] {
   if (!pathname.startsWith(trpcPrefix)) return [];

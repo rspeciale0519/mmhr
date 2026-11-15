@@ -7,6 +7,16 @@ import { getVendorRfps } from "@/server/commands/rfp-portal";
 
 import { getRfpReceiptStatus } from "@/server/commands/rfp-receipt";
 import { RfpReceiptStatus } from "@/components/workflow/rfp-receipt-status";
+import { launchVisibleLinks } from "@/lib/launch-surface";
+
+const vendorLinks = [
+  { href: "/home", label: "Home" },
+  { href: "/workspaces", label: "Change workspace" },
+  { href: "/vendor/demos", label: "Demo coordination" },
+  { href: "/vendor/proposals", label: "Proposals and pricing" },
+  { href: "/vendor/contracts", label: "Contract handoff" },
+] as const;
+
 export default async function VendorHome({ searchParams }: { searchParams: Promise<Record<string,string|string[]|undefined>> }) {
   const {authorization} = await requirePortalPageAccess("vendor");
   if (authorization.scope.kind !== "organization") forbidden();
@@ -18,12 +28,8 @@ export default async function VendorHome({ searchParams }: { searchParams: Promi
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
       <nav aria-label="Vendor workspace" className="flex flex-wrap gap-6 text-sm underline">
-        <Link href="/home" className="inline-flex min-h-11 items-center">Home</Link>
-        <Link href="/workspaces" className="inline-flex min-h-11 items-center">Change workspace</Link>
-        <Link href="/vendor/demos" className="inline-flex min-h-11 items-center">Demo coordination</Link>
-        <Link href="/vendor/proposals" className="inline-flex min-h-11 items-center">Proposals and pricing</Link>
-        <Link href="/vendor/contracts" className="inline-flex min-h-11 items-center">Contract handoff</Link>
-        <Link href="/documents" className="inline-flex min-h-11 items-center">Workspace documents</Link>
+        {launchVisibleLinks(vendorLinks).map(({ href, label }) =>
+          <Link key={href} href={href} className="inline-flex min-h-11 items-center">{label}</Link>)}
       </nav>
       <h1 className="text-2xl font-semibold">Vendor portal</h1>
       <p className="text-sm">Approved RFPs delivered to your organization.</p>
