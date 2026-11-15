@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { estimateEmployeeCountKey, estimateEmployeeCountLabel } from "@/lib/intake-estimate";
+import { formatMapAnswer, mapQuestionLabel, orderedMapEntries, sectionLabels, type ListSectionKey, type MapSectionKey } from "@/lib/intake-questions";
 import type { getIntake, getIntakesPage } from "@/server/commands/intake-read";
 
 type Intake = Awaited<ReturnType<typeof getIntake>>;
@@ -99,27 +99,36 @@ export function IntakeList({ page, hasCursor, canCreate = false }: { page: Intak
   );
 }
 
-function SavedSection({ title, value }: { title: string; value: string[] | Record<string, string | number | boolean> | undefined }) {
+function SavedListSection({ section, value }: { section: ListSectionKey; value: string[] | undefined }) {
+  const title = sectionLabels[section];
   return (
     <section className="grid gap-4 border-t py-6 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8" aria-label={title}>
       <h3 className="text-balance text-base font-semibold">{title}</h3>
-      {!value || Object.keys(value).length === 0 ? <p className="text-sm text-muted-foreground">Not provided</p>
-        : Array.isArray(value) ? (
-          <ul className="min-w-0 list-disc space-y-2 pl-5 text-sm leading-6">
-            {value.map((item, index) => <li key={index} className="whitespace-pre-wrap [overflow-wrap:anywhere]">{item}</li>)}
-          </ul>
-        ) : (
-          <dl className="min-w-0 space-y-4 text-sm leading-6">
-            {Object.entries(value).map(([label, entry]) => (
-              <div key={label}>
-                <dt className="whitespace-pre-wrap font-medium [overflow-wrap:anywhere]">{title === "Company context" && label === estimateEmployeeCountKey ? estimateEmployeeCountLabel : label}</dt>
-                <dd className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">
-                  {typeof entry === "boolean" ? (entry ? "Yes" : "No") : entry === "" ? "Not provided" : entry}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
+      {!value || value.length === 0 ? <p className="text-sm text-muted-foreground">Not provided</p> : (
+        <ul className="min-w-0 list-disc space-y-2 pl-5 text-sm leading-6">
+          {value.map((item, index) => <li key={index} className="whitespace-pre-wrap [overflow-wrap:anywhere]">{item}</li>)}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/** Shows guided answers with their question text. Labels from earlier form versions show as saved. */
+function SavedMapSection({ section, value }: { section: MapSectionKey; value: Record<string, string | number | boolean> | undefined }) {
+  const title = sectionLabels[section];
+  return (
+    <section className="grid gap-4 border-t py-6 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8" aria-label={title}>
+      <h3 className="text-balance text-base font-semibold">{title}</h3>
+      {!value || Object.keys(value).length === 0 ? <p className="text-sm text-muted-foreground">Not provided</p> : (
+        <dl className="min-w-0 space-y-4 text-sm leading-6">
+          {orderedMapEntries(section, value).map(([label, entry]) => (
+            <div key={label}>
+              <dt className="whitespace-pre-wrap font-medium [overflow-wrap:anywhere]">{mapQuestionLabel(section, label) ?? label}</dt>
+              <dd className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere]">{formatMapAnswer(section, label, entry)}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }
@@ -147,13 +156,13 @@ export function IntakeDetails({ intake, canEdit = false, staffView = false }: { 
         className={`${linkStyle} mb-5`}>View software comparison</Link>}
       {canEdit && !staffView && <Link href={`/customer?intake=${intake.intakeId}&edit=1`} prefetch={false}
         className={`${linkStyle} mb-5`}>Edit intake answers</Link>}
-      <SavedSection title="Company context" value={intake.data.companyContext} />
-      <SavedSection title="Current systems" value={intake.data.currentSystems} />
-      <SavedSection title="Compliance needs" value={intake.data.complianceNeeds} />
-      <SavedSection title="Budget" value={intake.data.budget} />
-      <SavedSection title="Timeline" value={intake.data.timeline} />
-      <SavedSection title="Stakeholders" value={intake.data.stakeholders} />
-      <SavedSection title="Decision process" value={intake.data.decisionProcess} />
+      <SavedMapSection section="companyContext" value={intake.data.companyContext} />
+      <SavedListSection section="currentSystems" value={intake.data.currentSystems} />
+      <SavedListSection section="complianceNeeds" value={intake.data.complianceNeeds} />
+      <SavedMapSection section="budget" value={intake.data.budget} />
+      <SavedMapSection section="timeline" value={intake.data.timeline} />
+      <SavedListSection section="stakeholders" value={intake.data.stakeholders} />
+      <SavedMapSection section="decisionProcess" value={intake.data.decisionProcess} />
     </article>
   );
 }
