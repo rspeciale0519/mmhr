@@ -2,7 +2,7 @@
 
 Updated: 2026-11-16 10:45 EST. `develop` is at f3fdab2 (PR #37 hosted worker login). Latest develop CI run 43766019866 completed successfully. Trim tasks 1–2 are done (`docs/LAUNCH.md` is launch authority). Trim task 3 (browser launch-path run on the local stack) remains open.
 
-Current branch work: `.cursor/skills/verify-mmhr/` — agents can launch, doctor, and drive the Pulse web UI before claiming done. Proof run used `--stand-in` (no Docker/Supabase in this environment) and drove landing. See journal/2026-11-16.md.
+Current branch work: `.cursor/skills/verify-mmhr/` on `cursor/verify-mmhr-c943` (draft PR #38). Stand-in launch no longer embeds a dummy credential URL; `npm run check:secrets` passed locally after that change. See journal/2026-11-16.md.
 
 ## Trim direction (owner-approved 2026-11-14)
 - Goal: cut the system to one launch path (sign-up, intake, masked comparison, five choices, disclosure, approved RFP, vendor response).

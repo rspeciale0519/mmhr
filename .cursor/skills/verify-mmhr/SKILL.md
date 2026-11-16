@@ -65,7 +65,7 @@ If Docker or the Supabase CLI is missing, full launch must fail. Only then:
 node .cursor/skills/verify-mmhr/scripts/launch.mjs --stand-in
 ```
 
-Stand-in starts `next dev` on `127.0.0.1:3100` with `NEXT_PUBLIC_SUPABASE_ANON_KEY=verification-placeholder-anon-key`. It skips migrations, the worker wrapper, and Auth. Authenticated journeys are unverified in that mode. Doctor will say `mode: stand-in`.
+Stand-in starts `next dev` on `127.0.0.1:3100`. It points `NEXT_PUBLIC_SUPABASE_URL` at this project's local API origin and reuses `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the environment when set; otherwise it generates a non-secret stand-in token at runtime. It does not set `MIGRATION_DATABASE_URL`, and it skips migrations, the worker wrapper, and Auth. Authenticated journeys are unverified in that mode. Doctor will say `mode: stand-in`.
 
 Teardown is the cleanup helper below.
 

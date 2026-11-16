@@ -36,7 +36,6 @@ export const INBUCKET_PORT = 57024;
 export const PULSE_HEADING = "Compare HR software options with vendor names hidden.";
 export const HOLDING_HEADING = "This site is not available yet.";
 export const SIGN_IN_HEADING = "Sign in";
-export const PLACEHOLDER_ANON_KEY = "verification-placeholder-anon-key";
 
 export function evidenceDir(runId) {
   return path.join(evidenceRoot, runId);

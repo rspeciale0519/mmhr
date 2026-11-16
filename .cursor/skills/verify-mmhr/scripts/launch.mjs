@@ -9,9 +9,7 @@ import {
   APP_URL,
   PULSE_HEADING,
   HOLDING_HEADING,
-  PLACEHOLDER_ANON_KEY,
   SUPABASE_API_PORT,
-  SUPABASE_DB_PORT,
   dockerAvailable,
   evidenceDir,
   ensureDir,
@@ -125,14 +123,13 @@ async function launchStandIn(runId) {
     PORT: String(APP_PORT),
     NEXT_PUBLIC_APP_URL: APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: `http://${APP_HOST}:${SUPABASE_API_PORT}`,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: PLACEHOLDER_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY:
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ["stand-in", "anon", APP_HOST].join("-"),
     NEXT_PUBLIC_BRAND_NAME: "MatchMaker HR",
     MMHR_LAUNCH_CANDIDATE: "A",
     PUBLIC_RELEASE_ENABLED: "0",
     AGENTID_SIGN_IN_ENABLED: "0",
     IDENTITY_INTENT_WORKER_ENABLED: "0",
-    // Dummy local URL so any accidental drizzle call stays on loopback.
-    MIGRATION_DATABASE_URL: `postgresql://postgres:postgres@${APP_HOST}:${SUPABASE_DB_PORT}/postgres`,
   };
   const child = spawnLogged(
     process.execPath,
