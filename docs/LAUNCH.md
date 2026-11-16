@@ -6,12 +6,18 @@ Product rules in [PRD.md](./PRD.md) and architecture rules in [TECH_STACK.md](./
 
 ## The launch path
 
+Before the path starts, staff enter the vendors (owner decision, 2026-11-16). A Super Admin lists each vendor at
+`/admin/vendors`. Staff open its workspace and enter its products, evidence, and approvals.
+No vendor user signs in for this. See [vendor-entry.md](./vendor-entry.md).
+
 1. A customer creates a free account and gets a private workspace.
 2. The customer enters software needs and submits them.
 3. The customer sees all published vendor options in the comparison matrix. Vendor names are hidden.
 4. The customer selects a maximum of five options.
 5. Staff talk with the customer and record the disclosure of vendor names.
-6. Staff approve the RFP and issue it to the selected vendors.
+6. Staff approve the RFP. For each selected vendor that has no user yet, staff invite its first user at `/admin/vendors`
+   and wait until that user joins. The invitation expires after 72 hours. The app sends no email yet, so staff send the
+   steps to the person. When the vendor has joined, staff issue the RFP. The response deadline starts at delivery.
 7. Each vendor reads the RFP in the portal and submits a response.
 
 Launch is ready when one customer, one vendor, and staff complete this path on hosted staging.
@@ -37,7 +43,7 @@ Add more control only when the work touches one of the five protections.
 | Shared | `/home`, `/workspaces`, `/members`, `/invitations` |
 | Customer | `/customer` (needs), `/customer/evaluation` (matrix), `/customer/rfp` |
 | Vendor | `/vendor`, `/vendor/response` |
-| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendor-evidence`, `/admin/audit` |
+| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendors`, `/admin/vendor-evidence`, `/admin/audit` |
 
 Blocked now by [`src/lib/launch-surface.ts`](../src/lib/launch-surface.ts) and `src/proxy.ts`:
 finance, documents, demos, proposals, and contracts, with their API routes.

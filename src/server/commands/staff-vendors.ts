@@ -25,6 +25,14 @@ export const enableStaffVendorPortalInputSchema = z.strictObject({
 export const inviteStaffVendorAdminInputSchema = z.strictObject({
   organizationId: uuid, email: inviteEmail, correlationId: uuid, idempotencyKey: uuid,
 });
+// Same rule as the SQL command: trimmed, 1 to 500 characters, no control characters.
+const listReason = z.string().trim().min(1).max(500).refine((value) => !/\p{Cc}/u.test(value));
+export const listStaffVendorInputSchema = z.strictObject({
+  organizationId: uuid, reason: listReason, correlationId: uuid, idempotencyKey: uuid,
+});
+export const openStaffVendorWorkspaceInputSchema = z.strictObject({
+  organizationId: uuid, correlationId: uuid, idempotencyKey: uuid,
+});
 
 const invitationSchema = z.strictObject({
   invitationId: uuid, email: z.string().min(3).max(254), expiresAt: utcTime, expired: z.boolean(),
@@ -35,11 +43,13 @@ const vendorSchema = z.strictObject({
   status: z.enum(["pending", "active", "suspended"]),
   profileStatus: z.enum(["prospect", "active", "paused", "archived"]).nullable(),
   portalOn: z.boolean(),
+  // Vendor users only. Staff workspace memberships are not counted.
   activeMembers: z.number().int().min(0).max(100_000),
+  callerHasAccess: z.boolean(),
   pendingInvitations: z.array(invitationSchema).max(20),
 });
 const directorySchema = z.strictObject({
-  version: z.literal(1), items: z.array(vendorSchema).max(200), truncated: z.boolean(),
+  version: z.literal(1), items: z.array(vendorSchema).max(200), truncated: z.boolean(), callerCanList: z.boolean(),
 });
 const createResultSchema = z.strictObject({
   organizationId: uuid, profileId: uuid, outcomeCode: z.enum(["created", "replayed"]), correlationId: uuid,
@@ -52,8 +62,15 @@ const inviteResultSchema = z.strictObject({
   outcomeCode: z.enum(["invited", "existing", "replayed"]), correlationId: uuid,
 });
 
+const listResultSchema = z.strictObject({
+  organizationId: uuid, activatedAt: utcTime, outcomeCode: z.enum(["listed", "replayed"]), correlationId: uuid,
+});
+const openResultSchema = z.strictObject({
+  organizationId: uuid, grantId: uuid.nullable(), outcomeCode: z.enum(["opened", "existing", "replayed"]), correlationId: uuid,
+});
+
 export type StaffVendor = z.output<typeof vendorSchema>;
-export type StaffVendorDirectory = { items: StaffVendor[]; truncated: boolean };
+export type StaffVendorDirectory = { items: StaffVendor[]; truncated: boolean; callerCanList: boolean };
 
 function databaseError(code: string | undefined): never {
   if (code === "42501") throw new AuthorizationError();
@@ -87,8 +104,8 @@ function parse<T>(schema: z.ZodType<T>, input: unknown) {
 
 /** Lists vendor organizations with portal, member, and pending invitation state. */
 export async function getStaffVendorDirectory(options: AuthorizationOptions = {}): Promise<StaffVendorDirectory> {
-  const { items, truncated } = await call("mmhr_get_staff_vendor_directory", { payload: {} }, directorySchema, options);
-  return { items, truncated };
+  const { items, truncated, callerCanList } = await call("mmhr_get_staff_vendor_directory", { payload: {} }, directorySchema, options);
+  return { items, truncated, callerCanList };
 }
 
 /** Adds a pending vendor organization with its prospect vendor profile. */
@@ -127,6 +144,34 @@ export async function inviteStaffVendorAdmin(
   }, inviteResultSchema, { ...options, correlationId: value.correlationId });
   if (result.organizationId !== value.organizationId || result.email !== value.email
     || result.correlationId !== value.correlationId) {
+    throw new StaffVendorError("INVALID_RESPONSE");
+  }
+  return result;
+}
+
+/** Lists one pending vendor for customer comparisons. Super Admin with AAL2 only; no vendor user is needed. */
+export async function listStaffVendor(input: z.input<typeof listStaffVendorInputSchema>, options: AuthorizationOptions = {}) {
+  const value = parse(listStaffVendorInputSchema, input);
+  const result = await call("mmhr_list_staff_vendor", {
+    payload: { organizationId: value.organizationId, reason: value.reason },
+    correlation_id: value.correlationId, idempotency_key: value.idempotencyKey,
+  }, listResultSchema, { ...options, correlationId: value.correlationId });
+  if (result.organizationId !== value.organizationId || result.correlationId !== value.correlationId) {
+    throw new StaffVendorError("INVALID_RESPONSE");
+  }
+  return result;
+}
+
+/** Gives the verified staff caller audited access to one active vendor workspace. */
+export async function openStaffVendorWorkspace(
+  input: z.input<typeof openStaffVendorWorkspaceInputSchema>, options: AuthorizationOptions = {},
+) {
+  const value = parse(openStaffVendorWorkspaceInputSchema, input);
+  const result = await call("mmhr_open_staff_vendor_workspace", {
+    payload: { organizationId: value.organizationId },
+    correlation_id: value.correlationId, idempotency_key: value.idempotencyKey,
+  }, openResultSchema, { ...options, correlationId: value.correlationId });
+  if (result.organizationId !== value.organizationId || result.correlationId !== value.correlationId) {
     throw new StaffVendorError("INVALID_RESPONSE");
   }
   return result;

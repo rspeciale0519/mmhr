@@ -6,6 +6,7 @@ import { searchCrm } from "@/server/commands/crm-search-database";
 import { getVendorEvidence } from "@/server/commands/vendor-evidence-database";
 import { EvidenceCapture, EvidenceReview, EvidenceRenewal } from "./evidence-controls";
 import { EvidenceValue } from "./evidence-value";
+import { AddProduct } from "./add-product";
 import { ProductReview } from "./product-review";
 import { ProfileReview } from "./profile-review";
 import { getVendorCatalogProfile } from "@/server/commands/vendor-catalog";
@@ -28,11 +29,12 @@ export default async function VendorEvidencePage({ searchParams }: { searchParam
       <h1 className="text-3xl font-semibold">Vendor evidence</h1>
       <p className="text-sm leading-6 text-muted-foreground">{vendors[0]?.label ?? "Select a vendor workspace to record evidence."}</p>
       <Link href="/workspaces" className="inline-flex min-h-11 items-center underline">Change workspace</Link></header>
+    {vendors.length === 1 && <AddProduct organizationId={organizationId} vendorProfileId={vendors[0].recordId}/>}
     {vendors.length === 1 && <EvidenceCapture key={`${organizationId}:${query.data.productsAfter ?? "first"}`} organizationId={organizationId}
       vendorProfileId={vendors[0].recordId} products={products}/>}
     {profile && <ProfileReview profile={profile}/>}
     {products.length > 0 && <ProductReview organizationId={organizationId} products={products}/>}
-    {products.length === 0 && <p>No active or draft products are available on this page.</p>}
+    {products.length === 0 && <p>No active or draft products are available on this page. Add a product above.</p>}
     {products.length === 50 && <Link className="inline-flex min-h-11 items-center underline" href={`/admin/vendor-evidence?productsAfter=${products.at(-1)!.recordId}`}>Next products</Link>}
     {query.data.productsAfter && <Link className="inline-flex min-h-11 items-center underline" href="/admin/vendor-evidence">First products</Link>}
     <section className="space-y-5" aria-labelledby="saved-evidence-heading"><h2 id="saved-evidence-heading" className="text-xl font-semibold">Saved evidence</h2>

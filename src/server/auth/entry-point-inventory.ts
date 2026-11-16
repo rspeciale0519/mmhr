@@ -2068,6 +2068,13 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   denialEvidence: "vendor-evidence.test.ts; r2b-crm-commands.integration.test.ts",
 },
 {
+  key: "src/server/trpc/routers/vendor-evidence.ts#createProduct",
+  kind: "trpc-procedure", access: "internal-only",
+  permission: "workspace.access and admin.access", scope: "selected vendor organization and its vendor profile",
+  surface: "Staff product entry", dataPath: "request-scoped existing product create RPC; draft status only",
+  denialEvidence: "vendor-evidence.test.ts; staff-vendor-listing.integration.test.ts",
+},
+{
   key: "src/server/trpc/routers/vendor-evidence.ts#activateProduct",
   kind: "trpc-procedure", access: "internal-only",
   permission: "workspace.access and admin.access", scope: "vendor organization and product revision",
@@ -2192,12 +2199,27 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   denialEvidence: "vendors/actions.test.ts; staff-vendor-setup.integration.test.ts; migration 0177 unapplied",
 })),
 {
-  key: "src/server/commands/staff-vendors.ts#command", surface: "staff vendor directory, add vendor, vendor portal, and invitation",
+  key: "src/app/(admin)/admin/vendors/actions.ts#listVendorAction", surface: "listVendorAction", kind: "server-action",
+  access: "internal-only", permission: "audit.export and independent Super Admin with AAL2",
+  scope: "one pending vendor organization that is not review-flagged; becomes active with no vendor user",
+  dataPath: "exact-origin action; audited idempotent listing RPC with a required reason; no email sent",
+  denialEvidence: "vendors/actions.test.ts; staff-vendor-listing.integration.test.ts; migration 0179 unapplied",
+},
+{
+  key: "src/app/(admin)/admin/vendors/actions.ts#openVendorWorkspaceAction", surface: "openVendorWorkspaceAction",
+  kind: "server-action", access: "internal-only", permission: "admin.access with AAL2; workspace.access by role after the grant",
+  scope: "one active vendor organization; staff viewer grant never gives vendor portal permissions",
+  dataPath: "exact-origin action; audited open-workspace RPC; HttpOnly selection cookie",
+  denialEvidence: "vendors/actions.test.ts; staff-vendor-listing.integration.test.ts; migration 0179 unapplied",
+},
+{
+  key: "src/server/commands/staff-vendors.ts#command",
+  surface: "staff vendor directory, add vendor, list vendor, vendor workspace, vendor portal, and invitation",
   kind: "command", access: "privileged",
-  permission: "admin.access with AAL2; first-admin acceptance needs a verified MFA factor and the capacity check",
+  permission: "admin.access with AAL2; listing needs audit.export and an independent Super Admin; first vendor user acceptance needs a verified MFA factor and the capacity check",
   scope: "vendor organizations only; organization type and status checked in SQL",
   dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited commands",
-  denialEvidence: "staff-vendors.test.ts; staff-vendor-setup.integration.test.ts; migration 0177 unapplied",
+  denialEvidence: "staff-vendors.test.ts; staff-vendor-setup.integration.test.ts; staff-vendor-listing.integration.test.ts; migrations 0177 and 0179 unapplied",
 },
 ];
 

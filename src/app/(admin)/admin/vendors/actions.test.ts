@@ -1,18 +1,26 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { AuthorizationError } from "@/server/auth/authorization";
 import {
-  createStaffVendor, enableStaffVendorPortal, inviteStaffVendorAdmin, StaffVendorError,
+  createStaffVendor, enableStaffVendorPortal, inviteStaffVendorAdmin, listStaffVendor, openStaffVendorWorkspace,
+  StaffVendorError,
 } from "@/server/commands/staff-vendors";
-import { createVendorAction, enableVendorPortalAction, inviteVendorAdminAction } from "./actions";
+import {
+  createVendorAction, enableVendorPortalAction, inviteVendorAdminAction, listVendorAction, openVendorWorkspaceAction,
+} from "./actions";
 
-vi.mock("next/headers", () => ({ headers: vi.fn() }));
+vi.mock("next/headers", () => ({ cookies: vi.fn(), headers: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("next/navigation", () => ({ forbidden: () => { throw new Error("FORBIDDEN"); } }));
+vi.mock("next/navigation", () => ({
+  forbidden: () => { throw new Error("FORBIDDEN"); },
+  redirect: vi.fn((to: string) => { throw new Error(`REDIRECT ${to}`); }),
+}));
 vi.mock("@/server/commands/staff-vendors", async (original) => ({
   ...(await original<typeof import("@/server/commands/staff-vendors")>()),
   createStaffVendor: vi.fn(), enableStaffVendorPortal: vi.fn(), inviteStaffVendorAdmin: vi.fn(),
+  listStaffVendor: vi.fn(), openStaffVendorWorkspace: vi.fn(),
 }));
 vi.mock("server-only", () => ({}));
 
@@ -20,6 +28,7 @@ const organizationId = "22222222-2222-4222-8222-222222222222";
 const idempotencyKey = "11111111-1111-4111-8111-111111111111";
 const invitationId = "33333333-3333-4333-8333-333333333333";
 const expiresAt = "2026-11-17T10:00:00.000000Z";
+const set = vi.fn();
 function form(values: Record<string, string>) {
   const data = new FormData();
   for (const [key, value] of Object.entries(values)) data.set(key, value);
@@ -37,6 +46,14 @@ beforeEach(() => {
   vi.mocked(inviteStaffVendorAdmin).mockReset().mockResolvedValue({
     organizationId, invitationId, email: "admin@northwind.example", expiresAt, outcomeCode: "invited", correlationId: idempotencyKey,
   });
+  vi.mocked(listStaffVendor).mockReset().mockResolvedValue({
+    organizationId, activatedAt: expiresAt, outcomeCode: "listed", correlationId: idempotencyKey,
+  });
+  vi.mocked(openStaffVendorWorkspace).mockReset().mockResolvedValue({
+    organizationId, grantId: invitationId, outcomeCode: "opened", correlationId: idempotencyKey,
+  });
+  vi.mocked(cookies).mockReset().mockResolvedValue({ set } as never);
+  set.mockReset(); vi.mocked(redirect).mockClear();
   vi.mocked(revalidatePath).mockClear();
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -103,4 +120,50 @@ test("rejects a cross-site request", async () => {
   vi.mocked(headers).mockResolvedValue(new Headers({ origin: "https://evil.example" }) as never);
   await expect(createVendorAction(null, form({ name: "Northwind", idempotencyKey }))).rejects.toThrow();
   expect(createStaffVendor).not.toHaveBeenCalled();
+});
+
+test("lists a vendor with the typed reason and refreshes the list", async () => {
+  await expect(listVendorAction(null, form({ organizationId, idempotencyKey, reason: "Checked the vendor site" })))
+    .resolves.toMatchObject({ status: "success", message: expect.stringContaining("listed") });
+  expect(listStaffVendor).toHaveBeenCalledExactlyOnceWith({
+    organizationId, idempotencyKey, reason: "Checked the vendor site", correlationId: expect.stringMatching(/^[0-9a-f-]{36}$/),
+  });
+  expect(revalidatePath).toHaveBeenCalledWith("/admin/vendors");
+});
+
+test("explains a refused listing with the Super Admin and two-step sign-in rule", async () => {
+  vi.mocked(listStaffVendor).mockRejectedValueOnce(new AuthorizationError());
+  const state = await listVendorAction(null, form({ organizationId, idempotencyKey, reason: "Checked" }));
+  expect(state).toMatchObject({ status: "error", field: "reason", value: "Checked" });
+  expect(state?.message).toContain("Only a Super Admin can list a vendor");
+  expect(state?.message).toContain("two-step sign-in");
+  expect(state?.message).toContain("/mfa");
+  expect(revalidatePath).not.toHaveBeenCalled();
+});
+
+test.each([
+  [{ organizationId, idempotencyKey, reason: "   " }],
+  [{ organizationId, idempotencyKey, reason: "x".repeat(501) }],
+  [{ organizationId: "bad", idempotencyKey, reason: "Checked" }],
+])("refuses invalid listing fields %# without a database call", async (values) => {
+  await expect(listVendorAction(null, form(values))).resolves.toMatchObject({ status: "error", field: "reason" });
+  expect(listStaffVendor).not.toHaveBeenCalled();
+});
+
+test("opens the vendor workspace, selects it, and shows vendor evidence", async () => {
+  await expect(openVendorWorkspaceAction(form({ organizationId, idempotencyKey }))).rejects.toThrow("REDIRECT /admin/vendor-evidence");
+  expect(openStaffVendorWorkspace).toHaveBeenCalledExactlyOnceWith({
+    organizationId, idempotencyKey, correlationId: expect.stringMatching(/^[0-9a-f-]{36}$/),
+  });
+  expect(set).toHaveBeenCalledWith("mmhr-organization-id", organizationId, expect.objectContaining({ httpOnly: true, sameSite: "lax" }));
+});
+
+test("a denied workspace returns to the vendor list without selecting it", async () => {
+  vi.mocked(openStaffVendorWorkspace).mockRejectedValueOnce(new AuthorizationError());
+  await expect(openVendorWorkspaceAction(form({ organizationId, idempotencyKey }))).rejects.toThrow("REDIRECT /admin/vendors?notice=denied");
+  expect(set).not.toHaveBeenCalled();
+  await expect(openVendorWorkspaceAction(form({ organizationId: "bad", idempotencyKey }))).rejects.toThrow("FORBIDDEN");
+  vi.mocked(headers).mockResolvedValue(new Headers({ origin: "https://evil.example" }) as never);
+  await expect(openVendorWorkspaceAction(form({ organizationId, idempotencyKey }))).rejects.toThrow();
+  expect(openStaffVendorWorkspace).toHaveBeenCalledTimes(1);
 });

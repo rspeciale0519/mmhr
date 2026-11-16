@@ -4,7 +4,9 @@ import { AuthorizationError, requirePermission, type AuthorizationContext } from
 import { vendorEvidenceApprovalSchema, vendorEvidenceRecordSchema, vendorEvidenceReadInputSchema } from "@/server/crm/vendor-evidence-contract";
 import { approveVendorEvidence, recordVendorEvidence, getVendorEvidence, VendorEvidenceCommandError } from "@/server/commands/vendor-evidence-database";
 import { permissionProcedure, router } from "../trpc";
-import { updateProduct, updateProductInputSchema } from "@/server/commands/crm-database";
+import {
+  createProduct, createProductInputSchema, CrmDatabaseCommandError, updateProduct, updateProductInputSchema,
+} from "@/server/commands/crm-database";
 import { approveVendorCatalogProfile } from "@/server/commands/vendor-catalog";
 import { vendorCatalogApprovalSchema } from "@/server/crm/vendor-catalog-contract";
 
@@ -16,7 +18,10 @@ async function staffResult<T>(authorization: AuthorizationContext, operation: ()
   } catch (error) {
     throw new TRPCError({
       code: error instanceof AuthorizationError ? "NOT_FOUND"
-        : error instanceof VendorEvidenceCommandError && error.code === "INVALID_INPUT" ? "BAD_REQUEST" : "INTERNAL_SERVER_ERROR",
+        : (error instanceof VendorEvidenceCommandError || error instanceof CrmDatabaseCommandError)
+          && error.code === "INVALID_INPUT" ? "BAD_REQUEST"
+        // The fixed CRM RPC refused the command, for example a duplicate product key or a stale revision.
+        : error instanceof CrmDatabaseCommandError && error.code === "REJECTED" ? "CONFLICT" : "INTERNAL_SERVER_ERROR",
       message: "Vendor evidence request failed",
     });
   }
@@ -28,6 +33,12 @@ export const vendorEvidenceRouter = router({
     resolveScope: input => ({ kind: "organization", organizationId: input.organizationId }),
   }).mutation(({ ctx, input }) => staffResult(ctx.authorization,
     () => approveVendorCatalogProfile(input, { supabase: ctx.supabase }))),
+  // Staff add a draft product to the selected vendor workspace. Activation stays a separate review step.
+  createProduct: permissionProcedure({
+    permission: "workspace.access", input: createProductInputSchema.omit({ status: true }),
+    resolveScope: (input) => ({ kind: "organization", organizationId: input.organizationId }),
+  }).mutation(({ ctx, input }) => staffResult(ctx.authorization,
+    () => createProduct({ ...input, status: "draft" }, { supabase: ctx.supabase }))),
   activateProduct: permissionProcedure({
     permission: "workspace.access", input: z.strictObject({
       organizationId: updateProductInputSchema.shape.organizationId,

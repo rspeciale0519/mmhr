@@ -2,29 +2,32 @@ import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { forbidden } from "next/navigation";
 
+import { Button } from "@/components/ui/button";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { requirePagePermission } from "@/server/auth/page-guards";
 import { getStaffVendorDirectory, type StaffVendor } from "@/server/commands/staff-vendors";
-import { CreateVendorForm, EnablePortalForm, InviteAdminForm, NextSteps } from "./vendor-forms";
+import { openVendorWorkspaceAction } from "./actions";
+import { CreateVendorForm, EnablePortalForm, InviteAdminForm, ListVendorForm, NextSteps } from "./vendor-forms";
 
 const statusText: Record<StaffVendor["status"], string> = {
-  pending: "Waiting for its first administrator",
-  active: "Active",
+  pending: "Not listed",
+  active: "Listed",
   suspended: "Suspended",
 };
 
 function memberText(count: number) {
-  return count === 0 ? "No active members" : count === 1 ? "1 active member" : `${count} active members`;
+  return count === 0 ? "Not joined" : count === 1 ? "1 vendor user" : `${count} vendor users`;
 }
 
-/** The three setup steps for one vendor. Each line says if it is done. */
+/** The setup steps for one vendor. Each line says if it is done. */
 function SetupSteps({ vendor }: { vendor: StaffVendor }) {
   const live = vendor.pendingInvitations.filter((invitation) => !invitation.expired).length;
+  const joined = vendor.activeMembers > 0;
   const steps = [
     ["Vendor added", true],
+    ["Vendor listed for customer comparisons", vendor.status !== "pending"],
     ["Vendor portal on", vendor.portalOn],
-    [vendor.status === "pending" ? (live > 0 ? "First administrator invited, not accepted yet" : "First administrator not invited")
-      : "Administrator accepted", vendor.status !== "pending"],
+    [joined ? "First vendor user joined" : live > 0 ? "Vendor user invited, not joined yet" : "No vendor user invited", joined],
   ] as const;
   return <ol aria-label={`Setup steps for ${vendor.name}`} className="space-y-1 text-sm">
     {steps.map(([label, done]) => <li key={label} className="flex gap-2">
@@ -34,15 +37,34 @@ function SetupSteps({ vendor }: { vendor: StaffVendor }) {
   </ol>;
 }
 
-function VendorEntry({ vendor }: { vendor: StaffVendor }) {
+function OpenWorkspaceForm({ vendor }: { vendor: StaffVendor }) {
+  const label = vendor.callerHasAccess ? "Continue in vendor workspace" : "Open vendor workspace";
+  return <form action={openVendorWorkspaceAction} className="space-y-2">
+    <input type="hidden" name="organizationId" value={vendor.organizationId}/>
+    <input type="hidden" name="idempotencyKey" value={randomUUID()}/>
+    <p className="text-sm text-muted-foreground">
+      {vendor.callerHasAccess ? "You have access to this vendor workspace."
+        : "Opening gives you staff access to add products and evidence. It is recorded in the audit log."}
+    </p>
+    <Button type="submit" variant={vendor.callerHasAccess ? "outline" : "default"} className="min-h-11 w-full px-4 sm:w-auto"
+      aria-label={`${label} for ${vendor.name}`}>
+      {label}
+    </Button>
+  </form>;
+}
+
+function VendorEntry({ vendor, callerCanList }: { vendor: StaffVendor; callerCanList: boolean }) {
   const canChange = vendor.status !== "suspended";
   return <li className="space-y-5 py-6">
     <div className="space-y-2">
-      <h3 className="break-words text-lg font-semibold">{vendor.name}</h3>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h3 className="break-words text-lg font-semibold">{vendor.name}</h3>
+        {vendor.activeMembers === 0 && <span className="rounded-md border px-2 py-0.5 text-xs font-medium">Not joined</span>}
+      </div>
       <dl className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
         <dt className="text-muted-foreground">Status</dt><dd>{statusText[vendor.status]}</dd>
         <dt className="text-muted-foreground">Vendor portal</dt><dd>{vendor.portalOn ? "On" : "Off"}</dd>
-        <dt className="text-muted-foreground">Members</dt><dd>{memberText(vendor.activeMembers)}</dd>
+        <dt className="text-muted-foreground">Vendor users</dt><dd>{memberText(vendor.activeMembers)}</dd>
       </dl>
     </div>
     <SetupSteps vendor={vendor}/>
@@ -60,6 +82,10 @@ function VendorEntry({ vendor }: { vendor: StaffVendor }) {
       )}
     </section>
     {canChange ? <div className="space-y-5">
+      {vendor.status === "pending" && (callerCanList
+        ? <ListVendorForm organizationId={vendor.organizationId} organizationName={vendor.name} idempotencyKey={randomUUID()}/>
+        : <p className="text-sm">Only a Super Admin can list this vendor.</p>)}
+      {vendor.status === "active" && <OpenWorkspaceForm vendor={vendor}/>}
       {!vendor.portalOn && <EnablePortalForm organizationId={vendor.organizationId} organizationName={vendor.name}
         idempotencyKey={randomUUID()}/>}
       <InviteAdminForm organizationId={vendor.organizationId} organizationName={vendor.name}
@@ -68,8 +94,11 @@ function VendorEntry({ vendor }: { vendor: StaffVendor }) {
   </li>;
 }
 
-export default async function StaffVendorsPage() {
+export default async function StaffVendorsPage({ searchParams }: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+} = {}) {
   const { authorization } = await requirePagePermission("admin.access", { kind: "platform" });
+  const notice = (await searchParams)?.notice;
   let directory;
   try {
     directory = await getStaffVendorDirectory({ supabase: authorization.supabase });
@@ -83,15 +112,19 @@ export default async function StaffVendorsPage() {
       <Link href="/admin" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">Back to administration</Link>
       <h1 className="text-balance text-3xl font-semibold tracking-tight">Vendors</h1>
       <p className="max-w-prose text-pretty text-sm leading-6 text-muted-foreground">
-        Add a vendor, turn on its portal, and invite its first user. Each action is recorded in the audit log.
-        You do not become a member of the vendor.
+        Add a vendor, list it for customer comparisons, and enter its products in its workspace. Invite its first user
+        when a customer picks it. Each action is recorded in the audit log.
       </p>
     </header>
+    {notice === "denied" && <p role="alert" className="max-w-2xl rounded-lg border border-destructive/40 px-4 py-3 text-sm">
+      The vendor workspace could not be opened. The vendor must be listed and active, you need staff access with two-step
+      sign-in, and access that was removed is not given again here.
+    </p>}
 
     <section aria-labelledby="add-vendor" className="max-w-xl space-y-4">
       <h2 id="add-vendor" className="text-xl font-semibold">Add vendor</h2>
       <p className="text-sm leading-6">
-        A new vendor waits until its first administrator accepts. Catalog approval for comparisons stays a separate review.
+        A new vendor is not listed until a Super Admin lists it. Catalog and evidence approval for comparisons stay separate reviews.
       </p>
       <CreateVendorForm idempotencyKey={randomUUID()}/>
     </section>
@@ -102,7 +135,8 @@ export default async function StaffVendorsPage() {
         <p role="status" className="text-sm leading-6">No vendors yet. Add the first vendor above.</p>
       ) : (
         <ul aria-label="Vendor organizations" className="max-w-2xl divide-y border-y">
-          {directory.items.map((vendor) => <VendorEntry key={vendor.organizationId} vendor={vendor}/>)}
+          {directory.items.map((vendor) => <VendorEntry key={vendor.organizationId} vendor={vendor}
+            callerCanList={directory.callerCanList}/>)}
         </ul>
       )}
       {directory.truncated && <p className="text-sm">Only the first 200 vendors are shown.</p>}

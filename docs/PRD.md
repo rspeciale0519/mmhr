@@ -189,6 +189,11 @@ They can change only shared intake, requirements, availability, feedback, tasks,
 
 They cannot access competitors, internal notes, customer-private records, or commission data without an explicit permission.
 
+A listed vendor can have no vendor users (FR-VND-09). Its first vendor user joins through a staff-issued administrator invitation.
+That user needs a verified two-step sign-in factor, and the administration capacity check runs when the user joins.
+The invitation expires after 72 hours. Staff send the RFP after the vendor has joined, because the response deadline starts at delivery.
+An MMHR staff member with an audited vendor workspace grant is not a vendor portal user.
+
 **FR-IAM-12 — Sharing control.** Authorized MMHR users must grant and revoke portal access with an audit record.
 
 ## 5. Functional Requirements
@@ -335,6 +340,14 @@ Provider names remain masked until the required MMHR discussion. Record authoriz
 **FR-VND-07 — Freshness.** Show freshness and confidence for customer-visible vendor facts.
 
 **FR-VND-08 — Overrides.** Manual overrides require a source, reason, author, time, and expiration or review date.
+
+**FR-VND-09 — Staff vendor entry (owner decision, 2026-11-16).** MMHR staff enter vendors into the catalog.
+A vendor can appear in customer comparisons before any vendor user signs in.
+A Super Admin with two-step sign-in lists a pending vendor with a recorded reason. Listing makes the vendor organization active.
+Staff then open an audited workspace on the listed vendor and enter its products, sources, evidence, and approvals.
+Catalog eligibility is unchanged: the vendor must be active, and its profile, product, evidence, and review approvals apply.
+The staff workspace grant never makes staff a vendor portal user. Staff do not receive vendor RFP notices and cannot answer an RFP as the vendor.
+Vendor users join later, through a staff invitation, to read and answer an RFP (FR-IAM-11).
 
 ### 5.6 RFP and Vendor Responses
 
