@@ -1,13 +1,15 @@
 # MMHR — Current State
 
-Updated: 2026-11-14 14:14 EST. The owner gave the project to Claude. PR #18 merged the Codex handoff into `develop` (merge 0c5c1eb); the main checkout is on `develop` at that commit and is the current copy of the code. Local type check, lint, 6,520 unit tests, and build passed on the same tree. The GitHub integration jobs for PR #18 were pending at merge time. See journal/2026-11-14.md.
+Updated: 2026-11-16 10:45 EST. `develop` is at f3fdab2 (PR #37 hosted worker login). Latest develop CI run 43766019866 completed successfully. Trim tasks 1–2 are done (`docs/LAUNCH.md` is launch authority). Trim task 3 (browser launch-path run on the local stack) remains open.
+
+Current branch work: `.cursor/skills/verify-mmhr/` — agents can launch, doctor, and drive the Pulse web UI before claiming done. Proof run used `--stand-in` (no Docker/Supabase in this environment) and drove landing. See journal/2026-11-16.md.
 
 ## Trim direction (owner-approved 2026-11-14)
 - Goal: cut the system to one launch path (sign-up, intake, masked comparison, five choices, disclosure, approved RFP, vendor response).
 - Keep Pulse and the current name. Hide finance, documents, demos, proposals, contracts, both galleries, and most public pages. Archive unused code to `archive/`; do not delete.
 - Keep all 175 migrations, all tables, and the access rules. New work needs only login and organization checks unless it touches isolation, masking, commission secrecy, or staff login.
 - Light work rule: four checks, one browser check, a short journal entry. Opus 5.5 subagents write the code.
-- Next: trim task 2 (`docs/LAUNCH.md`), then task 3 (browser run of the launch path on the local stack). The 16-task list is in journal/2026-11-14.md.
+- Next: trim task 3 (browser run of the launch path on the local stack). The 16-task list is in journal/2026-11-14.md.
 - The sections below are earlier records. Trim task 15 replaces this file with one page.
 
 ## Earlier state (2026-10-28)
