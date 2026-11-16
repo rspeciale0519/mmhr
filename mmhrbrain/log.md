@@ -1308,3 +1308,4 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 - 2026-11-14: PR #19 merged (31bbfac); docs/LAUNCH.md is the launch authority. Owner approved merging trim pull requests after the four checks. Subagents started for archive setup and public page blocking. See journal/2026-11-14.md.
 - 2026-11-16: Added `.cursor/skills/verify-mmhr/` (Pulse web UI launch/doctor/Playwright). Type-check, lint, 5,395 unit tests, and build passed. Landing driven in stand-in mode (no Docker/Supabase). See journal/2026-11-16.md.
 - 2026-11-16: Removed the dummy `MIGRATION_DATABASE_URL` from stand-in launch after CI Secret scan failed on PR #38. Local `npm run check:secrets` passed. See journal/2026-11-16.md.
+- 2026-11-16: Stand-in launch now refuses hosted DB/Supabase URLs, blanks outbound keys in both modes, and cleanup checks cmdline/pgid. Type-check, lint, 5,395 tests, build, and secret scan passed. See journal/2026-11-16.md.

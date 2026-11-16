@@ -14,6 +14,8 @@ import {
   readState,
   readSupabaseStatus,
 } from "./lib.mjs";
+import { outboundKeyNames } from "./env-guard.mjs";
+import { nextServerPids, readProcEnviron } from "./proc.mjs";
 
 function line(key, value) {
   console.log(`${key}: ${value}`);
@@ -75,6 +77,28 @@ async function main() {
     }
   }
 
+  const outbound = outboundKeyNames();
+  const outboundStatus = new Map(outbound.map((name) => [name, "unchecked"]));
+  let nextPids = [];
+  if (alive) {
+    try {
+      nextPids = nextServerPids(state.pid, owners);
+      for (const pid of nextPids) {
+        const environ = readProcEnviron(pid);
+        for (const name of outbound) {
+          if (environ[name]) {
+            outboundStatus.set(name, "set");
+            problems.push(`${name} is set on next server pid ${pid}`);
+          } else if (outboundStatus.get(name) !== "set") {
+            outboundStatus.set(name, "blank");
+          }
+        }
+      }
+    } catch (error) {
+      problems.push(`could not read next server environ: ${error.message}`);
+    }
+  }
+
   const ready = problems.length === 0;
   console.log("VERIFY-MMHR DOCTOR");
   line("ready", ready ? "yes" : "no");
@@ -83,12 +107,14 @@ async function main() {
   line("url", state.url);
   line("pid", String(state.pid));
   line("pid_alive", alive ? "yes" : "no");
+  line("next_server_pids", nextPids.join(",") || "none");
   line("port", String(APP_PORT));
   line("port_owners", [...owners].join(",") || "none");
   line("port_owned_by_launch", ownedByUs ? "yes" : "no");
   line("pulse_heading", home?.body.includes(PULSE_HEADING) ? "present" : "absent");
   line("holding_page", home?.body.includes(HOLDING_HEADING) ? "present" : "absent");
   line("sign_in", signIn?.body.includes(SIGN_IN_HEADING) ? "present" : "absent");
+  for (const name of outbound) line(`outbound.${name}`, outboundStatus.get(name));
   line("evidence", state.evidenceDir);
   if (state.standInReason) line("stand_in", state.standInReason);
   if (!ready) {

@@ -24,6 +24,12 @@ import {
   writeState,
   writeText,
 } from "./lib.mjs";
+import {
+  assertNoHostedDbOrSupabaseUrls,
+  blockedDatabaseUrl,
+  standInAnonKey,
+  verificationEnv,
+} from "./env-guard.mjs";
 
 function usage() {
   return `Usage: node .cursor/skills/verify-mmhr/scripts/launch.mjs [--stand-in]
@@ -105,7 +111,7 @@ async function launchFull(runId) {
   const supabase = startSupabaseIfNeeded();
   migrate(supabase.status);
   const logPath = path.join(evidenceDir(runId), "launch.log");
-  const child = spawnLogged(process.execPath, ["scripts/dev-local.mjs"], process.env, logPath);
+  const child = spawnLogged(process.execPath, ["scripts/dev-local.mjs"], verificationEnv({}), logPath);
   return {
     mode: "full",
     pid: child.pid,
@@ -117,20 +123,26 @@ async function launchFull(runId) {
 
 async function launchStandIn(runId) {
   if (await portInUse(APP_PORT)) throw new Error(`Port ${APP_PORT} is already in use. Reuse that instance only after doctor passes, or free the port.`);
+  assertNoHostedDbOrSupabaseUrls({
+    env: process.env,
+    envFilePath: path.join(repoRoot, ".env.local"),
+  });
+  const blocked = blockedDatabaseUrl();
   const logPath = path.join(evidenceDir(runId), "launch.log");
-  const env = {
-    ...process.env,
+  const env = verificationEnv({
     PORT: String(APP_PORT),
     NEXT_PUBLIC_APP_URL: APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: `http://${APP_HOST}:${SUPABASE_API_PORT}`,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY:
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ["stand-in", "anon", APP_HOST].join("-"),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: standInAnonKey(),
     NEXT_PUBLIC_BRAND_NAME: "MatchMaker HR",
     MMHR_LAUNCH_CANDIDATE: "A",
     PUBLIC_RELEASE_ENABLED: "0",
     AGENTID_SIGN_IN_ENABLED: "0",
     IDENTITY_INTENT_WORKER_ENABLED: "0",
-  };
+    SUPABASE_SERVICE_ROLE_KEY: "",
+    DATABASE_URL: blocked,
+    MIGRATION_DATABASE_URL: blocked,
+  });
   const child = spawnLogged(
     process.execPath,
     ["node_modules/next/dist/bin/next", "dev", "-H", APP_HOST, "-p", String(APP_PORT)],

@@ -6,8 +6,10 @@ import {
   descendantPids,
   pidAlive,
   readState,
+  repoRoot,
   writeState,
 } from "./lib.mjs";
+import { isVerificationLaunchCmdline, readProcCmdline, readProcPgid } from "./proc.mjs";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -59,13 +61,27 @@ async function main() {
     return;
   }
 
+  if (state.pid && pidAlive(state.pid)) {
+    const cmdline = readProcCmdline(state.pid);
+    const pgid = readProcPgid(state.pid);
+    const recordedPid = state.pid;
+    if (!isVerificationLaunchCmdline(cmdline) || pgid !== recordedPid) {
+      console.error(
+        `Cleanup refused: pid ${state.pid} cmdline=${JSON.stringify(cmdline)} pgid=${pgid} does not match the recorded launch (dev-local.mjs or next dev, pgid == pid ${recordedPid}).`,
+      );
+      process.exitCode = 1;
+      return;
+    }
+  }
+
   const signaled = state.pid ? terminateTree(state.pid) : [];
   const dead = await waitUntilDead(signaled, 8000);
   if (!dead) killRemaining(signaled);
   await waitUntilDead(signaled, 3000);
 
   if (state.startedSupabase) {
-    execFileSync("supabase", ["stop", "--no-backup"], {
+    execFileSync("supabase", ["stop"], {
+      cwd: repoRoot,
       stdio: "inherit",
       timeout: 120000,
     });

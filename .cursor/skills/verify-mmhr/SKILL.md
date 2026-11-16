@@ -65,7 +65,7 @@ If Docker or the Supabase CLI is missing, full launch must fail. Only then:
 node .cursor/skills/verify-mmhr/scripts/launch.mjs --stand-in
 ```
 
-Stand-in starts `next dev` on `127.0.0.1:3100`. It points `NEXT_PUBLIC_SUPABASE_URL` at this project's local API origin and reuses `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the environment when set; otherwise it generates a non-secret stand-in token at runtime. It does not set `MIGRATION_DATABASE_URL`, and it skips migrations, the worker wrapper, and Auth. Authenticated journeys are unverified in that mode. Doctor will say `mode: stand-in`.
+Stand-in starts `next dev` on `127.0.0.1:3100`. It always generates a non-secret `NEXT_PUBLIC_SUPABASE_ANON_KEY` at runtime and never inherits one. It forces `DATABASE_URL` and `MIGRATION_DATABASE_URL` to a blocked loopback URL, blanks `SUPABASE_SERVICE_ROLE_KEY`, and refuses to start if inherited env or `.env.local` contains a non-loopback database or Supabase URL. It skips migrations, the worker wrapper, and Auth. Authenticated journeys are unverified in that mode. Doctor will say `mode: stand-in`.
 
 Teardown is the cleanup helper below.
 
@@ -77,7 +77,7 @@ Read-only. Run before the first drive, after any failed drive, and whenever the 
 node .cursor/skills/verify-mmhr/scripts/doctor.mjs
 ```
 
-It checks: recorded pid alive, port 3100 owned by that process tree, `GET /` is Pulse not the holding page, `GET /sign-in` shows `Sign in`, and in full mode `supabase status` points at API port 57021. Exit 0 means the instance is worth driving.
+It checks: recorded pid alive, port 3100 owned by that process tree, `GET /` is Pulse not the holding page, `GET /sign-in` shows `Sign in`, in full mode `supabase status` points at API port 57021, and `/proc/<next-pid>/environ` has every outbound key from `.env.example` blank. Exit 0 means the instance is worth driving.
 
 ## Drive
 
@@ -115,8 +115,8 @@ Proof standards:
 
 - Drive the real UI route. Do not POST to `/api/trpc` as a stand-in for a click.
 - Capture the action and the resulting state (for landing: fill Get access, then the sign-up heading plus prefilled email).
-- Verify side effects that the path claims. Landing Get access is a GET to `/sign-up`; there is no database write. Newsletter and contact POSTs hit `/api/newsletter` and `/api/leads` and need a live stack — do not treat a skipped submit as a pass.
-- Mocks only at existing production boundaries (PostHog/Sentry stay inert without keys; Beehiiv/Resend are not called unless those keys exist).
+- Verify side effects that the path claims. Landing Get access is a GET to `/sign-up`; there is no database write. Newsletter and contact POSTs hit `/api/newsletter` and `/api/leads` and need a live stack with those keys present — launch blanks them, so do not treat a skipped submit as a pass.
+- Launch blanks every outbound key named in `.env.example` (`*_API_KEY`, `*_SECRET_KEY`, `*_AUTH_TOKEN`, `*_CLIENT_SECRET`, `NEXT_PUBLIC_POSTHOG_KEY`) in both full and stand-in modes. Process env wins over `.env.local`. Doctor fails if any of those keys is set on the next server process. PostHog, Sentry, Beehiiv, Resend, Trigger, Firecrawl, Cal.com, AgentID, and AI calls stay inert because launch blanked the keys.
 - `--stand-in` skips Supabase, migrations, worker login, Auth, and every signed-in page. Record that in the report; do not call those pages verified.
 
 ## Cleanup
@@ -125,7 +125,7 @@ Proof standards:
 node .cursor/skills/verify-mmhr/scripts/cleanup.mjs
 ```
 
-Kills only the recorded launch pid tree (SIGTERM, then SIGKILL). If this run started Supabase, it runs `supabase stop --no-backup`. It never `pkill node` / `killall next`. It never deletes `artifacts/verify-mmhr/<run-id>/`. After cleanup, confirm that directory still exists. Run cleanup after failed attempts too.
+Kills only the recorded launch pid tree (SIGTERM, then SIGKILL), and only after `/proc/<pid>/cmdline` matches `dev-local.mjs` or `next dev` and the process group equals that pid. If this run started Supabase, it runs `supabase stop` in the repository root and does not pass `--no-backup`, so local DB volumes stay. It never `pkill node` / `killall next`. It never deletes `artifacts/verify-mmhr/<run-id>/`. After cleanup, confirm that directory still exists. Run cleanup after failed attempts too.
 
 ## Helpers
 
