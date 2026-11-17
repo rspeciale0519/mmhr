@@ -56,7 +56,7 @@ Owner decision, 2026-11-17: most vendors never join the app. MMHR sends the RFP 
 4. Rare case: if the vendor wants to answer in the portal, invite its first user at `/admin/vendors`.
    The person sets up two-step sign-in at `/mfa`, then accepts at `/invitations/accept`. The invitation expires after 72 hours.
 
-Steps 2 and 3 are not built yet. See launch task 4 in [LAUNCH.md](./LAUNCH.md).
+Steps 2 and 3 are not built yet. See launch task 3 in [LAUNCH.md](./LAUNCH.md).
 
 ## Recovery
 

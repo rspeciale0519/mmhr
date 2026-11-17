@@ -92,8 +92,8 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 
 1. Repair each failure from trim task 3.
 2. Create hosted staging: Supabase project, migrations, Vercel preview, and email.
-3. Run the launch path and the full integration suite on staging.
-4. Build RFP send-out by email and vendor progress tracking in the vendor workspace (steps 6 and 7 above).
+3. Build RFP send-out by email and vendor progress tracking in the vendor workspace (steps 6 and 7 above).
+4. Run the launch path and the full integration suite on staging.
 5. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
 
 ## Owner decisions that stay open
