@@ -1,7 +1,7 @@
 # Staff Vendor Entry
 
 This runbook puts one vendor product into customer comparisons. No vendor user signs in.
-Owner decision, 2026-11-16: MMHR staff enter vendors. Vendor users join later, to read and answer an RFP.
+Owner decision, 2026-11-16: MMHR staff enter vendors. Most vendors never join; MMHR sends them the RFP (2026-11-17).
 Product rule: [PRD.md](./PRD.md) FR-VND-09 and FR-IAM-11. Launch order: [LAUNCH.md](./LAUNCH.md).
 
 ## Who can do each step
@@ -48,12 +48,15 @@ Every step writes an audit event. The app sends no email.
 
 ## When a customer picks the vendor
 
+Owner decision, 2026-11-17: most vendors never join the app. MMHR sends the RFP out.
+
 1. Approve the RFP.
-2. At `/admin/vendors`, invite the first vendor user. Send the steps on screen to that person yourself.
-   The person sets up two-step sign-in at `/mfa`, then accepts at `/invitations/accept`.
-   The invitation expires after 72 hours. Invite the same email again to replace an expired one.
-3. Wait until the vendor shows a vendor user and no longer shows "Not joined".
-4. Issue the RFP. The response deadline starts at delivery. Staff with a workspace grant are not notified as the vendor.
+2. Send the RFP to the vendor's contact by email. The response deadline starts at delivery.
+3. In the vendor workspace, record the send, the due date, each follow-up, and the reply when it arrives.
+4. Rare case: if the vendor wants to answer in the portal, invite its first user at `/admin/vendors`.
+   The person sets up two-step sign-in at `/mfa`, then accepts at `/invitations/accept`. The invitation expires after 72 hours.
+
+Steps 2 and 3 are not built yet. See launch task 4 in [LAUNCH.md](./LAUNCH.md).
 
 ## Recovery
 

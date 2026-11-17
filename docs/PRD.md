@@ -191,7 +191,7 @@ They cannot access competitors, internal notes, customer-private records, or com
 
 A listed vendor can have no vendor users (FR-VND-09). Its first vendor user joins through a staff-issued administrator invitation.
 That user needs a verified two-step sign-in factor, and the administration capacity check runs when the user joins.
-The invitation expires after 72 hours. Staff send the RFP after the vendor has joined, because the response deadline starts at delivery.
+The invitation expires after 72 hours. Most vendors never join (FR-VND-10): staff send the RFP to the vendor by email instead.
 An MMHR staff member with an audited vendor workspace grant is not a vendor portal user.
 
 **FR-IAM-12 — Sharing control.** Authorized MMHR users must grant and revoke portal access with an audit record.
@@ -347,7 +347,13 @@ A Super Admin with two-step sign-in lists a pending vendor with a recorded reaso
 Staff then open an audited workspace on the listed vendor and enter its products, sources, evidence, and approvals.
 Catalog eligibility is unchanged: the vendor must be active, and its profile, product, evidence, and review approvals apply.
 The staff workspace grant never makes staff a vendor portal user. Staff do not receive vendor RFP notices and cannot answer an RFP as the vendor.
-Vendor users join later, through a staff invitation, to read and answer an RFP (FR-IAM-11).
+Any staff member with `admin.access` and two-step sign-in may open the workspace of any active vendor, also after vendor users join (owner decision, 2026-11-17). Every opening writes an audit event.
+A vendor user who joins still sees only its own organization (FR-IAM-11).
+
+**FR-VND-10 — Vendor workspace as the staff tracking record (owner decision, 2026-11-17).** Most vendors never join the app.
+MMHR sends each approved RFP to the vendor's contact by email, and the vendor replies outside the app.
+The vendor workspace is where staff track that vendor: each RFP sent, its due date, follow-ups, the reply received and its status (FR-RSP-01), and each customer and vendor connection.
+A vendor user may still join to answer in the portal. That is optional and rare.
 
 ### 5.6 RFP and Vendor Responses
 
