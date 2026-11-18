@@ -773,6 +773,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "manifest schema validation and fail-closed release mode",
   },
   {
+    key: "scripts/check-dependency-audit.mjs#command",
+    surface: "dependency audit gate",
+    kind: "command",
+    access: "system-only",
+    permission: "local repository read and npm registry advisory read",
+    scope: "installed npm dependency tree",
+    dataPath: "advisory identifiers, severities, and package names only",
+    denialEvidence: "CI required check; dated owner-approved advisory exceptions expire and fail again",
+  },
+  {
     key: "scripts/check-secret-scan.mjs#command",
     surface: "repository secret scanner",
     kind: "command",
