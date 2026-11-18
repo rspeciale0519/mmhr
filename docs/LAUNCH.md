@@ -15,12 +15,12 @@ No vendor user signs in for this. See [vendor-entry.md](./vendor-entry.md).
 3. The customer sees all published vendor options in the comparison matrix. Vendor names are hidden.
 4. The customer selects a maximum of five options.
 5. Staff talk with the customer and record the disclosure of vendor names.
-6. Staff approve the RFP. For each selected vendor that has no user yet, staff invite its first user at `/admin/vendors`
-   and wait until that user joins. The invitation expires after 72 hours. The app sends no email yet, so staff send the
-   steps to the person. When the vendor has joined, staff issue the RFP. The response deadline starts at delivery.
-7. Each vendor reads the RFP in the portal and submits a response.
+6. Staff approve the RFP and send it out to each selected vendor's contact by email (owner decision, 2026-11-17).
+   The vendor does not need to sign in. The vendor workspace records the send, the due date, and each follow-up.
+7. The vendor replies outside the app, usually by email. Staff record the reply and its status in the vendor workspace.
+   A vendor may still join and answer in the portal, but that is the rare case, not the launch path.
 
-Launch is ready when one customer, one vendor, and staff complete this path on hosted staging.
+Launch is ready when one customer and staff complete this path on hosted staging, with one vendor reply recorded.
 Demos, proposals, contract handoff, and account recovery are manual work at launch. Use [the pilot operating procedure](./mvp-pilot-operating-procedure.md).
 
 ## Five protections that must hold
@@ -92,8 +92,9 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 
 1. Repair each failure from trim task 3.
 2. Create hosted staging: Supabase project, migrations, Vercel preview, and email.
-3. Run the three-role path and the full integration suite on staging.
-4. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
+3. Build RFP send-out by email and vendor progress tracking in the vendor workspace (steps 6 and 7 above).
+4. Run the launch path and the full integration suite on staging.
+5. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
 
 ## Owner decisions that stay open
 
