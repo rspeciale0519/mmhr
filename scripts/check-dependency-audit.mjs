@@ -34,6 +34,16 @@ function readAuditReport() {
 }
 
 const report = readAuditReport();
+
+// A failed audit (for example, the registry refused the request) also
+// prints JSON, but as an error object with no vulnerability list. Treat that
+// as a failure, never as a clean result.
+if (report.error || typeof report.vulnerabilities !== "object" || report.vulnerabilities === null
+  || typeof report.metadata?.vulnerabilities !== "object") {
+  console.error("Dependency audit failed: npm audit did not return a vulnerability report.");
+  console.error(JSON.stringify(report.error ?? report).slice(0, 500));
+  process.exit(1);
+}
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD in UTC
 const failures = [];
 const allowedHits = [];
@@ -42,7 +52,7 @@ const allowedHits = [];
 // advisory objects themselves or names of other vulnerable packages that it
 // depends on. Only the advisory objects are real findings; a package that
 // is listed only because of a dependency is covered by that dependency's advisory.
-for (const [name, vulnerability] of Object.entries(report.vulnerabilities ?? {})) {
+for (const [name, vulnerability] of Object.entries(report.vulnerabilities)) {
   for (const source of vulnerability.via) {
     if (typeof source !== "object" || !FAILING.has(source.severity)) continue;
     const allowed = ALLOWED.find((entry) => entry.url === source.url);
