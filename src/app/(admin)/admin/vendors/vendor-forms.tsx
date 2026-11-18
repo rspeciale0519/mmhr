@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  createVendorAction, enableVendorPortalAction, inviteVendorAdminAction, type VendorActionState,
+  createVendorAction, enableVendorPortalAction, inviteVendorAdminAction, listVendorAction, type VendorActionState,
 } from "./actions";
 
 const expiry = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
@@ -98,6 +98,34 @@ export function InviteAdminForm({ organizationId, organizationName, idempotencyK
     <Button type="submit" disabled={pending} className="min-h-11 w-full px-4 sm:w-auto"
       aria-label={`${label} for ${organizationName}`}>
       {pending ? "Saving invitation…" : label}
+    </Button>
+  </form>;
+}
+
+/** Super Admin only. The reason goes into the audit log. */
+export function ListVendorForm({ organizationId, organizationName, idempotencyKey }: {
+  organizationId: string; organizationName: string; idempotencyKey: string;
+}) {
+  const [state, action, pending] = useActionState<VendorActionState, FormData>(listVendorAction, null);
+  const id = useId();
+  const invalid = state?.status === "error" && state.field === "reason";
+  return <form action={action} className="space-y-3">
+    <input type="hidden" name="organizationId" value={organizationId}/>
+    <input type="hidden" name="idempotencyKey" value={idempotencyKey}/>
+    <div className="space-y-2">
+      <Label htmlFor={`${id}-reason`}>Reason for listing</Label>
+      <textarea id={`${id}-reason`} name="reason" required maxLength={500} rows={2}
+        defaultValue={state?.status === "error" ? state.value ?? "" : ""}
+        aria-invalid={invalid || undefined} aria-describedby={`${id}-hint${invalid ? ` ${id}-error` : ""}`}
+        className="min-h-11 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive md:text-sm"/>
+      <p id={`${id}-hint`} className="text-sm text-muted-foreground">
+        For example, the source you checked. Listing makes the vendor active with no vendor users. Its products still need approval.
+      </p>
+    </div>
+    <Result state={state} id={id}/>
+    <Button type="submit" disabled={pending || state?.status === "success"} className="min-h-11 w-full px-4 sm:w-auto"
+      aria-label={`List ${organizationName}`}>
+      {pending ? "Listing vendor…" : "List vendor"}
     </Button>
   </form>;
 }

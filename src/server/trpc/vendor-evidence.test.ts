@@ -66,6 +66,32 @@ test("activates a product through the existing scoped and revision-checked comma
     .toEqual(["workspace.access", "admin.access", "workspace.access"]);
 });
 
+test("adds a draft product through the existing scoped command after workspace and staff checks", async () => {
+  const productId = randomUUID(), idempotencyKey = randomUUID();
+  const original = rpc.getMockImplementation()!;
+  rpc.mockImplementation((name, args) => name === "mmhr_create_product" ? Promise.resolve({ error: null,
+    data: { operation: "create_product", recordId: productId, organizationId, revision: 1, outcomeCode: "created", correlationId: randomUUID() } }) : original(name, args));
+  await expect(caller().createProduct({ organizationId, vendorProfileId, stableKey: "Payroll_Core", name: " Payroll ", idempotencyKey }))
+    .resolves.toMatchObject({ recordId: productId, revision: 1 });
+  expect(rpc).toHaveBeenLastCalledWith("mmhr_create_product", {
+    payload: { organizationId, vendorProfileId, stableKey: "payroll_core", name: "Payroll", description: null, status: "draft", idempotencyKey },
+    correlation_id: expect.any(String), idempotency_key: idempotencyKey,
+  });
+  expect(rpc.mock.calls.filter(([name]) => name === "mmhr_authorize").map(([, args]) => args.permission_key))
+    .toEqual(["workspace.access", "admin.access", "workspace.access"]);
+});
+
+test("rejects a product status or bad key before calling the database, and reports a refused create", async () => {
+  const input = { organizationId, vendorProfileId, stableKey: "payroll", name: "Payroll", idempotencyKey: randomUUID() };
+  await expect(caller().createProduct({ ...input, status: "active" } as never)).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  await expect(caller().createProduct({ ...input, stableKey: "9 bad" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  expect(rpc).not.toHaveBeenCalled();
+  const original = rpc.getMockImplementation()!;
+  rpc.mockImplementation((name, args) => name === "mmhr_create_product"
+    ? Promise.resolve({ data: null, error: { code: "23505", message: "private detail" } }) : original(name, args));
+  await expect(caller().createProduct(input)).rejects.toMatchObject({ code: "CONFLICT", message: "Vendor evidence request failed" });
+});
+
 test("rejects an activation status override before calling the database", async () => {
   await expect(caller().activateProduct({ organizationId, productId: randomUUID(), expectedRevision: 1,
     idempotencyKey: randomUUID(), status: "archived" } as never)).rejects.toMatchObject({ code: "BAD_REQUEST" });

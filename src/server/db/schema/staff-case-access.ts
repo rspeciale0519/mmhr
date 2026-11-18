@@ -6,15 +6,17 @@ import { intakes } from "./r3-intake";
 const privateSchema = pgSchema("mmhr_private");
 
 /**
- * Audited staff access to one self-registered customer case. Only the fixed
- * open-case RPC writes it. The permission evaluator reads it for staff members.
+ * Audited staff access to one self-registered customer case, or to one listed
+ * vendor workspace. Only the fixed open-case and open-vendor-workspace RPCs
+ * write it. A customer grant names its intake; a vendor grant has no intake.
+ * The permission evaluator reads it for staff members.
  */
 export const staffCaseAccessGrants = privateSchema.table("staff_case_access_grants", {
   id: uuid("id").primaryKey().defaultRandom(),
   organizationId: uuid("organization_id").notNull().references(() => orgs.id, { onDelete: "restrict" }),
   identityId: uuid("identity_id").notNull().references(() => identities.id, { onDelete: "restrict" }),
   membershipId: uuid("membership_id").notNull().references(() => orgMembers.id, { onDelete: "restrict" }),
-  intakeId: uuid("intake_id").notNull().references(() => intakes.id, { onDelete: "restrict" }),
+  intakeId: uuid("intake_id").references(() => intakes.id, { onDelete: "restrict" }),
   state: text("state").notNull().default("active"),
   reason: text("reason").notNull(),
   correlationId: uuid("correlation_id").notNull(),

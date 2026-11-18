@@ -6,15 +6,21 @@ Product rules in [PRD.md](./PRD.md) and architecture rules in [TECH_STACK.md](./
 
 ## The launch path
 
+Before the path starts, staff enter the vendors (owner decision, 2026-11-16). A Super Admin lists each vendor at
+`/admin/vendors`. Staff open its workspace and enter its products, evidence, and approvals.
+No vendor user signs in for this. See [vendor-entry.md](./vendor-entry.md).
+
 1. A customer creates a free account and gets a private workspace.
 2. The customer enters software needs and submits them.
 3. The customer sees all published vendor options in the comparison matrix. Vendor names are hidden.
 4. The customer selects a maximum of five options.
 5. Staff talk with the customer and record the disclosure of vendor names.
-6. Staff approve the RFP and issue it to the selected vendors.
-7. Each vendor reads the RFP in the portal and submits a response.
+6. Staff approve the RFP and send it out to each selected vendor's contact by email (owner decision, 2026-11-17).
+   The vendor does not need to sign in. The vendor workspace records the send, the due date, and each follow-up.
+7. The vendor replies outside the app, usually by email. Staff record the reply and its status in the vendor workspace.
+   A vendor may still join and answer in the portal, but that is the rare case, not the launch path.
 
-Launch is ready when one customer, one vendor, and staff complete this path on hosted staging.
+Launch is ready when one customer and staff complete this path on hosted staging, with one vendor reply recorded.
 Demos, proposals, contract handoff, and account recovery are manual work at launch. Use [the pilot operating procedure](./mvp-pilot-operating-procedure.md).
 
 ## Five protections that must hold
@@ -37,7 +43,7 @@ Add more control only when the work touches one of the five protections.
 | Shared | `/home`, `/workspaces`, `/members`, `/invitations` |
 | Customer | `/customer` (needs), `/customer/evaluation` (matrix), `/customer/rfp` |
 | Vendor | `/vendor`, `/vendor/response` |
-| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendor-evidence`, `/admin/audit` |
+| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendors`, `/admin/vendor-evidence`, `/admin/audit` |
 
 Blocked now by [`src/lib/launch-surface.ts`](../src/lib/launch-surface.ts) and `src/proxy.ts`:
 finance, documents, demos, proposals, and contracts, with their API routes.
@@ -86,8 +92,9 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 
 1. Repair each failure from trim task 3.
 2. Create hosted staging: Supabase project, migrations, Vercel preview, and email.
-3. Run the three-role path and the full integration suite on staging.
-4. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
+3. Build RFP send-out by email and vendor progress tracking in the vendor workspace (steps 6 and 7 above).
+4. Run the launch path and the full integration suite on staging.
+5. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
 
 ## Owner decisions that stay open
 

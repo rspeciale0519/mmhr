@@ -24,7 +24,8 @@ const appRoles = "FROM PUBLIC, anon, authenticated, service_role, mmhr_worker, m
 
 describe("hosted worker login migration", () => {
   test("is the next journal entry and changes no table, policy, or grant to an application role", () => {
-    expect(journal.entries.at(-1)).toMatchObject({ idx: 178, tag: "0178_hosted_worker_login" });
+    // Later migrations follow 0178, so check its own journal position rather than the last entry.
+    expect(journal.entries[178]).toMatchObject({ idx: 178, tag: "0178_hosted_worker_login" });
     expect(sql).not.toMatch(/CREATE TABLE|ALTER TABLE|CREATE POLICY|DROP TABLE|DISABLE ROW LEVEL SECURITY|ALTER DEFAULT PRIVILEGES/);
     expect(sql).not.toMatch(/GRANT EXECUTE/);
     expect(sql.match(/\bGRANT /g)).toEqual(["GRANT "]);
