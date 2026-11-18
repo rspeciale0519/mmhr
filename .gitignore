@@ -52,3 +52,9 @@ mmhrbrain/.obsidian/
 
 # Shared agent project board (local only)
 .project-board/
+
+# Verification skill evidence and run state (survives helper cleanup; never commit)
+artifacts/verify-mmhr/
+
+# Playwright install used only by the verification skill
+.cursor/skills/verify-mmhr/node_modules/

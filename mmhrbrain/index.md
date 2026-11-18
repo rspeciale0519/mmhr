@@ -32,7 +32,7 @@ Test email roles: [AgentMail synthetic evidence](../docs/security/agentmail-synt
 Prior execution: [Complete pilot workflow plan](../.codex/plans/build-complete-pilot-workflow.md). Its full-platform sequence conflicts with the latest MVP direction. Use the current proposal and await approval.
 
 ## Skills
-- (none yet)
+- `.cursor/skills/verify-mmhr/` — verify the Pulse web UI at `http://127.0.0.1:3100` (launch, doctor, Playwright drive, evidence). Keep the map current with `maintain-verification-skill`.
 
 ## Knowledge
 - [[knowledge/orientation]] — current (2026-08-31) — canonical v2 orientation and verified R1 through R9 foundations
