@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -33,10 +34,14 @@ export function CookieConsent() {
     () => true,
   );
 
+  // A vendor's RFP form address contains its private link token. Analytics
+  // records page addresses, so it never loads there and no banner is shown.
+  const privatePage = usePathname().startsWith("/rfp/");
+
   useEffect(() => {
     // No-ops unless consent was granted on a previous visit.
-    initAnalytics();
-  }, []);
+    if (!privatePage) initAnalytics();
+  }, [privatePage]);
 
   const decide = useCallback((granted: boolean) => {
     if (granted) {
@@ -48,7 +53,7 @@ export function CookieConsent() {
     emit();
   }, []);
 
-  if (decided) return null;
+  if (decided || privatePage) return null;
 
   return (
     <div

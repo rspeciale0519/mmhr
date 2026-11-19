@@ -34,7 +34,7 @@ function questionsOf(tab: RfpTab): RfpQuestion[] {
 
 /** Writes a date in plain words, e.g. "December 2, 2026". */
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "America/New_York" }).format(new Date(value));
 }
 
 /** Writes a file size in plain words, e.g. "1.2 MB". */

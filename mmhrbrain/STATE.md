@@ -2,6 +2,10 @@
 
 Updated: 2026-11-14 14:14 EST. The owner gave the project to Claude. PR #18 merged the Codex handoff into `develop` (merge 0c5c1eb); the main checkout is on `develop` at that commit and is the current copy of the code. Local type check, lint, 6,520 unit tests, and build passed on the same tree. The GitHub integration jobs for PR #18 were pending at merge time. See journal/2026-11-14.md.
 
+## Launch task 3 (2026-11-18)
+- RFP email send-out, the vendor web form at `/rfp/[token]`, and staff tracking are built on branch `claude/project-thread-iu73pm` with migration 0180. The four checks passed in a cloud session. The database test is unverified until the GitHub integration job passes.
+- Open: apply migration 0180 to staging with owner approval; set `RFP_FORM_LINK_SECRET` and the Resend variables; signed-in browser run of the staff screens. See journal/2026-11-18.md and docs/vendor-entry.md.
+
 ## Trim direction (owner-approved 2026-11-14)
 - Goal: cut the system to one launch path (sign-up, intake, masked comparison, five choices, disclosure, approved RFP, vendor response).
 - Keep Pulse and the current name. Hide finance, documents, demos, proposals, contracts, both galleries, and most public pages. Archive unused code to `archive/`; do not delete.
