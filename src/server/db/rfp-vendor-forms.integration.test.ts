@@ -145,7 +145,9 @@ describe("RFP vendor forms", () => {
       const detail = await read(sql, staff, "mmhr_get_rfp_vendor_form", { formId });
       expect(detail).toMatchObject({ state: "submitted", answeredCount: 2, respondentName: "Pat Lee", respondentEmail: "pat@vendor.example.test",
         answers: { core_01: { answer: "yes", comment: null }, payroll_01: { answer: "no", comment: "Planned" }, core_02: { answer: null, comment: "Draft" } } });
-      expect((detail.events as { kind: string }[]).map((event) => event.kind)).toEqual(["email_sent", "opened", "submitted"]);
+      // The whole test is one transaction, so every event has the same saved time.
+      // Their order is therefore not fixed here; compare them as a sorted list.
+      expect((detail.events as { kind: string }[]).map((event) => event.kind).sort()).toEqual(["email_sent", "opened", "submitted"]);
       expect(detail.files).toHaveLength(1);
       const file = await read(sql, staff, "mmhr_get_rfp_vendor_form_file", { fileId: stored!.fileId });
       expect(file).toMatchObject({ fileName: "contract.pdf", contentType: "application/pdf", contentBase64: pdfBase64 });
