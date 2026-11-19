@@ -10,7 +10,11 @@ import { getStaffVendorDirectory, type StaffVendor } from "@/server/commands/sta
 vi.mock("@/server/auth/page-guards", () => ({ requirePagePermission: vi.fn() }));
 vi.mock("@/server/commands/staff-vendors", () => ({ getStaffVendorDirectory: vi.fn() }));
 vi.mock("./actions", () => ({ createVendorAction: vi.fn(), enableVendorPortalAction: vi.fn(), inviteVendorAdminAction: vi.fn(),
-  listVendorAction: vi.fn(), openVendorWorkspaceAction: vi.fn() }));
+  listVendorAction: vi.fn(), openVendorWorkspaceAction: vi.fn(), setVendorContactAction: vi.fn() }));
+// The saved RFP contacts come from their own command; one vendor has a contact.
+vi.mock("@/server/commands/rfp-vendor-forms", () => ({
+  getVendorRfpContacts: vi.fn(async () => new Map([["22222222-2222-4222-8222-222222222222", { vendorOrganizationId: "22222222-2222-4222-8222-222222222222", contactName: "Pat Lee", contactEmail: "pat@northwind.example" }]])),
+}));
 vi.mock("next/navigation", () => ({ forbidden: () => { throw new Error("forbidden"); } }));
 
 const supabase = { rpc: vi.fn() };
@@ -91,8 +95,11 @@ test("every input has a visible label and each form posts a fresh key", async ()
   expect(screen.getAllByLabelText("Email of the vendor administrator")).toHaveLength(2);
   expect(screen.getByLabelText("Reason for listing")).toHaveAttribute("name", "reason");
   const keys = [...container.querySelectorAll<HTMLInputElement>("input[name=idempotencyKey]")].map((input) => input.value);
-  expect(keys).toHaveLength(6);
-  expect(new Set(keys).size).toBe(6);
+  // 6 setup forms plus one RFP contact form for each pending or active vendor.
+  expect(keys).toHaveLength(8);
+  expect(new Set(keys).size).toBe(8);
+  // The saved RFP contact is shown and pre-filled for the vendor that has one.
+  expect(screen.getAllByDisplayValue("pat@northwind.example")).toHaveLength(1);
   const portalForm = screen.getByRole("button", { name: /Turn on vendor portal/ }).closest("form")!;
   expect([...portalForm.querySelectorAll("input")].map((input) => input.name)).toEqual(["organizationId", "idempotencyKey"]);
   const workspaceForm = screen.getByRole("button", { name: /Open vendor workspace/ }).closest("form")!;

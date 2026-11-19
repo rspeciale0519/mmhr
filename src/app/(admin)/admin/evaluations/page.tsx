@@ -20,6 +20,9 @@ import { StaffClarifications } from "@/components/workflow/clarification-control
 
 import { getRfpReceiptStatus } from "@/server/commands/rfp-receipt";
 import { RfpReceiptStatus } from "@/components/workflow/rfp-receipt-status";
+import { addBusinessDays } from "@/lib/rfp-vendor-form";
+import { getRfpSendOut } from "@/server/commands/rfp-vendor-forms";
+import { RfpSendOutPanel } from "../rfp-forms/send-out-panel";
 export default async function StaffEvaluations({ searchParams }: { searchParams: Promise<Record<string,string|string[]|undefined>> }) {
   await requirePagePermission("admin.access",{kind:"platform"});
   const {authorization} = await requireSelectedOrganizationPermission("evaluation.disclose");
@@ -49,6 +52,14 @@ export default async function StaffEvaluations({ searchParams }: { searchParams:
     receiptAccess ? getRfpReceiptStatus({organizationId,intakeId,view:"staff",afterId:query.data.receiptsAfter,correlationId:randomUUID()},options) : Promise.resolve(null),
     responseAccess ? getPortalClarifications({organizationId,intakeId,view:"staff",afterId:query.data.clarificationsAfter,correlationId:randomUUID()},options) : Promise.resolve(null),
   ]);
+  // Email send-out: one panel for each delivered RFP. A panel that cannot be
+  // read (for example, without rfp.distribute) is left out; the rest of the
+  // page still works.
+  const sendOuts = receiptAccess ? (await Promise.all(workflow.rfps.filter((rfp) => rfp.status === "distributed")
+    .map((rfp) => getRfpSendOut({ organizationId, rfpId: rfp.rfpId, version: rfp.version }, options).catch(() => null))))
+    .filter((item) => item !== null) : [];
+  // New sends default to a due date 10 business days from today.
+  const defaultDueDate = addBusinessDays(new Date(), 10).toISOString().slice(0, 10);
   return <main className="mx-auto w-full max-w-4xl space-y-10 px-6 py-10">
     <header><Link href="/admin/evaluations" className="inline-flex min-h-11 items-center text-sm underline">All intakes</Link>
       <h1 className="mt-4 text-balance text-3xl font-semibold">Customer review</h1></header>
@@ -60,6 +71,7 @@ export default async function StaffEvaluations({ searchParams }: { searchParams:
     <DisclosureControls review={review}/>
     {review.nextCursor && <Link href={`/admin/evaluations?intake=${intakeId}&disclosuresAfter=${review.nextCursor}`}>Next selected providers</Link>}
     <RfpControls workflow={workflow} revision={intake.revision} identityId={authorization.identityId}/>
+    {sendOuts.map((sendOut) => <RfpSendOutPanel key={sendOut.rfpId} sendOut={sendOut} defaultDueDate={defaultDueDate}/>)}
     {receipts && <RfpReceiptStatus page={receipts} nextHref={receipts.nextCursor ? `/admin/evaluations?intake=${intakeId}&receiptsAfter=${receipts.nextCursor}` : null}/>} 
     {responses && <section className="space-y-5 border-t pt-8"><h2 className="text-2xl font-semibold">Vendor responses</h2>
       <p className="text-sm leading-7">Check the vendor statements before approval. Staff review and approval require different staff members.</p>

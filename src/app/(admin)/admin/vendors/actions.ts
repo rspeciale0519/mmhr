@@ -9,6 +9,7 @@ import { securityUuidSchema } from "@/server/audit/security-values";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { organizationContextCookie } from "@/server/auth/page-guards";
 import { requireTrustedServerActionOrigin } from "@/server/auth/server-action-request";
+import { RfpVendorFormError, setVendorRfpContact } from "@/server/commands/rfp-vendor-forms";
 import {
   createStaffVendor, enableStaffVendorPortal, inviteStaffVendorAdmin, listStaffVendor, openStaffVendorWorkspace,
   StaffVendorError,
@@ -16,7 +17,7 @@ import {
 
 export type VendorActionState =
   | { status: "success"; message: string; email?: string; expiresAt?: string }
-  | { status: "error"; message: string; field?: "name" | "email" | "reason"; value?: string }
+  | { status: "error"; message: string; field?: "name" | "email" | "reason" | "contactName" | "contactEmail"; value?: string }
   | null;
 
 /** Shown when listing is refused. The SQL command needs Super Admin authority and AAL2. */
@@ -145,4 +146,25 @@ export async function openVendorWorkspaceAction(formData: FormData): Promise<voi
     maxAge: 8 * 60 * 60,
   });
   redirect("/admin/vendor-evidence");
+}
+
+/** Saves the person at a vendor who receives RFP emails. */
+export async function setVendorContactAction(_previous: VendorActionState, formData: FormData): Promise<VendorActionState> {
+  requireTrustedServerActionOrigin((await headers()).get("origin"));
+  const vendorOrganizationId = key(formData, "organizationId");
+  const idempotencyKey = key(formData, "idempotencyKey");
+  const contactName = single(formData, "contactName") ?? "";
+  const contactEmail = single(formData, "contactEmail") ?? "";
+  if (!vendorOrganizationId || !idempotencyKey) return { status: "error", message: uncertain };
+  try {
+    await setVendorRfpContact({ vendorOrganizationId, contactName, contactEmail, idempotencyKey, correlationId: randomUUID() });
+  } catch (error) {
+    if (error instanceof AuthorizationError) return { status: "error", message: refused };
+    if (error instanceof RfpVendorFormError && error.code === "INVALID_INPUT") {
+      return { status: "error", message: "Enter a contact name and a valid email address, for example name@company.com.", field: "contactEmail" };
+    }
+    return { status: "error", message: uncertain };
+  }
+  revalidatePath("/admin/vendors");
+  return { status: "success", message: "RFP contact saved. RFP emails for this vendor go to this person." };
 }

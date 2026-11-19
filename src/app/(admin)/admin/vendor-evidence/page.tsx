@@ -10,6 +10,8 @@ import { AddProduct } from "./add-product";
 import { ProductReview } from "./product-review";
 import { ProfileReview } from "./profile-review";
 import { getVendorCatalogProfile } from "@/server/commands/vendor-catalog";
+import { getVendorRfpTracking } from "@/server/commands/rfp-vendor-forms";
+import { RfpTrackingCard } from "../rfp-forms/tracking-card";
 
 export default async function VendorEvidencePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requirePagePermission("admin.access", { kind: "platform" });
@@ -23,12 +25,22 @@ export default async function VendorEvidencePage({ searchParams }: { searchParam
     searchCrm({ organizationId, resource: "product", statuses: ["active", "draft"], limit: 50, cursor: query.data.productsAfter }, options),
     getVendorEvidence({ organizationId, afterId: query.data.after, limit: 25, registryVersion: 1 }, options),
   ]);
+  // RFPs emailed to this vendor. Left out if the tracking data cannot be read.
+  const tracking = vendors.length === 1 ? await getVendorRfpTracking(organizationId, options).catch(() => null) : null;
   const profile = vendors.length === 1 ? await getVendorCatalogProfile({ organizationId, profileId: vendors[0].recordId }, options) : null;
   return <main className="mx-auto w-full max-w-4xl space-y-8 px-5 py-10 sm:px-8">
     <header className="space-y-3"><Link href="/admin" className="inline-flex min-h-11 items-center text-sm underline">Administration</Link>
       <h1 className="text-3xl font-semibold">Vendor evidence</h1>
       <p className="text-sm leading-6 text-muted-foreground">{vendors[0]?.label ?? "Select a vendor workspace to record evidence."}</p>
       <Link href="/workspaces" className="inline-flex min-h-11 items-center underline">Change workspace</Link></header>
+    {tracking && <section className="space-y-4" aria-labelledby="rfp-tracking-heading">
+      <h2 id="rfp-tracking-heading" className="text-xl font-semibold">RFP tracking</h2>
+      <p className="text-sm leading-6 text-muted-foreground">
+        RFPs emailed to this vendor, newest first. RFP contact: {tracking.contact ? `${tracking.contact.contactName}, ${tracking.contact.contactEmail}` : "not set. Add one at Administration, Vendors."}
+      </p>
+      {tracking.items.length === 0 && <p className="text-sm">No RFP has been emailed to this vendor yet. Send one from the customer review page after the RFP is delivered.</p>}
+      {tracking.items.map((form) => <RfpTrackingCard key={form.formId} form={form} heading="customer"/>)}
+    </section>}
     {vendors.length === 1 && <AddProduct organizationId={organizationId} vendorProfileId={vendors[0].recordId}/>}
     {vendors.length === 1 && <EvidenceCapture key={`${organizationId}:${query.data.productsAfter ?? "first"}`} organizationId={organizationId}
       vendorProfileId={vendors[0].recordId} products={products}/>}

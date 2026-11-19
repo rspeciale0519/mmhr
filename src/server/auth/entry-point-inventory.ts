@@ -2231,6 +2231,70 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited commands",
   denialEvidence: "staff-vendors.test.ts; staff-vendor-setup.integration.test.ts; staff-vendor-listing.integration.test.ts; migrations 0177 and 0179 unapplied",
 },
+// RFP email send-out and vendor tracking (launch task 3, migration 0180).
+{
+  key: "src/app/(admin)/admin/vendors/actions.ts#setVendorContactAction", surface: "setVendorContactAction", kind: "server-action",
+  access: "internal-only", permission: "admin.access with AAL2",
+  scope: "one pending or active vendor organization; the RFP contact name and email only",
+  dataPath: "exact-origin action; audited idempotent contact RPC; no email sent",
+  denialEvidence: "rfp-vendor-forms.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+{
+  key: "src/app/(admin)/admin/rfp-forms/[formId]/page.tsx#default", surface: "/admin/rfp-forms/[formId]", kind: "page",
+  access: "internal-only", permission: "admin.access with AAL2",
+  scope: "one RFP vendor form; its answers, file names, and tracking log",
+  dataPath: "request-scoped fixed read RPC; strict DTO; unknown form returns not found",
+  denialEvidence: "rfp-vendor-forms.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+{
+  key: "src/app/(admin)/admin/rfp-forms/[formId]/files/[fileId]/route.ts#GET", surface: "GET /admin/rfp-forms/[formId]/files/[fileId]",
+  kind: "route-handler", access: "internal-only", permission: "admin.access with AAL2",
+  scope: "one file a vendor uploaded to one RFP vendor form",
+  dataPath: "request-scoped fixed read RPC; attachment download with nosniff; never rendered inline",
+  denialEvidence: "rfp-vendor-forms.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+...([
+  ["sendRfpFormAction", "one vendor recipient of one distributed RFP; one email to the saved RFP contact"],
+  ["trackRfpFormAction", "one RFP vendor form; follow-up, reply, declined, no response, due date, or reopen"],
+] as const).map(([name, scope]): EntryPointInventoryRecord => ({
+  key: `src/app/(admin)/admin/rfp-forms/actions.ts#${name}`, surface: name, kind: "server-action", access: "internal-only",
+  permission: "admin.access with AAL2", scope,
+  dataPath: "exact-origin action; audited idempotent RPCs; email through the Resend adapter with an idempotency key",
+  denialEvidence: "rfp-forms/actions.test.ts; rfp-vendor-forms.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+})),
+{
+  key: "src/server/commands/rfp-vendor-forms.ts#command",
+  surface: "vendor RFP contact, RFP send-out, follow-up, tracking events, answers, and file download",
+  kind: "command", access: "privileged", permission: "admin.access with AAL2",
+  scope: "vendor organizations and the recipients of distributed RFPs; checked in SQL",
+  dataPath: "request-scoped fixed RPCs; strict input and output; idempotent audited commands; only a hash of the link token is stored",
+  denialEvidence: "rfp-vendor-forms.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+{
+  key: "src/app/rfp/[token]/page.tsx#default", surface: "/rfp/[token]", kind: "page", access: "public",
+  permission: "none; the unguessable link token is the key", scope: "the one RFP vendor form the token belongs to",
+  dataPath: "anonymous fixed RPC keyed by the token hash; strict DTO; noindex and no-referrer; unknown token shows a generic notice",
+  denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+...(["saveRfpAnswersAction", "submitRfpFormAction", "removeRfpFileAction"] as const).map((name): EntryPointInventoryRecord => ({
+  key: `src/app/rfp/[token]/actions.ts#${name}`, surface: name, kind: "server-action", access: "public",
+  permission: "none; the unguessable link token is the key", scope: "the one RFP vendor form the token belongs to",
+  dataPath: "exact-origin action; anonymous fixed RPC keyed by the token hash; writes only while the form is sent and not past due",
+  denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+})),
+{
+  key: "src/app/rfp/[token]/files/route.ts#POST", surface: "POST /rfp/[token]/files", kind: "route-handler", access: "public",
+  permission: "none; the unguessable link token is the key", scope: "the one RFP vendor form the token belongs to",
+  dataPath: "exact-origin POST; 4 MB limit, type allowlist, and content check; anonymous fixed RPC keyed by the token hash",
+  denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
+{
+  key: "src/server/commands/rfp-vendor-form-public.ts#command", surface: "vendor RFP web form read, save, submit, and files",
+  kind: "command", access: "public", permission: "none; the unguessable link token is the key",
+  scope: "the one RFP vendor form the token belongs to",
+  dataPath: "anonymous fixed RPCs keyed by the token hash; strict input and output; staff-only fields never returned",
+  denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
+},
 ];
 
 function escapeMarkdownCell(value: string) {

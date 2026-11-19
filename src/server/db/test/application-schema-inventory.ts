@@ -142,13 +142,15 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 180;
+export const applicationMigrationCount = 181;
 
 // Private tables have a separate inventory. The existing array is public-only.
 export const applicationPrivateTables = [
   "document_access_grants", "document_scan_lease_owners", "document_scan_readers",
   "finance_document_access_grants", "recovery_policy_state", "rfp_approval_policy", "rfp_notification_attempts",
-  "rfp_notification_outbox", "rfp_notification_receipts", "rfp_receipt_confirmations", "security_authority_guard", "staff_case_access_grants",
+  "rfp_notification_outbox", "rfp_notification_receipts", "rfp_receipt_confirmations",
+  "rfp_vendor_form_events", "rfp_vendor_form_files", "rfp_vendor_forms", "security_authority_guard", "staff_case_access_grants",
+  "vendor_rfp_contacts",
 ] as const;
 
 export const anonymousPublicFunctions = [
@@ -157,4 +159,14 @@ export const anonymousPublicFunctions = [
     signature:
       "full_name text, company text, work_email text, phone text, source text, consent_at timestamp with time zone, idempotency_key uuid",
   },
+  // The RFP web form a vendor opens from an emailed private link (migration 0180).
+  // Each function takes the SHA-256 hash of the link token as its only key.
+  {
+    name: "mmhr_vendor_rfp_form_file_add",
+    signature: "p_token_hash text, p_document_key text, p_file_name text, p_content_type text, p_content_base64 text",
+  },
+  { name: "mmhr_vendor_rfp_form_file_remove", signature: "p_token_hash text, p_file_id uuid" },
+  { name: "mmhr_vendor_rfp_form_read", signature: "p_token_hash text" },
+  { name: "mmhr_vendor_rfp_form_save", signature: "p_token_hash text, p_answers jsonb" },
+  { name: "mmhr_vendor_rfp_form_submit", signature: "p_token_hash text, p_name text, p_email text" },
 ] as const;

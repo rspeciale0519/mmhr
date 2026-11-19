@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button";
 import { AuthorizationError } from "@/server/auth/authorization";
 import { requirePagePermission } from "@/server/auth/page-guards";
 import { getStaffVendorDirectory, type StaffVendor } from "@/server/commands/staff-vendors";
+import { getVendorRfpContacts } from "@/server/commands/rfp-vendor-forms";
 import { openVendorWorkspaceAction } from "./actions";
-import { CreateVendorForm, EnablePortalForm, InviteAdminForm, ListVendorForm, NextSteps } from "./vendor-forms";
+import { CreateVendorForm, EnablePortalForm, InviteAdminForm, ListVendorForm, NextSteps, RfpContactForm } from "./vendor-forms";
+
+/** The saved RFP contact of one vendor, if any. */
+type RfpContact = { contactName: string; contactEmail: string } | undefined;
 
 const statusText: Record<StaffVendor["status"], string> = {
   pending: "Not listed",
@@ -53,7 +57,7 @@ function OpenWorkspaceForm({ vendor }: { vendor: StaffVendor }) {
   </form>;
 }
 
-function VendorEntry({ vendor, callerCanList }: { vendor: StaffVendor; callerCanList: boolean }) {
+function VendorEntry({ vendor, callerCanList, contact }: { vendor: StaffVendor; callerCanList: boolean; contact: RfpContact }) {
   const canChange = vendor.status !== "suspended";
   return <li className="space-y-5 py-6">
     <div className="space-y-2">
@@ -65,6 +69,8 @@ function VendorEntry({ vendor, callerCanList }: { vendor: StaffVendor; callerCan
         <dt className="text-muted-foreground">Status</dt><dd>{statusText[vendor.status]}</dd>
         <dt className="text-muted-foreground">Vendor portal</dt><dd>{vendor.portalOn ? "On" : "Off"}</dd>
         <dt className="text-muted-foreground">Vendor users</dt><dd>{memberText(vendor.activeMembers)}</dd>
+        <dt className="text-muted-foreground">RFP contact</dt>
+        <dd className="break-all">{contact ? `${contact.contactName}, ${contact.contactEmail}` : "Not set. RFP emails cannot be sent yet."}</dd>
       </dl>
     </div>
     <SetupSteps vendor={vendor}/>
@@ -82,6 +88,8 @@ function VendorEntry({ vendor, callerCanList }: { vendor: StaffVendor; callerCan
       )}
     </section>
     {canChange ? <div className="space-y-5">
+      <RfpContactForm organizationId={vendor.organizationId} organizationName={vendor.name} idempotencyKey={randomUUID()}
+        contactName={contact?.contactName} contactEmail={contact?.contactEmail}/>
       {vendor.status === "pending" && (callerCanList
         ? <ListVendorForm organizationId={vendor.organizationId} organizationName={vendor.name} idempotencyKey={randomUUID()}/>
         : <p className="text-sm">Only a Super Admin can list this vendor.</p>)}
@@ -106,6 +114,9 @@ export default async function StaffVendorsPage({ searchParams }: {
     if (error instanceof AuthorizationError) forbidden();
     throw error;
   }
+  // RFP contacts are an extra. If they cannot be read, the page still works
+  // and each vendor shows "Not set".
+  const contacts = await getVendorRfpContacts({ supabase: authorization.supabase }).catch(() => new Map<string, NonNullable<RfpContact>>());
 
   return <main className="mx-auto w-full max-w-4xl space-y-10 px-4 py-8 sm:px-6 sm:py-10">
     <header className="space-y-3">
@@ -136,7 +147,7 @@ export default async function StaffVendorsPage({ searchParams }: {
       ) : (
         <ul aria-label="Vendor organizations" className="max-w-2xl divide-y border-y">
           {directory.items.map((vendor) => <VendorEntry key={vendor.organizationId} vendor={vendor}
-            callerCanList={directory.callerCanList}/>)}
+            callerCanList={directory.callerCanList} contact={contacts.get(vendor.organizationId)}/>)}
         </ul>
       )}
       {directory.truncated && <p className="text-sm">Only the first 200 vendors are shown.</p>}

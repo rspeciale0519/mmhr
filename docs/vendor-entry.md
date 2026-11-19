@@ -56,7 +56,33 @@ Owner decision, 2026-11-17: most vendors never join the app. MMHR sends the RFP 
 4. Rare case: if the vendor wants to answer in the portal, invite its first user at `/admin/vendors`.
    The person sets up two-step sign-in at `/mfa`, then accepts at `/invitations/accept`. The invitation expires after 72 hours.
 
-Steps 2 and 3 are not built yet. See launch task 3 in [LAUNCH.md](./LAUNCH.md).
+### How steps 2 and 3 work
+
+Migration 0180 adds these steps. Apply it before first use.
+
+1. At `/admin/vendors`, save the vendor's **RFP contact** (name and email).
+2. At `/admin/evaluations`, open the customer's review and deliver the approved RFP. The section
+   **Email the RFP form to vendors** then appears.
+3. Fill in the client overview once and tick the topic tabs to include. Set the due date for each vendor.
+   The default is 10 business days. Press **Send RFP email**.
+4. The vendor contact gets an email with a private link to `/rfp/<token>`. No sign-in is needed.
+   Answers save automatically. The vendor can upload the requested documents (4 MB for each file, 12 files).
+   **Submit** locks the form. The link stops accepting changes after the due date.
+5. Track each vendor on the same review page, or in the vendor workspace at `/admin/vendor-evidence`:
+   status, sent date, due date, first open, progress, and the tracking log. An unanswered form past its due date shows **Overdue**.
+6. Use the buttons on the tracking card to send a follow-up email, log a call, record a reply received
+   outside the form, mark the vendor as declined or no response, change the due date, or reopen a form.
+   No reminder is sent automatically.
+7. **View answers and files** opens `/admin/rfp-forms/<formId>` with every answer and the uploaded files.
+
+Rules and limits:
+
+- The email names MatchMaker HR as the only contact. The form shows the client overview that staff typed.
+- The link token is never stored. The database keeps only its SHA-256 hash.
+  The server makes the token from the secret `RFP_FORM_LINK_SECRET`. A new secret stops every link that was already sent.
+- Email needs `RESEND_API_KEY`, `EMAIL_FROM`, and `EMAIL_REPLY_TO`. Links use `NEXT_PUBLIC_APP_URL`.
+- Uploaded files are checked by type and first bytes only. There is no virus scan. Staff download them as attachments.
+- The questions come from `src/lib/rfp-form-library.ts` (12 tabs, 262 questions, library version 1).
 
 ## Recovery
 
