@@ -2,8 +2,13 @@ import type { Event } from "@sentry/nextjs";
 
 type MonitoringSpan = NonNullable<Event["spans"]>[number];
 
+/**
+ * Removes everything from an address that monitoring must not store: the
+ * query string, the fragment, and the private link token of a vendor RFP
+ * form (`/rfp/<token>`). That token is the only key to the vendor's form.
+ */
 export function stripUrlParameters(value: string): string {
-  return value.split(/[?#]/, 1)[0] ?? "";
+  return (value.split(/[?#]/, 1)[0] ?? "").replace(/\/rfp\/[A-Za-z0-9_-]{43}(?=\/|$)/g, "/rfp/[token]");
 }
 function sanitizeData(value: NonNullable<MonitoringSpan["data"]>): NonNullable<MonitoringSpan["data"]>;
 function sanitizeData(value: Record<string, unknown>): Record<string, unknown>;

@@ -18,6 +18,16 @@ import { RfpTrackingCard } from "./tracking-card";
  * button's value tells the server which vendor to send to.
  */
 
+/**
+ * Writes a moment as the calendar day it falls on in US Eastern time, in the
+ * YYYY-MM-DD form a date input needs. Due dates are saved as the end of an
+ * Eastern day, which is already the next day in UTC, so cutting the UTC text
+ * would show one day too late. (The "en-CA" style writes dates as YYYY-MM-DD.)
+ */
+function easternDay(moment: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(moment);
+}
+
 const inputClass = "mt-1 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 
 /** `defaultDueDate` is YYYY-MM-DD, worked out on the server (10 business days ahead). */
@@ -26,7 +36,7 @@ export function RfpSendOutPanel({ sendOut, defaultDueDate }: { sendOut: RfpSendO
   // Pre-fill from the last form sent for this customer, if there is one.
   const overview: Record<string, string> = sendOut.lastClientOverview ?? { companyName: sendOut.customerName };
   const tabs = new Set(sendOut.lastTabKeys ?? RFP_LIBRARY.map((tab) => tab.key));
-  const today = new Date().toISOString().slice(0, 10);
+  const today = easternDay(new Date());
 
   /**
    * Sends the form ourselves instead of letting the browser do it. That way
@@ -97,7 +107,7 @@ export function RfpSendOutPanel({ sendOut, defaultDueDate }: { sendOut: RfpSendO
                   {canSend && <div className="flex flex-wrap items-end gap-3">
                     <label className="block text-sm">Due date
                       <input type="date" name={`dueDate.${recipient.recipientId}`} min={today} required
-                        defaultValue={recipient.form ? recipient.form.dueAt.slice(0, 10) : defaultDueDate} className={inputClass} />
+                        defaultValue={recipient.form ? easternDay(new Date(recipient.form.dueAt)) : defaultDueDate} className={inputClass} />
                     </label>
                     <Button type="submit" name="recipientId" value={recipient.recipientId} disabled={pending} className="min-h-11 px-4"
                       aria-label={`${sentBefore ? "Send again to" : "Send RFP email to"} ${recipient.vendorName}`}>

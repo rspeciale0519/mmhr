@@ -79,7 +79,11 @@ Rules and limits:
 
 - The email names MatchMaker HR as the only contact. The form shows the client overview that staff typed.
 - The link token is never stored. The database keeps only its SHA-256 hash.
-  The server makes the token from the secret `RFP_FORM_LINK_SECRET`. A new secret stops every link that was already sent.
+  The server makes the token from the secret `RFP_FORM_LINK_SECRET`.
+- A new secret does not stop a link that was already sent, because the saved hash does not change.
+  It does break follow-up emails for forms sent with the old secret: they would carry a link that does not open.
+- To replace a link (for example after a leak): set a new `RFP_FORM_LINK_SECRET`, then press **Send again** for each open form.
+  That saves the new hash, and the old link stops working. Reopen a closed form first.
 - Email needs `RESEND_API_KEY`, `EMAIL_FROM`, and `EMAIL_REPLY_TO`. Links use `NEXT_PUBLIC_APP_URL`.
 - Uploaded files are checked by type and first bytes only. There is no virus scan. Staff download them as attachments.
 - The questions come from `src/lib/rfp-form-library.ts` (12 tabs, 262 questions, library version 1).
