@@ -1,0 +1,413 @@
+/**
+ * Standard RFP question library.
+ *
+ * This is the list of questions a vendor answers on the RFP web form. It is
+ * based on the owner's example HRIS and payroll RFP spreadsheet, with the
+ * example client's own names removed so it fits any customer.
+ *
+ * How it is organised:
+ * - The library is a list of "tabs" (topics), such as Payroll or Reporting.
+ * - Each tab has "items". An item is either a heading (just a label) or a
+ *   question (something the vendor answers).
+ * - Every question has a `key`, a short permanent id such as "payroll_03".
+ *   Saved answers are stored under that key, so NEVER change or reuse a key.
+ *   To change the questions, add new keys and raise RFP_LIBRARY_VERSION.
+ */
+
+/** Raise this number whenever questions are added, removed, or reworded. */
+export const RFP_LIBRARY_VERSION = 1;
+
+/** The four answers a vendor can choose, with the label shown on screen. */
+export const RFP_ANSWER_CHOICES = [
+  { value: "yes", label: "Yes" },
+  { value: "no", label: "No" },
+  { value: "na", label: "N/A" },
+  { value: "within_12_months", label: "Within 12 months" },
+] as const;
+
+/** One of "yes" | "no" | "na" | "within_12_months". */
+export type RfpAnswerValue = (typeof RFP_ANSWER_CHOICES)[number]["value"];
+
+/** A label that groups the questions below it. It has no answer. */
+export type RfpHeading = { kind: "heading"; text: string };
+
+/** One question. `indent` marks a sub-question shown under a heading. */
+export type RfpQuestion = { kind: "question"; key: string; text: string; indent?: boolean };
+
+/** One topic tab on the form. */
+export type RfpTab = { key: string; title: string; items: readonly (RfpHeading | RfpQuestion)[] };
+
+/** Documents every RFP asks the vendor to upload. `key` is permanent. */
+export const RFP_REQUESTED_DOCUMENTS = [
+  { key: "contract_sample", label: "Client contract sample" },
+  { key: "performance_guarantees", label: "Performance guarantees" },
+  { key: "service_team", label: "One-page chart of the assigned service team with responsibilities" },
+  { key: "implementation_plan", label: "Sample implementation timeline and checklist" },
+] as const;
+
+/** All tabs, in the order they appear on the form. */
+export const RFP_LIBRARY: readonly RfpTab[] = [
+  {
+    key: "core",
+    title: "Core HRIS Functions",
+    items: [
+      { kind: "question", key: "core_01", text: "Data security" },
+      { kind: "question", key: "core_02", text: "Employee records & database" },
+      { kind: "question", key: "core_03", text: "Employee lifecycle management" },
+      { kind: "question", key: "core_04", text: "Employee self-service portal" },
+      { kind: "question", key: "core_05", text: "Payroll processing" },
+      { kind: "question", key: "core_06", text: "Integrated ad-hoc report writer" },
+      { kind: "question", key: "core_07", text: "Benefits administration, including enrollment (open enrollment and life events)" },
+      { kind: "question", key: "core_08", text: "Test environment" },
+      { kind: "question", key: "core_09", text: "Compliance management" },
+      { kind: "question", key: "core_10", text: "Organizational structures/charts" },
+      { kind: "question", key: "core_11", text: "Easily Accessible (24*7) Customer Support" },
+      { kind: "question", key: "core_12", text: "Ability to mass update employee records" },
+      { kind: "question", key: "core_13", text: "Automatic file feeds to benefit providers/vendors" },
+      { kind: "question", key: "core_14", text: "End user training" },
+      { kind: "question", key: "core_15", text: "Integrated user guides for business processes (created by the provider or by the client)" },
+      { kind: "question", key: "core_16", text: "Integration or compatibility with the client's applicant tracking system" },
+      { kind: "question", key: "core_17", text: "Integration or compatibility with the client's ERP or accounting system" },
+      { kind: "question", key: "core_18", text: "Provides for client-defined organization levels (specify number available)" },
+      { kind: "question", key: "core_19", text: "Document management" },
+      { kind: "question", key: "core_20", text: "User defined fields with user defined validation (specify number available)" },
+      { kind: "question", key: "core_21", text: "Federal, state, and local regulations and/or compliance requirement changes (including taxes) are maintained and updated by HRIS vendor" },
+      { kind: "question", key: "core_22", text: "Can import historical information from prior HRIS provider - Streamlined conversion" },
+      { kind: "question", key: "core_23", text: "Ability to customize look and feel of the platform (colors. logos, etc.)" },
+    ],
+  },
+  {
+    key: "employee_admin",
+    title: "Employee Administration",
+    items: [
+      { kind: "question", key: "employee_admin_01", text: "Employee document management" },
+      { kind: "question", key: "employee_admin_02", text: "Maintain employee demographic data" },
+      { kind: "question", key: "employee_admin_03", text: "Maintain ethnic, visa, and I-9 related data" },
+      { kind: "question", key: "employee_admin_04", text: "Maintain and track ADA and disability information" },
+      { kind: "question", key: "employee_admin_05", text: "Tracks any reasonable accommodations made to support the ADA" },
+      { kind: "question", key: "employee_admin_06", text: "Maintain military and veteran status for employees" },
+      { kind: "question", key: "employee_admin_07", text: "Maintain language, education, and certification data" },
+      { kind: "question", key: "employee_admin_08", text: "Maintain data for all job-related details (FLSA status, EEO codes, pay, grade, job families, job descriptions)" },
+      { kind: "question", key: "employee_admin_09", text: "Maintain marital, family, dependent/beneficiary related and tax-related elections" },
+      { kind: "question", key: "employee_admin_10", text: "Maintain historical data for current and former employees, including names, employment, job history, status, pay" },
+      { kind: "question", key: "employee_admin_11", text: "Maintain audit trail of employee file and data updates, additions and changes by data, time and user who submitted the changes" },
+      { kind: "question", key: "employee_admin_12", text: "Ability to create employee types such as full time, part time, temporary, contract employee, interns, etc." },
+      { kind: "question", key: "employee_admin_13", text: "Enable effective/future dating of pending transactions" },
+      { kind: "question", key: "employee_admin_14", text: "Maintain history on all employee fields" },
+      { kind: "question", key: "employee_admin_15", text: "Track employee relations matters, including disciplinary actions, date & type of complaint, follow-up steps and employee responses to actions." },
+      { kind: "heading", text: "Provides employee searches by" },
+      { kind: "question", key: "employee_admin_16", text: "Emp ID", indent: true },
+      { kind: "question", key: "employee_admin_17", text: "Last Name & First Name", indent: true },
+      { kind: "question", key: "employee_admin_18", text: "Organization level", indent: true },
+      { kind: "question", key: "employee_admin_19", text: "Company", indent: true },
+      { kind: "question", key: "employee_admin_20", text: "Work location", indent: true },
+      { kind: "question", key: "employee_admin_21", text: "Status", indent: true },
+      { kind: "question", key: "employee_admin_22", text: "Job", indent: true },
+      { kind: "question", key: "employee_admin_23", text: "Pay Group", indent: true },
+    ],
+  },
+  {
+    key: "benefits",
+    title: "Benefits Administration",
+    items: [
+      { kind: "question", key: "benefits_01", text: "Provides total integration between benefits and payroll" },
+      { kind: "question", key: "benefits_02", text: "Maintain calculations and limits in compliance with federal legislation" },
+      { kind: "question", key: "benefits_03", text: "Supports benefit/deduction goals and limits" },
+      { kind: "question", key: "benefits_04", text: "Supports \"catch-up\" contributions on deferred compensation plans" },
+      { kind: "question", key: "benefits_05", text: "Ability to assign different benefit packages to different groups of employees based on eligibility rules" },
+      { kind: "question", key: "benefits_06", text: "Establishes benefit/deduction plans with multiple types and options" },
+      { kind: "heading", text: "Supports effective dated" },
+      { kind: "question", key: "benefits_07", text: "Benefit/deduction plans", indent: true },
+      { kind: "question", key: "benefits_08", text: "Employee benefit/deduction plan enrollment", indent: true },
+      { kind: "question", key: "benefits_09", text: "Employer benefit/deduction plan enrollment", indent: true },
+      { kind: "question", key: "benefits_10", text: "Termination", indent: true },
+      { kind: "question", key: "benefits_11", text: "Includes defined start and stop dates for benefit/deduction" },
+      { kind: "question", key: "benefits_12", text: "Updates benefit/deduction plans based on employee status change(s)" },
+      { kind: "question", key: "benefits_13", text: "Supports processing of one-time benefit/deductions" },
+      { kind: "question", key: "benefits_14", text: "Tracks \"waived\" benefit/deduction plans" },
+      { kind: "question", key: "benefits_15", text: "Assigns a rate schedule to apply new rates with future effective dates for the new plan year" },
+      { kind: "question", key: "benefits_16", text: "Allows benefit costs to be set up for the new year while continuing processing for the current year" },
+      { kind: "question", key: "benefits_17", text: "Tracks and maintains information for dependents and beneficiaries" },
+      { kind: "question", key: "benefits_18", text: "Calculates imputed income" },
+      { kind: "question", key: "benefits_19", text: "Facilitates automatic reporting to third-party vendors such as benefit providers" },
+      { kind: "question", key: "benefits_20", text: "Includes both pre-tax and post-tax benefits/deductions" },
+      { kind: "question", key: "benefits_21", text: "Supports multiple types of life insurance, long term disability, and short term disability" },
+      { kind: "question", key: "benefits_22", text: "Supports multiple flexible spending accounts, including health care and dependent care" },
+      { kind: "question", key: "benefits_23", text: "Supports multiple health savings accounts (HSAs) including catch-up contributions" },
+      { kind: "heading", text: "Solution has the ability to" },
+      { kind: "question", key: "benefits_24", text: "Provide a place to describe benefit plans and include specific plan details, including links", indent: true },
+      { kind: "question", key: "benefits_25", text: "Add or modify employee elections", indent: true },
+      { kind: "question", key: "benefits_26", text: "Send reminders using an integrated email feature", indent: true },
+      { kind: "question", key: "benefits_27", text: "Link to external resources/provider websites", indent: true },
+      { kind: "question", key: "benefits_28", text: "Provide links to benefit plan provider web sites and/or the client intranet for additional information to help in making informed benefit choices", indent: true },
+      { kind: "heading", text: "Solution allows employees to" },
+      { kind: "question", key: "benefits_29", text: "View current benefits and related information", indent: true },
+      { kind: "question", key: "benefits_30", text: "Compare current beneits to new benefits employees may choose to elect", indent: true },
+      { kind: "question", key: "benefits_31", text: "Compare the cost of current versus new benefits", indent: true },
+      { kind: "question", key: "benefits_32", text: "Make elections from a list of eligible benefits (including ability to waive, decline, and modify benefits)", indent: true },
+      { kind: "question", key: "benefits_33", text: "Keep existing benefit elections with no changes (passive enrollment)", indent: true },
+      { kind: "question", key: "benefits_34", text: "Modify existing benefit elections", indent: true },
+      { kind: "question", key: "benefits_35", text: "Waive or decline benefits", indent: true },
+      { kind: "question", key: "benefits_36", text: "Review, add, modify and remove dependents and beneficiaries", indent: true },
+      { kind: "question", key: "benefits_37", text: "Save \"in progress\" enrollments and then later return to modify choices and complete enrollment", indent: true },
+      { kind: "question", key: "benefits_38", text: "Automatic file feeds to benefit providers/vendors including EDI 834 files." },
+    ],
+  },
+  {
+    key: "time_off",
+    title: "Time Off and Leave",
+    items: [
+      { kind: "question", key: "time_off_01", text: "PTO accruals viewable in HR, time off solution and on paystubs" },
+      { kind: "question", key: "time_off_02", text: "PTO plans can be configured to accrue based on length of service and defined accrual rates" },
+      { kind: "question", key: "time_off_03", text: "PTO plans can be configured to accrue based on defined frequency (specify capabilities)" },
+      { kind: "question", key: "time_off_04", text: "PTO plans can be configured to adhere to defined carryover rules" },
+      { kind: "question", key: "time_off_05", text: "PTO plans can be configured to provide a starting available balance for new hires" },
+      { kind: "question", key: "time_off_06", text: "Employees can view PTO plan balances" },
+      { kind: "question", key: "time_off_07", text: "Employees can request PTO, wellness day, volunteer time off, floating holiday and sick" },
+      { kind: "question", key: "time_off_08", text: "Workflow approval processes are included for PTO requests initiated by employees" },
+      { kind: "question", key: "time_off_09", text: "Leave tracking and administration" },
+    ],
+  },
+  {
+    key: "payroll",
+    title: "Payroll and Accounting",
+    items: [
+      { kind: "question", key: "payroll_01", text: "Payroll processing" },
+      { kind: "question", key: "payroll_02", text: "Labor cost distribution (General ledger)" },
+      { kind: "question", key: "payroll_03", text: "Paid time off (Tracking/accruing PTO)" },
+      { kind: "question", key: "payroll_04", text: "Time reporting" },
+      { kind: "question", key: "payroll_05", text: "Taxation updates from HRIS vendor when federal, state, and local regulations change" },
+      { kind: "question", key: "payroll_06", text: "Supports individual tax filings by EIN" },
+      { kind: "question", key: "payroll_07", text: "Integration or compatibility with the client's ERP or accounting system" },
+      { kind: "question", key: "payroll_08", text: "Ability to handle global payroll for employees outside the United States" },
+      { kind: "question", key: "payroll_09", text: "Access to do reporting by others othan than HR and Payroll - i.e accounting can you give access others to be able to run reports" },
+      { kind: "question", key: "payroll_10", text: "Reporting on yearly worker's comp audit" },
+      { kind: "question", key: "payroll_11", text: "Automated reports" },
+      { kind: "question", key: "payroll_12", text: "Ability to import payroll timekeeping hours into current payroll batch from separate timekeeping system" },
+      { kind: "question", key: "payroll_13", text: "Streamlined payroll conversion with carry over balances if mid year conversion is done." },
+      { kind: "question", key: "payroll_14", text: "Ability to show benefit arrears to be picked up on future pay checks." },
+      { kind: "question", key: "payroll_15", text: "Process taxes for State, Federal and locals to stay in compliance." },
+      { kind: "question", key: "payroll_16", text: "Create registration for state and local tax ids." },
+      { kind: "question", key: "payroll_17", text: "Ability to enter payroll adjustments prior to payroll being open and code it for a certain payroll date" },
+      { kind: "question", key: "payroll_18", text: "Ability to be able to process a mock check" },
+      { kind: "question", key: "payroll_19", text: "Garnishment check processing" },
+      { kind: "question", key: "payroll_20", text: "Payroll checks cut by the payroll provider, with tracking for uncashed checks" },
+      { kind: "question", key: "payroll_21", text: "Ability to process payroll and run payroll reports all by Tax group instead of pay group if possible - that way we are only running 1 payroll and not three separate payrolls. Everyone would be in one batch at processing time." },
+      { kind: "question", key: "payroll_22", text: "Ability to be able to setup employees working in another country for payroll and tax purposes - down the road issue as so many people are asking for this and who knows how the future will change. Would be good to have the ability if needed." },
+      { kind: "question", key: "payroll_23", text: "Process yearly W-2s" },
+      { kind: "question", key: "payroll_24", text: "Ability for employees to print their own yearly W-2 or import it into tax software" },
+      { kind: "question", key: "payroll_25", text: "Program in system to assist with choosing correct local tax" },
+    ],
+  },
+  {
+    key: "performance",
+    title: "Goals and Coaching",
+    items: [
+      { kind: "heading", text: "Technical Requirements" },
+      { kind: "question", key: "performance_01", text: "Integration with HRIS", indent: true },
+      { kind: "question", key: "performance_02", text: "Business intelligence platforms integration", indent: true },
+      { kind: "question", key: "performance_03", text: "Custom integrations using APIs or SFTP sites", indent: true },
+      { kind: "question", key: "performance_04", text: "Import supporting documents (PIPs, client feedback, etc.)", indent: true },
+      { kind: "question", key: "performance_05", text: "Pre-built reports", indent: true },
+      { kind: "question", key: "performance_06", text: "Native iOS and Android apps", indent: true },
+      { kind: "question", key: "performance_07", text: "Mobile access for employees & coaches", indent: true },
+      { kind: "heading", text: "Goal Setting" },
+      { kind: "question", key: "performance_08", text: "Cascade & align goals based on affiliations", indent: true },
+      { kind: "question", key: "performance_09", text: "Visibility to employee, coach, and matrix manager", indent: true },
+      { kind: "question", key: "performance_10", text: "Automatic reminders", indent: true },
+      { kind: "question", key: "performance_11", text: "SMART Goal wizard", indent: true },
+      { kind: "question", key: "performance_12", text: "Add/edit/delete goals", indent: true },
+      { kind: "question", key: "performance_13", text: "Tasks/planning", indent: true },
+      { kind: "question", key: "performance_14", text: "Add/edit/delete goals", indent: true },
+      { kind: "question", key: "performance_15", text: "Record goal achievement", indent: true },
+      { kind: "question", key: "performance_16", text: "Retain previous year goal plans", indent: true },
+      { kind: "question", key: "performance_17", text: "Copy goals from previous year to current year", indent: true },
+      { kind: "heading", text: "Assessments" },
+      { kind: "question", key: "performance_18", text: "Self- assessments", indent: true },
+      { kind: "question", key: "performance_19", text: "360° feedback", indent: true },
+      { kind: "question", key: "performance_20", text: "9 Box Grid", indent: true },
+      { kind: "question", key: "performance_21", text: "Succession planning tools", indent: true },
+      { kind: "heading", text: "Coaching" },
+      { kind: "question", key: "performance_22", text: "Documented coaching feedback", indent: true },
+      { kind: "question", key: "performance_23", text: "Record accomplishments (beyond goal achievements)", indent: true },
+      { kind: "question", key: "performance_24", text: "Developmental planning tools", indent: true },
+      { kind: "question", key: "performance_25", text: "Accessible by coach and matrix managers", indent: true },
+      { kind: "question", key: "performance_26", text: "Resources to stay in touch with coachee", indent: true },
+      { kind: "heading", text: "Platform Features" },
+      { kind: "question", key: "performance_27", text: "Goals dashboard", indent: true },
+      { kind: "question", key: "performance_28", text: "Custom fields & labels", indent: true },
+      { kind: "question", key: "performance_29", text: "Custom workflow rules & templates", indent: true },
+      { kind: "question", key: "performance_30", text: "Custom report builder", indent: true },
+      { kind: "question", key: "performance_31", text: "Document storage", indent: true },
+      { kind: "question", key: "performance_32", text: "Custom filters", indent: true },
+      { kind: "heading", text: "User Experience - stakeholders" },
+      { kind: "question", key: "performance_33", text: "Coaches", indent: true },
+      { kind: "question", key: "performance_34", text: "Matrix Managers", indent: true },
+      { kind: "question", key: "performance_35", text: "Employees", indent: true },
+      { kind: "question", key: "performance_36", text: "Talent Mgmt team members", indent: true },
+      { kind: "question", key: "performance_37", text: "HR Analyst", indent: true },
+    ],
+  },
+  {
+    key: "compensation",
+    title: "Compensation Management",
+    items: [
+      { kind: "question", key: "compensation_01", text: "Provides complete employee compensation history (including merit, incentives, commission, pay rate changes, etc.)" },
+      { kind: "question", key: "compensation_02", text: "Establish and maintain salary structures and ranges by grade, location, and other factors" },
+      { kind: "question", key: "compensation_03", text: "No limit to the number of salary grades" },
+      { kind: "question", key: "compensation_04", text: "Automatically calculates comp-ratio and percent in range" },
+      { kind: "question", key: "compensation_05", text: "Validates minimum and maximum salary (of grade) when pay is changed, provides warning messages as needed" },
+      { kind: "question", key: "compensation_06", text: "Facilitates an automated process for annual merit increases" },
+      { kind: "question", key: "compensation_07", text: "Facilitates base salary, merit increase, and annual bonus planning with stakeholders" },
+      { kind: "question", key: "compensation_08", text: "Provides budget worksheets to assist managers in compensation planning/merit increase process" },
+      { kind: "question", key: "compensation_09", text: "Provides abiliy to analyze and chart salary data by title, salary range and other appropriate fields" },
+      { kind: "question", key: "compensation_10", text: "Provides total compensation views/reports to employees" },
+      { kind: "question", key: "compensation_11", text: "Ability to conduct internal pay equity analysis" },
+      { kind: "question", key: "compensation_12", text: "Includes merit matrix to help with salary planning" },
+    ],
+  },
+  {
+    key: "learning",
+    title: "Learning",
+    items: [
+      { kind: "heading", text: "Technical Requirements" },
+      { kind: "question", key: "learning_01", text: "Integration with HRIS", indent: true },
+      { kind: "question", key: "learning_02", text: "Custom integrations using APIs or SFTP sites", indent: true },
+      { kind: "question", key: "learning_03", text: "Integration with LinkedIn Learning (courses & completions) & other open content networks", indent: true },
+      { kind: "question", key: "learning_04", text: "Integration with Outlook to add session to user's calendar", indent: true },
+      { kind: "question", key: "learning_05", text: "Integration with Teams/WebEx (webinars)", indent: true },
+      { kind: "question", key: "learning_06", text: "Import online courses developed by vendors", indent: true },
+      { kind: "question", key: "learning_07", text: "Import online courses/recordings developed internally", indent: true },
+      { kind: "question", key: "learning_08", text: "SCORM compliance", indent: true },
+      { kind: "question", key: "learning_09", text: "Keyword search functionality to find courses", indent: true },
+      { kind: "question", key: "learning_10", text: "Pre-built reports", indent: true },
+      { kind: "question", key: "learning_11", text: "Customize and schedule ad hoc reports", indent: true },
+      { kind: "question", key: "learning_12", text: "Custom surveys", indent: true },
+      { kind: "question", key: "learning_13", text: "Proxy as user", indent: true },
+      { kind: "question", key: "learning_14", text: "Support access to articles/open tickets", indent: true },
+      { kind: "question", key: "learning_15", text: "Native iOS and Android apps", indent: true },
+      { kind: "question", key: "learning_16", text: "Mobile access for learners", indent: true },
+      { kind: "question", key: "learning_17", text: "Business intelligence platforms integration", indent: true },
+      { kind: "heading", text: "Platform Features" },
+      { kind: "question", key: "learning_18", text: "Customizable branding for the client's learning site", indent: true },
+      { kind: "question", key: "learning_19", text: "Display sessions in user's time zone", indent: true },
+      { kind: "question", key: "learning_20", text: "Online catalog & libraries viewable only by specific roles/locations", indent: true },
+      { kind: "question", key: "learning_21", text: "Learning item details (title/description/objectives, requited vs recommended items, delivery method, duration, LU/PDH credit hours, target audience, min/max enrollments, waitlisting/auto enroll from waitlist, prerequisitites, retraining, search)", indent: true },
+      { kind: "question", key: "learning_22", text: "Programs - series of learning items, not required", indent: true },
+      { kind: "question", key: "learning_23", text: "Rule-based curriculum to bundle a series of learning items with/without due dates, assign to a user, track completion and maintenance of retraining", indent: true },
+      { kind: "question", key: "learning_24", text: "Schedule sessions (date, time, link to join)", indent: true },
+      { kind: "question", key: "learning_25", text: "Customized email notifications (registration, reminders, pre-work, materials/exercise files)", indent: true },
+      { kind: "question", key: "learning_26", text: "Create assignment profiles", indent: true },
+      { kind: "question", key: "learning_27", text: "Invite specific groups to learning events (coaches, disciplines, etc.)", indent: true },
+      { kind: "question", key: "learning_28", text: "Track registration", indent: true },
+      { kind: "question", key: "learning_29", text: "Allow substitutes for learning (recording vs. live)", indent: true },
+      { kind: "question", key: "learning_30", text: "Cap registration / waitlist", indent: true },
+      { kind: "question", key: "learning_31", text: "Record attendance", indent: true },
+      { kind: "question", key: "learning_32", text: "Generate certificates of completion", indent: true },
+      { kind: "question", key: "learning_33", text: "User transcripts retained for 7 years", indent: true },
+      { kind: "question", key: "learning_34", text: "Instructors - view rosters, record attendance", indent: true },
+      { kind: "question", key: "learning_35", text: "Coaches - view learning dashboard of coachees", indent: true },
+    ],
+  },
+  {
+    key: "system_admin",
+    title: "System Administration",
+    items: [
+      { kind: "question", key: "system_admin_01", text: "Access controls/role-based permissions for determining user privileges throughout the solution" },
+      { kind: "question", key: "system_admin_02", text: "Provides tools for system administrators to easily activate, inactivate, and reactivate user accounts" },
+      { kind: "question", key: "system_admin_03", text: "Provides tools for system administrators to easily reset passwords" },
+      { kind: "question", key: "system_admin_04", text: "Access privileges can be applied to a group of users or individual user" },
+      { kind: "question", key: "system_admin_05", text: "Provides configurable rules for password policy" },
+      { kind: "question", key: "system_admin_06", text: "Ability for employees to reset passwords and have a system generated temporary password automatically emailed out" },
+      { kind: "question", key: "system_admin_07", text: "Provides dashboard in which system administrators can post messages, alerts, and resources that are visible to users when they log in" },
+    ],
+  },
+  {
+    key: "workflows",
+    title: "Workflows and Approvals",
+    items: [
+      { kind: "question", key: "workflows_01", text: "Auto email to approvers" },
+      { kind: "question", key: "workflows_02", text: "Email to initiators informing them of request status" },
+      { kind: "question", key: "workflows_03", text: "Allow users to view outstanding workflow transactions" },
+      { kind: "question", key: "workflows_04", text: "Auto email notices to approvers for outstanding transactions" },
+      { kind: "question", key: "workflows_05", text: "Provides multiple levels of approvers" },
+      { kind: "question", key: "workflows_06", text: "Audit trail to capture modifications to employee information, including date/time, approver" },
+      { kind: "question", key: "workflows_07", text: "Allows workflow email messages to be customized" },
+    ],
+  },
+  {
+    key: "reporting",
+    title: "Reporting",
+    items: [
+      { kind: "question", key: "reporting_01", text: "Pre-built reports > Standard reports that are easy to customize and save" },
+      { kind: "heading", text: "Standard compliance reports, including" },
+      { kind: "question", key: "reporting_02", text: "EEO-1", indent: true },
+      { kind: "question", key: "reporting_03", text: "OSHA 300 and OSHA 301", indent: true },
+      { kind: "question", key: "reporting_04", text: "VETS-4212", indent: true },
+      { kind: "question", key: "reporting_05", text: "ACA reporting", indent: true },
+      { kind: "question", key: "reporting_06", text: "Ability to schedule/automate reports, including delivery to specified end-users" },
+      { kind: "question", key: "reporting_07", text: "Historical data is viewable and reportable, ability to pull report that provides all employee data during a point in time." },
+      { kind: "question", key: "reporting_08", text: "Report on employee relations matters, including disciplinary actions, date & type of complaint, follow-up steps and employee responses to actions." },
+      { kind: "question", key: "reporting_09", text: "Report on employee demographic data" },
+      { kind: "question", key: "reporting_10", text: "Report on ethnic, visa, and I-9 related data" },
+      { kind: "question", key: "reporting_11", text: "Automatic notification of I-9/visa expiration" },
+      { kind: "question", key: "reporting_12", text: "Tracks ADA and disability information" },
+      { kind: "question", key: "reporting_13", text: "Tracks any accommodations made to support the ADA" },
+      { kind: "question", key: "reporting_14", text: "Provides military and veteran status for employees" },
+      { kind: "question", key: "reporting_15", text: "Report on language, education, and certification data" },
+      { kind: "question", key: "reporting_16", text: "Report on data for all job-related details" },
+      { kind: "question", key: "reporting_17", text: "Includes affirmation action compliance features" },
+      { kind: "question", key: "reporting_18", text: "Includes state-mandated \"New Hire\" reports" },
+      { kind: "question", key: "reporting_19", text: "Providers workers' compensation support" },
+      { kind: "question", key: "reporting_20", text: "Audit trail of EE file and data updates, additions and changes" },
+      { kind: "question", key: "reporting_21", text: "Compliance reporting generated for current and historial periods (with ability to determine periods)" },
+      { kind: "question", key: "reporting_22", text: "Internal pay equity analysis and reporting" },
+      { kind: "question", key: "reporting_23", text: "W2 Reporting" },
+      { kind: "question", key: "reporting_24", text: "Report on benefits an employee is eligible for and what they are enrolled in" },
+      { kind: "question", key: "reporting_25", text: "Performance review report which provides current status" },
+    ],
+  },
+  {
+    key: "it_security",
+    title: "IT and Security",
+    items: [
+      { kind: "question", key: "it_security_01", text: "Native application" },
+      { kind: "heading", text: "IT Requirements" },
+      { kind: "question", key: "it_security_02", text: "Mobile website/app" },
+      { kind: "question", key: "it_security_03", text: "HRIS is hosted or cloud based" },
+      { kind: "question", key: "it_security_04", text: "Multi-factor authentication (App based)" },
+      { kind: "question", key: "it_security_05", text: "Integration or compatibility with the client's ERP or accounting system" },
+      { kind: "question", key: "it_security_06", text: "API capabilities - Push and Pull data. Is there an additional cost?" },
+      { kind: "question", key: "it_security_07", text: "Support framework (Respond and Resolution SLAs)" },
+      { kind: "question", key: "it_security_08", text: "Product uptime (99.99%)" },
+      { kind: "question", key: "it_security_09", text: "Easy and intuitive way to maintain user roles and assign individuals/AD group to a role" },
+      { kind: "question", key: "it_security_10", text: "Ability for codeless integration with Microsoft Active Directory and SSO AD authentication" },
+      { kind: "question", key: "it_security_11", text: "Integration with the client's recruiting and onboarding system" },
+      { kind: "question", key: "it_security_12", text: "Integration with the client's retirement plan provider" },
+      { kind: "question", key: "it_security_13", text: "Integration with the client's expense system" },
+      { kind: "question", key: "it_security_14", text: "Browser based and browser agnostic" },
+      { kind: "question", key: "it_security_15", text: "Ability to carry forward customizations to future releases" },
+      { kind: "question", key: "it_security_16", text: "Availability of support/maintenance contracts including customizations" },
+      { kind: "question", key: "it_security_17", text: "No/Low code Workflows and Customizations" },
+      { kind: "question", key: "it_security_18", text: "Provide a test environment with full functionality and APIs (mirroring the Production environement)" },
+      { kind: "question", key: "it_security_19", text: "Ability to access error logs" },
+      { kind: "question", key: "it_security_20", text: "Ability to import data from flat files" },
+      { kind: "question", key: "it_security_21", text: "Ability to export data to csv" },
+    ],
+  },
+];
+
+/** Every tab key, e.g. ["core", "employee_admin", ...]. */
+export const RFP_TAB_KEYS: readonly string[] = RFP_LIBRARY.map((tab) => tab.key);
+
+/** Returns only the chosen tabs, keeping the library's order. */
+export function selectRfpTabs(tabKeys: readonly string[]): RfpTab[] {
+  const wanted = new Set(tabKeys);
+  return RFP_LIBRARY.filter((tab) => wanted.has(tab.key));
+}
+
+/** Returns the question keys inside the chosen tabs. */
+export function rfpQuestionKeys(tabKeys: readonly string[]): string[] {
+  return selectRfpTabs(tabKeys).flatMap((tab) =>
+    tab.items.filter((item): item is RfpQuestion => item.kind === "question").map((item) => item.key));
+}

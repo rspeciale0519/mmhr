@@ -38,12 +38,12 @@ Add more control only when the work touches one of the five protections.
 
 | Area | Pages that stay |
 |---|---|
-| Public | `/`, `/contact`, `/privacy`, `/terms` |
+| Public | `/`, `/contact`, `/privacy`, `/terms`, `/rfp/[token]` (the RFP web form a vendor opens from an emailed private link) |
 | Sign-in | `/sign-up`, `/sign-in`, `/mfa`, `/pending-access`, `/invitations/accept` |
 | Shared | `/home`, `/workspaces`, `/members`, `/invitations` |
 | Customer | `/customer` (needs), `/customer/evaluation` (matrix), `/customer/rfp` |
 | Vendor | `/vendor`, `/vendor/response` |
-| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendors`, `/admin/vendor-evidence`, `/admin/audit` |
+| Staff | `/admin`, `/admin/evaluations`, `/admin/tasks`, `/admin/vendors`, `/admin/vendor-evidence`, `/admin/rfp-forms/[formId]` (one vendor's RFP answers), `/admin/audit` |
 
 Blocked now by [`src/lib/launch-surface.ts`](../src/lib/launch-surface.ts) and `src/proxy.ts`:
 finance, documents, demos, proposals, and contracts, with their API routes.
@@ -93,6 +93,7 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 1. Repair each failure from trim task 3.
 2. Create hosted staging: Supabase project, migrations, Vercel preview, and email.
 3. Build RFP send-out by email and vendor progress tracking in the vendor workspace (steps 6 and 7 above).
+   Built in code with migration 0180. Staging still needs the migration, `RFP_FORM_LINK_SECRET`, and the Resend variables. See [vendor-entry.md](./vendor-entry.md).
 4. Run the launch path and the full integration suite on staging.
 5. Give the owner the candidate, the known limits, and the results. Production release is a separate decision.
 

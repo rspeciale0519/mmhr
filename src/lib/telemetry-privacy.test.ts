@@ -27,3 +27,15 @@ test("removes query and fragment fields from spans without removing timing or st
   expect(result.timestamp).toBe(2);
   expect(sanitizeMonitoringEvent({ spans: [span] }).spans![0]).toEqual(result);
 });
+
+test("removes the private RFP link token from every monitored address", () => {
+  const token = "A".repeat(43);
+  expect(stripUrlParameters(`https://example.com/rfp/${token}`)).toBe("https://example.com/rfp/[token]");
+  expect(stripUrlParameters(`https://example.com/rfp/${token}/files?x=1`)).toBe("https://example.com/rfp/[token]/files");
+  // An ordinary address that only looks similar is left alone.
+  expect(stripUrlParameters("https://example.com/rfp/help")).toBe("https://example.com/rfp/help");
+  const span = sanitizeMonitoringSpan({ description: `POST /rfp/${token}/files`, data: { "http.url": `https://example.com/rfp/${token}/files` } } as never);
+  const event = sanitizeMonitoringEvent({ transaction: `/rfp/${token}`, request: { url: `https://example.com/rfp/${token}` },
+    breadcrumbs: [{ data: { url: `/rfp/${token}/files`, to: `/rfp/${token}` } }] } as never);
+  expect(JSON.stringify([span, event])).not.toContain(token);
+});

@@ -37,6 +37,7 @@ import * as managedInvoices from "./schema/r7-managed-invoice";
 import * as r8Operations from "./schema/r8-operations";
 import * as dealFollowUps from "./schema/r8-deal-follow-ups";
 import * as rfpReceipts from "./schema/r4-rfp-receipts";
+import * as rfpVendorForms from "./schema/r4-rfp-vendor-forms";
 import * as r9Evidence from "./schema/r9-evidence";
 
 export const schema = {
@@ -76,6 +77,7 @@ export const schema = {
   ...r8Operations,
   ...dealFollowUps,
   ...rfpReceipts,
+  ...rfpVendorForms,
   ...r9Evidence,
 };
 
@@ -127,4 +129,5 @@ export * from "./schema/r7-managed-invoice";
 export * from "./schema/r8-operations";
 export * from "./schema/r8-deal-follow-ups";
 export * from "./schema/r4-rfp-receipts";
+export * from "./schema/r4-rfp-vendor-forms";
 export * from "./schema/r9-evidence";

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  createVendorAction, enableVendorPortalAction, inviteVendorAdminAction, listVendorAction, type VendorActionState,
+  createVendorAction, enableVendorPortalAction, inviteVendorAdminAction, listVendorAction, setVendorContactAction, type VendorActionState,
 } from "./actions";
 
 const expiry = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
@@ -126,6 +126,34 @@ export function ListVendorForm({ organizationId, organizationName, idempotencyKe
     <Button type="submit" disabled={pending || state?.status === "success"} className="min-h-11 w-full px-4 sm:w-auto"
       aria-label={`List ${organizationName}`}>
       {pending ? "Listing vendor…" : "List vendor"}
+    </Button>
+  </form>;
+}
+
+/** The person at the vendor who receives RFP emails. Staff can change it at any time. */
+export function RfpContactForm({ organizationId, organizationName, idempotencyKey, contactName, contactEmail }: {
+  organizationId: string; organizationName: string; idempotencyKey: string; contactName?: string; contactEmail?: string;
+}) {
+  const [state, action, pending] = useActionState<VendorActionState, FormData>(setVendorContactAction, null);
+  const id = useId();
+  return <form action={action} className="space-y-3">
+    <input type="hidden" name="organizationId" value={organizationId}/>
+    <input type="hidden" name="idempotencyKey" value={idempotencyKey}/>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="space-y-2">
+        <Label htmlFor={`${id}-name`}>RFP contact name</Label>
+        <Input id={`${id}-name`} name="contactName" required maxLength={200} autoComplete="off" defaultValue={contactName ?? ""} className={fieldClass}/>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor={`${id}-email`}>RFP contact email</Label>
+        <Input id={`${id}-email`} name="contactEmail" type="email" required maxLength={320} autoComplete="off" defaultValue={contactEmail ?? ""} className={fieldClass}/>
+      </div>
+    </div>
+    <p className="text-sm text-muted-foreground">RFP emails for this vendor go to this person. No email is sent when you save.</p>
+    <Result state={state} id={id}/>
+    <Button type="submit" variant="outline" disabled={pending} className="min-h-11 w-full px-4 sm:w-auto"
+      aria-label={`Save RFP contact for ${organizationName}`}>
+      {pending ? "Saving contact…" : "Save RFP contact"}
     </Button>
   </form>;
 }
