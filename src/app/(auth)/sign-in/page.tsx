@@ -16,14 +16,17 @@ export default async function SignInPage({
   const message = isEmailConfirmationNotice(notice) ? emailConfirmationNotices[notice] : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Sign in</h1>
-      {message && <p role="status" className="rounded-md border p-3 text-sm">{message}</p>}
-      <AuthForm action={signIn} mode="sign-in" submitLabel="Sign in" />
-      <AgentIdButton enabled={isAgentIdSignInEnabled()} />
-      <p className="text-sm">
-        No account yet? <Link href="/sign-up">Sign up</Link>
-      </p>
+    <main className="co-w">
+      <div className="co-gl co-auth-card">
+        <p className="co-lbl">MatchMaker HR</p>
+        <h1 className="co-pt" style={{ fontSize: 44, marginBottom: 24, marginTop: 8 }}>Sign in</h1>
+        {message && <p role="status" className="co-notice co-gl text-sm" style={{ marginBottom: 16 }}>{message}</p>}
+        <AuthForm action={signIn} mode="sign-in" submitLabel="Sign in" />
+        <AgentIdButton enabled={isAgentIdSignInEnabled()} />
+        <p className="co-ps" style={{ marginTop: 18 }}>
+          No account yet? <Link href="/sign-up" className="underline">Sign up</Link>
+        </p>
+      </div>
     </main>
   );
 }

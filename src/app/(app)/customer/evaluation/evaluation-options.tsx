@@ -110,32 +110,55 @@ export function EvaluationOptions({ publication, history, canSelect, requirement
     void save(input);
   }
 
+  const picked = options.filter((option) => alreadySelected.has(option.optionId) || selected.includes(option.optionId));
+  const fitScore = (score: number) => Math.round(score / 100);
+
   return <section aria-labelledby="evaluation-options-heading" className="space-y-6">
     <header>
-      <h2 id="evaluation-options-heading" className="text-balance text-2xl font-semibold tracking-tight">Compare your software options</h2>
-      <p className="mt-3 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">Provider names stay hidden during this comparison. Option numbers identify records. They do not show rank.</p>
+      <h2 id="evaluation-options-heading" className="co-pt" style={{ fontSize: 44 }}>{publication.optionCount} matches, ranked on fit</h2>
+      <p className="co-ps">Provider names stay hidden during this comparison. Option numbers identify records. They do not show rank.</p>
       <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">The match score measures your recorded needs. Evidence coverage is not a prediction of success.</p>
       <p className="mt-3 text-sm tabular-nums">Showing {options.length} of {publication.optionCount} options. Comparison version {publication.sequence}.</p>
     </header>
-    {!canSelect && <p role="status" className="rounded-lg bg-muted p-4 text-sm leading-6">You can view this comparison. Your access or intake status does not allow initial choices.</p>}
-    {pageFailed && <div role="alert" className="border-l-2 border-destructive pl-4 text-sm leading-6">
+    <div className="co-lock">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8EF0C9" strokeWidth="2" aria-hidden="true">
+        <rect x="5" y="11" width="14" height="10" rx="2" />
+        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      </svg>
+      <p><b>Names unlock after your advisor review.</b> Compare on coverage until then.</p>
+    </div>
+    <div className="co-cg">
+    <div>
+    {!canSelect && <p role="status" className="co-gl co-notice text-sm leading-6">You can view this comparison. Your access or intake status does not allow initial choices.</p>}
+    {pageFailed && <div role="alert" className="co-status text-sm leading-6">
       <p>We could not load the next options. This comparison or your access may have changed. Choices are disabled.</p>
       <a href={refreshHref} className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">Reload comparison</a>
     </div>}
-    {options.length === 0 ? <p role="status" className="rounded-lg bg-muted p-5 text-sm leading-6">This approved comparison contains no options. Contact MMHR to review your requirements.</p> : <ComparisonMatrix options={options} requirements={requirements} labels={requirementLabels}
+    {options.length > 0 ? <div className="co-gl co-cboard">
+      {options.map((option) => {
+        const score = fitScore(option.deterministicScore);
+        const on = alreadySelected.has(option.optionId) || selected.includes(option.optionId);
+        return <div className={on ? "co-cr co-sel" : "co-cr"} key={`rank-${option.optionId}`}>
+          <div className="co-n">{option.maskedLabel}<small>Name masked</small></div>
+          <div className="co-track co-bar" style={{ ["--v" as string]: `${score}%` }}><i /></div>
+          <div className="co-sc">{score}</div>
+        </div>;
+      })}
+    </div> : null}
+    {options.length === 0 ? <p role="status" className="co-gl co-notice text-sm leading-6">This approved comparison contains no options. Contact MMHR to review your requirements.</p> : <ComparisonMatrix options={options} requirements={requirements} labels={requirementLabels}
       selectedOptionIds={new Set([...alreadySelected, ...selected])}
       renderChoice={(option) => alreadySelected.has(option.optionId)
-        ? <p className="flex min-h-11 items-center text-sm font-semibold text-teal-800 dark:text-teal-200">Choice saved</p>
-        : canSelect && <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-3 text-sm font-medium has-[:checked]:border-teal-600">
+        ? <p className="flex min-h-11 items-center text-sm font-semibold">Choice saved</p>
+        : canSelect && <label className="co-pick flex min-h-11 cursor-pointer items-center gap-3 has-[:checked]:co-pick-on">
           <input type="checkbox" checked={selected.includes(option.optionId)}
             disabled={locked || (selected.length >= remaining && !selected.includes(option.optionId))}
             onChange={() => toggleOption(option.optionId)}
-            className="size-4 accent-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2" />
+            className="size-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2" />
           <span>Choose {option.maskedLabel}</span>
         </label>} />}
     {nextOrdinal !== null && <Button type="button" variant="outline" className={buttonClass}
       disabled={loading || pageFailed || reviewing || saveState !== "ready"} onClick={() => void loadMore()}>{loading ? "Loading options…" : "Show more options"}</Button>}
-    {canSelect && <section aria-label="Initial choices" className="space-y-4 border-l-2 border-foreground pl-5">
+    {canSelect && <section aria-label="Initial choices" className="space-y-4">
       {saveState !== "confirmed" && <p className="text-sm font-semibold tabular-nums">{selected.length} {selected.length === 1 ? "new choice" : "new choices"}. {remaining} {remaining === 1 ? "initial choice remains" : "initial choices remain"}.</p>}
       <p className="max-w-2xl text-pretty text-sm leading-6">You can save up to five initial choices across this intake. Saved choices count even if they are later archived.</p>
       {saveState === "confirmed" ? <div role="status"><p className="font-semibold">Your choices are saved.</p><a href={refreshHref} className="inline-flex min-h-11 items-center underline underline-offset-4">View saved choices</a></div>
@@ -154,5 +177,22 @@ export function EvaluationOptions({ publication, history, canSelect, requirement
           </div> : <Button className={buttonClass} disabled={selected.length === 0 || pageFailed || loading || remaining === 0}
             onClick={() => { setReviewing(true); setConfirmedReview(false); }}>Review choices</Button>}
     </section>}
+    </div>
+    <aside className="co-gl co-tray">
+      <p className="co-tray-title">RFP contenders</p>
+      <p className="co-lbl" style={{ marginTop: 6 }}>Pick up to five. MMHR sends one approved RFP to all of them.</p>
+      {picked.map((option) => (
+        <div className="co-slot co-slot-f" key={option.optionId}>
+          {option.maskedLabel}
+          <span className="co-k">{fitScore(option.deterministicScore)}</span>
+        </div>
+      ))}
+      {Array.from({ length: Math.max(0, 5 - picked.length) }, (_, index) => (
+        <div className="co-slot co-slot-e" key={`open-${index}`}>Open slot</div>
+      ))}
+      <div className="co-meter" style={{ marginTop: 20 }}><i style={{ width: `${(picked.length / 5) * 100}%` }} /></div>
+      <p className="co-lbl" style={{ marginTop: 8 }}>{picked.length} of 5 picked</p>
+    </aside>
+    </div>
   </section>;
 }

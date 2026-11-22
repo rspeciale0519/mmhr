@@ -11,11 +11,11 @@ export function PageHero({
   lede: string;
 }) {
   return (
-    <section className="pu-phero">
-      <div className="pu-wrap pu-phero-in">
-        <div className="pu-eye">{eyebrow}</div>
-        <h1 className="pu-h1-p">{title}</h1>
-        <p className="pu-lede-p">{lede}</p>
+    <section className="co-pagehead">
+      <div>
+        <span className="co-lbl">{eyebrow}</span>
+        <h1 className="co-pt" style={{ marginTop: 10 }}>{title}</h1>
+        <p className="co-ps">{lede}</p>
       </div>
     </section>
   );
@@ -32,10 +32,10 @@ export function SectionHead({
   sub?: string;
 }) {
   return (
-    <div className="pu-head">
-      {eyebrow ? <div className="pu-eye">{eyebrow}</div> : null}
-      <h2 className="pu-h2">{title}</h2>
-      {sub ? <p className="pu-sub">{sub}</p> : null}
+    <div style={{ marginBottom: 24 }}>
+      {eyebrow ? <div className="co-lbl">{eyebrow}</div> : null}
+      <h2 className="co-pt" style={{ fontSize: 44 }}>{title}</h2>
+      {sub ? <p className="co-ps">{sub}</p> : null}
     </div>
   );
 }
@@ -53,16 +53,16 @@ export function CTA({
   secondary?: { label: string; href: string };
 }) {
   return (
-    <section className="pu-wrap pu-cta-wrap">
-      <div className="pu-cta">
-        <h2>{title}</h2>
+    <section className="co-final">
+      <h2 style={{ fontSize: 64 }}>{title}</h2>
+      <div>
         <p>{body}</p>
-        <div className="pu-cta-row">
-          <Link className="pu-btn pu-solid pu-lg" href={primary.href}>
+        <div className="co-ctas">
+          <Link className="co-btn co-btn-p" href={primary.href}>
             {primary.label}
           </Link>
           {secondary ? (
-            <Link className="pu-btn pu-ghost pu-lg" href={secondary.href}>
+            <Link className="co-btn co-btn-g" href={secondary.href}>
               {secondary.label}
             </Link>
           ) : null}
@@ -75,7 +75,7 @@ export function CTA({
 /** Placeholder-content notice. Used wherever figures are illustrative. */
 export function PlaceholderNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="pu-fine" style={{ marginTop: 18 }}>
+    <p className="co-lbl" style={{ marginTop: 18 }}>
       {children}
     </p>
   );

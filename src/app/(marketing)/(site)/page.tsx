@@ -1,4 +1,4 @@
-import { PulseBody } from "@/designs/pulse/Body";
+import { CobaltBody } from "@/designs/cobalt/landing/Body";
 import { getMarketingPageMetadata } from "@/lib/site-metadata";
 
 export const metadata = getMarketingPageMetadata(
@@ -7,8 +7,6 @@ export const metadata = getMarketingPageMetadata(
   "Buyer-side HRIS brokerage.",
 );
 
-// The homepage is Pulse, the selected visual direction. Nav, footer and the
-// theme toggle come from the shared chrome in this route group's layout.
 export default function Home() {
-  return <PulseBody />;
+  return <CobaltBody />;
 }

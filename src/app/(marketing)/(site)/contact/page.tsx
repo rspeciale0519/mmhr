@@ -35,26 +35,21 @@ export default function ContactPage() {
         lede="No cost, and no expectation that you run your selection with us. Plenty of the conversations we have are one-off second opinions on a quote."
       />
 
-      <section className="pu-sec">
-        <div className="pu-wrap pu-contact">
-          <div>
-            <SectionHead title="Send us a note" />
-            <ContactForm />
-          </div>
-
-          <aside>
-            <SectionHead title="What people contact us about" />
-            <div className="pu-cards">
-              {REASONS.map((r) => (
-                <article className="pu-pcard" key={r.k}>
-                  <div className="pu-cell-k">{r.k}</div>
-                  <h3>{r.h}</h3>
-                  <p>{r.p}</p>
-                </article>
-              ))}
-            </div>
-          </aside>
+      <section className="co-cg" style={{ paddingBottom: 80 }}>
+        <div className="co-gl co-card">
+          <SectionHead title="Send us a note" />
+          <ContactForm />
         </div>
+        <aside>
+          <SectionHead title="What people contact us about" />
+          {REASONS.map((r) => (
+            <article className="co-gl co-side-note" key={r.k}>
+              <span className="co-lbl">{r.k}</span>
+              <b>{r.h}</b>
+              <p>{r.p}</p>
+            </article>
+          ))}
+        </aside>
       </section>
     </>
   );

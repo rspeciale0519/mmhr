@@ -15,8 +15,8 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
   if (scope.kind !== "organization") forbidden();
   const query = await searchParams;
   const cursor = query.after === undefined ? undefined : securityUuidSchema.safeParse(query.after);
-  if (cursor && !cursor.success) return <main className="mx-auto max-w-3xl space-y-4 p-8">
-    <h1 className="text-3xl font-semibold">Members</h1><p role="alert">This member page reference is invalid.</p>
+  if (cursor && !cursor.success) return <main className="co-w space-y-4">
+    <h1 className="co-pt">Members</h1><p role="alert">This member page reference is invalid.</p>
     <Link className={linkClass} href="/members">Return to first page</Link>
   </main>;
   const [roleAccess, fieldAccess, statusAccess, revokeAccess] = await Promise.all([
@@ -29,14 +29,14 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
       { supabase: authorization.supabase });
   } catch (error) {
     if (error instanceof AuthorizationError) forbidden();
-    return <main className="mx-auto max-w-3xl space-y-4 p-8">
-      <h1 className="text-3xl font-semibold">Members</h1>
+    return <main className="co-w space-y-4">
+      <h1 className="co-pt">Members</h1>
       <p role="alert">Members could not load. Retry or return to your workspace.</p>
       <Link className={linkClass} href="/members">Retry member list</Link>
       <Link className={linkClass} href="/home">Back to workspace</Link>
     </main>;
   }
-  return <main className="mx-auto w-full max-w-3xl space-y-8 px-5 py-8 sm:px-8">
+  return <main className="co-w space-y-8">
     <Link className={linkClass} href="/home">Back to workspace</Link>
     <header className="space-y-3">
       <p className="text-sm font-medium text-muted-foreground">Organization access</p>

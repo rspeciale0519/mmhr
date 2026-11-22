@@ -9,13 +9,16 @@ import { z } from "zod";
 export default async function SignUpPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const email = z.email().max(254).safeParse((await searchParams).email);
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Create your account</h1>
-      <AuthForm action={signUp} mode="sign-up" submitLabel="Sign up" initialEmail={email.success ? email.data : ""} />
-      <AgentIdButton enabled={isAgentIdSignInEnabled()} />
-      <p className="text-sm">
-        Already have an account? <Link href="/sign-in">Sign in</Link>
-      </p>
+    <main className="co-w">
+      <div className="co-gl co-auth-card">
+        <p className="co-lbl">MatchMaker HR</p>
+        <h1 className="co-pt" style={{ fontSize: 44, marginBottom: 24, marginTop: 8 }}>Create your account</h1>
+        <AuthForm action={signUp} mode="sign-up" submitLabel="Sign up" initialEmail={email.success ? email.data : ""} />
+        <AgentIdButton enabled={isAgentIdSignInEnabled()} />
+        <p className="co-ps" style={{ marginTop: 18 }}>
+          Already have an account? <Link href="/sign-in" className="underline">Sign in</Link>
+        </p>
+      </div>
     </main>
   );
 }

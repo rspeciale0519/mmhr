@@ -63,7 +63,7 @@ export default async function CustomerEvaluationPage({ searchParams }: {
       description="The intake or your access may have changed. Return to saved intakes to check." /></CustomerFrame>;
   }
 
-  return <CustomerFrame>
+  return <CustomerFrame title="Masked comparison" description="Scored against your needs list only. Referral fees are never an input.">
     <Link href={`/customer?intake=${encodeURIComponent(intakeId)}`} prefetch={false} className={`${linkClass} mb-6`}>Back to saved intake</Link>
     {publication ? <EvaluationOptions publication={publication} history={history} canSelect={canSelect} requirementLabels={requirementLabels}
       requirements={requirements}

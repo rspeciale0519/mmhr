@@ -270,6 +270,7 @@ These results prove local evaluation behavior only. Command, remote, staging, an
 | `src/app/global-error.tsx#default` | global error | boundary | framework | none | none | redacted error response and Sentry event | does not return protected records |
 | `src/app/forbidden.tsx#default` | 403 boundary | boundary | framework | none | none | generic forbidden response | Next.js forbidden response |
 | `src/app/not-found.tsx#default` | 404 boundary | boundary | framework | none | none | generic not-found response | does not reveal resource existence |
+| `src/app/cobalt-preview/page.tsx#default` | /cobalt-preview | page | framework | none; development only | none | sample Cobalt chrome; no live workspace records | notFound outside development |
 | `src/proxy.ts#proxy` | all matched requests | middleware | framework | none | none | R0 release gate, launch surface allowlist, Server Action validation, session refresh | proxy tests; never the authorization boundary |
 | `src/app/api/trpc/[trpc]/route.ts#GET` | GET /api/trpc/* | route-handler | public | procedure-defined | procedure-defined | tRPC query transport | each procedure owns its identity or permission test |
 | `src/app/api/trpc/[trpc]/route.ts#POST` | POST /api/trpc/* | route-handler | public | procedure-defined | procedure-defined | tRPC transport; no routed mutations; shared POST and exact-Origin mutation guard | inventory and transport tests; all exported mutation builders require POST and exact Origin |

@@ -16,10 +16,9 @@ export default function PrivacyPage() {
         lede="What we collect, why we collect it, and who it goes to. Written to be read rather than to be defensible."
       />
 
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-prose">
-            <p className="pu-fine">
+      <section>
+        <div className="co-prose">
+            <p className="co-lbl">
               <strong>Draft pending legal review.</strong> This document describes
               our intended practice and has not yet been reviewed by counsel. It
               is not the final published policy.
@@ -99,7 +98,6 @@ export default function PrivacyPage() {
               If we change this policy materially we will say so on this page and
               notify account holders by email before it takes effect.
             </p>
-          </div>
         </div>
       </section>
     </>

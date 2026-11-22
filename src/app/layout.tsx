@@ -8,9 +8,8 @@ import { getSiteMetadataBase, getSiteSocialMetadata } from "@/lib/site-metadata"
 import { TRPCReactProvider } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import "./globals.css";
+import "@/designs/cobalt/styles.css";
 
-// Base typography from the shadcn preset. Pulse is selected, but its final
-// typography and theme tokens are not yet codified across every surface.
 const appGeist = localFont({
   src: [
     { path: "../assets/fonts/geist/geist-normal-100-900-latin.woff2", weight: "100 900", style: "normal" },
@@ -19,6 +18,19 @@ const appGeist = localFont({
   variable: "--font-sans",
 });
 const geist = appGeist;
+const appMona = localFont({
+  src: [
+    {
+      path: "../assets/fonts/mona-sans/mona-sans-normal-200-900-wdth-latin.woff2",
+      weight: "200 900",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  variable: "--font-mona",
+  adjustFontFallback: "Arial",
+});
+const mona = appMona;
 
 export const metadata: Metadata = {
   metadataBase: getSiteMetadataBase(),
@@ -41,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full antialiased", "font-sans", geist.variable)}
+      className={cn("co h-full antialiased", "font-sans", geist.variable, mona.variable)}
     >
       <body className="flex min-h-full flex-col">
         <TRPCReactProvider>{children}</TRPCReactProvider>
