@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import { CookieConsent } from "@/components/cookie-consent";
@@ -31,6 +31,11 @@ const appMona = localFont({
   adjustFontFallback: "Arial",
 });
 const mona = appMona;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: getSiteMetadataBase(),

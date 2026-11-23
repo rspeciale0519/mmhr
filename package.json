@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "check:integration-matrix": "node scripts/check-r1-integration-matrix.mjs",
     "check:r9-evidence": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs",
     "check:r9-evidence:release": "node --experimental-strip-types scripts/check-r9-release-readiness.mjs --require-ready",
@@ -67,6 +68,7 @@
     "effect@3": "3.22.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
