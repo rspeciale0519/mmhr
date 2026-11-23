@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MMHR design concepts — five directions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink: #1a1a1a; --muted: #5c5c5c; --line: #e6e6e6; --paper: #f7f7f6; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans", sans-serif; line-height: 1.45; }
+    a { color: inherit; }
+    header { padding: 36px 6vw 12px; max-width: 720px; }
+    h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 500; letter-spacing: -0.03em; margin: 8px 0 12px; }
+    .k { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    main { padding: 12px 6vw 80px; display: grid; gap: 28px; }
+    article {
+      display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 24px;
+      padding: 24px 0; border-top: 1px solid var(--line);
+    }
+    .name { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; margin: 0 0 8px; }
+    .swatches { display: flex; gap: 6px; margin: 12px 0; }
+    .swatches i { width: 22px; height: 22px; border-radius: 50%; display: block; border: 1px solid var(--line); }
+    .links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .links a {
+      display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px;
+      border: 1px solid var(--ink); border-radius: 999px; text-decoration: none; font-size: 13px;
+    }
+    .shots { display: grid; grid-template-columns: 1.6fr 0.7fr; gap: 10px; }
+    .shots figure { margin: 0; }
+    .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; background: #ddd; }
+    figcaption { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    @media (max-width: 800px) { article, .shots { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="k">MMHR · docs/design-concepts · sample only</p>
+    <h1>Five airy directions</h1>
+    <p>One brief: high-end, soft-technology software. Light grounds, whitespace, refined sans-serif type, restrained accents. Each direction still differs in palette temperature, layout, type pairing, and surface. Same four PRD screens in every concept.</p>
+  </header>
+  <main>
+    <article>
+      <div>
+        <p class="k">Concept 1 · cool mist · flat</p>
+        <h2 class="name">Haze</h2>
+        <p>Cool ice-white and steel blue. Hairline borders, a floating pill nav, a flat comparison strip in the hero. Almost no shadow.</p>
+        <p>Sora + Source Sans 3.</p>
+        <div class="swatches"><i style="background:#f5f8fb"></i><i style="background:#ffffff"></i><i style="background:#1a2433"></i><i style="background:#3e6f8a"></i><i style="background:#e3ecf3"></i></div>
+        <div class="links">
+          <a href="concept-1-haze/landing.html">Landing</a>
+          <a href="concept-1-haze/needs.html">Needs</a>
+          <a href="concept-1-haze/compare.html">Compare</a>
+          <a href="concept-1-haze/workspace.html">Workspace</a>
+        </div>
+      </div>
+      <div class="shots">
+        <figure><img src="screenshots/haze-landing-1440.jpg" alt="Haze landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/haze-landing-390.jpg" alt="Haze landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+      </div>
+    </article>
+    <article>
+      <div>
+        <p class="k">Concept 2 · warm sand · soft depth</p>
+        <h2 class="name">Pearl</h2>
+        <p>Pearl and terracotta. Oversized type, an uneven bento, large radii and a warm ambient glow. Depth without glass.</p>
+        <p>Plus Jakarta Sans + Figtree.</p>
+        <div class="swatches"><i style="background:#fbf6ef"></i><i style="background:#fffaf5"></i><i style="background:#2c2620"></i><i style="background:#b56a4a"></i><i style="background:#f3e6d6"></i></div>
+        <div class="links">
+          <a href="concept-2-pearl/landing.html">Landing</a>
+          <a href="concept-2-pearl/needs.html">Needs</a>
+          <a href="concept-2-pearl/compare.html">Compare</a>
+          <a href="concept-2-pearl/workspace.html">Workspace</a>
+        </div>
+      </div>
+      <div class="shots">
+        <figure><img src="screenshots/pearl-landing-1440.jpg" alt="Pearl landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/pearl-landing-390.jpg" alt="Pearl landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+      </div>
+    </article>
+    <article>
+      <div>
+        <p class="k">Concept 3 · sage · glass</p>
+        <h2 class="name">Still</h2>
+        <p>Sage and porcelain. A frosted app rail on every screen, translucent panels, blur. Product chrome, not a marketing poster.</p>
+        <p>Be Vietnam Pro + Nunito Sans.</p>
+        <div class="swatches"><i style="background:#f3f6f3"></i><i style="background:#fafcfb"></i><i style="background:#1c2a24"></i><i style="background:#4f7a64"></i><i style="background:#e4ede6"></i></div>
+        <div class="links">
+          <a href="concept-3-still/landing.html">Landing</a>
+          <a href="concept-3-still/needs.html">Needs</a>
+          <a href="concept-3-still/compare.html">Compare</a>
+          <a href="concept-3-still/workspace.html">Workspace</a>
+        </div>
+      </div>
+      <div class="shots">
+        <figure><img src="screenshots/still-landing-1440.jpg" alt="Still landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/still-landing-390.jpg" alt="Still landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+      </div>
+    </article>
+    <article>
+      <div>
+        <p class="k">Concept 4 · lavender-gray · wash</p>
+        <h2 class="name">Veil</h2>
+        <p>Dusty steel-lilac, not a purple gradient. Full-bleed horizontal chapters, a sticky frosted header, pale wash behind type.</p>
+        <p>Urbanist + Outfit.</p>
+        <div class="swatches"><i style="background:#f6f5f8"></i><i style="background:#ffffff"></i><i style="background:#24232b"></i><i style="background:#5e6a88"></i><i style="background:#eae8f0"></i></div>
+        <div class="links">
+          <a href="concept-4-veil/landing.html">Landing</a>
+          <a href="concept-4-veil/needs.html">Needs</a>
+          <a href="concept-4-veil/compare.html">Compare</a>
+          <a href="concept-4-veil/workspace.html">Workspace</a>
+        </div>
+      </div>
+      <div class="shots">
+        <figure><img src="screenshots/veil-landing-1440.jpg" alt="Veil landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/veil-landing-390.jpg" alt="Veil landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+      </div>
+    </article>
+    <article>
+      <div>
+        <p class="k">Concept 5 · monochrome · champagne</p>
+        <h2 class="name">Gleam</h2>
+        <p>Near-white, one gold accent, a narrow measure. One glass product window; everything else is flat and spare.</p>
+        <p>Space Grotesk + IBM Plex Sans.</p>
+        <div class="swatches"><i style="background:#fafafa"></i><i style="background:#ffffff"></i><i style="background:#171717"></i><i style="background:#9a7b4f"></i><i style="background:#e7e7e7"></i></div>
+        <div class="links">
+          <a href="concept-5-gleam/landing.html">Landing</a>
+          <a href="concept-5-gleam/needs.html">Needs</a>
+          <a href="concept-5-gleam/compare.html">Compare</a>
+          <a href="concept-5-gleam/workspace.html">Workspace</a>
+        </div>
+      </div>
+      <div class="shots">
+        <figure><img src="screenshots/gleam-landing-1440.jpg" alt="Gleam landing, desktop" /><figcaption>Landing · 1440</figcaption></figure>
+        <figure><img src="screenshots/gleam-landing-390.jpg" alt="Gleam landing, mobile" /><figcaption>Landing · 390</figcaption></figure>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

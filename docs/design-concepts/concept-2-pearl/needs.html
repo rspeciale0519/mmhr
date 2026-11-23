@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pearl · Needs questionnaire — Pearl</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+<header class="nav">
+  <a class="brand" href="landing.html">MMHR<small>Pearl</small></a>
+  <button class="menu" type="button" data-nav-toggle aria-expanded="false">Menu</button>
+  <nav class="links nav-panel" data-nav-panel data-open="false" aria-label="Concept screens"><a href="landing.html">Landing</a><a href="needs.html" aria-current="page">Needs</a><a href="compare.html">Compare</a><a href="workspace.html">Workspace</a><a href="../index.html">Gallery</a></nav>
+</header>
+<main id="main"><div class="wrap"><p class="kicker">Saved worksheet</p><h1>What should this platform cover?</h1><p class="lede">Company context through decision process. MMHR staff review before a comparison is published.</p>
+<form class="sheet" data-needs-form>
+  <div class="field-grid">
+    <div class="field"><label for="company">Company context</label><span>Who you are and how the company is organized.</span><input id="company" name="company" value="Fernwood Dental Group" /></div>
+    <div class="field"><label for="employees">Employees</label><span>Whole number from 1 to 100,000.</span><input id="employees" name="employees" inputmode="numeric" value="240" /></div>
+    <div class="field"><label for="systems">Current systems</label><span>Payroll, HR, and adjacent tools in use now.</span><input id="systems" name="systems" value="Separate payroll and benefits tools" /></div>
+    <div class="field"><label for="email">Work email</label><span>Used to save this workspace.</span><input id="email" name="email" type="email" value="sam@example.com" /></div>
+    <div class="field wide"><label for="req">Must-have requirements</label><span>Structured and custom needs. Importance is set with your advisor.</span><textarea id="req" name="req">Payroll in three states. Benefits administration. ACA reporting. Live within 90 days.</textarea></div>
+    <div class="field"><label for="compliance">Compliance needs</label><input id="compliance" name="compliance" value="ACA reporting; multi-state payroll" /></div>
+    <div class="field"><label for="budget">Budget</label><input id="budget" name="budget" value="Not disclosed in this sample" /></div>
+    <div class="field"><label for="timeline">Timeline</label><input id="timeline" name="timeline" value="Live before next benefits cycle" /></div>
+    <div class="field"><label for="owners">Stakeholders</label><input id="owners" name="owners" value="HR lead, finance, practice owner" /></div>
+    <div class="field wide"><span>Must-have modules</span>
+      <div class="checks">
+        <label><input type="checkbox" name="features" value="Payroll" checked /> Payroll</label>
+        <label><input type="checkbox" name="features" value="Benefits" checked /> Benefits</label>
+        <label><input type="checkbox" name="features" value="Time tracking" /> Time tracking</label>
+        <label><input type="checkbox" name="features" value="Hiring" /> Hiring</label>
+      </div>
+    </div>
+    <div class="field wide"><label for="decision">Decision process</label><textarea id="decision" name="decision">Committee review after demos. Final signature by the practice owner. Direct contract with the chosen provider.</textarea></div>
+  </div>
+  <div class="save-row">
+    <button class="btn ghost" type="submit">Save draft</button>
+    <a class="btn" href="compare.html">Save and continue</a>
+    <p class="fine" data-save-status hidden></p>
+  </div>
+</form></div></main></div>
+<footer class="site">
+  <div class="foot">
+    <span>MatchMaker HR · sample preview · not a product claim</span>
+    <span>Concept 2 of 5 · warm sand, soft depth</span>
+  </div>
+</footer>
+<script src="../shared.js"></script>
+</body>
+</html>
