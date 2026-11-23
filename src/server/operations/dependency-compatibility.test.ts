@@ -65,7 +65,7 @@ describe("security override compatibility", () => {
     if (!result.success) expect(fromZodError(result.error).message).toContain("logLevel");
   });
 
-  // TODO: remove package.json overrides.effect once @trigger.dev/schema-to-json
+  // TODO: remove package.json overrides["effect@3"] once @trigger.dev/schema-to-json
   // requires effect >= 3.22.1 (GHSA-7589-6fvf-x4pw).
   test("pins effect to the patched 3.22.1+ for trigger.dev schema conversion", async () => {
     const pkg = JSON.parse(

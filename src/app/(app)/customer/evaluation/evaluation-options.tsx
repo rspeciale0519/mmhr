@@ -115,7 +115,7 @@ export function EvaluationOptions({ publication, history, canSelect, requirement
 
   return <section aria-labelledby="evaluation-options-heading" className="space-y-6">
     <header>
-      <h2 id="evaluation-options-heading" className="co-pt" style={{ fontSize: 44 }}>{publication.optionCount} matches, ranked on fit</h2>
+      <h2 id="evaluation-options-heading" className="co-pt" style={{ fontSize: 44 }}>{publication.optionCount} options compared on fit</h2>
       <p className="co-ps">Provider names stay hidden during this comparison. Option numbers identify records. They do not show rank.</p>
       <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">The match score measures your recorded needs. Evidence coverage is not a prediction of success.</p>
       <p className="mt-3 text-sm tabular-nums">Showing {options.length} of {publication.optionCount} options. Comparison version {publication.sequence}.</p>
