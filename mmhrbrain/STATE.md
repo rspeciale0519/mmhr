@@ -1,6 +1,12 @@
 # MMHR — Current State
 
-Updated: 2026-11-14 14:14 EST. The owner gave the project to Claude. PR #18 merged the Codex handoff into `develop` (merge 0c5c1eb); the main checkout is on `develop` at that commit and is the current copy of the code. Local type check, lint, 6,520 unit tests, and build passed on the same tree. The GitHub integration jobs for PR #18 were pending at merge time. See journal/2026-11-14.md.
+Updated: 2026-11-22. Cobalt is the live user-facing UI on branch `cursor/cobalt-ui-41fe` (from `develop`). Type check, lint, 5,509 unit tests, and build passed in this cloud run. See journal/2026-11-22.md.
+
+## Cobalt UI (2026-11-22)
+- Pulse remains in `src/designs/pulse/` but `/` renders `CobaltBody`.
+- Primary buttons ship `#1E3AD4` → `#1730C9` so white text meets WCAG AA (mockup `#3352FF` was already 5.54:1; still darkened per the brief).
+- `/cobalt-preview` is development-only for screenshots. Production 404s it.
+- Open: GitHub CI on the draft PR; signed-in run on a real stack; stepped intake vs single-page form.
 
 ## Launch task 3 (2026-11-18)
 - RFP email send-out, the vendor web form at `/rfp/[token]`, and staff tracking are built on branch `claude/project-thread-iu73pm` with migration 0180. The four checks passed in a cloud session. The database test is unverified until the GitHub integration job passes.

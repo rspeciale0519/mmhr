@@ -28,8 +28,9 @@ export default async function PendingAccessPage() {
 
   const needsEmailVerification = row.email_verified_at === null;
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">
+    <main className="co-w">
+      <div className="co-gl co-auth-card" style={{ maxWidth: 640 }}>
+      <h1 className="co-pt" style={{ fontSize: 44 }}>
         {needsEmailVerification ? "Confirm your email" : row.status === "pending" ? "Access pending" : "Account access"}
       </h1>
       <p className="text-sm" role="status" aria-live="polite">
@@ -44,6 +45,7 @@ export default async function PendingAccessPage() {
           <Link className="inline-flex min-h-11 items-center text-sm underline" href="/sign-in">Sign in to retry account setup</Link>
         </div>
       ) : null}
+      </div>
     </main>
   );
 }

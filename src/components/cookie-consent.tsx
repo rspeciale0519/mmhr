@@ -59,7 +59,7 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 flex flex-wrap items-center justify-between gap-4 border-t bg-white p-4 text-sm"
+      className="co-gl fixed inset-x-3 bottom-3 z-50 flex flex-wrap items-center justify-between gap-4 p-4 text-sm"
     >
       <p className="max-w-2xl">
         We use analytics cookies to understand how the site is used. Nothing is

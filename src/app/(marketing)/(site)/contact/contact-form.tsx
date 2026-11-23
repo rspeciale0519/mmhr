@@ -62,19 +62,19 @@ export default function ContactForm() {
   const status = state === "idle" || state === "submitting" ? undefined : statusMessages[state];
 
   return (
-    <form className="pu-fieldset" aria-describedby="contact-form-status" onSubmit={submit}>
-      <div className="pu-field">
+    <form aria-describedby="contact-form-status" onSubmit={submit}>
+      <div className="co-field">
         <label htmlFor="c-name">Full name</label>
-        <input className="pu-input" id="c-name" name="fullName" maxLength={200} required />
+        <input className="co-input" id="c-name" name="fullName" maxLength={200} required />
       </div>
-      <div className="pu-field">
+      <div className="co-field">
         <label htmlFor="c-company">Company</label>
-        <input className="pu-input" id="c-company" name="company" maxLength={200} required />
+        <input className="co-input" id="c-company" name="company" maxLength={200} required />
       </div>
-      <div className="pu-field">
+      <div className="co-field">
         <label htmlFor="c-email">Work email</label>
         <input
-          className="pu-input"
+          className="co-input"
           id="c-email"
           name="workEmail"
           type="email"
@@ -82,10 +82,10 @@ export default function ContactForm() {
           required
         />
       </div>
-      <div className="pu-field">
+      <div className="co-field">
         <label htmlFor="c-phone">Direct company phone</label>
         <input
-          className="pu-input"
+          className="co-input"
           id="c-phone"
           name="directCompanyPhone"
           type="tel"
@@ -94,14 +94,14 @@ export default function ContactForm() {
           required
         />
       </div>
-      <label className="pu-fine" htmlFor="c-consent">
+      <label className="co-lbl" htmlFor="c-consent" style={{ display: "flex", gap: 10, margin: "8px 0 18px" }}>
         <input id="c-consent" name="consent" type="checkbox" required /> I agree that MatchMaker HR may
         use these details to reply to my request. See our <a href="/privacy">privacy notice</a>.
       </label>
-      <button className="pu-btn pu-solid pu-lg" type="submit" disabled={state === "submitting"}>
+      <button className="co-btn co-btn-p" type="submit" disabled={state === "submitting"}>
         {state === "submitting" ? "Sending..." : "Send"}
       </button>
-      <p className="pu-fine" id="contact-form-status" role="status" aria-live="polite">
+      <p className="co-lbl" id="contact-form-status" role="status" aria-live="polite" style={{ marginTop: 14 }}>
         {status ?? "We use your details only to reply to your request."}
       </p>
     </form>

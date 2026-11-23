@@ -22,13 +22,15 @@ export default async function WorkspacesPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-5 py-8 sm:p-8">
-      <header className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">Organization access</p>
-        <h1 className="text-balance text-3xl font-semibold tracking-tight">Choose a workspace</h1>
-        <p className="text-pretty text-sm leading-6 text-muted-foreground">
+    <main className="co-w">
+      <header className="co-pagehead">
+        <div>
+        <p className="co-lbl">Organization access</p>
+        <h1 className="co-pt" style={{ marginTop: 10 }}>Choose a workspace</h1>
+        <p className="co-ps">
           Each workspace belongs to one organization. Your access is checked when you open it.
         </p>
+        </div>
       </header>
       {memberships === null ? (
         <section className="space-y-3">

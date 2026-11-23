@@ -29,13 +29,15 @@ export default async function VendorRfpPage({ params }: { params: Promise<{ toke
   // Unknown, mistyped, or withdrawn link. Say so plainly, with a next step.
   if (!form) {
     return (
-      <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-6 py-24">
-        <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{brand.name}</p>
-        <h1 className="text-2xl font-semibold">This link is not active</h1>
+      <main className="co-w">
+        <div className="co-gl co-auth-card">
+        <p className="co-lbl">{brand.name}</p>
+        <h1 className="co-pt" style={{ fontSize: 44, marginTop: 10 }}>This link is not active</h1>
         <p className="text-base leading-7 text-muted-foreground">
           Check that you copied the whole link from your email. If it still does not open, reply to that email and
           the {brand.name} team will send you a new one.
         </p>
+        </div>
       </main>
     );
   }

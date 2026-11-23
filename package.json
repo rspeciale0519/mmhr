@@ -63,7 +63,8 @@
     "ip-address@10": "10.7.5",
     "dompurify@3": "3.4.17",
     "braces@3": "$braces",
-    "@hono/node-server": "2.1.5"
+    "@hono/node-server": "2.1.5",
+    "effect@3": "3.22.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

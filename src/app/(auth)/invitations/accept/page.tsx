@@ -12,8 +12,8 @@ export default async function InvitationAcceptancePage() {
   } catch (error) {
     if (error instanceof InvitationReadError) {
       return (
-        <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-          <h1 className="text-2xl font-semibold">Invitations unavailable</h1>
+        <main className="co-w flex flex-col gap-6">
+          <h1 className="co-pt" style={{ fontSize: 44 }}>Invitations unavailable</h1>
           <p className="text-sm" role="alert">We could not load invitations. Refresh the page and try again.</p>
         </main>
       );
@@ -22,8 +22,8 @@ export default async function InvitationAcceptancePage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Your invitations</h1>
+    <main className="co-w flex flex-col gap-6">
+      <h1 className="co-pt" style={{ fontSize: 44 }}>Your invitations</h1>
       <p className="text-sm">
         The first administrator of a new vendor must set up two-step sign-in at /mfa before accepting.
       </p>

@@ -1307,3 +1307,4 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 - 2026-11-14: Owner gave the project to Claude and approved a 16-task trim list. Trim task 1 done: PR #18 merged the Codex handoff into develop (0c5c1eb); type check, lint, 6,520 unit tests, and build passed locally. Integration jobs pending. See journal/2026-11-14.md.
 - 2026-11-14: PR #19 merged (31bbfac); docs/LAUNCH.md is the launch authority. Owner approved merging trim pull requests after the four checks. Subagents started for archive setup and public page blocking. See journal/2026-11-14.md.
 - 2026-11-18: Launch task 3 built: RFP email send-out, vendor web form, and tracking with migration 0180. Four checks passed in the cloud; the database test waits for the GitHub integration job. See journal/2026-11-18.md.
+- 2026-11-22: Cobalt UI ported onto the live app on `cursor/cobalt-ui-41fe`. Type check, lint, 5,509 tests, and build passed. See journal/2026-11-22.md.

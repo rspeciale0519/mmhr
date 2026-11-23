@@ -1,13 +1,12 @@
 import Link from "next/link";
 
-import { SiteChrome } from "../_site/SiteChrome";
-// Pulse's stylesheet is the design system — tokens, canvas, nav, footer and
-// section primitives all live there. site.css only adds what inner pages need.
+import { CobaltSiteChrome } from "@/designs/cobalt/chrome/SiteChrome";
 import "@/designs/pulse/styles.css";
 import "../_site/site.css";
 
 /**
- * Chrome for the public site.
+ * Chrome for the public site. Cobalt is the live direction; Pulse CSS stays
+ * imported so blocked marketing pages that still use those classes do not break.
  */
 export default function SiteLayout({
   children,
@@ -16,10 +15,10 @@ export default function SiteLayout({
 }) {
   return (
     <>
-      <Link className="pu-skip" href="#content">
+      <Link className="co-skip" href="#content">
         Skip to content
       </Link>
-      <SiteChrome>{children}</SiteChrome>
+      <CobaltSiteChrome>{children}</CobaltSiteChrome>
     </>
   );
 }

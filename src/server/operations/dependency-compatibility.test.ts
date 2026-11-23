@@ -65,6 +65,19 @@ describe("security override compatibility", () => {
     if (!result.success) expect(fromZodError(result.error).message).toContain("logLevel");
   });
 
+  // TODO: remove package.json overrides["effect@3"] once @trigger.dev/schema-to-json
+  // requires effect >= 3.22.1 (GHSA-7589-6fvf-x4pw).
+  test("pins effect to the patched 3.22.1+ for trigger.dev schema conversion", async () => {
+    const pkg = JSON.parse(
+      await readFile(dependencyOf("@trigger.dev/schema-to-json").resolve("effect/package.json"), "utf8"),
+    ) as { name: string; version: string };
+    expect(pkg.name).toBe("effect");
+    const [major, minor, patch] = pkg.version.split(".").map(Number);
+    const atLeast3221 =
+      major > 3 || (major === 3 && (minor > 22 || (minor === 22 && patch >= 1)));
+    expect(atLeast3221).toBe(true);
+  });
+
   // TODO: remove package.json overrides["@hono/node-server"] once trigger.dev /
   // @modelcontextprotocol/sdk requires @hono/node-server >= 2.1.3.
   test("pins @hono/node-server to the patched 2.1.3+ for trigger.dev MCP", async () => {

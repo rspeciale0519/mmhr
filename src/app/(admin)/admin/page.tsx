@@ -11,9 +11,10 @@ export default async function AdminHome() {
   const documents = isLaunchAreaEnabled("documents");
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Administration</h1>
-      <p className="text-sm">You have access to internal administration.</p>
+    <main className="co-w">
+      <h1 className="co-pt" style={{ paddingTop: 40 }}>Administration</h1>
+      <p className="co-ps">You have access to internal administration.</p>
+      <div className="co-gl co-card mt-8 flex flex-col">
       {auditHref && <Link href={auditHref} className="inline-flex min-h-11 items-center underline">Search audit events</Link>}
       <Link href="/admin/submissions" className="inline-flex min-h-11 items-center underline">Open submitted customer intakes</Link>
       <Link href="/admin/vendors" className="inline-flex min-h-11 items-center underline">Add vendors and invite vendor users</Link>
@@ -27,6 +28,7 @@ export default async function AdminHome() {
       {finance && <Link href="/admin/finance/documents" className="inline-flex min-h-11 items-center underline">Manage private finance documents</Link>}
       {finance && <Link href="/admin/finance/commercial" className="inline-flex min-h-11 items-center underline">Manage commission agreements and calculations</Link>}
       {documents && <Link href="/documents" className="inline-flex min-h-11 items-center underline">View selected workspace documents</Link>}
+      </div>
     </main>
   );
 }

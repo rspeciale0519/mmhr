@@ -1,12 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AppNav } from "@/designs/cobalt/chrome/AppNav";
+import { MobileBar } from "@/designs/cobalt/chrome/MobileBar";
+import { CobaltGlows } from "@/designs/cobalt/Glow";
+import { PageHead } from "@/designs/cobalt/chrome/PageHead";
 import { formatMapAnswer, mapQuestionLabel, orderedMapEntries, sectionLabels, type ListSectionKey, type MapSectionKey } from "@/lib/intake-questions";
 import { launchVisibleLinks } from "@/lib/launch-surface";
 import type { getIntake, getIntakesPage } from "@/server/commands/intake-read";
 
 type Intake = Awaited<ReturnType<typeof getIntake>>;
 type IntakePage = Awaited<ReturnType<typeof getIntakesPage>>;
-const linkStyle = "inline-flex min-h-11 items-center rounded-md px-3 text-sm font-semibold underline underline-offset-4 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
+const linkStyle = "inline-flex min-h-11 items-center text-sm font-semibold underline underline-offset-4";
 const customerLinks = [
   { href: "/home", label: "Home" },
   { href: "/customer", label: "Your intakes" },
@@ -30,27 +34,24 @@ function SavedTime({ value }: { value: string }) {
 export function CustomerFrame({ children, title = "Your software needs", description = "Review the intake information saved in your selected workspace." }: {
   children: ReactNode; title?: string; description?: string;
 }) {
+  const items = launchVisibleLinks(customerLinks);
+  const currentHref = title === "Your RFP and provider review" ? "/customer"
+    : title.toLowerCase().includes("comparison") ? "/customer"
+      : "/customer";
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
-      <header className="mb-10 border-b pb-6">
-        <nav aria-label="Customer workspace" className="mb-8 flex flex-wrap gap-2">
-          {launchVisibleLinks(customerLinks).map(({ href, label }) =>
-            <Link key={href} href={href} prefetch={false} className={linkStyle}>{label}</Link>)}
-        </nav>
-        <p className="mb-2 text-sm font-medium text-muted-foreground">Customer workspace</p>
-        <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-        <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-muted-foreground">
-          {description}
-        </p>
-      </header>
+    <main className="co-w">
+      <CobaltGlows placement="app" />
+      <AppNav items={items} currentHref={currentHref} label="Customer workspace" />
+      <PageHead kicker="Customer workspace" title={title} description={description} />
       {children}
+      <MobileBar items={items} currentHref={currentHref} />
     </main>
   );
 }
 
 export function IntakeNotice({ title, description }: { title: string; description?: string }) {
   return (
-    <section className="border-l-2 border-foreground pl-5">
+    <section className="co-gl co-notice co-status">
       <div role="alert">
         <h2 className="text-balance text-xl font-semibold">{title}</h2>
         {description && <p className="mt-2 max-w-xl text-pretty leading-7 text-muted-foreground">{description}</p>}
@@ -70,17 +71,17 @@ export function IntakeList({ page, hasCursor, canCreate = false }: { page: Intak
       </p>
       {canCreate && <Link href="/customer?new=1" prefetch={false} className={`${linkStyle} mt-4`}>Start an intake</Link>}
       {page.intakes.length === 0 ? (
-        <p role="status" className="mt-6 rounded-lg bg-muted p-6 text-pretty leading-7">
+        <p role="status" className="co-gl co-notice mt-6 text-pretty leading-7">
           {hasCursor ? "There are no more saved intakes in this list." : "There are no saved intakes in this workspace."}
         </p>
       ) : (
-        <ul className="mt-6 divide-y border-y">
+        <ul className="mt-6 divide-y">
           {page.intakes.map((intake) => (
             <li key={intake.intakeId} className="grid gap-3 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
                   <h3 className="text-base font-semibold">Intake created <SavedTime value={intake.createdAt} /></h3>
-                  <span className="rounded bg-muted px-2 py-1 text-xs font-medium">{statusLabels[intake.status]}</span>
+                  <span className="co-chip">{statusLabels[intake.status]}</span>
                 </div>
                 <p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">
                   Last saved <SavedTime value={intake.updatedAt} />. Revision <span className="tabular-nums">{intake.revision}</span>.
@@ -144,7 +145,7 @@ export function IntakeDetails({ intake, canEdit = false, staffView = false }: { 
       <div className="mb-7">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id="intake-details" className="text-balance text-2xl font-semibold">Saved intake details</h2>
-          <span className="rounded bg-muted px-2 py-1 text-sm font-medium">{statusLabels[intake.status]}</span>
+          <span className="co-chip">{statusLabels[intake.status]}</span>
         </div>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           Last saved <SavedTime value={intake.updatedAt} />. Revision <span className="tabular-nums">{intake.revision}</span>.
@@ -152,7 +153,7 @@ export function IntakeDetails({ intake, canEdit = false, staffView = false }: { 
         <p className="mt-1 break-all text-xs leading-5 text-muted-foreground [font-family:ui-monospace,monospace]">Reference: {intake.intakeId}</p>
         {intake.submittedAt && <p className="mt-2 text-sm">Submitted <SavedTime value={intake.submittedAt} /></p>}
       </div>
-      <p className="mb-7 rounded-lg bg-muted p-4 text-pretty text-sm leading-6">
+      <p className="co-gl co-notice mb-7 text-pretty text-sm leading-6">
         {staffView ? "Review the customer's saved answers and requirements below. Prepare the comparison, discuss provider details, and manage the RFP on this page."
           : "This view shows saved intake details and active requirements, including custom requests. Open the comparison to view approved options and saved choices."}
       </p>

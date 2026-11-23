@@ -9,7 +9,7 @@ export default async function NewInvitationPage() {
   if (authorization.scope.kind !== "organization") forbidden();
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-5 py-8 sm:p-8">
+    <main className="co-w flex flex-col gap-8">
       <Link href="/home" className="inline-flex min-h-11 w-fit items-center text-sm underline underline-offset-4">
         Back to workspace
       </Link>

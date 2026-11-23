@@ -12,11 +12,13 @@ export default async function AgentIdRegistrationPage() {
   try { user = await getVerifiedAgentIdUser(await createClient()); }
   catch { redirect("/sign-in"); }
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Complete your registration</h1>
+    <main className="co-w">
+      <div className="co-gl co-auth-card">
+      <h1 className="co-pt" style={{ fontSize: 44 }}>Complete your registration</h1>
       <p className="text-sm">Enter your company details before creating your customer workspace.</p>
       <AgentIdRegistrationForm email={user.email} idempotencyKey={randomUUID()} />
       <Link className="text-sm underline" href="/invitations/accept">Review an existing organization invitation</Link>
+      </div>
     </main>
   );
 }

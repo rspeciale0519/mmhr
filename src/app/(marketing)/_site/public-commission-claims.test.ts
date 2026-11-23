@@ -15,6 +15,7 @@ const PUBLIC_SOURCES = [
   "src/app/(marketing)/(site)/resources/partner-finder/page.tsx",
   "src/designs/_content.ts",
   "src/designs/pulse/Body.tsx",
+  "src/designs/cobalt/landing/Body.tsx",
 ].map((relativePath) => ({
   relativePath,
   source: readFileSync(join(process.cwd(), relativePath), "utf8"),

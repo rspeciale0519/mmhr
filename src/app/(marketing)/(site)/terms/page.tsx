@@ -16,10 +16,9 @@ export default function TermsPage() {
         lede="What you can expect from us, what we ask of you, and the limits on both."
       />
 
-      <section className="pu-sec">
-        <div className="pu-wrap">
-          <div className="pu-prose">
-            <p className="pu-fine">
+      <section>
+        <div className="co-prose">
+            <p className="co-lbl">
               <strong>Draft pending legal review.</strong> This document describes
               our intended terms and has not yet been reviewed by counsel. It is
               not the final published agreement.
@@ -107,7 +106,6 @@ export default function TermsPage() {
             <p>
               <a href="/contact">Contact us</a> and a person will answer.
             </p>
-          </div>
         </div>
       </section>
     </>

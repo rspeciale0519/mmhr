@@ -532,6 +532,16 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     denialEvidence: "does not reveal resource existence",
   },
   {
+    key: "src/app/cobalt-preview/page.tsx#default",
+    surface: "/cobalt-preview",
+    kind: "page",
+    access: "framework",
+    permission: "none; development only",
+    scope: "none",
+    dataPath: "sample Cobalt chrome; no live workspace records",
+    denialEvidence: "notFound outside development",
+  },
+  {
     key: "src/proxy.ts#proxy",
     surface: "all matched requests",
     kind: "middleware",

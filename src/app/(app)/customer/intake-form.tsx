@@ -81,17 +81,43 @@ export function CustomerIntakeForm({ organizationId, intake }: { organizationId:
     await runSave(attempt.current.input);
   }
 
-  if (saveConfirmed && confirmedIntakeId) return <section className="border-l-2 border-foreground pl-5" role="status">
+  if (saveConfirmed && confirmedIntakeId) return <section className="co-gl co-notice" role="status">
     <h2 className="text-xl font-semibold">Save confirmed</h2>
     <p className="mt-2 max-w-xl text-pretty text-sm leading-6 text-muted-foreground">Your answers are saved. Open the saved intake to review the confirmed result.</p>
-    <div className="mt-5 flex flex-wrap gap-3"><a href={`/customer?intake=${encodeURIComponent(confirmedIntakeId)}`} className="inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Open saved intake</a><a href="/customer" className="inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-semibold">Saved intakes</a></div>
+    <div className="mt-5 flex flex-wrap gap-3"><a href={`/customer?intake=${encodeURIComponent(confirmedIntakeId)}`} className="co-btn co-btn-p co-btn-s">Open saved intake</a><a href="/customer" className="co-btn co-btn-g co-btn-s">Saved intakes</a></div>
   </section>;
-  if (!editable) return <section className="border-l-2 border-foreground pl-5" role="status"><h2 className="text-xl font-semibold">This intake is no longer editable</h2><p className="mt-2 max-w-xl text-pretty text-sm leading-6 text-muted-foreground">This record has moved beyond the draft stage. Return to the saved intake to review it.</p></section>;
+  if (!editable) return <section className="co-gl co-notice" role="status"><h2 className="text-xl font-semibold">This intake is no longer editable</h2><p className="mt-2 max-w-xl text-pretty text-sm leading-6 text-muted-foreground">This record has moved beyond the draft stage. Return to the saved intake to review it.</p></section>;
 
-  return <form onSubmit={(event) => submit(event, currentStatus)} aria-label="Customer software needs intake" className="space-y-10">
-    <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-6"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Working worksheet</p><h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight">Describe what your team needs</h2><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">Save a draft now. You can return later and continue where you stopped.</p></div><p className="font-mono text-xs tabular-nums text-muted-foreground">{intake ? `Revision ${intake.revision}` : "New intake"}</p></div>
+  const completeCount = sectionOrder.filter((key) => {
+    if (isMapSection(key)) return Object.values(state.maps[key].answers).some((answer) => answer.value !== "");
+    const list = state.lists[key];
+    return list.prefixed.some(Boolean) || list.checked.length > 0 || list.other.some(Boolean);
+  }).length;
+  const completePct = Math.round((completeCount / sectionOrder.length) * 100);
+
+  return <form onSubmit={(event) => submit(event, currentStatus)} aria-label="Customer software needs intake" className="co-qg">
+    <div className="co-gl co-secs">
+      <div className="co-pct">
+        <span className="co-lbl">Complete</span>
+        <div className="co-big">{completePct}%</div>
+        <div className="co-meter"><i style={{ width: `${completePct}%` }} /></div>
+      </div>
+      <ol>
+        {sectionOrder.map((key, index) => {
+          const done = isMapSection(key)
+            ? Object.values(state.maps[key].answers).some((answer) => answer.value !== "")
+            : state.lists[key].prefixed.some(Boolean) || state.lists[key].checked.length > 0 || state.lists[key].other.some(Boolean);
+          return <li key={key} className={done ? "co-done" : undefined}>
+            <b>{String(index + 1).padStart(2, "0")}</b>{sectionLabels[key]}<em>{done ? "Done" : ""}</em>
+          </li>;
+        })}
+      </ol>
+    </div>
+    <div>
+    <div className="co-gl co-qmain">
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-6"><div><p className="co-lbl">Needs list</p><h2>Describe what your team needs</h2><p className="co-ps" style={{ marginTop: 12 }}>Save a draft now. You can return later and continue where you stopped.</p></div><p className="co-lbl">{intake ? `Revision ${intake.revision}` : "New intake"}</p></div>
     <fieldset disabled={save.isPending || locked} className="space-y-10">
-      {sectionOrder.map((key) => <section key={key} aria-labelledby={`${key}-heading`} className="grid gap-5 border-b pb-8 sm:grid-cols-[minmax(10rem,0.32fr)_minmax(0,1fr)] sm:gap-10">
+      {sectionOrder.map((key) => <section key={key} aria-labelledby={`${key}-heading`} className="grid gap-5 border-b pb-8">
         <div><h3 id={`${key}-heading`} className="text-base font-semibold">{sectionLabels[key]}</h3><p className="mt-2 text-pretty text-sm leading-6 text-muted-foreground">{sectionHelp[key]}</p></div>
         {isMapSection(key) ? <div className="flex min-w-0 flex-col gap-5">
           {mapQuestions[key].map((question) => <MapQuestionField key={question.key} section={key} question={question}
@@ -106,7 +132,18 @@ export function CustomerIntakeForm({ organizationId, intake }: { organizationId:
       </section>)}
     </fieldset>
     {save.isPending && <p role="status" aria-live="polite" className="text-sm text-muted-foreground">Saving your answers…</p>}
-    {(validationError || save.isError) && <section role="alert" className="border-l-2 border-destructive pl-5 text-sm leading-6"><p className="font-medium">{validationError ?? "This save was not confirmed."}</p>{save.isError && !validationError && <p className="mt-1 text-muted-foreground">Retry the unchanged request. Editing stays paused until the save is confirmed.</p>}</section>}
-    {locked ? <section className="flex flex-wrap items-center justify-between gap-4 border-t pt-6"><p role="status" className="text-sm text-muted-foreground">We could not confirm this save. Your answers stay on screen.</p><div className="flex flex-wrap gap-3"><Button type="button" className={`${formButtonClass} min-h-11`} disabled={save.isPending} onClick={() => { const pendingAttempt = attempt.current; if (pendingAttempt) void runSave(pendingAttempt.input); }}>Retry unchanged request</Button><a href="/customer" className="inline-flex min-h-11 items-center rounded-md border px-4 text-sm font-semibold">Saved intakes</a></div></section> : <div className="flex flex-wrap items-center justify-end gap-3 border-t pt-6"><Button type="submit" variant="outline" className={`${formButtonClass} min-h-11`} disabled={save.isPending || currentStatus === "in_progress"}>{save.isPending ? "Saving…" : "Save draft"}</Button><Button type="button" className={`${formButtonClass} min-h-11`} disabled={save.isPending} onClick={() => { void submit({ preventDefault: () => undefined } as FormEvent<HTMLFormElement>, "in_progress"); }}>{save.isPending ? "Saving…" : currentStatus === "in_progress" ? "Save changes" : "Save and continue"}</Button></div>}
+    {(validationError || save.isError) && <section role="alert" className="co-status text-sm leading-6"><p className="font-medium">{validationError ?? "This save was not confirmed."}</p>{save.isError && !validationError && <p className="mt-1 text-muted-foreground">Retry the unchanged request. Editing stays paused until the save is confirmed.</p>}</section>}
+    {locked ? <section className="co-qfoot"><p role="status" className="text-sm text-muted-foreground">We could not confirm this save. Your answers stay on screen.</p><div className="flex flex-wrap gap-3"><Button type="button" className={`${formButtonClass} min-h-11`} disabled={save.isPending} onClick={() => { const pendingAttempt = attempt.current; if (pendingAttempt) void runSave(pendingAttempt.input); }}>Retry unchanged request</Button><a href="/customer" className="co-btn co-btn-g co-btn-s">Saved intakes</a></div></section> : <div className="co-qfoot"><Button type="submit" variant="outline" className={`${formButtonClass} min-h-11`} disabled={save.isPending || currentStatus === "in_progress"}>{save.isPending ? "Saving…" : "Save draft"}</Button><Button type="button" className={`${formButtonClass} min-h-11`} disabled={save.isPending} onClick={() => { void submit({ preventDefault: () => undefined } as FormEvent<HTMLFormElement>, "in_progress"); }}>{save.isPending ? "Saving…" : currentStatus === "in_progress" ? "Save changes" : "Save and continue"}</Button></div>}
+    </div>
+    </div>
+    <div>
+      <div className="co-gl co-live">
+        <span className="co-lbl">After you submit</span>
+        <div className="co-big" style={{ fontSize: 48 }}>Fit</div>
+        <p style={{ fontSize: 14, color: "var(--co-ink2)", marginTop: 8 }}>Matches appear after MMHR publishes a comparison. Rankings ignore referral fees.</p>
+      </div>
+      <div className="co-gl co-side-note"><b>Names stay masked</b><p>You see every match on fit first. Names unlock when you review these answers with an advisor.</p></div>
+      <div className="co-gl co-side-note"><b>Free, with no catch</b><p>Providers pay MMHR a referral fee. It never changes your rankings.</p></div>
+    </div>
   </form>;
 }
