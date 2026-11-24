@@ -197,7 +197,9 @@ export function VendorRfpForm({ token, form, tabs, brandName }: Props) {
 
           {section === "documents" && <Documents token={token} form={form} editable={editable} beforeChange={flush} onChanged={() => router.refresh()} />}
 
-          {section === "submit" && <Submit token={token} form={form} progress={progress} tabs={tabs} editable={editable}
+          {/* key={form.state}: when the form is reopened, React builds a fresh Submit
+              section, so the button is not left stuck on "Submitting…". */}
+          {section === "submit" && <Submit key={form.state} token={token} form={form} progress={progress} tabs={tabs} editable={editable}
             flush={flush} onOpen={open} onSubmitted={() => router.refresh()} />}
 
           {/* Back and Next move through the sections in order. */}
