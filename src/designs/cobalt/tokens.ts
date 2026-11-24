@@ -18,6 +18,7 @@ export const cobaltTokens = {
   buttonStart: "#1E3AD4",
   /** Dark stop of the primary button gradient (mockup used #1F38D6). */
   buttonEnd: "#1730C9",
+  /** On-primary label. CSS: `--co-on-primary`. Stays white in `.dark`. */
   buttonText: "#FFFFFF",
   mockupButtonStart: "#3352FF",
 } as const;

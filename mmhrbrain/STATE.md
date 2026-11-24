@@ -1,12 +1,14 @@
 # MMHR — Current State
 
-Updated: 2026-11-23. Cobalt iPhone overflow is fixed on `cursor/cobalt-mobile-overflow-23f4` (from `develop`). Type check, lint, 5,513 unit tests, Playwright overflow e2e, and build passed. See journal/2026-11-23.md.
+Updated: 2026-11-24. Cobalt primary CTA labels are white on the blue gradient (branch `cursor/cobalt-primary-button-text-6528`). Type check, lint, 5,516 unit tests, build, and 17 Playwright e2e tests passed. See journal/2026-11-24.md.
 
-## Cobalt UI (2026-11-23)
+## Cobalt UI (2026-11-24)
 - Pulse remains in `src/designs/pulse/` but `/` renders `CobaltBody`.
-- iPhone Chrome showed the landing page in the left ~56% of the visual viewport because 1100px glow orbs (`right: -300`) widened the document to 690px and iOS shrink-to-fit. Glows are clipped in `.co-glows`; Playwright guards `scrollWidth` against the visual viewport at 390px.
+- Primary buttons ship `#1E3AD4` → `#1730C9` so white text meets WCAG AA.
+- Root cause of navy CTA text: unlayered `.co a { color: inherit }` (0,1,1) beat `.co-btn-p` (0,1,0) on Next.js `<Link>` buttons. Button-styled anchors are excluded; `a.co-btn-p` keeps `--co-on-primary` (#fff) for hover/focus/visited/active and `.dark`.
+- iPhone overflow fix from 2026-11-23 is on `develop` (PR #45): glows clip in `.co-glows`.
 - `/cobalt-preview` is development-only for screenshots. Production 404s it.
-- Open: GitHub CI on the overflow draft PR; signed-in run on a real stack; stepped intake vs single-page form.
+- Open: GitHub CI on the draft PR; do not merge. Signed-in run on a real stack remains open.
 
 ## Launch task 3 (2026-11-18)
 - RFP email send-out, the vendor web form at `/rfp/[token]`, and staff tracking are built on branch `claude/project-thread-iu73pm` with migration 0180. The four checks passed in a cloud session. The database test is unverified until the GitHub integration job passes.
