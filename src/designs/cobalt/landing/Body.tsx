@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { CobaltGlow } from "../Glow";
-import { FitBoard } from "./FitBoard";
+import { MatchDemo } from "./MatchDemo";
 import { RuleIcon } from "./RuleIcons";
 import { rankingRules, sixSteps } from "./sample-ranking";
 
@@ -39,7 +39,7 @@ export function CobaltBody() {
               </span>
             </div>
           </div>
-          <FitBoard />
+          <MatchDemo />
         </div>
       </section>
 
@@ -49,8 +49,10 @@ export function CobaltBody() {
           <p>You stay in charge from the first question to the signature. MMHR handles the legwork in between.</p>
         </div>
         <div className="co-six">
-          {sixSteps.map((step) => (
-            <div key={step.n}>
+          {sixSteps.map((step, index) => (
+            // --i tells the CSS which step this is, so the steps can
+            // light up one after another as the section scrolls into view.
+            <div key={step.n} style={{ ["--i" as string]: index }}>
               <span className="co-num">{step.n}</span>
               <h3>{step.title}</h3>
               <p>{step.body}</p>
