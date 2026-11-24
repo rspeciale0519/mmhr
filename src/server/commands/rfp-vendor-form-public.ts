@@ -91,6 +91,20 @@ export async function submitPublicRfpForm(token: string, input: unknown, options
 }
 
 /**
+ * Reopens a form the vendor already submitted, so they can change it and
+ * submit again. Answers, comments, and files are kept. It works only while
+ * the form is "submitted" and the due date has not passed.
+ */
+export async function reopenPublicRfpForm(token: string, options: PublicFormOptions = {}): Promise<PublicFormResult> {
+  if (!isRfpFormToken(token)) return { ok: false, reason: "invalid" };
+  const result = z.strictObject({ reopened: z.boolean(), state: z.string() }).safeParse(
+    await call("mmhr_vendor_rfp_form_reopen", { p_token_hash: rfpFormTokenHash(token) }, options));
+  if (!result.success) return { ok: false, reason: "unavailable" };
+  // "locked" here means the form could not be reopened (closed by staff or past due).
+  return result.data.reopened ? { ok: true } : { ok: false, reason: "locked" };
+}
+
+/**
  * Checks that a file really is what its name says.
  * Every file type starts with a known "signature" (its first bytes). A PDF
  * starts with "%PDF", Office files are ZIP archives starting with "PK", and

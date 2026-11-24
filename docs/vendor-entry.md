@@ -67,7 +67,8 @@ Migration 0180 adds these steps. Apply it before first use.
    The default is 10 business days. Press **Send RFP email**.
 4. The vendor contact gets an email with a private link to `/rfp/<token>`. No sign-in is needed.
    Answers save automatically. The vendor can upload the requested documents (4 MB for each file, 12 files).
-   **Submit** locks the form. The link stops accepting changes after the due date.
+   **Submit** locks the form. The vendor can press **Reopen to edit** on the same link to change a submitted
+   response; answers, comments, and files stay (migration 0181). The link stops accepting changes after the due date.
 5. Track each vendor on the same review page, or in the vendor workspace at `/admin/vendor-evidence`:
    status, sent date, due date, first open, progress, and the tracking log. An unanswered form past its due date shows **Overdue**.
 6. Use the buttons on the tracking card to send a follow-up email, log a call, record a reply received

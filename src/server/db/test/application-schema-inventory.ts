@@ -142,7 +142,7 @@ export const applicationTables = [
   "workspaces",
 ] as const;
 
-export const applicationMigrationCount = 181;
+export const applicationMigrationCount = 182;
 
 // Private tables have a separate inventory. The existing array is public-only.
 export const applicationPrivateTables = [
@@ -167,6 +167,8 @@ export const anonymousPublicFunctions = [
   },
   { name: "mmhr_vendor_rfp_form_file_remove", signature: "p_token_hash text, p_file_id uuid" },
   { name: "mmhr_vendor_rfp_form_read", signature: "p_token_hash text" },
+  // Added by migration 0181: the vendor reopens their own submitted form.
+  { name: "mmhr_vendor_rfp_form_reopen", signature: "p_token_hash text" },
   { name: "mmhr_vendor_rfp_form_save", signature: "p_token_hash text, p_answers jsonb" },
   { name: "mmhr_vendor_rfp_form_submit", signature: "p_token_hash text, p_name text, p_email text" },
 ] as const;

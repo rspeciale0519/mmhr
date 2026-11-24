@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { RFP_ANSWER_CHOICES, RFP_REQUESTED_DOCUMENTS, type RfpQuestion, type RfpTab } from "@/lib/rfp-form-library";
 import { CLIENT_OVERVIEW_FIELDS, RFP_UPLOAD_MAX_BYTES, RFP_UPLOAD_MAX_FILES, type RfpAnswer, type RfpAnswers } from "@/lib/rfp-vendor-form";
 import type { PublicRfpForm } from "@/server/commands/rfp-vendor-form-public";
-import { removeRfpFileAction, saveRfpAnswersAction, submitRfpFormAction } from "./actions";
+import { removeRfpFileAction, reopenRfpFormAction, saveRfpAnswersAction, submitRfpFormAction } from "./actions";
 
 /**
  * The vendor's RFP web form.
@@ -177,7 +177,7 @@ export function VendorRfpForm({ token, form, tabs, brandName }: Props) {
         </nav>
 
         <main className="min-w-0 flex-1 space-y-6">
-          {!editable && <LockedNotice form={form} brandName={brandName} />}
+          {!editable && <LockedNotice token={token} form={form} brandName={brandName} onReopened={() => router.refresh()} />}
 
           {section === "overview" && <Overview form={form} brandName={brandName} total={progress.total} />}
 
@@ -222,17 +222,50 @@ function SaveIndicator({ status, editable, onRetry }: { status: SaveStatus; edit
   return <p aria-live="polite" className="text-muted-foreground">{text}</p>;
 }
 
-/** Explains why a form can be read but not changed. */
-function LockedNotice({ form, brandName }: { form: PublicRfpForm; brandName: string }) {
-  const message = form.state === "submitted"
+/**
+ * Explains why a form can be read but not changed.
+ * A submitted form also gets a "Reopen to edit" button, so the vendor can
+ * change their response without asking staff. Their answers stay in place.
+ */
+function LockedNotice({ token, form, brandName, onReopened }: {
+  token: string; form: PublicRfpForm; brandName: string; onReopened: () => void;
+}) {
+  // `busy` is true while the reopen request is running, to stop double clicks.
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const submitted = form.state === "submitted";
+  const message = submitted
     ? `Your response was submitted${form.submittedAt ? ` on ${formatDate(form.submittedAt)}` : ""}. Thank you. You can still read your answers here.`
     : form.state === "sent"
       ? `The due date for this request has passed, so answers can no longer be changed.`
       : `This request is closed, so answers can no longer be changed.`;
+
+  async function reopen() {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    const result = await reopenRfpFormAction(token).catch(() => ({ ok: false as const, reason: "unavailable" as const }));
+    // On success the page reloads its data and the form becomes editable.
+    if (result.ok) { onReopened(); return; }
+    setError(result.reason === "locked"
+      ? `This form can no longer be reopened here. Reply to the email you received and the ${brandName} team will help.`
+      : "We could not reopen the form. Please try again.");
+    setBusy(false);
+  }
+
   return (
     <div role="status" className="rounded-lg border border-border bg-background px-5 py-4 text-sm leading-6 sm:px-6">
       <p className="font-semibold">{message}</p>
-      <p className="text-muted-foreground">To change your response, reply to the email you received and the {brandName} team will reopen the form.</p>
+      {submitted ? (
+        <>
+          <p className="text-muted-foreground">Need to change something? Reopen the form, edit it, and submit again before the due date. Your answers, comments, and files are kept.</p>
+          <button type="button" className="mt-3 inline-flex min-h-11 items-center rounded-md border border-border px-4 text-sm font-semibold disabled:opacity-50"
+            disabled={busy} onClick={() => { void reopen(); }}>{busy ? "Reopening…" : "Reopen to edit"}</button>
+          {error && <p role="alert" className="mt-2 text-destructive">{error}</p>}
+        </>
+      ) : (
+        <p className="text-muted-foreground">To change your response, reply to the email you received and the {brandName} team will reopen the form.</p>
+      )}
     </div>
   );
 }

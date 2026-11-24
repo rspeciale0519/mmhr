@@ -39,8 +39,8 @@ async function asVisitor<T>(sql: SecurityTransaction, callback: (probe: Security
 }
 
 /** Calls one vendor function by its fixed name. `args` are passed in order. */
-function vendorCall(sql: SecurityTransaction, name: "read" | "save" | "submit" | "file_add" | "file_remove", args: (string | null)[]) {
-  const casts = { read: ["text"], save: ["text", "text::jsonb"], submit: ["text", "text", "text"],
+function vendorCall(sql: SecurityTransaction, name: "read" | "save" | "submit" | "reopen" | "file_add" | "file_remove", args: (string | null)[]) {
+  const casts = { read: ["text"], save: ["text", "text::jsonb"], submit: ["text", "text", "text"], reopen: ["text"],
     file_add: ["text", "text", "text", "text", "text"], file_remove: ["text", "uuid"] }[name];
   const list = casts.map((cast, index) => `$${index + 1}::${cast}`).join(", ");
   return asVisitor(sql, async (probe) => {
@@ -152,6 +152,19 @@ describe("RFP vendor forms", () => {
       const file = await read(sql, staff, "mmhr_get_rfp_vendor_form_file", { fileId: stored!.fileId });
       expect(file).toMatchObject({ fileName: "contract.pdf", contentType: "application/pdf", contentBase64: pdfBase64 });
 
+      // The vendor reopens their own submitted form by link. Answers, comments, and the file stay.
+      await expect(vendorCall(sql, "reopen", [tokenHash])).resolves.toMatchObject({ reopened: true, state: "sent" });
+      await expect(vendorCall(sql, "read", [tokenHash])).resolves.toMatchObject({ state: "sent", editable: true, submittedAt: null,
+        answers: { core_01: { answer: "yes", comment: null }, payroll_01: { answer: "no", comment: "Planned" }, core_02: { answer: null, comment: "Draft" } },
+        files: [{ fileName: "contract.pdf" }] });
+      // An open form has nothing to reopen. The vendor then submits again.
+      await expect(vendorCall(sql, "reopen", [tokenHash])).resolves.toMatchObject({ reopened: false, state: "sent" });
+      await expect(vendorCall(sql, "submit", [tokenHash, "Pat Lee", "pat@vendor.example.test"])).resolves.toMatchObject({ submitted: true });
+      // The log line for the vendor's reopen has no staff member on it.
+      const reopenedLog = await read(sql, staff, "mmhr_get_rfp_vendor_form", { formId });
+      expect((reopenedLog.events as { kind: string; byStaff: boolean }[]).filter((event) => event.kind === "reopened"))
+        .toEqual([expect.objectContaining({ byStaff: false })]);
+
       // Staff cannot mark a submitted form as declined, but can reopen it. Answers stay.
       await expect(invoke(sql, staff, "mmhr_record_rfp_vendor_form_event", { formId, kind: "declined" })).resolves.toMatchObject({ outcomeCode: "conflict", state: "submitted" });
       await expect(invoke(sql, staff, "mmhr_record_rfp_vendor_form_event", { formId, kind: "reopened" })).resolves.toMatchObject({ outcomeCode: "recorded", state: "sent" });
@@ -195,6 +208,8 @@ describe("RFP vendor forms", () => {
       await expect(vendorCall(sql, "save", [tokenHash, JSON.stringify({ core_01: { answer: "yes", comment: null } })])).resolves.toMatchObject({ saved: false });
       await expect(invoke(sql, staff, "mmhr_prepare_rfp_vendor_form", { organizationId: fixture.organizationId, recipientId: first.recipientId,
         tokenHash, libraryVersion: 1, tabKeys: ["core"], clientOverview: overview, dueAt: future() })).resolves.toMatchObject({ outcomeCode: "closed" });
+      // The vendor cannot reopen a form that staff closed.
+      await expect(vendorCall(sql, "reopen", [tokenHash])).resolves.toMatchObject({ reopened: false, state: "no_response" });
       await expect(track({ kind: "reply_recorded", occurredAt: new Date(Date.now() - 86_400_000).toISOString(), note: "Reply by email." }))
         .resolves.toMatchObject({ state: "replied" });
       await expect(track({ kind: "reopened", dueAt: future(3) })).resolves.toMatchObject({ state: "sent" });
@@ -204,6 +219,10 @@ describe("RFP vendor forms", () => {
       await expect(vendorCall(sql, "read", [tokenHash])).resolves.toMatchObject({ state: "sent", editable: false });
       await expect(vendorCall(sql, "save", [tokenHash, JSON.stringify({ core_01: { answer: "yes", comment: null } })])).resolves.toMatchObject({ saved: false });
       await expect(vendorCall(sql, "submit", [tokenHash, "Pat Lee", "pat@vendor.example.test"])).resolves.toMatchObject({ submitted: false });
+      // A submitted form past its due date cannot be reopened by the vendor.
+      await sql`UPDATE mmhr_private.rfp_vendor_forms SET state = 'submitted', submitted_at = clock_timestamp() WHERE id = ${formId}::uuid`;
+      await expect(vendorCall(sql, "reopen", [tokenHash])).resolves.toMatchObject({ reopened: false, state: "submitted" });
+      await sql`UPDATE mmhr_private.rfp_vendor_forms SET state = 'sent', submitted_at = NULL WHERE id = ${formId}::uuid`;
       await track({ kind: "declined" });
       await expect(track({ kind: "reopened" })).resolves.toMatchObject({ outcomeCode: "conflict" });
     });
@@ -277,6 +296,8 @@ describe("RFP vendor forms", () => {
       await expect(vendorCall(sql, "read", ["not-a-hash"])).resolves.toBeNull();
       await expect(vendorCall(sql, "save", [hashOf("guess"), JSON.stringify({ core_01: { answer: "yes", comment: null } })])).rejects.toMatchObject(denied);
       await expect(vendorCall(sql, "submit", [hashOf("guess"), "Pat", "pat@vendor.example.test"])).rejects.toMatchObject(denied);
+      await expect(vendorCall(sql, "reopen", [hashOf("guess")])).rejects.toMatchObject(denied);
+      await expect(vendorCall(sql, "reopen", ["not-a-hash"])).rejects.toMatchObject(invalid);
 
       // One vendor's link never reads or changes the other vendor's form or files.
       await vendorCall(sql, "save", [one.tokenHash, JSON.stringify({ core_01: { answer: "yes", comment: "Vendor one only" } })]);

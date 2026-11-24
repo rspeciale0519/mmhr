@@ -2292,6 +2292,13 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   dataPath: "exact-origin action; anonymous fixed RPC keyed by the token hash; writes only while the form is sent and not past due",
   denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
 })),
+// The vendor reopens their own submitted form (migration 0181).
+{
+  key: "src/app/rfp/[token]/actions.ts#reopenRfpFormAction", surface: "reopenRfpFormAction", kind: "server-action", access: "public",
+  permission: "none; the unguessable link token is the key", scope: "the one RFP vendor form the token belongs to",
+  dataPath: "exact-origin action; anonymous fixed RPC keyed by the token hash; reopens only a submitted form that is not past due; answers and files are kept",
+  denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0181 unapplied",
+},
 {
   key: "src/app/rfp/[token]/files/route.ts#POST", surface: "POST /rfp/[token]/files", kind: "route-handler", access: "public",
   permission: "none; the unguessable link token is the key", scope: "the one RFP vendor form the token belongs to",
@@ -2299,7 +2306,7 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
   denialEvidence: "rfp-vendor-form-public.test.ts; rfp-vendor-forms.integration.test.ts; migration 0180 unapplied",
 },
 {
-  key: "src/server/commands/rfp-vendor-form-public.ts#command", surface: "vendor RFP web form read, save, submit, and files",
+  key: "src/server/commands/rfp-vendor-form-public.ts#command", surface: "vendor RFP web form read, save, submit, reopen, and files",
   kind: "command", access: "public", permission: "none; the unguessable link token is the key",
   scope: "the one RFP vendor form the token belongs to",
   dataPath: "anonymous fixed RPCs keyed by the token hash; strict input and output; staff-only fields never returned",
