@@ -1,6 +1,10 @@
 # Log
 Append-only timeline. Entry format: `## [YYYY-MM-DD] <op> | <title>`.
 
+## [2026-11-24] fix | Cobalt primary button text color
+- `.co a` inherit was painting navy on blue `<Link>` CTAs. Button-styled anchors now keep `--co-on-primary` (#fff).
+- Type check, lint, 5,516 unit tests, build, and 17 Playwright e2e tests passed. See journal/2026-11-24.md.
+
 ## [2026-09-13] implementation | Verify the local MVP through vendor delivery
 - Native browser verified customer choices, staff disclosure, creator approval, vendor delivery, and customer/vendor reads with synthetic accounts.
 - User-approved local MFA repair completed. Added dev:local startup and corrected workflow navigation and requirement labels.
