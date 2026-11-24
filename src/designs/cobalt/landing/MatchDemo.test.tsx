@@ -41,3 +41,13 @@ test("picks and unpicks a contender", () => {
   fireEvent.click(row);
   expect(screen.getByText(/2 of 5 contenders picked/)).toBeTruthy();
 });
+
+test("unpicks a provider that drops off the board", () => {
+  render(<MatchDemo />);
+  // With only "Global hiring" on, neither default pick is in the top five.
+  fireEvent.click(screen.getByRole("button", { name: "Global hiring" }));
+  for (const name of ["Payroll", "Benefits", "Time tracking"]) {
+    fireEvent.click(screen.getByRole("button", { name }));
+  }
+  expect(screen.getByText(/0 of 5 contenders picked/)).toBeTruthy();
+});

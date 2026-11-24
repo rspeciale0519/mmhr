@@ -155,9 +155,16 @@ export function MatchDemo() {
     lastTops.current = tops;
   }, [order, still]);
 
-  /** Switches one need on or off. */
+  /**
+   * Switches one need on or off. Picks belong to the ranking on screen, so
+   * a picked provider that drops off the board is unpicked. Otherwise it
+   * would still count toward the limit with no row left to unpick it.
+   */
   function toggleNeed(id: NeedId) {
-    setNeeds((current) => (current.includes(id) ? current.filter((need) => need !== id) : [...current, id]));
+    const next = needs.includes(id) ? needs.filter((need) => need !== id) : [...needs, id];
+    const onBoard = rankProviders(next).slice(0, BOARD_ROWS).map((row) => row.id);
+    setNeeds(next);
+    setPicks((current) => current.filter((pick) => onBoard.includes(pick)));
   }
 
   /** Picks or unpicks a contender, up to the limit. */
