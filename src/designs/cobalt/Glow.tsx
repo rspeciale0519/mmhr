@@ -34,11 +34,16 @@ export function CobaltGlow({ tone = "blue", placement = "hero" }: Props) {
   );
 }
 
+/**
+ * Decorative blobs live in a paint-clipped layer so their 1100px boxes and
+ * blur cannot expand the document width. iOS WebKit shrink-to-fits overflow,
+ * which is what made the landing page sit in the left ~56% of an iPhone.
+ */
 export function CobaltGlows({ placement = "hero" }: { placement?: "hero" | "app" }) {
   return (
-    <>
+    <div className="co-glows" aria-hidden="true">
       <CobaltGlow tone="blue" placement={placement} />
       <CobaltGlow tone="mint" placement={placement} />
-    </>
+    </div>
   );
 }

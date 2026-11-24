@@ -32,7 +32,7 @@ export function CobaltBody() {
               <Link className="co-btn co-btn-p" href="/sign-up">Start your needs list</Link>
               <Link className="co-btn co-btn-g" href="/#how-it-works">How ranking works</Link>
             </div>
-            <div className="co-gl" style={{ marginTop: 34, padding: "18px 20px", display: "flex", gap: 14, alignItems: "center" }}>
+            <div className="co-gl co-fee-note">
               <span className="co-chip co-chip-m">Fees excluded</span>
               <span style={{ fontSize: 14, color: "var(--co-ink2)" }}>
                 Providers pay MMHR a referral fee. It is never an input to rank.

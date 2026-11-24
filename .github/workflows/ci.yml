@@ -65,3 +65,16 @@ jobs:
           NEXT_PUBLIC_BRAND_NAME: MatchMaker HR
           # Unset DSN keeps Sentry inert and skips source-map upload.
           SENTRY_AUTH_TOKEN: ""
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Mobile overflow
+        run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:56321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+          NEXT_PUBLIC_BRAND_NAME: MatchMaker HR
+          SENTRY_AUTH_TOKEN: ""
+          VERCEL_ENV: preview
+          MMHR_PREVIEW_RELEASE_ENABLED: "1"

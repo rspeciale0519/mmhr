@@ -21,6 +21,8 @@ const eslintConfig = defineConfig([
     ".codex/**",
     // Archived code is kept in Git but is not built, linted, or tested.
     "archive/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 
