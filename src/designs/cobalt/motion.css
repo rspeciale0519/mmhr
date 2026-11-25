@@ -1,0 +1,343 @@
+/* Cobalt motion and the home page matching demo.
+   Loaded after styles.css. Everything that moves has a calmer version in
+   the "prefers-reduced-motion" block at the bottom of this file. */
+.co {
+  /* One shared curve: starts fast, lands softly. */
+  --co-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Parts of the page the browser draws for us, themed to match. */
+.co ::selection {
+  background: rgba(35, 64, 232, 0.22);
+}
+.co-btn:focus-visible,
+.co-need:focus-visible,
+button.co-brow:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 3px;
+}
+.co-blue .co-btn:focus-visible {
+  outline-color: #fff;
+}
+
+/* Buttons answer the pointer: brighter on hover, pressed in on click. */
+.co-btn {
+  transition: filter 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.2s ease-out,
+    transform 0.15s var(--co-ease);
+}
+.co-btn-p:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 18px 34px -12px rgba(35, 64, 232, 0.95);
+}
+.co-btn-g:hover {
+  background: #fff;
+}
+.co-btn:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+/* ---- Matching demo ---- */
+.co-bchips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* The needs a visitor can switch on and off. */
+.co-needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.co-need {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 38px;
+  padding: 0 13px 0 9px;
+  border: 0;
+  border-radius: 11px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--co-ink2);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out,
+    transform 0.15s var(--co-ease);
+}
+.co-need:hover {
+  background: #fff;
+}
+.co-need:active {
+  transform: scale(0.97);
+}
+.co-need[aria-pressed="true"] {
+  color: #1c33c2;
+  background: rgba(35, 64, 232, 0.09);
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.4) inset;
+}
+/* The little check box inside each need. */
+.co-need-box {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 0 0 1.5px rgba(13, 26, 74, 0.32) inset;
+  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+.co-need[aria-pressed="true"] .co-need-box {
+  background: var(--co-cobalt);
+  box-shadow: none;
+}
+/* The check mark draws itself from left to right. */
+.co-need-box path {
+  stroke-dasharray: 12;
+  animation: co-check 0.28s var(--co-ease) backwards;
+}
+@keyframes co-check {
+  from {
+    stroke-dashoffset: 12;
+  }
+}
+
+/* The dark stage that holds the 3D fit field. The glow below is what you
+   see before the 3D loads, and all you see on a device without WebGL. */
+.co-stage {
+  position: relative;
+  height: 300px;
+  margin-bottom: 8px;
+  border-radius: 18px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 34% 30% at 50% 52%, rgba(142, 240, 201, 0.16), rgba(142, 240, 201, 0) 70%),
+    radial-gradient(ellipse 70% 62% at 50% 52%, rgba(35, 64, 232, 0.6), rgba(35, 64, 232, 0) 72%),
+    #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 26px 44px -30px rgba(13, 26, 74, 0.8);
+}
+.co-stage-gl {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease-out;
+}
+/* MatchStage sets data-live once the first 3D frame is drawn. */
+.co-stage-gl[data-live] {
+  opacity: 1;
+}
+.co-stage-gl canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Small text tags that follow the dots. MatchStage moves them. */
+.co-stage-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 7px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #dfe5ff;
+  background: rgba(13, 26, 74, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.co-stage-tag b {
+  margin-left: 6px;
+  font-weight: 700;
+  color: #fff;
+}
+.co-stage-tag-on,
+.co-stage-tag-on b {
+  color: var(--co-mint);
+}
+.co-stage-tag-core {
+  color: var(--co-mint);
+  background: none;
+  box-shadow: none;
+  font-weight: 600;
+}
+.co-stage-key {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Board rows are buttons now, so a visitor can pick contenders. */
+.co-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+button.co-brow {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--co-line);
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.co-rows li:first-child .co-brow {
+  border-top: 0;
+}
+.co-brow[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+.co-brow .co-track {
+  transition: background-color 0.15s ease-out;
+}
+.co-brow:hover .co-track {
+  background: rgba(35, 64, 232, 0.11);
+}
+.co-brow[aria-disabled="true"]:hover .co-track {
+  background: rgba(13, 26, 74, 0.05);
+}
+.co-brow.co-sel .co-n small {
+  color: #0b5a3e;
+  font-weight: 600;
+}
+/* The bar glides to its new length when the score changes. */
+.co-track i {
+  transition: width 0.5s var(--co-ease);
+}
+.co-sc {
+  font-variant-numeric: tabular-nums;
+}
+.co-demo-empty {
+  margin: 0;
+  padding: 26px 0;
+  color: var(--co-ink2);
+  font-size: 15px;
+}
+
+/* ---- Movement. Only for visitors who have not asked for less motion. ---- */
+@media (prefers-reduced-motion: no-preference) {
+  /* The headline rises into view from behind an invisible edge. */
+  .co-h1,
+  .co-h1 em {
+    animation: co-rise 0.8s var(--co-ease) backwards;
+  }
+  .co-h1 em {
+    animation-delay: 0.09s;
+  }
+  /* The demo settles in just after the headline. */
+  .co-demo {
+    animation: co-settle 0.7s var(--co-ease) 0.18s backwards;
+  }
+  /* Each bar grows from zero, one row after another. */
+  .co-track i {
+    animation: co-grow 0.9s var(--co-ease) calc(0.35s + var(--i, 0) * 70ms) backwards;
+  }
+
+  /* The six steps light up in order as you scroll to them. Browsers that
+     cannot tie animation to scrolling simply show all six lit. */
+  @supports (animation-timeline: view()) {
+    .co-six > div {
+      position: relative;
+      border-top-color: var(--co-line);
+    }
+    .co-six > div::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -2px;
+      height: 2px;
+      background: var(--co-navy);
+      transform-origin: left;
+      animation: co-draw linear both;
+    }
+    .co-six .co-num {
+      animation: co-lit linear both;
+    }
+    .co-six > div::before,
+    .co-six .co-num {
+      animation-timeline: view();
+      /* --i is the step number, so each step starts a little later. */
+      animation-range: cover calc(8% + var(--i, 0) * 4%) cover calc(20% + var(--i, 0) * 4%);
+    }
+  }
+}
+@keyframes co-rise {
+  from {
+    clip-path: inset(-10% -10% 100% -10%);
+    transform: translateY(0.2em);
+  }
+  to {
+    clip-path: inset(-10%);
+    transform: none;
+  }
+}
+@keyframes co-settle {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes co-grow {
+  from {
+    width: 0;
+  }
+}
+@keyframes co-draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes co-lit {
+  from {
+    opacity: 0.28;
+  }
+}
+
+/* ---- Less motion: keep the feedback, drop the travel. ---- */
+@media (prefers-reduced-motion: reduce) {
+  .co-btn,
+  .co-need,
+  .co-track i,
+  .co-stage-gl {
+    transition-duration: 0.01s;
+  }
+  .co-btn:active:not(:disabled),
+  .co-need:active {
+    transform: none;
+  }
+  .co-need-box path {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .co-stage {
+    height: 240px;
+    border-radius: 14px;
+  }
+  .co-need {
+    height: 42px;
+    font-size: 13px;
+  }
+  .co-brow .co-n small {
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .co-stage-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+  }
+}

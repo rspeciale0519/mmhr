@@ -1,6 +1,11 @@
 # MMHR — Current State
 
-Updated: 2026-11-24. Cobalt primary CTA labels are white on the blue gradient (branch `cursor/cobalt-primary-button-text-6528`). Type check, lint, 5,516 unit tests, build, and 17 Playwright e2e tests passed. See journal/2026-11-24.md.
+Updated: 2026-11-24. Home page has a live 3D matching demo and Cobalt motion (branch `claude/project-thread-9rznrd`). Type check, lint, 5,524 unit tests, and build passed. See journal/2026-11-24.md.
+
+## Cobalt motion (2026-11-24)
+- `/` hero uses `MatchDemo` (sample needs re-rank 12 masked sample providers) with a lazy three.js stage in `MatchStage.tsx`. Motion rules live in `src/designs/cobalt/motion.css`; every effect has a reduced-motion path.
+- Owner direction: client questionnaire gets guided steps with a live match preview; vendor RFP form gets a fast-answer mode with no 3D. Vendor form work waits for PR #47.
+- Open: real iPhone check of the 3D stage.
 
 ## Cobalt UI (2026-11-24)
 - Pulse remains in `src/designs/pulse/` but `/` renders `CobaltBody`.
