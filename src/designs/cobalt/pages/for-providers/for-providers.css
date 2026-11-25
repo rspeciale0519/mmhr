@@ -1,0 +1,362 @@
+/* /for-providers (src/designs/cobalt/pages/for-providers/).
+   Loaded by Body.tsx. Builds on styles.css, motion.css, and pages.css.
+   Colors come only from the Cobalt variables and the navy/white tints the
+   home page's 3D stage already uses (motion.css, ".co-stage").
+   Every animation has a still version in the reduced-motion block below. */
+
+/* ---- "One RFP out. Answers back." (RfpFlow.tsx) ------------------------- */
+
+/* The heading row above the panel: title on the left, the "Illustration"
+   label and the Replay button on the right. */
+.co-fp-flow-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+.co-fp-flow-head h3 {
+  margin: 0;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.co-fp-flow-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* One dark panel: the 3D stage on the left, the status list on the right.
+   Without WebGL only the list remains (.co-fp-panel-text). */
+.co-fp-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+  border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 26px 44px -30px rgba(13, 26, 74, 0.8);
+  color: #dfe5ff;
+}
+.co-fp-panel-text {
+  grid-template-columns: minmax(0, 1fr);
+}
+.co-fp-panel-text .co-fp-stage {
+  display: none;
+}
+.co-fp-panel-text .co-fp-status {
+  border-left: 0;
+  max-width: 720px;
+}
+
+/* The stage. The glow is what shows before the 3D loads. */
+.co-fp-stage {
+  position: relative;
+  min-height: 460px;
+  background:
+    radial-gradient(ellipse 22% 26% at 50% 50%, rgba(142, 240, 201, 0.16), rgba(142, 240, 201, 0) 70%),
+    radial-gradient(ellipse 60% 62% at 50% 50%, rgba(35, 64, 232, 0.55), rgba(35, 64, 232, 0) 72%),
+    #0b1541;
+}
+.co-fp-gl {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+/* RfpStage sets data-live once the first 3D frame is drawn. */
+.co-fp-gl[data-live] {
+  opacity: 1;
+}
+.co-fp-gl canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Small tags that follow the dots. RfpStage moves them. */
+.co-fp-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(13, 26, 74, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.co-fp-tag b {
+  margin-left: 6px;
+  font-weight: 500;
+  color: #dfe5ff;
+}
+.co-fp-tag-on,
+.co-fp-tag-on b {
+  color: var(--co-mint);
+}
+.co-fp-tag-core {
+  color: var(--co-mint);
+  font-weight: 600;
+}
+
+/* The status list: the same states as text. */
+.co-fp-status {
+  padding: 26px 28px 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
+}
+.co-fp-status-sum {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.co-fp-status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.co-fp-status-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.co-fp-status-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+.co-fp-status-word {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #dfe5ff;
+}
+.co-fp-status-list li[data-step="0"] .co-fp-status-word {
+  color: rgba(255, 255, 255, 0.66);
+}
+.co-fp-status-list li[data-step="4"] .co-fp-status-word {
+  color: var(--co-mint);
+  font-weight: 650;
+}
+/* Four marks under each provider: Sent, Opened, Answering, Answered. */
+.co-fp-marks {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+.co-fp-marks i {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.25s var(--co-ease);
+}
+.co-fp-marks i[data-on] {
+  background: #8fa2ff;
+}
+.co-fp-status-list li[data-step="4"] .co-fp-marks i {
+  background: var(--co-mint);
+}
+/* What each status means. */
+.co-fp-key {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12.5px;
+}
+.co-fp-key div {
+  display: flex;
+  gap: 10px;
+}
+.co-fp-key dt {
+  flex: none;
+  width: 76px;
+  font-weight: 600;
+  color: #fff;
+}
+.co-fp-key dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+/* ---- "From listing to signed contract": six numbered steps ------------- */
+
+.co-fp-path {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px 32px;
+}
+.co-fp-path li {
+  border-top: 2px solid var(--co-navy);
+  padding-top: 18px;
+  min-width: 0;
+}
+.co-fp-path h3 {
+  margin: 18px 0 6px;
+  font-weight: 650;
+  font-size: 18px;
+  line-height: 1.25;
+}
+.co-fp-path p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 15px;
+  color: var(--co-ink2);
+}
+
+/* ---- "Rank is earned on fit": three rules ------------------------------- */
+
+.co-fp-rules {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.co-fp-rules > div {
+  border-top: 1px solid var(--co-line);
+  padding-top: 20px;
+  min-width: 0;
+}
+.co-fp-rules h3 {
+  margin: 0 0 8px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.co-fp-rules p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 16px;
+  color: var(--co-ink2);
+}
+
+/* ---- "Answering the RFP": a short list of facts ------------------------- */
+
+.co-fp-facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 780px;
+}
+.co-fp-facts li {
+  position: relative;
+  padding: 16px 0 16px 30px;
+  border-top: 1px solid var(--co-line);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+}
+/* A small cobalt square marks each fact. */
+.co-fp-facts li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 26px;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--co-cobalt);
+}
+
+/* ---- Movement ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Steps, rules, and facts rise into place as they scroll into view.
+     Browsers that cannot tie animation to scrolling show them at once. */
+  @supports (animation-timeline: view()) {
+    .co-fp-rv {
+      animation: co-fp-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes co-fp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---- Less motion: no fades, no glides ----------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-fp-gl,
+  .co-fp-marks i {
+    transition-duration: 0.01s;
+  }
+}
+
+/* ---- Phones -------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .co-fp-path {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .co-fp-rules {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+@media (max-width: 760px) {
+  /* The list moves under the stage. */
+  .co-fp-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-fp-stage {
+    min-height: 300px;
+  }
+  .co-fp-status {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+@media (max-width: 600px) {
+  .co-fp-flow-head h3 {
+    font-size: 19px;
+  }
+  .co-fp-panel {
+    border-radius: 18px;
+  }
+  .co-fp-stage {
+    min-height: 270px;
+  }
+  .co-fp-status {
+    padding: 18px 18px 20px;
+  }
+  /* On a phone the tags show only the letter; the list says the status. */
+  .co-fp-tag {
+    font-size: 11.5px;
+    padding: 1px 7px;
+  }
+  .co-fp-tag b {
+    display: none;
+  }
+  .co-fp-path {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .co-fp-path .co-num {
+    font-size: 48px;
+  }
+  .co-fp-facts li {
+    font-size: 16px;
+  }
+}

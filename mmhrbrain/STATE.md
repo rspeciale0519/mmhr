@@ -1,6 +1,12 @@
 # MMHR — Current State
 
-Updated: 2026-11-24. Home page has a live 3D matching demo and Cobalt motion (branch `claude/project-thread-9rznrd`). Type check, lint, 5,524 unit tests, and build passed. See journal/2026-11-24.md.
+Updated: 2026-11-25. Public site PR 1 is built on `claude/project-thread-9rznrd`: buyer-journey menu, full home page, and real pages. Type check, lint, 5,660 unit tests, and build passed. See journal/2026-11-25.md.
+
+## Public site (2026-11-25, owner decisions)
+- Menu pages: `/how-it-works`, `/why-its-free`, `/for-providers`, `/resources`. `/blog` and everything under `/resources/` stay blocked in `src/lib/launch-surface.ts` until built and approved. This replaces the "hide most public pages" part of the trim direction for these four pages only.
+- Shared blocks live in `src/designs/cobalt/pages/`; each page's content is in `pages/<slug>/`. Page transitions wrap each `page.tsx` with `CobaltPageTransition`.
+- Newsletter provider is Resend (`src/server/workflows/resend-newsletter-service.ts`). The footer signup shows only when `RESEND_API_KEY` and `RESEND_NEWSLETTER_SEGMENT_ID` are set at build time. Not yet configured; MMHR has no sending domain.
+- Open: owner review of public copy; six-step order vs `docs/LAUNCH.md`; double opt-in decision. Next: Blog PR, then Resources content PR.
 
 ## Cobalt motion (2026-11-24)
 - `/` hero uses `MatchDemo` (sample needs re-rank 12 masked sample providers) with a lazy three.js stage in `MatchStage.tsx`. Motion rules live in `src/designs/cobalt/motion.css`; every effect has a reduced-motion path.

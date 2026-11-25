@@ -593,7 +593,7 @@ export const entryPointInventory: readonly EntryPointInventoryRecord[] = [
     permission: "none; provider-neutral consent boundary",
     scope: "newsletter subscriber",
     dataPath: "exact-origin POST; normalized email and consent timestamp; redacted response",
-    denialEvidence: "route and Beehiiv adapter tests; missing configuration fails closed",
+    denialEvidence: "route and Resend adapter tests; missing configuration fails closed",
   },
   {
     key: "src/app/(auth)/actions.ts#signUp",

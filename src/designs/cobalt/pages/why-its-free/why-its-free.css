@@ -1,0 +1,817 @@
+/* /why-its-free page styles (Body.tsx and FollowTheMoney.tsx).
+   Loaded by Body.tsx, after the Cobalt styles.css, motion.css and pages.css,
+   so rules here build on theirs. Colors come only from the Cobalt variables
+   and the white/navy/mint tints those files already use. Every animation has
+   a reduced-motion version in the block at the end of this file.
+
+   Class prefixes: `co-wif-` for the page sections, `co-fm-` for the
+   "Follow the money" diagram. */
+
+/* ---- Page sections ------------------------------------------------------- */
+
+/* Three short columns, each under a navy rule, like the home page's steps.
+   Used for "Who pays", the ranking reasons, and the honesty checks. */
+.co-wif-cols {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  min-width: 0;
+}
+.co-wif-cols > * {
+  border-top: 2px solid var(--co-navy);
+  padding-top: 18px;
+  min-width: 0;
+}
+.co-wif-cols h3 {
+  margin: 0 0 8px;
+  font-weight: 650;
+  font-size: 20px;
+  line-height: 1.25;
+}
+.co-wif-cols p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+
+/* "What MMHR does not do": one readable column, each line under a rule. */
+.co-wif-nots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 760px;
+}
+.co-wif-nots li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--co-line);
+  font-size: 17px;
+  line-height: 1.45;
+}
+.co-wif-nots svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--co-cobalt);
+}
+
+/* ---- Follow the money: the stage ------------------------------------------ */
+
+/* The diagram reuses the home page's dark .co-stage panel (motion.css) for
+   its navy background and glow, but grows to fit its content. */
+.co-fm.co-stage {
+  /* Space between stage boxes across (and the length of the lines between
+     them), and between the decision row and the money lane below. */
+  --fm-gap: 28px;
+  --fm-row: 56px;
+  height: auto;
+  margin-bottom: 0;
+  padding: 24px 28px 28px;
+  color: #dfe5ff;
+}
+
+/* Top bar: step count, "money moved so far", Previous / Next. */
+.co-fm-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+.co-fm-count,
+.co-fm-money {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.co-fm-count b,
+.co-fm-money b {
+  font-weight: 650;
+  color: #fff;
+}
+/* Once money has moved, the words turn mint, the color of the money lane. */
+.co-fm-money[data-moved] b {
+  color: var(--co-mint);
+}
+.co-fm-steps {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Buttons on the dark stage. */
+.co-fm-btn,
+.co-fm-switch {
+  border: 0;
+  font: inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out, filter 0.15s ease-out, transform 0.15s var(--co-ease);
+}
+.co-fm-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.co-fm-btn:hover,
+.co-fm-switch:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+.co-fm-btn-p {
+  background: linear-gradient(180deg, var(--co-btn-start), var(--co-btn-end));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+}
+.co-fm-btn-p:hover {
+  filter: brightness(1.15);
+}
+.co-fm-btn:active:not([aria-disabled="true"]),
+.co-fm-switch:active {
+  transform: scale(0.975);
+}
+.co-fm-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* Cobalt blue focus rings vanish on navy, so the stage uses mint. */
+.co-fm-btn:focus-visible,
+.co-fm-node:focus-visible,
+.co-fm-switch:focus-visible {
+  outline: 2px solid var(--co-mint);
+  outline-offset: 3px;
+}
+
+/* ---- Follow the money: the diagram ---------------------------------------- */
+
+/* Wide screens: stages 1 to 6 in one row, the money lane in a row below. */
+.co-fm-flow {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: var(--fm-gap);
+  row-gap: var(--fm-row);
+  min-width: 0;
+}
+.co-fm-li {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+/* One stage box. Its color says where the visitor is: dim ahead, outlined
+   once passed, filled blue when selected. Hover only tints it. */
+.co-fm-node {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 136px;
+  padding: 14px 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, color 0.2s ease-out;
+}
+.co-fm-node:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+.co-fm-node[data-state="done"] {
+  color: #dfe5ff;
+  box-shadow: 0 0 0 1px rgba(91, 116, 255, 0.6) inset;
+}
+.co-fm-node[data-state="current"] {
+  color: #fff;
+  background-color: rgba(35, 64, 232, 0.5);
+  box-shadow: 0 0 0 1.5px var(--co-cob2) inset, 0 14px 30px -16px rgba(35, 64, 232, 0.9);
+}
+/* The glow FollowTheMoney plays once when a box is reached or checked. */
+.co-fm-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 18px;
+  box-shadow: 0 0 0 2px var(--co-mint);
+  opacity: 0;
+  pointer-events: none;
+}
+.co-fm-num {
+  font-stretch: 125%;
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: #9fb0ff;
+}
+.co-fm-node[data-state="current"] .co-fm-num {
+  color: var(--co-mint);
+}
+.co-fm-title {
+  margin-top: 18px;
+  font-weight: 650;
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.co-fm-tag {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.7);
+}
+.co-fm-node[data-state="current"] .co-fm-tag {
+  color: rgba(255, 255, 255, 0.88);
+}
+/* Scoring's tag names its single input. Mint makes it stand out. */
+.co-fm-li:nth-child(2) .co-fm-tag {
+  color: var(--co-mint);
+}
+
+/* The line from one stage to the next. The grey track is always there; the
+   blue fill (`i`) grows along it once the visitor has passed that line.
+   --d (set by FollowTheMoney) delays each fill a little on a jump ahead. */
+.co-fm-wire {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: var(--fm-gap);
+  height: 2px;
+  margin-top: -1px;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+.co-fm-wire i {
+  position: absolute;
+  inset: 0;
+  background: var(--co-cob2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.36s var(--co-ease) calc(var(--d, 0) * 70ms);
+}
+.co-fm-wire[data-lit] i {
+  transform: none;
+}
+/* An arrow head at the end of each line. */
+.co-fm-wire::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  border: 4px solid transparent;
+  border-left: 6px solid rgba(255, 255, 255, 0.3);
+  border-right-width: 0;
+  transform: translateY(-50%);
+}
+.co-fm-wire[data-lit]::after {
+  border-left-color: var(--co-cob2);
+}
+/* The small dot FollowTheMoney sends along a line. Hidden at rest. */
+.co-fm-dot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--co-mint);
+  box-shadow: 0 0 10px var(--co-mint);
+  opacity: 0;
+}
+
+/* The money line runs down from "You sign direct" into the money lane, in
+   mint. It is the only line that touches the referral fee. */
+.co-fm-wire[data-money] {
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: var(--fm-row);
+  margin: 0 0 0 -1px;
+}
+.co-fm-wire[data-money] i {
+  background: var(--co-mint);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.co-fm-wire[data-money][data-lit] i {
+  transform: none;
+}
+.co-fm-wire[data-money]::after {
+  right: auto;
+  left: 50%;
+  top: auto;
+  bottom: -2px;
+  border: 4px solid transparent;
+  border-top: 6px solid rgba(255, 255, 255, 0.3);
+  border-bottom-width: 0;
+  transform: translateX(-50%);
+}
+.co-fm-wire[data-money][data-lit]::after {
+  border-top-color: var(--co-mint);
+}
+.co-fm-wire[data-money] .co-fm-dot {
+  left: 50%;
+  top: 0;
+  margin: -4px 0 0 -4px;
+}
+
+/* The money lane: a dashed mint band along the bottom. It holds the
+   referral fee (under "You sign direct") and a note under the scoring
+   column. It uses the same six columns as the row above, so its contents
+   line up with the stages. */
+.co-fm-lane {
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: var(--fm-gap);
+  align-items: start;
+  min-width: 0;
+}
+.co-fm-lane::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 18px;
+  border: 1px dashed rgba(142, 240, 201, 0.4);
+  background: rgba(142, 240, 201, 0.04);
+  pointer-events: none;
+}
+.co-fm-lane > .co-fm-node {
+  grid-column: 6;
+  grid-row: 1;
+  min-height: 116px;
+}
+.co-fm-lane .co-fm-num {
+  color: var(--co-mint);
+}
+.co-fm-lane .co-fm-node[data-state="current"] {
+  background-color: rgba(142, 240, 201, 0.14);
+  box-shadow: 0 0 0 1.5px var(--co-mint) inset, 0 14px 30px -16px rgba(142, 240, 201, 0.5);
+}
+/* While "what if a provider paid more?" is on, the fee box keeps a mint
+   outline: this is where the bigger fee goes, and the only place. */
+.co-fm[data-paid-more] .co-fm-lane .co-fm-node {
+  box-shadow: 0 0 0 1.5px var(--co-mint) inset;
+}
+.co-fm-lane-label,
+.co-fm-lane-gap {
+  grid-row: 1;
+  margin: 0;
+  padding-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78);
+  min-width: 0;
+}
+.co-fm-lane-label {
+  grid-column: 1;
+  display: grid;
+  gap: 2px;
+}
+.co-fm-lane-label b {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--co-mint);
+}
+/* Under the scoring column: "no line from fees into scoring". */
+.co-fm-lane-gap {
+  grid-column: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.co-fm-lane-gap svg {
+  flex: none;
+  color: var(--co-mint);
+}
+
+/* ---- Follow the money: explanation and "what if" -------------------------- */
+
+.co-fm-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.co-fm-detail {
+  padding-right: 40px;
+  min-width: 0;
+}
+.co-fm-detail h3 {
+  margin: 0 0 10px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.co-fm-detail p {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 16.5px;
+  line-height: 1.6;
+}
+/* The selected stage's explanation repeated under its box: phones only. */
+.co-fm-inline {
+  display: none;
+}
+/* "Scoring reads / never reads": two short rows under the explanation. */
+.co-fm-ledger {
+  display: grid;
+  gap: 10px;
+  margin: 28px 0 0;
+  max-width: 56ch;
+}
+.co-fm-ledger > div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 14.5px;
+}
+.co-fm-ledger dt {
+  font-weight: 650;
+  color: var(--co-mint);
+}
+.co-fm-ledger div + div dt {
+  color: #fff;
+}
+.co-fm-ledger dd {
+  margin: 0;
+}
+.co-fm-what {
+  padding-left: 40px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  min-width: 0;
+}
+.co-fm-what-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.co-fm-what-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  color: #fff;
+}
+.co-fm-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+}
+
+/* The sample ranking. Numbers line up in columns. */
+.co-fm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.co-fm-table th {
+  padding: 0 10px 8px 0;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+.co-fm-table th:last-child {
+  width: 34%;
+}
+.co-fm-table td {
+  padding: 9px 10px 9px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  vertical-align: middle;
+}
+.co-fm-table td:last-child,
+.co-fm-table th:last-child {
+  padding-right: 0;
+}
+.co-fm-table td small {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.co-fm-rank {
+  width: 40px;
+  font-weight: 650;
+  color: #fff;
+}
+.co-fm-fit {
+  width: 48px;
+  font-stretch: 125%;
+  font-weight: 750;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+/* A relative fee bar: longer means a bigger fee in this sample. */
+.co-fm-fee {
+  position: relative;
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+.co-fm-fee i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--v);
+  border-radius: 5px;
+  background: rgba(142, 240, 201, 0.5);
+  transition: width 0.5s var(--co-ease);
+}
+.co-fm-table tr[data-raised] .co-fm-fee i {
+  background: var(--co-mint);
+}
+
+/* The "what if" switch: a whole-width button with a small track and knob. */
+.co-fm-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.co-fm-switch-track {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background-color 0.2s ease-out;
+}
+.co-fm-switch-track i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s var(--co-ease), background-color 0.2s ease-out;
+}
+.co-fm-switch[aria-pressed="true"] .co-fm-switch-track {
+  background: var(--co-mint);
+}
+.co-fm-switch[aria-pressed="true"] .co-fm-switch-track i {
+  transform: translateX(16px);
+  background: #0b1541;
+}
+.co-fm-verdict {
+  margin: 12px 0 0;
+  min-height: 4.65em;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #fff;
+}
+.co-fm-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---- Narrower screens ------------------------------------------------------ */
+
+/* Small laptops and tablets in landscape: tighter boxes so six still fit. */
+@media (max-width: 1100px) {
+  .co-fm.co-stage {
+    --fm-gap: 20px;
+  }
+  .co-fm-node {
+    padding: 12px 11px 14px;
+  }
+  .co-fm-title {
+    font-size: 14px;
+  }
+}
+
+/* Phones and portrait tablets: the diagram turns into one column that reads
+   top to bottom. Lines run down the left, and the money lane comes last. */
+@media (max-width: 900px) {
+  .co-fm.co-stage {
+    --fm-gap: 18px;
+    padding: 18px 16px 20px;
+  }
+  .co-fm-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin-left: 0;
+  }
+  .co-fm-flow {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--fm-gap);
+    margin-top: 18px;
+  }
+  /* Number on the left, title and tag on the right. */
+  .co-fm-node {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 10px;
+    align-items: center;
+    min-height: 0;
+    padding: 12px 14px;
+  }
+  .co-fm-num {
+    grid-row: 1 / span 2;
+    font-size: 26px;
+  }
+  .co-fm-title {
+    margin-top: 0;
+    font-size: 15px;
+  }
+  .co-fm-tag {
+    margin-top: 2px;
+  }
+  /* Every line now runs down, from the middle of the number column. */
+  .co-fm-wire,
+  .co-fm-wire[data-money] {
+    left: 34px;
+    top: 100%;
+    width: 2px;
+    height: var(--fm-gap);
+    margin: 0 0 0 -1px;
+  }
+  .co-fm-wire i {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  .co-fm-wire::after,
+  .co-fm-wire[data-money]::after {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -2px;
+    border: 4px solid transparent;
+    border-top: 6px solid rgba(255, 255, 255, 0.3);
+    border-bottom-width: 0;
+    transform: translateX(-50%);
+  }
+  .co-fm-wire[data-lit]::after {
+    border-top-color: var(--co-cob2);
+  }
+  .co-fm-wire[data-money][data-lit]::after {
+    border-top-color: var(--co-mint);
+  }
+  .co-fm-wire .co-fm-dot {
+    left: 50%;
+    top: 0;
+  }
+  /* The lane stacks: the fee box first (the line from "You sign direct"
+     lands on it), then the two notes. */
+  .co-fm-lane {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+  .co-fm-lane::before {
+    inset: -8px;
+  }
+  .co-fm-lane > .co-fm-node,
+  .co-fm-lane-label,
+  .co-fm-lane-gap {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .co-fm-lane > .co-fm-node {
+    min-height: 0;
+  }
+  .co-fm-lane-label {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 2px 4px 0;
+  }
+  .co-fm-lane-gap {
+    padding: 0 4px 2px;
+  }
+  .co-fm-lower {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 28px;
+    padding-top: 20px;
+  }
+  .co-fm-detail {
+    padding-right: 0;
+  }
+  /* The explanation moves up under the selected box (.co-fm-inline). */
+  .co-fm-current {
+    display: none;
+  }
+  .co-fm-inline {
+    display: block;
+    margin: 0;
+    padding: 10px 4px 2px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #fff;
+  }
+  .co-fm-li {
+    flex-direction: column;
+  }
+  .co-fm-lane .co-fm-inline {
+    grid-column: 1;
+    padding-top: 0;
+  }
+  .co-fm-ledger {
+    margin-top: 0;
+  }
+  .co-fm-ledger > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .co-fm-what {
+    margin-top: 24px;
+    padding: 20px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+@media (max-width: 600px) {
+  .co-wif-cols {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .co-wif-nots li {
+    font-size: 16px;
+  }
+}
+
+/* ---- Movement ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Columns and list lines rise into place as they scroll into view, one
+     after another (--i is the item's position). Browsers that cannot tie
+     animation to scrolling simply show them in place. */
+  @supports (animation-timeline: view()) {
+    .co-wif-cols > *,
+    .co-wif-nots li {
+      animation: co-wif-in linear both;
+      animation-timeline: view();
+      animation-range: cover calc(2% + var(--i, 0) * 3%) cover calc(16% + var(--i, 0) * 3%);
+    }
+  }
+}
+@keyframes co-wif-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* ---- Less motion: keep the feedback, drop the travel ---------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-fm-btn,
+  .co-fm-switch,
+  .co-fm-node,
+  .co-fm-wire i,
+  .co-fm-fee i,
+  .co-fm-switch-track,
+  .co-fm-switch-track i {
+    transition: none;
+  }
+  .co-fm-btn:active:not([aria-disabled="true"]),
+  .co-fm-switch:active {
+    transform: none;
+  }
+}

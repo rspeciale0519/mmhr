@@ -7,7 +7,7 @@ import { getMarketingPageMetadata } from "@/lib/site-metadata";
 export const metadata = getMarketingPageMetadata(
   "/how-it-works",
   "How it works — MatchMaker HR",
-  "Answer one needs list, see every HRIS match scored against it with vendor names masked, pick up to five contenders, and MMHR sends one approved RFP.",
+  "Answer one needs list, compare every HRIS match scored on fit with names masked, review with an advisor, pick up to five, and MMHR sends one approved RFP. Free for buyers.",
 );
 
 export default function HowItWorksPage() {

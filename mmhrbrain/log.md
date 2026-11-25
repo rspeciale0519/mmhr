@@ -1314,3 +1314,4 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 - 2026-11-22: Cobalt UI ported onto the live app on `cursor/cobalt-ui-41fe`. Type check, lint, 5,509 tests, and build passed. See journal/2026-11-22.md.
 - 2026-11-23: Cobalt iPhone shrink-to-fit (690px layout in a 390px visual viewport) fixed by clipping glow overflow. Type check, lint, 5,513 tests, Playwright e2e, and build passed. See journal/2026-11-23.md.
 - 2026-11-24: Home page live 3D matching demo and Cobalt motion built on `claude/project-thread-9rznrd`. Type check, lint, 5,524 tests, and build passed. See journal/2026-11-24.md.
+- 2026-11-25: PR #48 merged. Public site PR 1 built on `claude/project-thread-9rznrd`: buyer-journey menu, full home page, four real pages, newsletter moved to Resend. Type check, lint, 5,660 tests, and build passed. See journal/2026-11-25.md.

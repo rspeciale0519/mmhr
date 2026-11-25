@@ -7,8 +7,8 @@ import { getMarketingPageMetadata } from "@/lib/site-metadata";
 // The older Pulse pages below /resources stay blocked (src/lib/launch-surface.ts).
 export const metadata = getMarketingPageMetadata(
   "/resources",
-  "Resources — MatchMaker HR",
-  "Guides from MatchMaker HR for teams choosing HRIS software.",
+  "HR software buyer's checklist and glossary — MatchMaker HR",
+  "How to choose HR software: a short, vendor-neutral buyer's checklist, plus plain-language definitions of HRIS, HCM, payroll, benefits administration, ATS, PEO, RFP, and other core terms.",
 );
 
 export default function ResourcesPage() {

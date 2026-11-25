@@ -7,7 +7,7 @@ import { getMarketingPageMetadata } from "@/lib/site-metadata";
 export const metadata = getMarketingPageMetadata(
   "/why-its-free",
   "Why it's free — MatchMaker HR",
-  "Customers never pay MatchMaker HR. Providers pay MMHR a referral fee, and that fee is never an input to rank.",
+  "MatchMaker HR is free for buyers. When you sign with a provider, that provider pays MMHR a referral fee, and the fee is never an input to your ranking.",
 );
 
 export default function WhyItsFreePage() {

@@ -22,6 +22,12 @@ const PUBLIC_SOURCES = [
   "src/designs/cobalt/pages/why-its-free/Body.tsx",
   "src/designs/cobalt/pages/for-providers/Body.tsx",
   "src/designs/cobalt/pages/resources/Body.tsx",
+  // Copy that lives beside a Body file instead of inside it.
+  "src/designs/cobalt/landing/home-content.ts",
+  "src/designs/cobalt/pages/how-it-works/journey.ts",
+  "src/designs/cobalt/pages/why-its-free/money-flow.ts",
+  "src/designs/cobalt/pages/for-providers/rfp-flow.ts",
+  "src/designs/cobalt/pages/resources/content.ts",
 ].map((relativePath) => ({
   relativePath,
   source: readFileSync(join(process.cwd(), relativePath), "utf8"),

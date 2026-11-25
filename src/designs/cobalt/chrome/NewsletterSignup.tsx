@@ -11,8 +11,8 @@ import { type FormEvent, useId, useState } from "react";
  * - `email`: the address, at most 254 characters;
  * - `consentAt`: when the visitor ticked the consent box, as an ISO time
  *   (it must not be in the future), so consent is explicit and dated;
- * - `idempotencyKey`: a fresh random UUID for each attempt, so a double
- *   submit is not counted twice by the provider.
+ * - `idempotencyKey`: a fresh random UUID for each attempt. (The provider,
+ *   Resend, keys subscribers by email, so a repeat signup is harmless.)
  * Because the route rejects unknown fields, this form sends no honeypot
  * field; the route's exact-origin check is its abuse guard.
  *
@@ -25,7 +25,12 @@ import { type FormEvent, useId, useState } from "react";
  *   -> "could not subscribe you right now".
  *
  * Copy rule: promise only what exists, which is HR software news and buyer
- * guides by email. Do not mention downloads or reports here.
+ * guides by email, and that the reader can unsubscribe at any time (every
+ * newsletter sent from Resend carries an unsubscribe link). Do not mention
+ * downloads or reports here.
+ *
+ * The site footer shows this form only when the newsletter is configured
+ * (see ./SiteChrome).
  *
  * Styles: `.co-news` in src/designs/cobalt/pages.css.
  */
@@ -136,7 +141,7 @@ export function NewsletterSignup() {
         />
         <label htmlFor={consentId}>
           I agree to receive HR software news and buyer guides from MatchMaker HR by email.
-          See the <a href="/privacy">privacy policy</a>.
+          I can unsubscribe at any time. See the <a href="/privacy">privacy policy</a>.
         </label>
       </div>
       {/* One live region for every outcome, present from the start so screen

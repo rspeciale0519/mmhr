@@ -1,0 +1,340 @@
+/* /how-it-works: the six-step scroll story and the "after the RFP" list.
+   Imported by pages/how-it-works/Body.tsx. Builds on styles.css (.co-stage,
+   .co-stage-tag, .co-num, .co-chip) and motion.css. Colors come only from
+   the Cobalt variables and the white/navy tints styles.css already uses.
+
+   Three layouts, chosen by the same media query as StepStory.tsx:
+   - Story (wider than 760px, motion allowed): step texts on the left, one
+     sticky navy stage on the right that follows the scroll.
+   - Less motion on a wide screen: no sticky stage; each step shows its own
+     still picture beside its text.
+   - Phone (760px and narrower): no sticky stage; each step's still picture
+     sits above its text. */
+
+/* ---- Story layout -------------------------------------------------------- */
+
+.co-hiw-story {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 56px;
+  min-width: 0;
+}
+
+.co-hiw-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* Each step is tall, so scrolling through it gives the stage time to play
+   that step's change and then hold it while the text is read. */
+.co-hiw-step {
+  min-height: 72vh;
+  padding: 6px 0 56px 28px;
+  border-left: 2px solid var(--co-line);
+  transition: border-color 0.2s ease-out;
+}
+.co-hiw-step:last-child {
+  padding-bottom: 0;
+}
+.co-hiw-num {
+  font-size: 56px;
+  transition: color 0.2s ease-out;
+}
+.co-hiw-step h3 {
+  margin: 14px 0 8px;
+  font-stretch: 120%;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  transition: color 0.2s ease-out;
+}
+.co-hiw-sum {
+  margin: 0;
+  font-size: 17px;
+  color: var(--co-ink2);
+}
+
+/* "You / MMHR / You get": a small labelled list under each step. */
+.co-hiw-parts {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 0;
+  max-width: 560px;
+}
+.co-hiw-parts > div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--co-line);
+}
+.co-hiw-parts dt {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--co-navy);
+}
+.co-hiw-parts dd {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+  transition: color 0.2s ease-out;
+}
+
+/* While the story runs, the step under the reading line is marked with
+   aria-current. It gets the cobalt edge; the others step back to the muted
+   text color, which still reads at well over 4.5:1 contrast. */
+.co-hiw-step[aria-current="step"] {
+  border-left-color: var(--co-cobalt);
+}
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) .co-hiw-num {
+  color: var(--co-cob2);
+}
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) h3,
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) dd {
+  color: var(--co-mute);
+}
+
+/* The column that holds the sticky stage runs the full height of the
+   steps, so the stage can stay in view the whole way down. */
+.co-hiw-rail {
+  min-width: 0;
+}
+.co-hiw-rail .co-hiw-stage {
+  position: sticky;
+  top: 100px;
+  height: min(620px, calc(100vh - 132px));
+  margin: 0;
+  /* Lets the still picture size itself to the stage (cqw/cqh below). */
+  container-type: size;
+}
+/* The 3D canvas layer sits over the still picture once it is live. */
+.co-hiw-gl {
+  z-index: 1;
+}
+.co-hiw-stage .co-hiw-still {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100cqw, 160cqh);
+  transform: translate(-50%, -50%);
+}
+.co-hiw-stage .co-stage-key {
+  z-index: 2;
+}
+
+/* Which step the stage shows, and the "Illustration" label. */
+.co-hiw-caption {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.co-hiw-where {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+/* A chip that reads on the navy stage (the light chips are for the light page). */
+.co-hiw-chip {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+/* ---- Still picture (SceneStill.tsx) -------------------------------------- */
+
+/* Keeps the drawing's 16:10 shape so the HTML tags land on their dots. */
+.co-hiw-still {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+.co-hiw-still svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Tags are placed by percent (inline left/top) and lifted over their dot. */
+.co-hiw-tag {
+  transform: translate(-50%, -150%);
+}
+.co-hiw-tag.co-stage-tag-core {
+  transform: translate(-50%, 70%);
+}
+.co-hiw-need {
+  color: var(--co-mint);
+}
+
+/* A step's own picture: hidden while the sticky stage tells the story. */
+.co-hiw-step-pic {
+  display: none;
+  position: relative;
+  margin: 0 0 20px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 26px 44px -30px rgba(13, 26, 74, 0.8);
+}
+.co-hiw-step-pic .co-hiw-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+/* ---- Less motion, or a phone: a still picture with each step ------------- */
+
+@media (max-width: 760px), (prefers-reduced-motion: reduce) {
+  .co-hiw-story {
+    display: block;
+  }
+  .co-hiw-rail {
+    display: none;
+  }
+  .co-hiw-step-pic {
+    display: block;
+  }
+  .co-hiw-step {
+    min-height: 0;
+  }
+  .co-hiw-step,
+  .co-hiw-num,
+  .co-hiw-step h3,
+  .co-hiw-parts dd {
+    transition: none;
+  }
+}
+
+/* Less motion on a wide screen: picture beside the text, like the story. */
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  .co-hiw-step {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 56px;
+    padding-bottom: 64px;
+  }
+  .co-hiw-step > * {
+    grid-column: 1;
+  }
+  .co-hiw-step > .co-hiw-step-pic {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: start;
+    margin: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .co-hiw-step {
+    padding: 0 0 44px 16px;
+  }
+  .co-hiw-step-pic {
+    border-radius: 14px;
+  }
+  .co-hiw-num {
+    font-size: 40px;
+  }
+  .co-hiw-step h3 {
+    margin-top: 8px;
+    font-size: 26px;
+  }
+  .co-hiw-sum {
+    font-size: 16px;
+  }
+  .co-hiw-parts > div {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .co-hiw-parts dd {
+    font-size: 15px;
+  }
+}
+
+/* ---- After the RFP: four short steps in a row ---------------------------- */
+
+.co-hiw-after {
+  counter-reset: co-hiw-after;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+.co-hiw-after li {
+  counter-increment: co-hiw-after;
+  padding-top: 16px;
+  border-top: 2px solid var(--co-navy);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+}
+.co-hiw-after li::before {
+  content: counter(co-hiw-after, decimal-leading-zero);
+  display: block;
+  margin-bottom: 14px;
+  font-stretch: 125%;
+  font-weight: 250;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--co-cobalt);
+}
+@media (max-width: 900px) {
+  .co-hiw-after {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .co-hiw-after {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .co-hiw-after li::before {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+}
+
+/* ---- Movement (only when motion is allowed) ------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* In the sticky stage, each step's still fades in when the step changes
+     (seen before the 3D loads, or without WebGL). */
+  .co-hiw-stage .co-hiw-still {
+    animation: co-hiw-fade 0.32s var(--co-ease) both;
+  }
+  /* On phones, each step's picture settles in as it scrolls into view.
+     Browsers that cannot tie animation to scrolling show it straight away. */
+  @supports (animation-timeline: view()) {
+    .co-hiw-step-pic .co-hiw-still {
+      animation: co-hiw-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes co-hiw-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes co-hiw-settle {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

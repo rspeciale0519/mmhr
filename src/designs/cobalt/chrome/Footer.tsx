@@ -9,10 +9,10 @@ import { siteFooterLinks, siteMenuLinks } from "./site-links";
  * Left: the brand and one plain sentence on how MMHR is paid. Right: the
  * four menu pages, then contact and the legal pages.
  *
- * `newsletter` is an optional slot. Pass a signup form (for example
- * `<NewsletterSignup />` from ./NewsletterSignup) to show it as a full-width
- * row under the links. Nothing is shown when it is left out, so the footer
- * never offers a signup the site cannot deliver yet.
+ * `newsletter` is an optional slot shown as a full-width row under the links.
+ * ./SiteChrome passes `<NewsletterSignup />` here only when the newsletter is
+ * configured. Nothing is shown when it is left out, so the footer never offers
+ * a signup the site cannot deliver.
  */
 export function CobaltFooter({ newsletter }: { newsletter?: React.ReactNode }) {
   return (

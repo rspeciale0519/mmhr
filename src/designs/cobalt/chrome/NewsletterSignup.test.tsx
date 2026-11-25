@@ -30,6 +30,7 @@ describe("newsletter signup", () => {
     expect(screen.getByRole("checkbox")).not.toBeChecked();
     const text = container.textContent ?? "";
     expect(text).toContain("HR software news and buyer guides");
+    expect(text).toContain("I can unsubscribe at any time.");
     // Only promise what exists: no download, kit, or report.
     expect(text).not.toMatch(/download|kit\b|report/i);
   });

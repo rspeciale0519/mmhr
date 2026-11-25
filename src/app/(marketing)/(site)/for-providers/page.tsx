@@ -6,8 +6,8 @@ import { getMarketingPageMetadata } from "@/lib/site-metadata";
 // The page content itself lives in src/designs/cobalt/pages/for-providers/Body.tsx.
 export const metadata = getMarketingPageMetadata(
   "/for-providers",
-  "For providers — MatchMaker HR",
-  "How HRIS providers work with MatchMaker HR: buyers bring one needs list, every match is scored against it, and the referral fee providers pay is never an input to rank.",
+  "For HRIS providers — MatchMaker HR",
+  "HRIS providers do not need to join MatchMaker HR. When a buyer shortlists your product, MMHR emails you one RFP with the buyer's real requirements. Rank depends on fit, never on fees.",
 );
 
 export default function ForProvidersPage() {
