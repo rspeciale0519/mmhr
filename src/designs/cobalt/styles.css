@@ -542,20 +542,13 @@ a.co-btn-p:active,
   font-size: 17px;
   margin: 0 0 24px;
 }
+/* Footer frame. The columns inside it are laid out in pages.css. */
 .co-foot {
-  display: flex;
-  justify-content: space-between;
-  padding: 30px 0 44px;
+  padding: 36px 0 48px;
   border-top: 1px solid var(--co-line);
   margin-top: 60px;
   font-size: 13.5px;
   color: var(--co-mute);
-  gap: 16px;
-}
-.co-foot nav {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
 }
 .co-av {
   width: 38px;
@@ -1219,10 +1212,6 @@ a.co-btn-p:active,
   .co-nav {
     height: 66px;
   }
-  .co-nav .co-pills,
-  .co-nav .co-btn-g {
-    display: none;
-  }
   .co-hero {
     padding: 16px 0 0;
   }
@@ -1329,10 +1318,6 @@ a.co-btn-p:active,
   }
   .co-final h2 {
     font-size: 60px;
-  }
-  .co-foot {
-    flex-direction: column;
-    gap: 6px;
   }
   .co-appnav {
     height: 62px;

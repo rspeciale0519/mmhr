@@ -12,7 +12,9 @@ export type LaunchArea = "core" | "candidate-b" | "finance" | "documents" | "una
 
 /**
  * Public marketing pages whose claims the owner has not approved (docs/LAUNCH.md,
- * trim task 6). Only `/`, `/contact`, `/privacy`, and `/terms` stay public.
+ * trim task 6). Each prefix blocks the page itself and every page below it.
+ * The public pages that stay are listed in the Pages table of docs/LAUNCH.md.
+ * `/blog` stays blocked until the blog is built in a later change.
  */
 const unapprovedMarketingPrefixes = [
   "/about",
@@ -22,10 +24,18 @@ const unapprovedMarketingPrefixes = [
   "/faq",
   "/partners",
   "/platform",
-  "/resources",
   "/services",
   "/transparency",
 ] as const;
+
+/**
+ * Public pages that are allowed themselves while every page below them stays
+ * blocked (owner decision, 2026-11-25). `/resources` is the new Cobalt page;
+ * the older Pulse pages under it, such as `/resources/partner-finder`, carry
+ * claims the owner has not approved. A new subpage needs its own approval and
+ * an explicit change here, so the default for anything below stays "blocked".
+ */
+const unapprovedMarketingSubpageParents = ["/resources"] as const;
 
 const areaPrefixes: ReadonlyArray<readonly [string, LaunchArea]> = [
   ["/admin/finance", "finance"],
@@ -72,6 +82,13 @@ export function isLaunchAreaEnabled(area: LaunchArea, candidate: LaunchCandidate
 export function launchAreaForPath(pathname: string): LaunchArea {
   for (const [prefix, area] of areaPrefixes) {
     if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return area;
+  }
+  for (const parent of unapprovedMarketingSubpageParents) {
+    // "/resources" and "/resources/" (the same page) stay allowed; any longer
+    // path below the parent is a subpage and stays blocked.
+    if (pathname.startsWith(`${parent}/`) && pathname.length > parent.length + 1) {
+      return "unapproved-marketing";
+    }
   }
   return "core";
 }

@@ -128,6 +128,8 @@ These results prove local evaluation behavior only. Command, remote, staging, an
 | `src/app/(marketing)/(site)/case-studies/[slug]/page.tsx#default` | /case-studies/[slug] | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/contact/page.tsx#default` | /contact | page | public | none | none | public lead form; fixed DTO to exact-origin lead route; redacted status | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/faq/page.tsx#default` | /faq | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
+| `src/app/(marketing)/(site)/for-providers/page.tsx#default` | /for-providers | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
+| `src/app/(marketing)/(site)/how-it-works/page.tsx#default` | /how-it-works | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/partners/brokers-consultants/page.tsx#default` | /partners/brokers-consultants | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/partners/pe-vc/page.tsx#default` | /partners/pe-vc | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/partners/software-vendors/page.tsx#default` | /partners/software-vendors | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
@@ -140,6 +142,7 @@ These results prove local evaluation behavior only. Command, remote, staging, an
 | `src/app/(marketing)/(site)/services/page.tsx#default` | /services | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/terms/page.tsx#default` | /terms | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(marketing)/(site)/transparency/page.tsx#default` | /transparency | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
+| `src/app/(marketing)/(site)/why-its-free/page.tsx#default` | /why-its-free | page | public | none | none | checked-in public content | R0 release gate; no R1 permission gate |
 | `src/app/(admin)/admin/audit/page.tsx#default` | /admin/audit | page | internal-only | admin.access and audit.view with AAL2 | exact platform scope or server-selected workspace | request-scoped fixed audit RPC; five-field metadata; current session and authority | audit/page.test.tsx; staff-audit-read.test.ts; genuine audit database proof pending |
 | `src/app/(admin)/admin/audit/error.tsx#default` | /admin/audit error | boundary | framework | parent audit route guard | parent route | static loading or generic error; no protected audit data | audit/page.test.tsx; entry-point-inventory.test.ts |
 | `src/app/(admin)/admin/audit/loading.tsx#default` | /admin/audit loading | boundary | framework | parent audit route guard | parent route | static loading or generic error; no protected audit data | audit/page.test.tsx; entry-point-inventory.test.ts |

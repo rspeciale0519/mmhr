@@ -422,7 +422,6 @@ describe("launch surface proxy", () => {
     "/partners/pe-vc",
     "/partners/software-vendors",
     "/platform",
-    "/resources",
     "/resources/hris-landscape-report",
     "/resources/partner-finder",
     "/resources/requirements-builder",
@@ -439,7 +438,18 @@ describe("launch surface proxy", () => {
     expect(createServerClient).not.toHaveBeenCalled();
   });
 
-  test.each(["/", "/contact", "/privacy", "/terms", "/platformx", "/blogging"])(
+  test.each([
+    "/",
+    "/contact",
+    "/privacy",
+    "/terms",
+    "/how-it-works",
+    "/why-its-free",
+    "/for-providers",
+    "/resources",
+    "/platformx",
+    "/blogging",
+  ])(
     "passes the launch path %s through to session work",
     async (path) => {
       vi.mocked(createServerClient).mockReturnValue({

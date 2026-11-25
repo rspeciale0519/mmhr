@@ -46,6 +46,8 @@ const publicContentPages = [
   ],
   ["/contact", "src/app/(marketing)/(site)/contact/page.tsx"],
   ["/faq", "src/app/(marketing)/(site)/faq/page.tsx"],
+  ["/for-providers", "src/app/(marketing)/(site)/for-providers/page.tsx"],
+  ["/how-it-works", "src/app/(marketing)/(site)/how-it-works/page.tsx"],
   [
     "/partners/brokers-consultants",
     "src/app/(marketing)/(site)/partners/brokers-consultants/page.tsx",
@@ -76,6 +78,7 @@ const publicContentPages = [
   ["/services", "src/app/(marketing)/(site)/services/page.tsx"],
   ["/terms", "src/app/(marketing)/(site)/terms/page.tsx"],
   ["/transparency", "src/app/(marketing)/(site)/transparency/page.tsx"],
+  ["/why-its-free", "src/app/(marketing)/(site)/why-its-free/page.tsx"],
 ] as const;
 
 const checkedInContentPages: EntryPointInventoryRecord[] =

@@ -38,6 +38,10 @@ describe("sitemap route", () => {
 
     expect(entries).toEqual([
       { url: "http://localhost:3000/" },
+      { url: "http://localhost:3000/how-it-works" },
+      { url: "http://localhost:3000/why-its-free" },
+      { url: "http://localhost:3000/for-providers" },
+      { url: "http://localhost:3000/resources" },
       { url: "http://localhost:3000/contact" },
       { url: "http://localhost:3000/privacy" },
       { url: "http://localhost:3000/terms" },
@@ -64,7 +68,8 @@ describe("sitemap route", () => {
     "/faq",
     "/partners/pe-vc",
     "/platform",
-    "/resources",
+    "/resources/hris-landscape-report",
+    "/resources/partner-finder",
     "/resources/requirements-builder",
     "/services",
     "/transparency",

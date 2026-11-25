@@ -1,3 +1,4 @@
+import { CobaltPageTransition } from "@/designs/cobalt/chrome/PageTransition";
 import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { PageHero, SectionHead } from "../../_site/PageParts";
 import ContactForm from "./contact-form";
@@ -28,7 +29,7 @@ const REASONS = [
 
 export default function ContactPage() {
   return (
-    <>
+    <CobaltPageTransition>
       <PageHero
         eyebrow="Contact"
         title="Talk to an advisor."
@@ -51,6 +52,6 @@ export default function ContactPage() {
           ))}
         </aside>
       </section>
-    </>
+    </CobaltPageTransition>
   );
 }

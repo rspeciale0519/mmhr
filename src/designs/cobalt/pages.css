@@ -1,0 +1,459 @@
+/* Cobalt public pages: the top menu, the footer, the shared page blocks in
+   src/designs/cobalt/pages/, the newsletter signup, and page transitions.
+   Loaded after styles.css and motion.css (src/app/layout.tsx), so rules here
+   can build on theirs. Colors come only from the Cobalt variables and the
+   white/navy tints styles.css already uses. Every animation here has a
+   reduced-motion version in the block near the end of this file.
+
+   One width matters for the menu: below about 850px the four page pills
+   and "Sign in" no longer fit beside the brand and "Start free" (measured
+   in Chromium), so at 880px and below the phone menu takes over. Tablets in
+   portrait get the phone menu; 1024px and wider get the pills. */
+
+/* ---- Top menu ------------------------------------------------------------ */
+
+/* Anchor links (#section) land below the sticky menu, not under it. */
+html.co:has(.co-nav) {
+  scroll-padding-top: 88px;
+}
+
+/* The menu stays in view while the page scrolls. It keeps the same height
+   in the page flow at all times, so nothing below it ever jumps.
+   `top: -12px` lets the empty strip above the bar slide out of view once the
+   page scrolls, which is what makes the stuck menu shorter. */
+.co-nav {
+  position: sticky;
+  top: -12px;
+  z-index: 40;
+  padding-top: 10px;
+  /* The header box is wider and taller than the visible bar. Let clicks
+     pass through its empty edges to the page below; its children opt back
+     in. */
+  pointer-events: none;
+}
+.co-nav > * {
+  pointer-events: auto;
+}
+/* The frosted bar behind the menu. Shown at all times in browsers that
+   cannot tie animation to scrolling; elsewhere it fades in over the first
+   96px of scrolling (see "Movement" below). */
+.co-nav::before {
+  content: "";
+  position: absolute;
+  inset: 18px -14px 8px;
+  z-index: -1;
+  border-radius: 20px;
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.66));
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.95) inset, 0 0 0 1px rgba(13, 26, 74, 0.06),
+    0 18px 40px -24px rgba(23, 45, 160, 0.45);
+  pointer-events: none;
+}
+
+/* Page pills: a hover tint and a visible keyboard focus ring. Neither moves
+   the link. */
+.co-pills a {
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+}
+.co-pills a:hover:not([aria-current="page"]) {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--co-navy);
+}
+.co-pills a:focus-visible,
+.co-menu a:not(.co-btn):focus-visible,
+.co-foot a:focus-visible,
+.co-news a:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+
+/* Phone menu button and panel. Both are hidden on wide screens. */
+.co-menu-btn {
+  display: none;
+}
+.co-menu {
+  display: none;
+}
+/* Three bars that turn into a cross while the menu is open. */
+.co-menu-icon {
+  display: grid;
+  gap: 3px;
+  width: 16px;
+}
+.co-menu-icon i {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease-out;
+}
+.co-menu-btn[aria-expanded="true"] .co-menu-icon i:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+.co-menu-btn[aria-expanded="true"] .co-menu-icon i:nth-child(2) {
+  opacity: 0;
+}
+.co-menu-btn[aria-expanded="true"] .co-menu-icon i:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+@media (max-width: 880px) {
+  .co-nav-main,
+  .co-nav-signin {
+    display: none;
+  }
+  .co-menu-btn {
+    display: inline-flex;
+  }
+  /* The panel drops down under the bar. It scrolls inside itself if the
+     screen is short, and the page behind it keeps scrolling normally. */
+  .co-menu:not([hidden]) {
+    display: block;
+    position: absolute;
+    top: calc(100% - 4px);
+    left: -10px;
+    right: -10px;
+    padding: 8px 14px 14px;
+    border-radius: 20px;
+    max-height: calc(100dvh - 84px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  /* ".co-nav" in the link selectors below outranks the styles.css rule that
+     makes every link inherit its parent's color. */
+  .co-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .co-menu li + li {
+    border-top: 1px solid var(--co-line);
+  }
+  .co-nav .co-menu li a {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 10px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 550;
+    color: var(--co-ink2);
+  }
+  .co-nav .co-menu li a:hover {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--co-navy);
+  }
+  .co-nav .co-menu li a[aria-current="page"] {
+    color: var(--co-navy);
+    font-weight: 650;
+    box-shadow: inset 3px 0 0 var(--co-cobalt);
+  }
+  .co-menu-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .co-nav {
+    top: -8px;
+    padding-top: 8px;
+  }
+  .co-nav::before {
+    inset: 12px -10px 4px;
+    border-radius: 16px;
+  }
+  /* Keep "Start free" and "Menu" side by side on a 390px phone. */
+  .co-nav-actions {
+    gap: 8px;
+  }
+  .co-nav-actions .co-btn-s {
+    padding: 0 13px;
+  }
+}
+
+/* ---- Page wrapper and footer -------------------------------------------- */
+
+/* The canvas glows (.co-glows) are positioned, so they paint over any page
+   content that is not. Positioning the page wrapper (chrome/PageTransition)
+   and the footer keeps their text above the glows, at full contrast. */
+.co-page,
+.co-foot {
+  position: relative;
+}
+
+.co-foot-main {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 32px;
+  align-items: start;
+}
+.co-foot-about p {
+  margin: 14px 0 0;
+  color: var(--co-ink2);
+  max-width: 400px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.co-foot-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 56px;
+  flex-wrap: wrap;
+}
+.co-foot-links ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+/* ".co-foot" in the selectors below outranks the styles.css rule that makes
+   every link inherit its parent's color. */
+.co-foot a.co-brand {
+  color: var(--co-navy);
+}
+.co-foot .co-foot-links a {
+  display: inline-block;
+  padding: 6px 0;
+  font-size: 14.5px;
+  color: var(--co-ink2);
+}
+.co-foot .co-foot-links a:hover {
+  color: var(--co-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* Optional newsletter row (the `newsletter` slot of CobaltFooter). */
+.co-foot-news {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--co-line);
+}
+@media (max-width: 600px) {
+  .co-foot-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .co-foot-links {
+    justify-content: flex-start;
+    gap: 40px;
+  }
+}
+
+/* ---- Shared page blocks (src/designs/cobalt/pages/) ---------------------- */
+
+/* PageHero: the page's h1 (.co-pt) and lede (.co-lede), left-aligned. */
+.co-page-hero {
+  padding: 56px 0 0;
+  max-width: 920px;
+}
+.co-page-hero .co-lede {
+  margin-top: 22px;
+  max-width: 680px;
+}
+
+/* PageSection: a smaller step of the home page's .co-sech heading row. */
+.co-page-sec {
+  padding: 104px 0 0;
+}
+.co-page-sec .co-sech {
+  margin-bottom: 36px;
+}
+.co-page-sec .co-sech h2 {
+  font-size: 56px;
+  line-height: 0.96;
+}
+/* Running text inside a section, kept to a readable line length. */
+.co-page-copy {
+  max-width: 680px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--co-ink2);
+}
+.co-page-copy p {
+  margin: 0 0 16px;
+}
+
+/* QuestionsAndAnswers: two columns of questions with open answers. */
+.co-qa {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+}
+.co-qa-item {
+  border-top: 1px solid var(--co-line);
+  padding: 22px 0;
+}
+.co-qa-item h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.co-qa-item p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+
+/* CtaBand: the home page's closing band (.co-final) one size down. */
+.co-page-final {
+  padding-top: 120px;
+}
+.co-page-final h2 {
+  font-size: 88px;
+}
+
+@media (max-width: 600px) {
+  .co-page-hero {
+    padding-top: 28px;
+  }
+  .co-page-sec {
+    padding-top: 64px;
+  }
+  .co-page-sec .co-sech {
+    margin-bottom: 24px;
+  }
+  .co-page-sec .co-sech h2 {
+    font-size: 36px;
+  }
+  .co-qa {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-page-final {
+    padding-top: 72px;
+  }
+  .co-page-final h2 {
+    font-size: 46px;
+  }
+}
+
+/* ---- Newsletter signup (chrome/NewsletterSignup.tsx) --------------------- */
+
+.co-news {
+  max-width: 560px;
+}
+.co-news-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--co-navy);
+}
+.co-news-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.co-news-row .co-field {
+  flex: 1 1 240px;
+  min-width: 0;
+  margin: 0;
+}
+.co-news-row .co-field label {
+  color: var(--co-navy);
+}
+.co-news input[type="email"]:focus-visible,
+.co-news input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+.co-news input[aria-invalid="true"] {
+  box-shadow: 0 0 0 2px var(--co-cobalt);
+}
+.co-news-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--co-ink2);
+}
+.co-news-consent input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--co-cobalt);
+}
+.co-news-consent a {
+  text-decoration: underline;
+}
+/* Always present (empty until there is news) so screen readers announce
+   each change. Success uses the dark mint text of .co-chip-m. */
+.co-news-status {
+  min-height: 1.5em;
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #0b5a3e;
+}
+.co-news-status.co-news-error {
+  color: var(--co-navy);
+  font-weight: 600;
+}
+
+/* ---- Movement ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The frosted menu bar fades in over the first 96px of scrolling, so the
+     menu turns compact as soon as the page moves. Pure CSS: the browser
+     ties the animation to the scroll position, with no script running. */
+  @supports (animation-timeline: scroll()) {
+    .co-nav::before {
+      animation: co-nav-bar linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 96px;
+    }
+  }
+
+  /* Page transitions (chrome/PageTransition.tsx). The old page fades up
+     and out; the new one rises into place. Short, so clicks never wait. */
+  ::view-transition-old(.co-page-out) {
+    animation: co-page-out 0.16s ease-in both;
+  }
+  ::view-transition-new(.co-page-in) {
+    animation: co-page-in 0.36s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+  }
+}
+@keyframes co-nav-bar {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+}
+@keyframes co-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes co-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+/* While a transition runs, clicks go to the live page underneath instead of
+   being swallowed by the transition overlay (Next.js view-transitions guide). */
+::view-transition {
+  pointer-events: none;
+}
+
+/* ---- Less motion --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* No page glide: the new page simply replaces the old one. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .co-pills a,
+  .co-menu-icon i {
+    transition: none;
+  }
+}

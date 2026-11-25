@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import "@/designs/cobalt/styles.css";
 import "@/designs/cobalt/motion.css";
+import "@/designs/cobalt/pages.css";
 
 const appGeist = localFont({
   src: [

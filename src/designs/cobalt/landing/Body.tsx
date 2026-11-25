@@ -30,7 +30,7 @@ export function CobaltBody() {
             </p>
             <div className="co-ctas">
               <Link className="co-btn co-btn-p" href="/sign-up">Start your needs list</Link>
-              <Link className="co-btn co-btn-g" href="/#how-it-works">How ranking works</Link>
+              <Link className="co-btn co-btn-g" href="/how-it-works">How ranking works</Link>
             </div>
             <div className="co-gl co-fee-note">
               <span className="co-chip co-chip-m">Fees excluded</span>

@@ -38,7 +38,7 @@ Add more control only when the work touches one of the five protections.
 
 | Area | Pages that stay |
 |---|---|
-| Public | `/`, `/contact`, `/privacy`, `/terms`, `/rfp/[token]` (the RFP web form a vendor opens from an emailed private link) |
+| Public | `/`, `/how-it-works`, `/why-its-free`, `/for-providers`, `/resources` (the four menu pages, owner decision, 2026-11-25), `/contact`, `/privacy`, `/terms`, `/rfp/[token]` (the RFP web form a vendor opens from an emailed private link) |
 | Sign-in | `/sign-up`, `/sign-in`, `/mfa`, `/pending-access`, `/invitations/accept` |
 | Shared | `/home`, `/workspaces`, `/members`, `/invitations` |
 | Customer | `/customer` (needs), `/customer/evaluation` (matrix), `/customer/rfp` |
@@ -48,7 +48,11 @@ Add more control only when the work touches one of the five protections.
 Blocked now by [`src/lib/launch-surface.ts`](../src/lib/launch-surface.ts) and `src/proxy.ts`:
 finance, documents, demos, proposals, and contracts, with their API routes.
 
-To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gallery`.
+Also blocked by `src/lib/launch-surface.ts`: the older public pages with unapproved claims (trim task 6).
+`/resources` is public, but every page below it, such as `/resources/partner-finder`, stays blocked (owner decision, 2026-11-25).
+`/blog` stays blocked until the blog is built in a later change.
+
+To block in trim task 7: `/designs` and `/gallery`.
 `/agentid/complete-registration` needs a review in task 4.
 
 ## What does not change
@@ -76,7 +80,7 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 | 3 | Run the launch path in a browser on the local stack; record each failure | Open |
 | 4 | Confirm the pages that stay | Open |
 | 5 | Block finance, documents, demos, proposals, and contracts | Done before the trim (allowlist) |
-| 6 | Reduce the public site to four pages | Open |
+| 6 | Reduce the public site to the public pages in the table above (eight, owner decision, 2026-11-25) | Open |
 | 7 | Block the two design galleries | Open |
 | 8 | Archive the 20 candidate designs and the older gallery; keep Pulse | Open |
 | 9 | Archive the file reader; remove `pdfjs-dist`, `mammoth`, `sharp`, and `braces` | Open |

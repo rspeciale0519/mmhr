@@ -34,7 +34,7 @@ test("primary button links compute on-primary white against the navy inherit rul
   document.head.append(style);
   document.body.innerHTML = `
     <a class="co-btn co-btn-p" href="/sign-up">Start your needs list</a>
-    <a class="co-btn co-btn-g" href="/#how-it-works">How ranking works</a>
+    <a class="co-btn co-btn-g" href="/how-it-works">How ranking works</a>
     <a href="/privacy">Privacy</a>
   `;
 

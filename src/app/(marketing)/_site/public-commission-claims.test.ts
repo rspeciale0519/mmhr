@@ -16,6 +16,12 @@ const PUBLIC_SOURCES = [
   "src/designs/_content.ts",
   "src/designs/pulse/Body.tsx",
   "src/designs/cobalt/landing/Body.tsx",
+  "src/designs/cobalt/chrome/Footer.tsx",
+  "src/designs/cobalt/chrome/NewsletterSignup.tsx",
+  "src/designs/cobalt/pages/how-it-works/Body.tsx",
+  "src/designs/cobalt/pages/why-its-free/Body.tsx",
+  "src/designs/cobalt/pages/for-providers/Body.tsx",
+  "src/designs/cobalt/pages/resources/Body.tsx",
 ].map((relativePath) => ({
   relativePath,
   source: readFileSync(join(process.cwd(), relativePath), "utf8"),

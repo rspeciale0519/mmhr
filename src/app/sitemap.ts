@@ -8,6 +8,11 @@ import { getSiteMetadataBase } from "@/lib/site-metadata";
 // launch-hidden routes must not enter the public sitemap.
 export const PUBLIC_SITEMAP_PATHS = [
   "/",
+  // The four menu pages (owner decision, 2026-11-25). `/blog` joins later.
+  "/how-it-works",
+  "/why-its-free",
+  "/for-providers",
+  "/resources",
   "/contact",
   "/privacy",
   "/terms",

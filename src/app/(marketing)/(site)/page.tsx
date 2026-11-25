@@ -1,3 +1,4 @@
+import { CobaltPageTransition } from "@/designs/cobalt/chrome/PageTransition";
 import { CobaltBody } from "@/designs/cobalt/landing/Body";
 import { getMarketingPageMetadata } from "@/lib/site-metadata";
 
@@ -8,5 +9,9 @@ export const metadata = getMarketingPageMetadata(
 );
 
 export default function Home() {
-  return <CobaltBody />;
+  return (
+    <CobaltPageTransition>
+      <CobaltBody />
+    </CobaltPageTransition>
+  );
 }

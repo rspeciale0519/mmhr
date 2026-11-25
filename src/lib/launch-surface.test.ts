@@ -61,7 +61,9 @@ describe("launch surface", () => {
     expect(isLaunchAreaEnabled("unapproved-marketing", "B")).toBe(false);
   });
 
-  // The 17 public pages that docs/LAUNCH.md removes from the launch site.
+  // The old public pages that docs/LAUNCH.md keeps out of the launch site.
+  // `/resources` itself is public again (owner decision, 2026-11-25), but the
+  // older Pulse pages below it stay blocked.
   const unapprovedMarketingPages = [
     "/about",
     "/blog",
@@ -74,7 +76,6 @@ describe("launch surface", () => {
     "/partners/pe-vc",
     "/partners/software-vendors",
     "/platform",
-    "/resources",
     "/resources/hris-landscape-report",
     "/resources/partner-finder",
     "/resources/requirements-builder",
@@ -95,6 +96,29 @@ describe("launch surface", () => {
       expect(isPathInLaunch(path, "B")).toBe(false);
     },
   );
+
+  test.each(["/resources/new-unapproved-guide", "/resources/a/b", "/resources//x"])(
+    "blocks any page below /resources until it is approved: %s",
+    (path) => {
+      expect(launchAreaForPath(path)).toBe("unapproved-marketing");
+      expect(isPathInLaunch(path, "A")).toBe(false);
+      expect(isPathInLaunch(path, "B")).toBe(false);
+    },
+  );
+
+  // The public menu pages (owner decision, 2026-11-25).
+  const publicMenuPages = ["/how-it-works", "/why-its-free", "/for-providers", "/resources"] as const;
+
+  test.each([...publicMenuPages, "/resources/"])("serves the public menu page %s in both candidates", (path) => {
+    expect(launchAreaForPath(path)).toBe("core");
+    expect(isPathInLaunch(path, "A")).toBe(true);
+    expect(isPathInLaunch(path, "B")).toBe(true);
+  });
+
+  test("keeps the blog blocked until it is built", () => {
+    expect(isPathInLaunch("/blog", "A")).toBe(false);
+    expect(isPathInLaunch("/blog", "B")).toBe(false);
+  });
 
   test.each(["/", "/contact", "/privacy", "/terms", "/sign-up", "/sign-in"])(
     "keeps the launch page %s",
