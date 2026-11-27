@@ -22,9 +22,11 @@ import "./why-its-free.css";
  *   and ./why-its-free-claims.test.tsx check this).
  * - Say "provider" for vendors, as the home page does.
  * - Only claim what the product does today: buyers never pay; providers pay
- *   a referral fee; the fee is never an input to the score; names stay
- *   masked until the advisor review; the buyer picks up to five and signs
- *   directly with the provider.
+ *   a referral fee; the fee is never an input to the score; the buyer
+ *   picks up to five while names are still masked; the advisor review then
+ *   names only those picks, and a pick the buyer already knows and does not
+ *   want can be swapped for another match; the buyer signs directly with
+ *   the provider.
  *
  * Shared blocks are in src/designs/cobalt/pages/: PageHero (the one h1),
  * PageSection, QuestionsAndAnswers, CtaBand.
@@ -56,12 +58,12 @@ const rankingReasons = [
 /** The checks a buyer controls, in the order they happen. */
 const honestyChecks = [
   {
-    title: "Names stay masked until your advisor review",
-    body: "You see every match ranked on fit with provider names hidden. Names are shown only after you review your requirements with an MMHR advisor, so you judge fit before brand.",
+    title: "You pick while names are masked",
+    body: "You see every match ranked on fit with provider names hidden, and you choose up to five contenders from the ranking. You judge fit before brand.",
   },
   {
-    title: "You pick the contenders",
-    body: "You choose up to five providers from the ranking. MMHR sends one RFP to each of them, and only after you approve it.",
+    title: "Names come at your advisor review",
+    body: "When you review your requirements with an MMHR advisor, you see the names of the providers you picked. Recognize one you already know and do not want? Swap it for another match. MMHR sends one RFP to each pick, and only after you approve it.",
   },
   {
     title: "You sign directly with the provider",
@@ -73,7 +75,7 @@ const honestyChecks = [
 const doesNot = [
   "Charge buyers anything, at any step.",
   "Let a fee, or who pays it, change a score or a ranking.",
-  "Show provider names before your advisor review.",
+  "Show provider names before you pick.",
   "Send an RFP you have not approved, or send it to providers you did not pick.",
   "Sign the contract for you. You sign it directly with the provider.",
 ] as const;
@@ -94,7 +96,7 @@ const questions: readonly QuestionAndAnswer[] = [
   },
   {
     question: "Why are provider names hidden at first?",
-    answer: "So you judge fit before brand. Names stay masked until you review your requirements with an MMHR advisor, and then they are shown before any RFP goes out.",
+    answer: "So you judge and pick on fit before brand. You pick up to five while names are masked. The names of your picks are shown when you review your requirements with an MMHR advisor, before any RFP goes out.",
   },
   {
     question: "Who contacts the providers?",

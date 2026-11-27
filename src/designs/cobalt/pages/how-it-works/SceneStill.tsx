@@ -97,7 +97,7 @@ export function SceneStill({ progress, id }: { progress: number; id: string }) {
           />
         ))}
 
-        {/* The advisor review sweep. */}
+        {/* The advisor review sweep (step 04): it names only the picks. */}
         {scene.sweep.opacity > 0 ? (
           <ellipse
             cx={CX}

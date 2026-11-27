@@ -105,8 +105,9 @@ function circleGeometry() {
  * provider dots whose distance from the middle is their fit.
  *
  * As the visitor scrolls the steps, the needs fly in, masked providers
- * appear and glide in by score, an advisor sweep reveals names, five turn
- * mint, one RFP travels out to each, and one provider is signed.
+ * appear and glide in by score, five are picked (turn mint) while still
+ * masked, an advisor sweep then names only those five picks, one RFP
+ * travels out to each, and one provider is signed.
  * Everything the story shows comes from sceneAt() in story-scene.ts.
  *
  * On top of the story, the stage is alive while it is on screen:

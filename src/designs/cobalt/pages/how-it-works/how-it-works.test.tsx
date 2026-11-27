@@ -43,7 +43,10 @@ describe("/how-it-works", () => {
     expect(text).toContain("Customers never pay MMHR");
     expect(text).toContain("Providers pay MMHR a referral fee");
     expect(text).toContain("never an input to the ranking");
-    expect(text).toContain("Names appear after you review your requirements with an MMHR advisor");
+    // Pick first: names come after picking, at the advisor review, and only for the picks.
+    expect(text).toContain("You pick up to five contenders while the names are still masked");
+    expect(text).toContain("you see the names of the providers you picked. Matches you did not pick stay masked.");
+    expect(text).toContain("Swap it for another match.");
     expect(text).toContain("Your contract is with the provider, not with MMHR");
   });
 
@@ -75,5 +78,14 @@ describe("/how-it-works", () => {
       expect(container.textContent).toContain(step.name);
       expect(container.textContent).toContain(step.text);
     }
+    // The HowTo order is pick first: picking (step 3) before the advisor review (step 4).
+    expect(howTo.step.map((step: { name: string }) => step.name)).toEqual([
+      "Share your needs",
+      "Compare masked",
+      "Pick up to five",
+      "Advisor review",
+      "One approved RFP",
+      "Sign direct",
+    ]);
   });
 });

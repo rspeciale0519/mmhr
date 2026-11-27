@@ -49,13 +49,16 @@ test("shows all six steps in the HTML, the first one selected", () => {
 
 test("selecting a step marks it current and shows its detail", () => {
   renderSteps();
-  fireEvent.click(stepButton("Advisor review"));
-  expect(current()).toBe("Advisor review");
+  // Pick first: step 03 is picking (names still masked), step 04 the
+  // advisor review where the picks are named.
+  fireEvent.click(stepButton("Pick up to five"));
+  expect(current()).toBe("Pick up to five");
   expect(stepButton("Share your needs")).not.toHaveAttribute("aria-current");
   expect(screen.getByText("Step 03 of 06")).toBeInTheDocument();
-  expect(screen.getByText("Then: Pick up to five")).toBeInTheDocument();
+  expect(screen.getByText("Then: Advisor review")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Next step" }));
-  expect(current()).toBe("Pick up to five");
+  expect(current()).toBe("Advisor review");
+  expect(screen.getByText("Step 04 of 06")).toBeInTheDocument();
 });
 
 test("arrow keys move the selection and the focus", () => {

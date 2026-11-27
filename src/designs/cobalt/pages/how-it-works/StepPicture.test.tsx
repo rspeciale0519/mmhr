@@ -23,18 +23,18 @@ afterEach(() => {
 
 describe("a step's own picture (phones)", () => {
   test("on screen at load: shows the settled step and offers Replay", () => {
-    const { container } = render(<StepPicture index={2} n="03" />);
+    const { container } = render(<StepPicture index={3} n="04" />);
     expect(tagNames(container)).toEqual(["Provider A", "Provider B", "Provider C", "Provider D", "Provider E"]);
-    expect(screen.getByRole("button", { name: "Replay the step 03 picture" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replay the step 04 picture" })).toBeTruthy();
   });
 
   test("below the screen at load: rewinds to the step's start, then plays it on arrival", () => {
     const { container } = render(
       <div data-testid="below">
-        <StepPicture index={2} n="03" />
+        <StepPicture index={3} n="04" />
       </div>,
     );
-    // Step 03 starts before the advisor review: names still masked.
+    // Step 04 (the advisor review) starts with the picks still masked.
     expect(tagNames(container).every((name) => name === "Masked")).toBe(true);
     const picture = container.querySelector(".co-hiw-step-pic")!;
     const watcher = observers.find((observer) => observer.elements.includes(picture));
@@ -49,7 +49,7 @@ describe("a step's own picture (phones)", () => {
     setMedia({ reduce: true });
     const { container } = render(
       <div data-testid="below">
-        <StepPicture index={2} n="03" />
+        <StepPicture index={3} n="04" />
       </div>,
     );
     expect(tagNames(container)).toContain("Provider A");

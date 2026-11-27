@@ -31,7 +31,8 @@ describe("the step story's controls", () => {
     const steps = within(rail).getAllByRole("listitem");
     expect(steps).toHaveLength(6);
     // Each button is named by its number and title.
-    expect(within(rail).getByRole("button", { name: "03 Advisor review" })).toBeTruthy();
+    expect(within(rail).getByRole("button", { name: "03 Pick up to five" })).toBeTruthy();
+    expect(within(rail).getByRole("button", { name: "04 Advisor review" })).toBeTruthy();
     expect(within(rail).getByRole("button", { name: "Previous step" }).getAttribute("aria-disabled")).toBe("true");
     expect(within(rail).getByRole("button", { name: "Next step" }).getAttribute("aria-disabled")).toBe("false");
     // The first step is the current one.

@@ -53,21 +53,21 @@ describe("the story scene", () => {
     expect(tags(stillProgress(1)).map((tag) => tag.name)).toEqual(Array(5).fill("Masked"));
   });
 
-  test("names stay masked until the advisor review, then show as letters", () => {
-    expect(tags(1.99).every((tag) => tag.name === "Masked")).toBe(true);
-    expect(tags(stillProgress(2)).map((tag) => tag.name)).toEqual([
-      "Provider A",
-      "Provider B",
-      "Provider C",
-      "Provider D",
-      "Provider E",
-    ]);
+  test("step 03 picks exactly five contenders while every name is still masked", () => {
+    expect(sceneAt(stillProgress(1)).providers.some((p) => p.picked > 0)).toBe(false);
+    const scene = sceneAt(stillProgress(2));
+    expect(scene.providers.filter((p) => p.picked > 0.9)).toHaveLength(5);
+    // Pick first: the picks are chosen on fit, before any name is shown.
+    expect(tags(stillProgress(2)).map((tag) => tag.name)).toEqual(Array(5).fill("Masked"));
+    expect(tags(2.99).every((tag) => tag.name === "Masked")).toBe(true);
   });
 
-  test("step 04 picks exactly five contenders", () => {
-    const picked = sceneAt(stillProgress(3)).providers.filter((p) => p.picked > 0.9);
-    expect(picked).toHaveLength(5);
-    expect(sceneAt(stillProgress(2)).providers.some((p) => p.picked > 0)).toBe(false);
+  test("step 04, the advisor review, names only the five picks", () => {
+    const scene = sceneAt(stillProgress(3));
+    const picks = scene.providers.filter((p) => p.picked > 0.9);
+    expect(picks.map((p) => p.tag?.name)).toEqual(["Provider A", "Provider B", "Provider C", "Provider D", "Provider E"]);
+    // Providers that were not picked never get a name.
+    expect(scene.providers.filter((p) => p.picked === 0).every((p) => p.tag === null)).toBe(true);
   });
 
   test("step 05 sends one RFP to each contender and no one else", () => {

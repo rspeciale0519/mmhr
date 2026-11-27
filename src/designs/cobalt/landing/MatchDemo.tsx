@@ -300,7 +300,7 @@ export function MatchDemo() {
           {picks.length} of {MAX_PICKS} contenders picked
           {full ? ". Unpick one to swap." : ""}
         </span>
-        <span className="co-lbl">Names unlock after advisor review</span>
+        <span className="co-lbl">Picks named at the advisor review</span>
       </div>
     </Spotlight>
   );

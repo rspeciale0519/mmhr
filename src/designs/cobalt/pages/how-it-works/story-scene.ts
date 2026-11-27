@@ -12,6 +12,10 @@
  *   masked and get scored), and so on up to step 06 (sign direct).
  * - Each change happens in the first half of its step, so the picture
  *   settles while the visitor is still reading that step's text.
+ * - Pick first (owner decision, 2026-11-27): in step 03 the buyer picks five
+ *   contenders while every name is still masked; in step 04 the advisor
+ *   review sweep names only those five picks. Providers that were not
+ *   picked never get a name.
  *
  * Nothing here is a real provider or a real score. The page labels the
  * picture "Illustration" and "Sample data". Letters stand in for names.
@@ -39,7 +43,7 @@ export function needPlace(index: number, pull: number) {
  * Sample providers. `angle` is the fixed direction from the middle, in
  * degrees, hand-placed so the five best fits sit apart and their tags do
  * not overlap. The list is in score order, best first, so the first five
- * are the contenders picked in step 04.
+ * are the contenders picked in step 03 (while still masked).
  */
 const sampleProviders = [
   { letter: "A", score: 93, angle: 200 },
@@ -131,7 +135,7 @@ export type Scene = {
   needsOpacity: number;
   /** 0 to 1: how visible the score rings are. */
   rings: number;
-  /** The advisor review sweep: a ring that grows out from the middle. */
+  /** The advisor review sweep (step 04): a ring that grows out from the middle. */
   sweep: { radius: number; opacity: number };
   providers: SceneProvider[];
 };
@@ -146,11 +150,13 @@ export function sceneAt(progress: number): Scene {
   // Step 02: providers appear on the outer edge, then glide in by score.
   const appear = phase(p, 1, 1.25);
   const scored = phase(p, 1.2, 1.6);
-  // Step 03: the advisor review sweep runs from the middle outward.
-  const review = Math.min(1, Math.max(0, (p - 2) / 0.55));
+  // Step 03: the buyer picks five contenders while names are still
+  // masked. They turn mint; the rest step back.
+  const pick = phase(p, 2, 2.45);
+  // Step 04: the advisor review sweep runs from the middle outward and
+  // names the picks it passes (only picks carry a name tag at all).
+  const review = Math.min(1, Math.max(0, (p - 3) / 0.55));
   const sweepRadius = review * (OUTER + 0.4);
-  // Step 04: the five contenders turn mint; the rest step back.
-  const pick = phase(p, 3, 3.45);
   // Step 05: one RFP travels out to each contender.
   const sendRaw = Math.min(1, Math.max(0, (p - 4) / 0.6));
   const send = phase(p, 4, 4.6);
@@ -161,11 +167,13 @@ export function sceneAt(progress: number): Scene {
     const contender = index < PICKS;
     const chosenOne = index === CHOSEN;
     const target = radiusFor(sample.score);
-    // Providers that were not picked drift outward a little in step 04.
+    // Providers that were not picked drift outward a little in step 03.
     const radius = mix(OUTER, target, scored) + (contender ? 0 : pick * 0.5);
 
-    // A name is shown once the advisor sweep has passed the dot.
-    const revealed = review > 0 && sweepRadius >= radius;
+    // A name is shown once the advisor sweep (step 04) has passed the dot,
+    // and only for a picked contender: the review names your picks, never
+    // the providers you did not pick.
+    const revealed = contender && review > 0 && sweepRadius >= radius;
 
     let opacity = appear * (0.55 + 0.45 * scored);
     if (!contender) opacity *= mix(1, 0.3, pick) * mix(1, 0.5, send);

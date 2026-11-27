@@ -49,7 +49,7 @@ const pathSteps = [
   },
   {
     title: "The buyer shortlists up to five",
-    body: "The buyer picks up to five contenders, then reviews requirements with an MMHR advisor. Names are shown after that review.",
+    body: "The buyer picks up to five contenders while names are masked, then reviews requirements with an MMHR advisor and sees the names of its picks. A pick the buyer already knows and does not want can be swapped for another match.",
   },
   {
     title: "MMHR emails you one RFP",
@@ -80,7 +80,7 @@ const rankRules = [
   {
     icon: "mask",
     title: "Masked until review",
-    body: "Buyers compare fit with provider names masked, until they review requirements with an MMHR advisor.",
+    body: "Buyers compare fit and pick with provider names masked. Only their picks are named, when they review requirements with an MMHR advisor.",
   },
 ] as const satisfies readonly { icon: "fit" | "fee" | "mask"; title: string; body: string }[];
 

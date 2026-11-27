@@ -20,7 +20,8 @@ import "./how-it-works.css";
  * 1. Hero: the page's one h1 and a direct answer to "how does it work?".
  * 2. The six steps as a scroll story (StepStory.tsx): each step says what
  *    you do, what MMHR does, and what you get, beside a picture of it.
- * 3. What "masked" means and when names appear.
+ * 3. What "masked" means and when names appear (after you pick, at the
+ *    advisor review, and only for your picks).
  * 4. What the advisor review is.
  * 5. What happens after the RFP goes out.
  * 6. Buyer questions (visible text plus FAQPage structured data).
@@ -45,7 +46,7 @@ export function HowItWorksBody() {
     <>
       <PageHero
         title="How MatchMaker HR works"
-        lede="You answer one needs list. MMHR scores every matching option against it with provider names masked, reviews your requirements with you, and sends one approved RFP to up to five contenders you pick. You sign directly with the provider you choose."
+        lede="You answer one needs list. MMHR scores every matching option against it with provider names masked. You pick up to five on fit, see their names at your advisor review, and MMHR sends one approved RFP to each. You sign directly with the provider you choose."
         actions={
           <>
             <Magnetic>
@@ -100,9 +101,14 @@ export function HowItWorksBody() {
               ranking. Who pays, and how much, never changes your results.
             </p>
             <p>
-              Names appear after you review your requirements with an MMHR advisor. MMHR records when the names
-              are shown to you. That always happens before any RFP goes out, so you know exactly who receives
-              your request.
+              You pick up to five contenders while the names are still masked. Then, when you review your
+              requirements with an MMHR advisor, you see the names of the providers you picked. Matches you did
+              not pick stay masked. MMHR records when the names are shown to you. That always happens before any
+              RFP goes out, so you know exactly who receives your request.
+            </p>
+            <p>
+              Recognize one of your picks as a provider you already know and do not want? Swap it for another
+              match.
             </p>
           </RevealGroup>
           <Reveal className="co-hiw-mask-wrap" variant="scale" delay={120}>
@@ -122,8 +128,9 @@ export function HowItWorksBody() {
             customization you are asking for. The goal is an RFP that asks providers the right questions.
           </p>
           <p>
-            The advisor does not pick providers for you. You choose your contenders, and the RFP goes out only
-            once it is approved. After the review, you see the provider names behind the scores.
+            The advisor does not pick providers for you. You have already chosen your contenders on fit. In the
+            review, you see the names of the providers you picked. Recognize one you already know and do not
+            want? Swap it for another match. The RFP goes out only once it is approved.
           </p>
         </RevealGroup>
       </PageSection>

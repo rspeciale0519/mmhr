@@ -22,9 +22,10 @@ const shown = (element: HTMLElement) => element.getClientRects().length > 0;
  * it while the scroll story runs.
  *
  * Phones get a light, animated version: when the picture scrolls into view
- * it plays that step's change (the needs fly in, the names unmask, five
- * turn mint...) by redrawing the flat picture for under two seconds, then
- * stops. "Replay" plays it again. Nothing loops, nothing runs off screen.
+ * it plays that step's change (the needs fly in, five turn mint while
+ * still masked, the picks' names unmask...) by redrawing the flat
+ * picture for under two seconds, then stops. "Replay" plays it again.
+ * Nothing loops, nothing runs off screen.
  *
  * Less motion: the settled still, no Replay button. The server HTML (and
  * every visitor without JavaScript) also gets the settled still. Only a

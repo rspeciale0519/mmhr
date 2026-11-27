@@ -3,9 +3,11 @@
  *
  * FR-MKT-03: every public claim must be true and traceable. Each line here
  * restates the approved buyer journey in docs/PRD.md ("Approved Customer
- * Journey"): one needs list, every matching option scored against it, names
- * masked until the advisor review, up to five contenders, one approved RFP,
- * a contract signed directly with the provider, and providers (never
+ * Journey"): one needs list, every matching option scored against it with
+ * names masked, up to five contenders picked while still masked, an advisor
+ * review that names only the picks (one the buyer already knows and does not
+ * want can be swapped for another match), one approved RFP, a contract
+ * signed directly with the provider, and providers (never
  * customers) paying MMHR a referral fee that is never an input to rank.
  * Do not add figures, counts, time savings, customer names, or vendor names.
  */
@@ -63,11 +65,11 @@ export const homeQuestions: readonly QuestionAndAnswer[] = [
   },
   {
     question: "Why are provider names hidden at first?",
-    answer: "So you compare options on fit before brand. Names stay masked until you review your requirements with an MMHR advisor.",
+    answer: "So you compare and pick on fit before brand. You pick up to five while names are masked, then see your picks' names when you review your requirements with an MMHR advisor. Recognize one you already know and do not want? Swap it for another match.",
   },
   {
     question: "How many providers receive my RFP?",
-    answer: "Up to five. You pick up to five contenders, approve the RFP, and MMHR sends it to each provider you picked.",
+    answer: "Up to five. You pick up to five contenders, review them with an advisor, approve the RFP, and MMHR sends it to each provider you picked.",
   },
   {
     question: "Do the providers I pick need to be on MMHR?",

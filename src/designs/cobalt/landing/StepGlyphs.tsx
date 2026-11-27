@@ -49,18 +49,8 @@ const drawings: ReactNode[] = [
     ))}
     <Line order={3.5} d="M20 98h80" opacity={0.4} />
   </>,
-  // 03 Advisor review: a padlock whose shackle lifts open.
-  <>
-    <Line order={0} d="M34 56h52a6 6 0 0 1 6 6v32a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V62a6 6 0 0 1 6-6Z" />
-    <g className="co-g-lift">
-      <Line order={1} d="M44 56V42a16 16 0 0 1 32 0v4" />
-    </g>
-    <Pop order={2.5}>
-      <circle cx="60" cy="74" r="5" fill="currentColor" />
-    </Pop>
-    <Line order={3} d="M60 79v8" />
-  </>,
-  // 04 Pick up to five: five slots, filled one after another.
+  // 03 Pick up to five: five slots, filled one after another (names are
+  // still masked, so the slots stay plain dots).
   <>
     {[22, 41, 60, 79, 98].map((x, i) => (
       <g key={x}>
@@ -71,6 +61,18 @@ const drawings: ReactNode[] = [
       </g>
     ))}
     <Line order={4} d="M18 84h84" opacity={0.4} />
+  </>,
+  // 04 Advisor review: a padlock whose shackle lifts open (your picks
+  // are named).
+  <>
+    <Line order={0} d="M34 56h52a6 6 0 0 1 6 6v32a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V62a6 6 0 0 1 6-6Z" />
+    <g className="co-g-lift">
+      <Line order={1} d="M44 56V42a16 16 0 0 1 32 0v4" />
+    </g>
+    <Pop order={2.5}>
+      <circle cx="60" cy="74" r="5" fill="currentColor" />
+    </Pop>
+    <Line order={3} d="M60 79v8" />
   </>,
   // 05 One approved RFP: a document with a check, on its way.
   <>

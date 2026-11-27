@@ -11,8 +11,10 @@ import { sixSteps } from "../../landing/sample-ranking";
  *
  * Every sentence must stay true to the product: customers never pay MMHR;
  * providers pay MMHR a referral fee that is never an input to the ranking;
- * names stay masked until the advisor review; up to five contenders; one
- * approved RFP emailed to each; the buyer signs directly with the provider.
+ * the buyer picks up to five contenders while names are still masked; the
+ * advisor review then names only those picks, and a pick the buyer already
+ * knows and does not want can be swapped for another match; one approved
+ * RFP emailed to each; the buyer signs directly with the provider.
  * No statistics, counts, or provider names. Tests in journey.test.ts guard
  * the key claims.
  */
@@ -38,14 +40,14 @@ const details: Record<(typeof sixSteps)[number]["n"], StepDetail> = {
     get: "A comparison of every match, ranked on fit alone, with names masked.",
   },
   "03": {
-    you: "Review your requirements with an MMHR advisor: what you must have, what would be nice, and any customization you need.",
-    mmhr: "Checks that your needs list says what you mean, records the review, and then shows you the provider names.",
-    get: "Confirmed requirements, and the real names behind the scores, before any RFP goes out.",
+    you: "Choose up to five contenders on fit, while the names are still masked. You decide who is on the list.",
+    mmhr: "Keeps the list to five at most and keeps the names masked. Only the providers you choose can receive your request.",
+    get: "A shortlist of up to five contenders, chosen by you on fit alone.",
   },
   "04": {
-    you: "Choose up to five contenders to receive your RFP. You decide who is on the list.",
-    mmhr: "Keeps the list to five at most. Only the providers you choose receive your request.",
-    get: "A shortlist of up to five contenders, chosen by you.",
+    you: "Review your requirements with an MMHR advisor: what you must have, what would be nice, and any customization you need. Recognize one of your picks as a provider you already know and do not want? Swap it for another match.",
+    mmhr: "Checks that your needs list says what you mean, records the review, and then shows you the names of the providers you picked. Matches you did not pick stay masked.",
+    get: "Confirmed requirements, and the real names behind your picks, before any RFP goes out.",
   },
   "05": {
     you: "Read the RFP (request for proposal) that MMHR prepares from your confirmed requirements, and approve it.",
@@ -90,7 +92,7 @@ export const buyerQuestions = [
   },
   {
     question: "Why are provider names hidden at first?",
-    answer: "So your first comparison is about fit, not brand. Names are shown after you review your requirements with an MMHR advisor, before any RFP goes out.",
+    answer: "So you compare and pick on fit, not brand. After you pick, the names of your picks are shown when you review your requirements with an MMHR advisor, before any RFP goes out. Recognize one you already know and do not want? Swap it for another match.",
   },
   {
     question: "Does a referral fee change my results?",

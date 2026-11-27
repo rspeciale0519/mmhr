@@ -111,9 +111,9 @@ export function CobaltBody() {
         <div className="co-board-wrap">
           <div>
             <p className="co-lede co-enter" style={{ ["--co-delay" as string]: "420ms" }}>
-              Answer one needs list. See every match scored against it, with vendor
-              names masked until you review your requirements with an advisor. Pick
-              up to five contenders and we send one approved RFP.
+              Answer one needs list. See every match scored against it, with
+              provider names masked. Pick up to five on fit, see their names at
+              your advisor review, and we send one approved RFP.
             </p>
             <div className="co-ctas co-enter" style={{ ["--co-delay" as string]: "520ms" }}>
               <Magnetic>

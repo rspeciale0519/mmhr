@@ -13,12 +13,18 @@ No vendor user signs in for this. See [vendor-entry.md](./vendor-entry.md).
 1. A customer creates a free account and gets a private workspace.
 2. The customer enters software needs and submits them.
 3. The customer sees all published vendor options in the comparison matrix. Vendor names are hidden.
-4. The customer selects a maximum of five options.
-5. Staff talk with the customer and record the disclosure of vendor names.
+4. The customer selects a maximum of five options while vendor names are still hidden ("pick first", owner decision, 2026-11-27).
+5. Staff talk with the customer (the advisor review) and record the disclosure of vendor names, for the selected options only.
+   If the customer recognizes a selected vendor that they already know and do not want, the customer can replace it with another option
+   (owner decision, 2026-11-27). The app does not support this yet: a selection can only be added to, up to five, and no replace command exists.
 6. Staff approve the RFP and send it out to each selected vendor's contact by email (owner decision, 2026-11-17).
    The vendor does not need to sign in. The vendor workspace records the send, the due date, and each follow-up.
 7. The vendor replies outside the app, usually by email. Staff record the reply and its status in the vendor workspace.
    A vendor may still join and answer in the portal, but that is the rare case, not the launch path.
+
+The public site shows this path as six steps: 1 Share your needs, 2 Compare masked, 3 Pick up to five (names still masked),
+4 Advisor review (names of the picks only; a pick the buyer knows and does not want can be swapped for another match),
+5 One approved RFP, 6 Sign direct. Source: `src/designs/cobalt/landing/sample-ranking.ts`.
 
 Launch is ready when one customer and staff complete this path on hosted staging, with one vendor reply recorded.
 Demos, proposals, contract handoff, and account recovery are manual work at launch. Use [the pilot operating procedure](./mvp-pilot-operating-procedure.md).
@@ -27,7 +33,7 @@ Demos, proposals, contract handoff, and account recovery are manual work at laun
 
 1. One customer cannot see the data of a different customer.
 2. One vendor cannot see the replies of a competitor.
-3. Vendor names stay hidden until staff record the disclosure.
+3. Vendor names stay hidden until staff record the disclosure. Only the options the customer selected are disclosed.
 4. Commission amounts stay hidden and do not change a score.
 5. Staff logins have strong protection.
 
@@ -103,6 +109,7 @@ To block in trim task 7: `/designs` and `/gallery`.
 
 ## Owner decisions that stay open
 
+- Whether the in-app replace step (path step 5, decided 2026-11-27) must be built before launch, or handled by staff at first.
 - Approval of the Gusto and Rippling draft records. Until then, launch uses the eight approved products.
 - Removal of one expired local worker login, which task 3 needs before the local server starts.
 - Each external staging action and each production action.

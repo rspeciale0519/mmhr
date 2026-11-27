@@ -619,7 +619,8 @@
 }
 .co-hiw-board li {
   display: grid;
-  grid-template-columns: 26px minmax(0, 9.5em) minmax(0, 1fr) 30px;
+  /* rank, name, bar, score, pick ("Pick" / "Out" / empty). */
+  grid-template-columns: 26px minmax(0, 9.5em) minmax(0, 1fr) 30px 34px;
   /* Row 2 holds the fee chip; it opens from 0fr when fees are shown. */
   grid-template-rows: auto 0fr;
   column-gap: 12px;
@@ -675,11 +676,13 @@
   translate: 0 110%;
   opacity: 0;
 }
-.co-hiw-mask[data-view="named"] .co-hiw-name-m {
+/* After the advisor review only the picked rows (data-named) show a name:
+   a match the buyer did not pick stays masked. */
+.co-hiw-board li[data-named] .co-hiw-name-m {
   translate: 0 -110%;
   opacity: 0;
 }
-.co-hiw-mask[data-view="named"] .co-hiw-name-r {
+.co-hiw-board li[data-named] .co-hiw-name-r {
   translate: 0 0;
   opacity: 1;
 }
@@ -722,6 +725,52 @@
   transition: opacity 0.3s ease-out, translate 0.5s var(--co-spring);
   transition-delay: calc(var(--i, 0) * 70ms);
 }
+/* The pick cell: a small mint "Pick", or a struck-through "Out" for a pick
+   the buyer swapped after seeing its name. */
+.co-hiw-pick {
+  justify-self: end;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  color: var(--co-mute);
+}
+.co-hiw-board li[data-pick="pick"] .co-hiw-pick {
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(142, 240, 201, 0.45);
+  color: #0b5a3e;
+}
+.co-hiw-board li[data-pick="out"] .co-hiw-pick {
+  text-decoration: line-through;
+}
+.co-hiw-board li[data-pick="out"] .co-hiw-name-r {
+  color: var(--co-mute);
+}
+
+/* The swap offer under the rows, and its button (after the review only). */
+.co-hiw-swap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 12px;
+  padding: 12px 10px 0;
+  border-top: 1px solid var(--co-line);
+}
+.co-hiw-swap p {
+  flex: 1 1 16em;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--co-ink2);
+}
+.co-hiw-swap-btn.co-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+}
+
 .co-hiw-mask[data-fees="on"] .co-hiw-board li {
   grid-template-rows: auto 1fr;
 }
@@ -947,7 +996,7 @@
     padding: 16px;
   }
   .co-hiw-board li {
-    grid-template-columns: 22px minmax(0, 7.5em) minmax(0, 1fr) 26px;
+    grid-template-columns: 22px minmax(0, 7.5em) minmax(0, 1fr) 26px 32px;
     column-gap: 9px;
     padding: 10px 6px;
   }
@@ -988,7 +1037,7 @@
     animation-delay: calc(450ms + var(--i, 0) * 90ms);
   }
   /* ...a name flashes mint as it is revealed... */
-  .co-hiw-mask[data-view="named"] .co-hiw-name-r {
+  .co-hiw-board li[data-named] .co-hiw-name-r {
     animation: co-hiw-flash 1.2s ease-out backwards;
     animation-delay: calc(var(--i, 0) * 80ms);
   }
@@ -1084,7 +1133,7 @@
   .co-hiw-fee {
     translate: none;
   }
-  .co-hiw-mask[data-view="named"] .co-hiw-name-m {
+  .co-hiw-board li[data-named] .co-hiw-name-m {
     translate: none;
   }
 }

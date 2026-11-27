@@ -46,12 +46,12 @@ export const flowStages: readonly FlowStage[] = [
   {
     title: "Your five picks",
     tag: "You choose",
-    body: "You pick up to five contenders from the ranking. The choice is yours, not MMHR's.",
+    body: "You pick up to five contenders from the ranking while names are still masked. The choice is yours, not MMHR's.",
   },
   {
     title: "One approved RFP",
     tag: "Sent once you approve",
-    body: "You review your requirements with an MMHR advisor, and provider names are shown. MMHR then sends one RFP that you approved to each provider you picked.",
+    body: "You review your requirements with an MMHR advisor and see the names of your picks. Recognize one you already know and do not want? Swap it for another match. MMHR then sends one RFP that you approved to each provider you picked.",
   },
   {
     title: "You sign direct",
