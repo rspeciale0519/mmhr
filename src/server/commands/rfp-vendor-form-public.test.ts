@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { rfpFormTokenHash } from "@/server/workflows/rfp-vendor-form-link";
 import {
-  addPublicRfpFile, detectUploadType, readPublicRfpForm, removePublicRfpFile, savePublicRfpAnswers, submitPublicRfpForm,
+  addPublicRfpFile, detectUploadType, readPublicRfpForm, removePublicRfpFile, reopenPublicRfpForm, savePublicRfpAnswers,
+  submitPublicRfpForm,
 } from "./rfp-vendor-form-public";
 
 vi.mock("server-only", () => ({}));
@@ -84,6 +85,26 @@ describe("submitting", () => {
     await expect(submitPublicRfpForm(token, { name: "", email: "pat@northwind.example" }, options)).resolves.toEqual({ ok: false, reason: "invalid" });
     await expect(submitPublicRfpForm(token, { name: "Pat", email: "not-an-email" }, options)).resolves.toEqual({ ok: false, reason: "invalid" });
     expect(rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe("reopening", () => {
+  test("reopens a submitted form by the token hash", async () => {
+    rpc.mockResolvedValue({ data: { reopened: true, state: "sent" }, error: null });
+    await expect(reopenPublicRfpForm(token, options)).resolves.toEqual({ ok: true });
+    expect(rpc).toHaveBeenCalledExactlyOnceWith("mmhr_vendor_rfp_form_reopen", { p_token_hash });
+  });
+
+  test("reports a form that cannot be reopened as locked", async () => {
+    rpc.mockResolvedValue({ data: { reopened: false, state: "declined" }, error: null });
+    await expect(reopenPublicRfpForm(token, options)).resolves.toEqual({ ok: false, reason: "locked" });
+  });
+
+  test("refuses a malformed link before any database call and reports a failed call", async () => {
+    await expect(reopenPublicRfpForm("short", options)).resolves.toEqual({ ok: false, reason: "invalid" });
+    expect(rpc).not.toHaveBeenCalled();
+    rpc.mockResolvedValue({ data: null, error: { message: "down" } });
+    await expect(reopenPublicRfpForm(token, options)).resolves.toEqual({ ok: false, reason: "unavailable" });
   });
 });
 

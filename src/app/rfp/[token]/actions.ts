@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { RFP_TAB_KEYS } from "@/lib/rfp-form-library";
 import { requireTrustedServerActionOrigin } from "@/server/auth/server-action-request";
 import {
-  removePublicRfpFile, savePublicRfpAnswers, submitPublicRfpForm, type PublicFormResult,
+  removePublicRfpFile, reopenPublicRfpForm, savePublicRfpAnswers, submitPublicRfpForm, type PublicFormResult,
 } from "@/server/commands/rfp-vendor-form-public";
 
 /**
@@ -32,6 +32,12 @@ export async function saveRfpAnswersAction(token: string, answers: unknown): Pro
 export async function submitRfpFormAction(token: string, input: { name: string; email: string }): Promise<PublicFormResult> {
   await checkOrigin();
   return submitPublicRfpForm(token, input);
+}
+
+/** Reopens a submitted form so the vendor can edit it. Answers are kept. */
+export async function reopenRfpFormAction(token: string): Promise<PublicFormResult> {
+  await checkOrigin();
+  return reopenPublicRfpForm(token);
 }
 
 /** Removes one uploaded document. */
