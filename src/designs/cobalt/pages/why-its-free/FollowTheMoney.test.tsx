@@ -1,7 +1,9 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vitest";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { FollowTheMoney } from "./FollowTheMoney";
+import { installMotionDoubles, observers } from "@/designs/cobalt/motion/test-helpers";
+
+import { FollowTheMoney, STEP_MS } from "./FollowTheMoney";
 import { flowStages } from "./money-flow";
 
 afterEach(cleanup);
@@ -87,5 +89,96 @@ describe("Follow the money", () => {
     expect(tableRows()).toEqual(before);
     expect(screen.getByText("Highest fee in the sample")).toBeInTheDocument();
     expect(liveText(container)).toContain("Provider D now pays the highest fee in this sample. It is still fourth");
+  });
+});
+
+describe("Follow the money: play, preview and motion hooks", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  test("Play the story steps on by itself and any manual step pauses it", () => {
+    vi.useFakeTimers();
+    const { container } = render(<FollowTheMoney />);
+    fireEvent.click(screen.getByRole("button", { name: "Play the story" }));
+    expect(screen.getByRole("button", { name: "Pause the story" })).toBeInTheDocument();
+    expect(container.querySelector(".co-fm")).toHaveAttribute("data-playing");
+
+    act(() => vi.advanceTimersByTime(STEP_MS));
+    expect(stageButtons()[1]).toHaveAttribute("aria-current", "step");
+    expect(liveText(container)).toContain("Step 2 of 7: Scoring.");
+    act(() => vi.advanceTimersByTime(STEP_MS));
+    expect(stageButtons()[2]).toHaveAttribute("aria-current", "step");
+
+    // Previous is a manual step: the story pauses and stays put.
+    fireEvent.click(screen.getByRole("button", { name: "Previous" }));
+    expect(screen.getByRole("button", { name: "Play the story" })).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(STEP_MS * 3));
+    expect(stageButtons()[1]).toHaveAttribute("aria-current", "step");
+  });
+
+  test("the story stops at the referral fee, and Play then starts again from step 1", () => {
+    vi.useFakeTimers();
+    render(<FollowTheMoney />);
+    fireEvent.click(stageButtons()[5]!);
+    fireEvent.click(screen.getByRole("button", { name: "Play the story" }));
+    act(() => vi.advanceTimersByTime(STEP_MS));
+    expect(stageButtons()[6]).toHaveAttribute("aria-current", "step");
+    expect(screen.getByRole("button", { name: "Play the story" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play the story" }));
+    expect(stageButtons()[0]).toHaveAttribute("aria-current", "step");
+    expect(screen.getByRole("button", { name: "Pause the story" })).toBeInTheDocument();
+  });
+
+  test("off screen the story holds its place; particles run only on screen", () => {
+    installMotionDoubles();
+    vi.useFakeTimers();
+    const { container } = render(<FollowTheMoney />);
+    const stage = container.querySelector<HTMLElement>(".co-fm")!;
+    const watcher = observers.find((observer) => observer.elements.includes(stage))!;
+    expect(stage).not.toHaveAttribute("data-live");
+
+    act(() => watcher.fire(stage, true));
+    expect(stage).toHaveAttribute("data-live");
+    act(() => watcher.fire(stage, false));
+    expect(stage).not.toHaveAttribute("data-live");
+
+    fireEvent.click(screen.getByRole("button", { name: "Play the story" }));
+    act(() => vi.advanceTimersByTime(STEP_MS * 2));
+    expect(stageButtons()[0]).toHaveAttribute("aria-current", "step");
+
+    act(() => watcher.fire(stage, true));
+    act(() => vi.advanceTimersByTime(STEP_MS));
+    expect(stageButtons()[1]).toHaveAttribute("aria-current", "step");
+  });
+
+  test("hovering a stage previews it and lights its lines without selecting it", () => {
+    const { container } = render(<FollowTheMoney />);
+    const third = stageButtons()[2]!;
+    fireEvent.pointerEnter(third, { pointerType: "mouse" });
+
+    expect(screen.getByRole("heading", { level: 3, name: "Ranked, names masked" })).toBeInTheDocument();
+    expect(screen.getByText("Preview")).toBeInTheDocument();
+    expect(third).toHaveAttribute("data-shown");
+    expect(stageButtons()[0]).toHaveAttribute("aria-current", "step");
+    // The lines into and out of stage 3 glow; the others do not.
+    const hot = [...container.querySelectorAll(".co-fm-wire")].map((wire) => wire.hasAttribute("data-hot"));
+    expect(hot).toEqual([false, true, true, false, false, false]);
+    // A preview is not a change of step: nothing is announced.
+    expect(liveText(container)).toBe("");
+
+    fireEvent.pointerLeave(screen.getByRole("list", { name: /seven stages/i }), { pointerType: "mouse" });
+    expect(screen.getByRole("heading", { level: 3, name: "Your needs list" })).toBeInTheDocument();
+    expect(screen.queryByText("Preview")).toBeNull();
+  });
+
+  test("a touch does not preview; the light and depth stay off without a mouse", () => {
+    const { container } = render(<FollowTheMoney />);
+    fireEvent.pointerEnter(stageButtons()[3]!, { pointerType: "touch" });
+    expect(screen.queryByText("Preview")).toBeNull();
+    expect(container.querySelector(".co-fm")).not.toHaveAttribute("data-pointer");
   });
 });

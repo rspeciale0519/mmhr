@@ -438,3 +438,19 @@
     padding-right: 0;
   }
 }
+
+/* Phones: a sideways start pose would stick out past the edge of a narrow
+   screen and let the page scroll sideways while the element waits. So on
+   narrow screens the "left" and "right" entrances rise from below instead. */
+@media (max-width: 720px) {
+  [data-co-reveal="wait"][data-co-variant="left"],
+  [data-co-reveal="wait"][data-co-variant="right"] {
+    translate: 0 32px;
+  }
+  @keyframes co-rv-left {
+    from { opacity: 0; translate: 0 32px; }
+  }
+  @keyframes co-rv-right {
+    from { opacity: 0; translate: 0 32px; }
+  }
+}

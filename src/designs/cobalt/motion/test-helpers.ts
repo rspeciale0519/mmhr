@@ -23,8 +23,11 @@ export class FakeObserver {
     this.elements = [];
   }
   /** Pretends `element` scrolled into (or out of) view. */
-  fire(element: Element, isIntersecting = true) {
-    this.callback([{ target: element, isIntersecting } as unknown as IntersectionObserverEntry], this as unknown as IntersectionObserver);
+  fire(element: Element, isIntersecting = true, bottom = 100) {
+    // `bottom` is where the element's bottom edge is; below 0 means the
+    // visitor has scrolled (or jumped) past it.
+    const entry = { target: element, isIntersecting, boundingClientRect: { bottom } };
+    this.callback([entry as unknown as IntersectionObserverEntry], this as unknown as IntersectionObserver);
   }
 }
 

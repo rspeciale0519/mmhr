@@ -84,3 +84,45 @@ export function statusChangeTimes(): number[] {
   ]);
   return [...new Set(times)].sort((a, b) => a - b);
 }
+
+/**
+ * The four stages the stepper above the illustration can jump to. Each one
+ * is the first moment when every provider has reached that status, so the
+ * picture and the list show that step for the whole shortlist. "Answered"
+ * jumps to the end, when the last answer is back at the buyer.
+ */
+export type FlowStage = { readonly status: Exclude<RfpFlowStatus, "Not sent">; readonly at: number };
+
+const reachedBy = (key: "sentAt" | "openedAt" | "answeringAt") =>
+  Math.max(...flowProviders.map((provider) => provider[key]));
+
+export const flowStages: readonly FlowStage[] = [
+  { status: "Sent", at: reachedBy("sentAt") },
+  { status: "Opened", at: reachedBy("openedAt") },
+  { status: "Answering", at: reachedBy("answeringAt") },
+  { status: "Answered", at: FLOW_END_SECONDS },
+];
+
+/**
+ * The stage a moment belongs to: the index of the last stage already
+ * reached, or -1 before the first one. Infinity counts as the last stage.
+ */
+export function stageIndexAt(seconds: number): number {
+  let index = -1;
+  flowStages.forEach((stage, position) => {
+    if (seconds >= stage.at) index = position;
+  });
+  return index;
+}
+
+/**
+ * How full each stage's bar in the stepper is at a moment, from 0 to 1.
+ * Bar 1 fills from the start of the replay to stage 1, bar 2 from stage 1
+ * to stage 2, and so on, so a bar is exactly full when its stage arrives.
+ */
+export function stageFill(seconds: number): number[] {
+  return flowStages.map((stage, index) => {
+    const from = index === 0 ? 0 : flowStages[index - 1].at;
+    return Math.min(1, Math.max(0, (seconds - from) / (stage.at - from)));
+  });
+}

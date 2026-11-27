@@ -8,5 +8,9 @@
  * lower down), then to "in" as they arrive; home.css and motion-kit.css play
  * the entrance. Without JavaScript, with reduced motion, or after unmount,
  * every block is shown. See motion/reveal-observer.ts for the rules.
+ *
+ * The home page itself no longer renders it: its blocks use Reveal,
+ * RevealGroup and SplitText directly. Kept for markup that cannot be
+ * wrapped, and covered by ScrollReveal.test.tsx.
  */
 export { RevealAll as ScrollReveal } from "../motion/Reveal";

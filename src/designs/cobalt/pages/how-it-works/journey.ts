@@ -73,6 +73,12 @@ export const afterRfp = [
 ] as const;
 
 /**
+ * Who acts in each line of `afterRfp`, shown as a small chip on its card.
+ * Same order as `afterRfp`; each one names the subject of its sentence.
+ */
+export const afterRfpWho = ["MMHR", "Provider", "MMHR", "You"] as const;
+
+/**
  * Buyer questions, answered directly. These exact strings are both shown on
  * the page and published as FAQPage structured data, so keep them identical
  * and true.

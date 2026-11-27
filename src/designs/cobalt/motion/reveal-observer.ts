@@ -41,22 +41,48 @@ function revealFocused(event: FocusEvent) {
   }
 }
 
+// The observer only reports an element when it crosses the edge of the
+// screen. A fast fling, a link to a lower section or the End key can carry an
+// element from below the screen to above it between two checks, so it would
+// stay hidden. After each scroll (at most once per frame) show everything
+// that is now above the top of the screen.
+let sweepQueued = false;
+function sweepPassed() {
+  if (sweepQueued) return;
+  sweepQueued = true;
+  requestAnimationFrame(() => {
+    sweepQueued = false;
+    for (const element of watched) {
+      if (element.getAttribute(REVEAL_ATTRIBUTE) === "wait" && element.getBoundingClientRect().bottom < 0) reveal(element);
+    }
+  });
+}
+
 function start() {
   observer = new IntersectionObserver(
     (entries) => {
-      for (const entry of entries) if (entry.isIntersecting) reveal(entry.target);
+      for (const entry of entries) {
+        // Show it when it comes on screen. Also show it when the visitor has
+        // jumped past it (a link to a section lower down, or the End key):
+        // its bottom edge is then above the top of the screen, and without
+        // this it would stay hidden until they scrolled back up.
+        if (entry.isIntersecting || entry.boundingClientRect.bottom < 0) reveal(entry.target);
+      }
     },
     // Start a little before the element's top reaches the bottom of the
     // screen, so it is already moving when the visitor sees it.
     { rootMargin: "0px 0px -8% 0px" },
   );
   document.addEventListener("focusin", revealFocused);
+  // passive: this listener only looks, it never blocks scrolling.
+  window.addEventListener("scroll", sweepPassed, { passive: true });
 }
 
 function stop() {
   observer?.disconnect();
   observer = null;
   document.removeEventListener("focusin", revealFocused);
+  window.removeEventListener("scroll", sweepPassed);
 }
 
 /**

@@ -1,6 +1,6 @@
 # MMHR — Current State
 
-Updated: 2026-11-25. Public site PR 1 is built on `claude/project-thread-9rznrd`: buyer-journey menu, full home page, and real pages. Type check, lint, 5,660 unit tests, and build passed. See journal/2026-11-25.md.
+Updated: 2026-11-27. Bold motion and interaction pass added to public site PR 1 (PR #49) on `claude/project-thread-9rznrd`: shared motion toolkit plus interactive pieces on every public page. Type check, lint, 5,763 unit tests, and build passed. See journal/2026-11-27.md.
 
 ## Public site (2026-11-25, owner decisions)
 - Menu pages: `/how-it-works`, `/why-its-free`, `/for-providers`, `/resources`. `/blog` and everything under `/resources/` stay blocked in `src/lib/launch-surface.ts` until built and approved. This replaces the "hide most public pages" part of the trim direction for these four pages only.

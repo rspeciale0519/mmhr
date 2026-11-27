@@ -1,3 +1,4 @@
+import { RevealGroup, Tilt } from "../motion";
 import { homeFacts } from "./home-content";
 
 /**
@@ -5,7 +6,7 @@ import { homeFacts } from "./home-content";
  * (for 5: 0, 1, 2, 3, 4, 5) inside a window one digit tall. home.css slides
  * the column up so the last digit, the real value, sits in the window.
  *
- * When the strip scrolls into view (ScrollReveal sets `data-co-reveal="in"`
+ * When the strip scrolls into view (RevealGroup sets `data-co-reveal="in"`
  * on the list), the column starts at its first digit and slides to the last
  * one, so the number visibly counts and settles. With reduced motion, no
  * JavaScript, or before scrolling, the column already shows the value.
@@ -38,21 +39,25 @@ function Odometer({ from, value, index }: { from: number; value: number; index: 
  *
  * The digits are decoration (aria-hidden); each item also carries the number
  * as visually hidden text, so screen readers read "1 needs list to answer...".
+ *
+ * Motion: the four cards rise in one after another (RevealGroup) while
+ * their digits roll; each card tilts toward the mouse with a light under the
+ * cursor (Tilt), and its digit lifts on hover (home.css).
  */
 export function HomeFacts() {
   return (
     <section className="co-home-facts" aria-label="MatchMaker HR at a glance">
-      <ul data-co-reveal="">
+      <RevealGroup as="ul" stagger={90}>
         {homeFacts.map((fact, index) => (
-          <li key={fact.label}>
+          <Tilt as="li" innerClassName="co-gl co-home-fact" key={fact.label} max={5} spotlight>
             <Odometer from={fact.from} value={fact.value} index={index} />
             <p>
               <span className="co-home-vh">{fact.value} </span>
               {fact.label}
             </p>
-          </li>
+          </Tilt>
         ))}
-      </ul>
+      </RevealGroup>
     </section>
   );
 }

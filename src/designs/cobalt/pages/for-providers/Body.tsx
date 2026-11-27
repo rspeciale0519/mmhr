@@ -1,9 +1,16 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
+import { Magnetic, Tilt } from "../../motion/pointer";
+import { Reveal, type RevealVariant } from "../../motion/Reveal";
+import { Parallax } from "../../motion/scroll";
 import { CtaBand } from "../CtaBand";
 import { PageHero } from "../PageHero";
 import { PageSection } from "../PageSection";
 import { QuestionsAndAnswers } from "../QuestionsAndAnswers";
+import { RuleIcon } from "./icons";
+import { PathTrack } from "./PathTrack";
+import { ReplyPaths } from "./ReplyPaths";
 import { RfpFlow } from "./RfpFlow";
 import "./for-providers.css";
 
@@ -20,6 +27,14 @@ import "./for-providers.css";
  * src/app/(marketing)/_site/public-commission-claims.test.ts.
  *
  * Styles: ./for-providers.css. Shared blocks: src/designs/cobalt/pages/.
+ *
+ * Motion (toolkit: src/designs/cobalt/motion/): every card and list row
+ * enters as it scrolls into view, with a different entrance per section;
+ * cards tilt toward the mouse with a light under the cursor; the path's
+ * lines draw in as the page scrolls (PathTrack); soft glows behind two
+ * sections drift at their own rate (Parallax); the main buttons lean toward
+ * the mouse (Magnetic). The interactive parts are RfpFlow (stepper, pause,
+ * replay) and ReplyPaths (web form or email).
  */
 
 /** The path from listing to signed contract, as six short steps. */
@@ -53,18 +68,21 @@ const pathSteps = [
 /** Why rank cannot be bought: three short rules. */
 const rankRules = [
   {
+    icon: "fit",
     title: "Scored on the buyer's needs",
     body: "Each option gets a fit score against the needs list this buyer submitted. A closer fit ranks higher.",
   },
   {
+    icon: "fee",
     title: "Fees are not an input",
     body: "The referral fee is never an input to rank. Who pays MMHR, and how much, never changes results.",
   },
   {
+    icon: "mask",
     title: "Masked until review",
     body: "Buyers compare fit with provider names masked, until they review requirements with an MMHR advisor.",
   },
-] as const;
+] as const satisfies readonly { icon: "fit" | "fee" | "mask"; title: string; body: string }[];
 
 /** What answering the RFP involves for the provider. */
 const answeringFacts = [
@@ -74,6 +92,12 @@ const answeringFacts = [
   "Submitting locks the form. The link stops taking changes after the due date.",
   "Prefer email? Reply to MMHR by email instead, and staff record your reply.",
 ] as const;
+
+/** Entrances for the six path steps and the three rules, in turn. */
+const stepVariants: readonly RevealVariant[] = ["rise", "scale", "rise", "scale", "rise", "scale"];
+// No "right" entrance: while it waits off to the right, it would widen a
+// phone's page for a moment.
+const ruleVariants: readonly RevealVariant[] = ["left", "rise", "scale"];
 
 const questions = [
   {
@@ -114,7 +138,9 @@ export function ForProvidersBody() {
         lede="You do not need to join MatchMaker HR or create an account. When a buyer shortlists your product, MMHR emails you one RFP with that buyer's real requirements, and you answer through a private link."
         actions={
           <>
-            <Link className="co-btn co-btn-p" href="/contact">Contact the MMHR team</Link>
+            <Magnetic>
+              <Link className="co-btn co-btn-p" href="/contact">Contact the MMHR team</Link>
+            </Magnetic>
             <a className="co-btn co-btn-g" href="#rfp-flow">See how an RFP reaches you</a>
           </>
         }
@@ -133,34 +159,59 @@ export function ForProvidersBody() {
         title="From listing to signed contract"
         intro="MMHR staff do the listing and the send-out. You answer one RFP per buyer."
       >
-        <ol className="co-fp-path">
+        <PathTrack>
           {pathSteps.map((step, index) => (
-            <li className="co-fp-rv" key={step.title}>
-              <span className="co-num">{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
-            </li>
+            <Reveal
+              as="li"
+              className="co-fp-path-step"
+              index={index % 3}
+              key={step.title}
+              // --s: the step's place on the path, for the line that draws in.
+              style={{ "--s": index } as CSSProperties}
+              variant={stepVariants[index]}
+            >
+              <Tilt innerClassName="co-fp-card" max={4} spotlight>
+                <span className="co-num">{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </Tilt>
+            </Reveal>
           ))}
-        </ol>
+        </PathTrack>
       </PageSection>
 
       <PageSection id="ranking" title="Rank is earned on fit" intro="Paying MMHR never changes where you rank.">
         <div className="co-fp-rules">
-          {rankRules.map((rule) => (
-            <div className="co-fp-rv" key={rule.title}>
-              <h3>{rule.title}</h3>
-              <p>{rule.body}</p>
-            </div>
+          {/* Decorative depth: two soft glows that drift as the page scrolls. */}
+          <Parallax aria-hidden="true" className="co-fp-deco co-fp-deco-a" max={90} speed={0.25} />
+          <Parallax aria-hidden="true" className="co-fp-deco co-fp-deco-b" max={70} speed={-0.18} />
+          {rankRules.map((rule, index) => (
+            <Reveal index={index} key={rule.title} variant={ruleVariants[index]}>
+              <Tilt className="co-fp-rule" innerClassName="co-fp-card co-fp-rule-in" max={6} spotlight>
+                <span className="co-fp-ico">
+                  <RuleIcon name={rule.icon} />
+                </span>
+                <h3>{rule.title}</h3>
+                <p>{rule.body}</p>
+              </Tilt>
+            </Reveal>
           ))}
         </div>
       </PageSection>
 
       <PageSection id="answering" title="Answering the RFP" intro="No account, no portal, no sign-in.">
-        <ul className="co-fp-facts">
-          {answeringFacts.map((fact) => (
-            <li className="co-fp-rv" key={fact}>{fact}</li>
-          ))}
-        </ul>
+        <div className="co-fp-answer">
+          <ul className="co-fp-facts">
+            {answeringFacts.map((fact, index) => (
+              <Reveal as="li" index={index} key={fact} variant="left">
+                <span className="co-fp-fact">{fact}</span>
+              </Reveal>
+            ))}
+          </ul>
+          <Reveal delay={160} variant="scale">
+            <ReplyPaths />
+          </Reveal>
+        </div>
       </PageSection>
 
       <PageSection id="questions" title="Questions from providers">

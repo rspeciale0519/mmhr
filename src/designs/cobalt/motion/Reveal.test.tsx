@@ -38,6 +38,17 @@ describe("Reveal", () => {
     expect(observed()).toEqual([]);
   });
 
+  test("shows a waiting element the visitor jumped past, and keeps one still below hidden", () => {
+    render(<Reveal data-testid="below">Later</Reveal>);
+    const element = screen.getByTestId("below");
+    // Not on screen and still below it: keep waiting.
+    observers[0]!.fire(element, false, 900);
+    expect(element).toHaveAttribute("data-co-reveal", "wait");
+    // Not on screen because it is now above it: show it.
+    observers[0]!.fire(element, false, -40);
+    expect(element).toHaveAttribute("data-co-reveal", "in");
+  });
+
   test("shows a waiting element at once when keyboard focus lands inside it", () => {
     render(
       <Reveal data-testid="below">

@@ -5,6 +5,9 @@ import {
   RFP_FLOW_STATUSES,
   TRAVEL_SECONDS,
   flowProviders,
+  flowStages,
+  stageFill,
+  stageIndexAt,
   statusAt,
   statusChangeTimes,
   statusStep,
@@ -49,5 +52,25 @@ describe("RFP flow timeline", () => {
     for (const provider of flowProviders) {
       expect(times).toEqual(expect.arrayContaining([provider.sentAt, provider.openedAt, provider.answeringAt, provider.answeredAt]));
     }
+  });
+
+  test("each stage is the moment every provider has reached it", () => {
+    expect(flowStages.map((stage) => stage.status)).toEqual(["Sent", "Opened", "Answering", "Answered"]);
+    for (const stage of flowStages) {
+      const steps = flowProviders.map((provider) => statusStep(statusAt(provider, stage.at)));
+      expect(Math.min(...steps)).toBe(statusStep(stage.status));
+    }
+    expect(flowStages.at(-1)?.at).toBe(FLOW_END_SECONDS);
+  });
+
+  test("knows the stage of any moment, and how full each stepper bar is", () => {
+    expect(stageIndexAt(0)).toBe(-1);
+    expect(stageIndexAt(flowStages[1].at)).toBe(1);
+    expect(stageIndexAt(Number.POSITIVE_INFINITY)).toBe(flowStages.length - 1);
+    expect(stageFill(0)).toEqual([0, 0, 0, 0]);
+    expect(stageFill(flowStages[1].at)).toEqual([1, 1, 0, 0]);
+    expect(stageFill(Number.POSITIVE_INFINITY)).toEqual([1, 1, 1, 1]);
+    const half = stageFill(flowStages[0].at / 2);
+    expect(half[0]).toBeCloseTo(0.5);
   });
 });

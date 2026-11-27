@@ -1315,3 +1315,4 @@ Full38069 exits0 with360 files/4068 tests. No test process remains live. Custome
 - 2026-11-23: Cobalt iPhone shrink-to-fit (690px layout in a 390px visual viewport) fixed by clipping glow overflow. Type check, lint, 5,513 tests, Playwright e2e, and build passed. See journal/2026-11-23.md.
 - 2026-11-24: Home page live 3D matching demo and Cobalt motion built on `claude/project-thread-9rznrd`. Type check, lint, 5,524 tests, and build passed. See journal/2026-11-24.md.
 - 2026-11-25: PR #48 merged. Public site PR 1 built on `claude/project-thread-9rznrd`: buyer-journey menu, full home page, four real pages, newsletter moved to Resend. Type check, lint, 5,660 tests, and build passed. See journal/2026-11-25.md.
+- 2026-11-27: Bold motion and interaction pass on the public site (PR #49): shared motion toolkit in `src/designs/cobalt/motion/`, interactive pieces on all five public pages. Type check, lint, 5,763 tests, and build passed. See journal/2026-11-27.md.

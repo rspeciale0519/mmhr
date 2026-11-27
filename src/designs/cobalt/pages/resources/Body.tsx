@@ -1,8 +1,11 @@
+import { Magnetic } from "../../motion/pointer";
 import { CtaBand } from "../CtaBand";
 import { JsonLd, type JsonLdValue } from "../JsonLd";
 import { PageHero } from "../PageHero";
 import { PageSection } from "../PageSection";
+import { Checklist } from "./Checklist";
 import { checklistSteps, glossaryTerms } from "./content";
+import { Glossary } from "./Glossary";
 import "./resources.css";
 
 /**
@@ -20,6 +23,14 @@ import "./resources.css";
  * buttons below only jump to sections of this page (#checklist, #glossary).
  *
  * Styles: ./resources.css. Shared blocks: src/designs/cobalt/pages/.
+ *
+ * Interactive parts (Client Components, fully server-rendered):
+ * - Checklist.tsx: checkable steps with a progress ring and a count, kept
+ *   in this browser (checklist-store.ts), with a reset button.
+ * - Glossary.tsx: live search with highlighted matches, A to Z letter
+ *   chips, animated filtering, and cards that open to related terms.
+ * Every step and term enters as it scrolls into view and responds to the
+ * mouse (motion toolkit: src/designs/cobalt/motion/).
  */
 
 /**
@@ -52,7 +63,9 @@ export function ResourcesBody() {
         lede="Plain-language help for choosing HR software. Use the buyer's checklist and the glossary below today, whether or not you use MatchMaker HR."
         actions={
           <>
-            <a className="co-btn co-btn-p" href="#checklist">Read the checklist</a>
+            <Magnetic>
+              <a className="co-btn co-btn-p" href="#checklist">Read the checklist</a>
+            </Magnetic>
             <a className="co-btn co-btn-g" href="#glossary">Open the glossary</a>
           </>
         }
@@ -63,17 +76,7 @@ export function ResourcesBody() {
         title="How to choose HR software: a short buyer's checklist"
         intro="General good practice for any buyer and any provider. Work through it in order before you compare options."
       >
-        <ol className="co-res-steps">
-          {checklistSteps.map((step, index) => (
-            <li className="co-res-rv" key={step.title}>
-              <span aria-hidden="true" className="co-res-n">{String(index + 1).padStart(2, "0")}</span>
-              <div>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <Checklist steps={checklistSteps} />
       </PageSection>
 
       <PageSection
@@ -81,17 +84,7 @@ export function ResourcesBody() {
         title="HR software terms, in plain language"
         intro="Short definitions of the words you will meet when you compare HR software."
       >
-        <dl className="co-res-terms">
-          {glossaryTerms.map((entry) => (
-            <div className="co-res-rv" key={entry.term}>
-              <dt>
-                <dfn>{entry.term}</dfn>
-                {entry.expansion ? <span>{entry.expansion}</span> : null}
-              </dt>
-              <dd>{entry.definition}</dd>
-            </div>
-          ))}
-        </dl>
+        <Glossary terms={glossaryTerms} />
         <JsonLd data={glossaryData()} />
         <p className="co-res-next">
           Coming next: buyer guides, a fuller glossary, and a short quiz are being prepared for this section.

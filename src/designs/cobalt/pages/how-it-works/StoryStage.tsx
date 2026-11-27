@@ -12,6 +12,8 @@ import {
   LineLoop,
   LineSegments,
   PerspectiveCamera,
+  Points,
+  PointsMaterial,
   Scene,
   Sprite,
   SpriteMaterial,
@@ -19,7 +21,8 @@ import {
   WebGLRenderer,
 } from "three";
 
-import { RING_SCORES, needPlace, radiusFor, sceneAt, sceneNeeds } from "./story-scene";
+import { FINE_POINTER, matches } from "../../motion/media";
+import { RING_SCORES, activeStepAt, needPlace, radiusFor, sceneAt, sceneNeeds } from "./story-scene";
 
 type Props = {
   /**
@@ -37,8 +40,34 @@ const BRIGHT = new Color(0xd3dcff); // a provider with a tag (top five)
 const MINT = new Color(0x8ef0c9); // a picked contender, and "your needs"
 
 // The camera looks down at the field from this angle (radians) on a wide
-// stage, and from higher up on a tall one (see resize below).
+// stage, and from higher up on a tall one (see resize below). Through the
+// story it sinks a little lower (ELEVATION_DRIFT at step 01, none at 06),
+// so scrolling feels like a slow camera move, not just dots changing.
 const ELEVATION = 0.5;
+const ELEVATION_DRIFT = 0.09;
+
+// How quickly the picture catches up with the scroll position (per second).
+// Lower is softer: a fast scroll or a step-rail jump plays as a glide.
+const FOLLOW = 4.2;
+
+/** A small, fixed "random" number from 0 to 1, so the dust is the same every visit. */
+function hash(seed: number) {
+  const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+/** Dust: faint specks floating over and under the field, for depth. */
+function dustGeometry(count: number) {
+  const points = new Float32Array(count * 3);
+  for (let index = 0; index < count; index += 1) {
+    const radius = 0.6 + hash(index) * 4.6;
+    const angle = hash(index + 99) * Math.PI * 2;
+    points.set([Math.cos(angle) * radius, -0.7 + hash(index + 7) * 2.1, Math.sin(angle) * radius], index * 3);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new BufferAttribute(points, 3));
+  return geometry;
+}
 
 /** Draws a soft round glow once, to reuse as the picture for every dot. */
 function makeGlowTexture() {
@@ -78,7 +107,16 @@ function circleGeometry() {
  * As the visitor scrolls the steps, the needs fly in, masked providers
  * appear and glide in by score, an advisor sweep reveals names, five turn
  * mint, one RFP travels out to each, and one provider is signed.
- * Everything it shows comes from sceneAt() in story-scene.ts.
+ * Everything the story shows comes from sceneAt() in story-scene.ts.
+ *
+ * On top of the story, the stage is alive while it is on screen:
+ * - the picture glides to the scroll position (never jumps), and the camera
+ *   sinks slowly lower as the story goes on;
+ * - dots bob and twinkle, dust drifts, "your needs" sends out soft pulses,
+ *   picked contenders wear a breathing ring, the signed provider ripples,
+ *   and each RFP packet pulls a short trail;
+ * - a bright ring runs out from the middle each time the step changes;
+ * - with a mouse, the camera leans toward the pointer (and springs back).
  *
  * Loaded only on wide screens with motion allowed, and only when the story
  * is near the screen (StepStory.tsx). The loop runs only while the stage is
@@ -196,8 +234,47 @@ export function StoryStage({ readProgress }: Props) {
     disposables.push(linkGeometry, linkMaterial);
     field.add(new LineSegments(linkGeometry, linkMaterial));
 
+    // Dust: tiny specks that turn a little slower than the field.
+    const dustShape = dustGeometry(140);
+    const dustMaterial = new PointsMaterial({
+      map: glow,
+      color: 0x8fa2ff,
+      size: 0.07,
+      transparent: true,
+      opacity: 0.55,
+      blending: AdditiveBlending,
+      depthWrite: false,
+    });
+    disposables.push(dustShape, dustMaterial);
+    const dust = new Points(dustShape, dustMaterial);
+    scene.add(dust);
+
+    // Two soft pulses that keep leaving "your needs", half a beat apart.
+    const pulses = [makeRing(0x8ef0c9, 0), makeRing(0x8ef0c9, 0)];
+    field.add(...pulses);
+    // The ring that runs out from the middle when the step changes.
+    const stepRing = makeRing(0xd3dcff, 0);
+    field.add(stepRing);
+    // A breathing ring around each provider (shown once picked), and a
+    // ripple for the one the buyer signs with.
+    const halos = start.providers.map(() => {
+      const halo = makeRing(0x8ef0c9, 0);
+      field.add(halo);
+      return halo;
+    });
+    const ripple = makeRing(0x8ef0c9, 0);
+    field.add(ripple);
+    // Each RFP packet pulls two fading specks behind it.
+    const trails = start.providers.map(() => {
+      const pair = [makeDot(0xd3dcff, 0.14, 0), makeDot(0xd3dcff, 0.1, 0)];
+      field.add(...pair);
+      return pair;
+    });
+
     let width = 1;
     let height = 1;
+    let baseElevation = ELEVATION;
+    let distance = 10;
     /** Matches the drawing size to the box and backs the camera up to fit. */
     function resize() {
       width = Math.max(1, host!.clientWidth);
@@ -207,22 +284,69 @@ export function StoryStage({ readProgress }: Props) {
       const halfView = Math.tan((camera.fov * Math.PI) / 360);
       // A taller stage looks down from higher up, so the field fills more
       // of the height (the same idea as the home page fit field).
-      const elevation = Math.min(0.8, ELEVATION + Math.max(0, 1.6 - camera.aspect) * 0.5);
-      // Far enough to fit the field side to side, and top to bottom.
+      baseElevation = Math.min(0.8, ELEVATION + Math.max(0, 1.6 - camera.aspect) * 0.5);
+      // Far enough to fit the field side to side, and top to bottom, at
+      // the highest the camera goes (the start of the story).
       const forWidth = 4.4 / (halfView * camera.aspect);
-      const forHeight = (4.2 * Math.sin(elevation) + 0.6) / halfView;
-      const distance = Math.max(forWidth, forHeight);
-      camera.position.set(0, Math.sin(elevation) * distance, Math.cos(elevation) * distance);
-      camera.lookAt(0, -0.1, 0);
+      const forHeight = (4.2 * Math.sin(baseElevation + ELEVATION_DRIFT) + 0.6) / halfView;
+      distance = Math.max(forWidth, forHeight);
       camera.updateProjectionMatrix();
+    }
+
+    /**
+     * Puts the camera on its orbit: `elevation` up from the field, turned
+     * `turn` radians around it. It always looks at the middle.
+     */
+    function placeCamera(elevation: number, turn: number) {
+      const flat = Math.cos(elevation) * distance;
+      camera.position.set(Math.sin(turn) * flat, Math.sin(elevation) * distance, Math.cos(turn) * flat);
+      camera.lookAt(0, -0.1, 0);
+      camera.updateMatrixWorld();
+    }
+
+    // Where the pointer is over the stage, -1 to 1 from its middle (mouse
+    // only). The camera eases toward it, so it never twitches.
+    const pointer = { x: 0, y: 0 };
+    const lean = { x: 0, y: 0 };
+    const stage = host.parentElement ?? host;
+    let stageBox = stage.getBoundingClientRect();
+    const onPointerEnter = () => {
+      stageBox = stage.getBoundingClientRect();
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      pointer.x = ((event.clientX - stageBox.left) / Math.max(1, stageBox.width)) * 2 - 1;
+      pointer.y = ((event.clientY - stageBox.top) / Math.max(1, stageBox.height)) * 2 - 1;
+    };
+    const onPointerLeave = () => {
+      pointer.x = 0;
+      pointer.y = 0;
+    };
+    const fine = matches(FINE_POINTER);
+    if (fine) {
+      stage.addEventListener("pointerenter", onPointerEnter);
+      stage.addEventListener("pointermove", onPointerMove, { passive: true });
+      stage.addEventListener("pointerleave", onPointerLeave);
     }
 
     // The progress on screen. It chases the scroll position with a quick,
     // soft landing, so a fast scroll still reads as movement, not a jump.
     let shown = reader.current();
     let spin = 0;
+    // Seconds the stage has been drawing; drives the idle motion.
+    let clock = 0;
+    // The step on screen, and when the step-change ring last started.
+    let step = activeStepAt(shown);
+    let stepRingAt = -10;
     const scratch = new Vector3();
     const tint = new Color();
+
+    /** Lays a flat ring around a point on the field, at a size and brightness. */
+    function setRing(ring: LineLoop, x: number, y: number, z: number, size: number, opacity: number) {
+      ring.position.set(x, y, z);
+      ring.scale.setScalar(Math.max(0.01, size));
+      (ring.material as LineBasicMaterial).opacity = Math.max(0, opacity);
+    }
 
     /** Turns a point in the field into a pixel spot inside the stage. */
     function toScreen(x: number, y: number, z: number) {
@@ -232,14 +356,38 @@ export function StoryStage({ readProgress }: Props) {
 
     /** Moves one step toward the scroll position and draws a frame. */
     function draw(seconds: number) {
-      shown += (reader.current() - shown) * (1 - Math.exp(-seconds * 7));
+      shown += (reader.current() - shown) * (1 - Math.exp(-seconds * FOLLOW));
+      clock += seconds;
       // A slow turn keeps the field reading as 3D. It is ambient only.
       spin += seconds * 0.05;
       field.rotation.set(0, spin, 0);
       field.updateMatrixWorld();
+      dust.rotation.y = -spin * 0.6;
+      dust.position.y = Math.sin(clock * 0.4) * 0.08;
+
+      // The camera leans toward the pointer and sinks as the story goes on.
+      const ease = 1 - Math.exp(-seconds * 4);
+      lean.x += (pointer.x - lean.x) * ease;
+      lean.y += (pointer.y - lean.y) * ease;
+      const drift = ELEVATION_DRIFT * (1 - Math.min(1, shown / 6));
+      placeCamera(baseElevation + drift + lean.y * 0.07, lean.x * 0.16);
+
+      // A new step: send a bright ring out from the middle.
+      const nowStep = activeStepAt(shown);
+      if (nowStep !== step) {
+        step = nowStep;
+        stepRingAt = clock;
+      }
+      const ringAge = (clock - stepRingAt) / 1.3;
+      setRing(stepRing, 0, 0, 0, 0.3 + ringAge * 4, ringAge < 1 ? (1 - ringAge) * 0.55 : 0);
 
       const now = sceneAt(shown);
-      coreGlow.scale.setScalar(0.7 + now.needsPull * 0.5);
+      // "Your needs" breathes, and keeps sending out soft pulses.
+      coreGlow.scale.setScalar((0.7 + now.needsPull * 0.5) * (1 + Math.sin(clock * 1.8) * 0.07));
+      pulses.forEach((pulse, index) => {
+        const beat = (clock / 2.8 + index / 2) % 1;
+        setRing(pulse, 0, 0, 0, 0.25 + beat * 1.3, (1 - beat) * 0.42);
+      });
 
       rings.forEach(({ ring, strength }) => {
         ring.material.opacity = strength * now.rings;
@@ -259,26 +407,49 @@ export function StoryStage({ readProgress }: Props) {
         }
       });
 
+      (ripple.material as LineBasicMaterial).opacity = 0;
       now.providers.forEach((provider, index) => {
         const { dot, packet } = dots[index];
         const x = Math.cos(provider.angle) * provider.radius;
         const z = Math.sin(provider.angle) * provider.radius;
-        dot.position.set(x, provider.height, z);
-        dot.scale.setScalar(0.26 + (provider.tag ? 0.2 : 0) + provider.picked * 0.08 + provider.chosen * 0.22);
+        // Each dot bobs gently on its own beat.
+        const y = provider.height + Math.sin(clock * 1.1 + index * 1.7) * 0.06;
+        dot.position.set(x, y, z);
+        const twinkle = 1 + Math.sin(clock * 2.3 + index * 2.1) * 0.07;
+        dot.scale.setScalar((0.26 + (provider.tag ? 0.2 : 0) + provider.picked * 0.08 + provider.chosen * 0.22) * twinkle);
+
+        // Picked contenders wear a breathing mint ring; it steps back for
+        // the ones not signed in step 06.
+        const breath = 0.34 + Math.sin(clock * 2 + index) * 0.04;
+        setRing(halos[index], x, y, z, breath, provider.picked * 0.55 * provider.opacity);
+        // The signed provider ripples.
+        if (provider.chosen > 0) {
+          const beat = (clock / 1.9) % 1;
+          setRing(ripple, x, y, z, 0.3 + beat * 0.9, provider.chosen * (1 - beat) * 0.8);
+        }
         // Dim to bright for the top five, then mint once picked.
         tint.copy(DIM).lerp(BRIGHT, provider.tag ? 1 : 0).lerp(MINT, provider.picked);
         dot.material.color.copy(tint);
         dot.material.opacity = provider.opacity;
 
+        const trail = trails[index];
         if (provider.packet === null) {
           packet.material.opacity = 0;
+          trail.forEach((speck) => {
+            speck.material.opacity = 0;
+          });
         } else {
-          packet.position.set(x * provider.packet, provider.height * provider.packet, z * provider.packet);
+          packet.position.set(x * provider.packet, y * provider.packet, z * provider.packet);
           packet.material.opacity = 1;
+          trail.forEach((speck, back) => {
+            const along = Math.max(0, provider.packet! - (back + 1) * 0.07);
+            speck.position.set(x * along, y * along, z * along);
+            speck.material.opacity = along > 0 ? 0.6 - back * 0.25 : 0;
+          });
         }
 
         // The line runs from the middle (left at 0,0,0) to the dot.
-        linkPositions.set([x, provider.height, z], index * 6 + 3);
+        linkPositions.set([x, y, z], index * 6 + 3);
         const strength = provider.link * 0.7;
         const lineColor = provider.chosen > 0.5 ? MINT : BRIGHT;
         // Slightly dimmer at the middle end, so the line reads as outgoing.
@@ -293,7 +464,7 @@ export function StoryStage({ readProgress }: Props) {
           if (!provider.tag) {
             tag.style.opacity = "0";
           } else {
-            const spot = toScreen(x, provider.height, z);
+            const spot = toScreen(x, y, z);
             tag.style.transform = `translate(${spot.left.toFixed(1)}px, ${spot.top.toFixed(1)}px) translate(-50%, -150%)`;
             tag.style.opacity = provider.tag.opacity.toFixed(2);
             // Change the words only when they change, to keep frames cheap.
@@ -351,6 +522,7 @@ export function StoryStage({ readProgress }: Props) {
     document.addEventListener("visibilitychange", sync);
 
     resize();
+    placeCamera(baseElevation + ELEVATION_DRIFT * (1 - Math.min(1, reader.current() / 6)), 0);
     // Start where the visitor already is, with no catch-up animation.
     shown = reader.current();
     draw(0);
@@ -364,6 +536,9 @@ export function StoryStage({ readProgress }: Props) {
       sizeWatcher.disconnect();
       viewWatcher.disconnect();
       document.removeEventListener("visibilitychange", sync);
+      stage.removeEventListener("pointerenter", onPointerEnter);
+      stage.removeEventListener("pointermove", onPointerMove);
+      stage.removeEventListener("pointerleave", onPointerLeave);
       disposables.forEach((item) => item.dispose());
       renderer.dispose();
       renderer.domElement.remove();

@@ -54,6 +54,15 @@ const sampleProviders = [
   { letter: "J", score: 36, angle: 5 },
 ] as const;
 
+/**
+ * The best `count` sample providers (best fit first), for the masking demo
+ * beside the "What masked means" text. Same letters and sample scores as
+ * the story picture, so the page never shows two different samples.
+ */
+export function sampleBoard(count: number) {
+  return sampleProviders.slice(0, count).map(({ letter, score }) => ({ letter, score }));
+}
+
 /** How many contenders the buyer picks (the real limit is also five). */
 const PICKS = 5;
 /**
@@ -236,4 +245,25 @@ export function progressFromSteps(steps: readonly { top: number; bottom: number 
     if (line < end) return index + (line - start) / Math.max(1, end - start);
   }
   return steps.length;
+}
+
+/**
+ * Where inside a step the step rail's buttons land: 62% of the way through,
+ * just after that step's change has finished playing (every change in
+ * sceneAt ends by 0.6 into its step), so the picture is settled on arrival.
+ */
+export const JUMP_POINT = 0.62;
+
+/**
+ * The page scroll position (window.scrollY) that puts the reading line
+ * JUMP_POINT of the way through step `index`. `steps` and `line` are
+ * measured as for progressFromSteps; `scrollY` is the current scroll.
+ * The step rail scrolls the page here smoothly; it never takes over the
+ * wheel.
+ */
+export function jumpTarget(steps: readonly { top: number; bottom: number }[], index: number, line: number, scrollY: number) {
+  const step = steps[index];
+  if (!step) return scrollY;
+  const end = index + 1 < steps.length ? steps[index + 1].top : step.bottom;
+  return Math.max(0, scrollY + step.top + (end - step.top) * JUMP_POINT - line);
 }

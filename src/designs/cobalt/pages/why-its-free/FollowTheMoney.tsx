@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+
+import { useFinePointer, useInView, useReducedMotion } from "@/designs/cobalt/motion";
+import { perFrame } from "@/designs/cobalt/motion/frame";
 
 import {
   FEE_STAGE,
@@ -28,26 +31,27 @@ import {
  * Layout (why-its-free.css): on wide screens stages 1 to 6 sit in a row and
  * stage 7, the referral fee, sits alone in a "money lane" underneath, joined
  * only to "You sign direct". On phones everything stacks in one column.
+ *
+ * What moves, and why (all of it is CSS driven by attributes set here):
+ * - While the diagram is on screen (`data-live`), small particles run along
+ *   the lines: bright on lines already passed, faint ahead. The money line
+ *   only carries particles once the story reaches the referral fee.
+ * - Hovering a stage (or selecting it) lights the lines in and out of it and
+ *   shows its explanation below, sliding in. Other stages dim while you look.
+ * - "Play the story" walks through the stages on a timer; a bar in the step
+ *   rail fills while each step waits. Any manual step pauses it.
+ * - With a mouse, the layers shift a few pixels with the cursor (depth) and
+ *   a soft light follows it across the navy stage.
+ * Reduced motion: no particles, light or depth; the story still plays, the
+ * explanation swaps at once.
  */
 
 // The same "fast start, soft landing" curve the CSS uses (--co-ease).
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
-const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 /** Delay between one line lighting up and the next, when jumping ahead. */
 const STAGGER_MS = 70;
-
-/** Listens for the visitor changing their device's motion setting. */
-function watchMotion(onChange: () => void) {
-  if (typeof window.matchMedia !== "function") return () => {};
-  const query = window.matchMedia(MOTION_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-
-/** True when the device asks for less motion (or cannot tell us). */
-function wantsLessMotion() {
-  return typeof window.matchMedia !== "function" || window.matchMedia(MOTION_QUERY).matches;
-}
+/** How long "Play the story" stays on each step. Long enough to read it. */
+export const STEP_MS = 3400;
 
 /** Plays a small dot along one connecting line, in whichever way it runs. */
 function travel(wire: HTMLElement | null | undefined, delay: number) {
@@ -81,20 +85,58 @@ function NoLineIcon() {
   );
 }
 
+/** Play triangle, or two pause bars while playing. */
+function PlayIcon({ playing }: { playing: boolean }) {
+  return (
+    <svg aria-hidden="true" fill="currentColor" height="14" viewBox="0 0 14 14" width="14">
+      {playing ? <path d="M3 2h3v10H3zM8 2h3v10H8z" /> : <path d="M3.5 1.8v10.4L12 7z" />}
+    </svg>
+  );
+}
+
+/** The small arrow that slides into a stage box on hover. */
+function GoIcon() {
+  return (
+    <svg aria-hidden="true" className="co-fm-go" fill="none" height="16" viewBox="0 0 16 16" width="16">
+      <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+/** Three particles that run along a line while the diagram is on screen. */
+const particles = (
+  <span aria-hidden="true" className="co-wif-run">
+    <span />
+    <span />
+    <span />
+  </span>
+);
+
 export function FollowTheMoney() {
   // Which stage is selected (0 to 6), and the one before it. Knowing where
   // the visitor came from lets lines light up one after another on a jump.
   const [view, setView] = useState({ stage: 0, from: 0 });
+  // The stage under the mouse, previewed without selecting it.
+  const [peek, setPeek] = useState<number | null>(null);
+  // "Play the story" is running.
+  const [playing, setPlaying] = useState(false);
   // The "what if a provider paid more?" switch.
   const [paidMore, setPaidMore] = useState(false);
   // What the screen reader announces after each change. Empty at first, so
   // nothing is read out on page load.
   const [announcement, setAnnouncement] = useState("");
-  const still = useSyncExternalStore(watchMotion, wantsLessMotion, () => false);
+  const still = useReducedMotion();
+  const fine = useFinePointer();
+
+  const root = useRef<HTMLDivElement>(null);
+  // On screen (with a little margin): particles run and the story can play.
+  const inView = useInView(root, { rootMargin: "80px 0px" });
 
   const { stage, from } = view;
-  const current = flowStages[stage]!;
   const last = flowStages.length - 1;
+  // The stage the explanation and the lit lines are about.
+  const shown = peek ?? stage;
+  const current = flowStages[shown]!;
 
   // The sample ranking. It is scored from the provider list that includes
   // the fees, so the switch really does hand scoring a bigger fee. The
@@ -142,8 +184,12 @@ export function FollowTheMoney() {
     });
   }, [paidMore, still]);
 
-  /** Selects a stage. `focus` moves keyboard focus to it (arrow keys). */
-  function goTo(next: number, focus: boolean) {
+  /**
+   * Selects a stage. `focus` moves keyboard focus to it (arrow keys).
+   * Anything but the player's own timer pauses "Play the story".
+   */
+  function goTo(next: number, focus: boolean, byPlayer = false) {
+    if (!byPlayer) setPlaying(false);
     const target = Math.max(0, Math.min(last, next));
     if (focus) nodes.current[target]?.focus();
     if (target === stage) return;
@@ -152,6 +198,35 @@ export function FollowTheMoney() {
     setAnnouncement(
       `Step ${target + 1} of ${flowStages.length}: ${chosen.title}. ${chosen.body} Money moved so far: ${moneyMoved(target)}`,
     );
+  }
+
+  // The player: while playing and on screen, wait STEP_MS, then step on. It
+  // stops by itself on the last stage. Off screen it holds its place and
+  // carries on when the diagram is back (browsers without
+  // IntersectionObserver never report "on screen", so they always play).
+  useEffect(() => {
+    if (!playing) return;
+    if (!inView && typeof IntersectionObserver !== "undefined") return;
+    const timer = window.setTimeout(() => {
+      const next = view.stage + 1;
+      goTo(next, false, true);
+      if (next >= last) setPlaying(false);
+    }, STEP_MS);
+    return () => window.clearTimeout(timer);
+    // goTo is recreated every render; the stage in `view` is what matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, inView, view.stage]);
+
+  function togglePlay() {
+    if (playing) {
+      setPlaying(false);
+      setAnnouncement(`Paused at step ${stage + 1} of ${flowStages.length}.`);
+      return;
+    }
+    // From the end, play the story again from the start.
+    if (stage === last) goTo(0, false, true);
+    else setAnnouncement(`Playing from step ${stage + 1} of ${flowStages.length}.`);
+    setPlaying(true);
   }
 
   /** Arrow keys, Home and End move between stages, like a tab list. */
@@ -176,6 +251,45 @@ export function FollowTheMoney() {
     setAnnouncement(verdict(next, rankOnFit(sampleNeeds, next ? sampleProvidersPayingMore : sampleProviders)));
   }
 
+  // Depth: with a mouse, write the pointer position as CSS variables on the
+  // stage, at most once per frame. CSS shifts each layer by a different
+  // amount (why-its-free.css, "Depth") and moves a soft light to the cursor.
+  useEffect(() => {
+    const element = root.current;
+    if (!element || still || !fine) return;
+    const move = perFrame((event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      const rect = element.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / Math.max(rect.width, 1);
+      const y = (event.clientY - rect.top) / Math.max(rect.height, 1);
+      element.style.setProperty("--fm-px", (x * 2 - 1).toFixed(3));
+      element.style.setProperty("--fm-py", (y * 2 - 1).toFixed(3));
+      element.style.setProperty("--fm-mx", `${(event.clientX - rect.left).toFixed(0)}px`);
+      element.style.setProperty("--fm-my", `${(event.clientY - rect.top).toFixed(0)}px`);
+      element.setAttribute("data-pointer", "");
+    });
+    const leave = () => {
+      move.cancel();
+      element.style.setProperty("--fm-px", "0");
+      element.style.setProperty("--fm-py", "0");
+      element.removeAttribute("data-pointer");
+    };
+    element.addEventListener("pointermove", move, { passive: true });
+    element.addEventListener("pointerleave", leave);
+    return () => {
+      leave();
+      element.removeEventListener("pointermove", move);
+      element.removeEventListener("pointerleave", leave);
+    };
+  }, [still, fine]);
+
+  /** Preview a stage while the mouse is over it (touch taps select instead). */
+  function onPeek(index: number | null) {
+    return (event: ReactPointerEvent) => {
+      if (event.pointerType === "mouse") setPeek(index);
+    };
+  }
+
   /** One stage box. Only the selected one is in the Tab order (arrow keys reach the rest). */
   function node(index: number) {
     const item = flowStages[index]!;
@@ -184,8 +298,11 @@ export function FollowTheMoney() {
       <button
         aria-current={index === stage ? "step" : undefined}
         className="co-fm-node"
+        data-near={Math.abs(index - shown) === 1 || undefined}
+        data-shown={index === shown || undefined}
         data-state={state}
         onClick={() => goTo(index, false)}
+        onPointerEnter={onPeek(index)}
         ref={(element) => {
           nodes.current[index] = element;
         }}
@@ -193,6 +310,8 @@ export function FollowTheMoney() {
         type="button"
       >
         <span aria-hidden="true" className="co-fm-ring" />
+        <span aria-hidden="true" className="co-fm-beam" />
+        <GoIcon />
         <span className="co-fm-num">{String(index + 1).padStart(2, "0")}</span>
         <span className="co-fm-title">{item.title}</span>
         <span className="co-fm-tag">{item.tag}</span>
@@ -211,8 +330,22 @@ export function FollowTheMoney() {
     return <p className="co-fm-inline">{flowStages[index]!.body}</p>;
   }
 
+  const peeking = peek !== null && peek !== stage;
+
   return (
-    <div className="co-stage co-fm" data-paid-more={paidMore || undefined}>
+    <div
+      className="co-stage co-fm"
+      data-live={(inView && !still) || undefined}
+      data-paid-more={paidMore || undefined}
+      data-peek={peeking || undefined}
+      data-playing={playing || undefined}
+      data-shown={shown}
+      ref={root}
+    >
+      {/* Depth layers: a dot grid and a light that follows the mouse. */}
+      <span aria-hidden="true" className="co-fm-depth" />
+      <span aria-hidden="true" className="co-fm-glow" />
+
       <div className="co-fm-bar">
         <p className="co-fm-count">
           Step <b>{stage + 1}</b> of {flowStages.length}
@@ -221,14 +354,33 @@ export function FollowTheMoney() {
           Money moved so far: <b>{moneyMoved(stage)}</b>
         </p>
         <div className="co-fm-steps">
+          <button className="co-fm-btn co-fm-play" data-on={playing || undefined} onClick={togglePlay} type="button">
+            <PlayIcon playing={playing} />
+            {playing ? "Pause the story" : "Play the story"}
+          </button>
           {/* aria-disabled instead of disabled, so focus stays on the button at either end. */}
           <button aria-disabled={stage === 0} className="co-fm-btn" onClick={() => goTo(stage - 1, false)} type="button">
             Previous
           </button>
           <button aria-disabled={stage === last} className="co-fm-btn co-fm-btn-p" onClick={() => goTo(stage + 1, false)} type="button">
             Next step
+            <GoIcon />
           </button>
         </div>
+      </div>
+
+      {/* The step rail: one segment per stage. While playing, the current
+          segment fills over STEP_MS (restarted per step via `key`). */}
+      <div aria-hidden="true" className="co-fm-rail">
+        {flowStages.map((item, index) => (
+          <span
+            data-fill={index < stage || (index === stage && !playing) || undefined}
+            data-money={index === FEE_STAGE || undefined}
+            key={item.title}
+          >
+            {index === stage && playing ? <i key={`${stage}-${inView}`} style={{ animationDuration: `${STEP_MS}ms` }} /> : null}
+          </span>
+        ))}
       </div>
 
       <ol
@@ -236,6 +388,9 @@ export function FollowTheMoney() {
         aria-label="The seven stages, from your needs list to the referral fee"
         className="co-fm-flow"
         onKeyDown={onKeyDown}
+        // Cleared when the mouse leaves the whole diagram, not each box, so
+        // moving from box to box never flashes back to the selected stage.
+        onPointerLeave={onPeek(null)}
       >
         {flowStages.map((item, index) => {
           if (index === FEE_STAGE) {
@@ -243,14 +398,14 @@ export function FollowTheMoney() {
             // note under the scoring column says out loud what the drawing
             // shows: no line runs from fees to scoring.
             return (
-              <li className="co-fm-lane" key={item.title}>
+              <li className="co-fm-lane" data-moved={stage === FEE_STAGE || undefined} key={item.title}>
                 {node(index)}
                 {inline(index)}
                 <p className="co-fm-lane-label">
                   <b>Money lane</b>
                   <span>Empty until you sign.</span>
                 </p>
-                <p className="co-fm-lane-gap">
+                <p className="co-fm-lane-gap" data-hot={shown === SCORING_STAGE || shown === FEE_STAGE || undefined}>
                   <NoLineIcon />
                   <span>No line from fees into scoring.</span>
                 </p>
@@ -264,6 +419,8 @@ export function FollowTheMoney() {
               <span
                 aria-hidden="true"
                 className="co-fm-wire"
+                // The lines into and out of the stage being looked at glow.
+                data-hot={index === shown || index === shown - 1 || undefined}
                 data-lit={stage > index || undefined}
                 data-money={index === FEE_STAGE - 1 || undefined}
                 ref={(element) => {
@@ -273,6 +430,7 @@ export function FollowTheMoney() {
                 style={{ ["--d" as string]: stage > from ? Math.max(0, index - from) : 0 }}
               >
                 <i />
+                {particles}
                 <b className="co-fm-dot" />
               </span>
             </li>
@@ -283,7 +441,13 @@ export function FollowTheMoney() {
 
       <div className="co-fm-lower">
         <div className="co-fm-detail">
-          <div className="co-fm-current">
+          {/* `key` remounts this block when the stage changes, which replays
+              its slide-in (why-its-free.css, co-fm-swap). */}
+          <div className="co-fm-current" data-money={shown === FEE_STAGE || undefined} key={shown}>
+            <p className="co-fm-where">
+              <span className="co-fm-where-n">{String(shown + 1).padStart(2, "0")}</span>
+              {peeking ? <span className="co-fm-chip">Preview</span> : null}
+            </p>
             <h3>{current.title}</h3>
             <p>{current.body}</p>
           </div>
@@ -330,7 +494,7 @@ export function FollowTheMoney() {
                     </td>
                     <td className="co-fm-fit">{row.score}</td>
                     <td>
-                      <span className="co-fm-fee" style={{ ["--v" as string]: `${(level / MAX_FEE_LEVEL) * 100}%` }}>
+                      <span className="co-fm-fee" style={{ ["--v" as string]: level / MAX_FEE_LEVEL }}>
                         <i />
                       </span>
                       <span className="sr-only">
