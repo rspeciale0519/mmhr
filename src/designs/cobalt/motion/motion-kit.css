@@ -1,0 +1,440 @@
+/* Cobalt motion toolkit styles (src/designs/cobalt/motion/). Loaded once by
+   src/app/layout.tsx after motion.css. Each block names the component that
+   sets its classes or attributes; index.ts documents how to use them.
+
+   Two rules hold everywhere in this file:
+   - Movement uses the individual `translate`, `scale` and `rotate`
+     properties, plus opacity and clip-path. They combine with an element's
+     own `transform` instead of replacing it.
+   - Everything that moves is inside `prefers-reduced-motion: no-preference`,
+     or switched off in the reduced-motion block at the end. Hidden states
+     only exist while JavaScript has set them ("wait"), so the server HTML is
+     always fully visible. */
+
+/* ---- Scroll reveals: Reveal, RevealGroup, RevealAll, SplitText ---------- */
+/* Group children get their position in the row from CSS, so a server
+   rendered list staggers without any extra props. Inline --i wins. */
+[data-co-variant="group"] > :nth-child(2) { --i: 1; }
+[data-co-variant="group"] > :nth-child(3) { --i: 2; }
+[data-co-variant="group"] > :nth-child(4) { --i: 3; }
+[data-co-variant="group"] > :nth-child(5) { --i: 4; }
+[data-co-variant="group"] > :nth-child(6) { --i: 5; }
+[data-co-variant="group"] > :nth-child(7) { --i: 6; }
+[data-co-variant="group"] > :nth-child(8) { --i: 7; }
+[data-co-variant="group"] > :nth-child(9) { --i: 8; }
+[data-co-variant="group"] > :nth-child(10) { --i: 9; }
+[data-co-variant="group"] > :nth-child(11) { --i: 10; }
+[data-co-variant="group"] > :nth-child(n + 12) { --i: 11; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Plain `data-co-reveal` without a variant: the home page's original
+     rise, written exactly as landing/home.css has it, so it works on every
+     page and the two copies never add up. */
+  [data-co-reveal="wait"]:not([data-co-variant]) {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-co-reveal="in"]:not([data-co-variant]) {
+    transition: opacity 0.45s ease-out, transform 0.7s var(--co-ease);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  /* Variants: hidden while waiting... (transform: none cancels the plain
+     rise above and the copy in home.css) */
+  [data-co-reveal="wait"][data-co-variant] {
+    transform: none;
+  }
+  [data-co-reveal="wait"][data-co-variant="rise"] {
+    opacity: 0;
+    translate: 0 32px;
+  }
+  [data-co-reveal="wait"][data-co-variant="fade"] {
+    opacity: 0;
+  }
+  [data-co-reveal="wait"][data-co-variant="scale"] {
+    opacity: 0;
+    scale: 0.92;
+  }
+  [data-co-reveal="wait"][data-co-variant="left"] {
+    opacity: 0;
+    translate: -56px 0;
+  }
+  [data-co-reveal="wait"][data-co-variant="right"] {
+    opacity: 0;
+    translate: 56px 0;
+  }
+  [data-co-reveal="wait"][data-co-variant="clip"] {
+    clip-path: inset(0 100% 0 0);
+  }
+  /* ...then played in. Animations (not transitions) so the element keeps
+     its own hover transitions; `backwards` holds the start pose during the
+     delay and lets go at the end. */
+  [data-co-reveal="in"][data-co-variant] {
+    animation-duration: 0.8s;
+    animation-timing-function: var(--co-ease);
+    animation-fill-mode: backwards;
+    animation-delay: calc(var(--co-delay, 0ms) + var(--i, 0) * var(--co-stagger, 70ms));
+  }
+  [data-co-reveal="in"][data-co-variant="rise"] { animation-name: co-rv-rise; }
+  [data-co-reveal="in"][data-co-variant="fade"] { animation-name: co-rv-fade; animation-duration: 0.7s; }
+  [data-co-reveal="in"][data-co-variant="scale"] { animation-name: co-rv-scale; }
+  [data-co-reveal="in"][data-co-variant="left"] { animation-name: co-rv-left; }
+  [data-co-reveal="in"][data-co-variant="right"] { animation-name: co-rv-right; }
+  [data-co-reveal="in"][data-co-variant="clip"] { animation-name: co-rv-clip; animation-duration: 1s; }
+
+  /* Group: the wrapper stays, its children rise one after another. */
+  [data-co-reveal="wait"][data-co-variant="group"],
+  [data-co-reveal="wait"][data-co-variant="split"] {
+    opacity: 1;
+  }
+  [data-co-reveal="wait"][data-co-variant="group"] > * {
+    opacity: 0;
+    translate: 0 28px;
+  }
+  [data-co-reveal="in"][data-co-variant="group"] {
+    animation: none;
+  }
+  [data-co-reveal="in"][data-co-variant="group"] > * {
+    animation: co-rv-rise 0.75s var(--co-ease) backwards;
+    animation-delay: calc(var(--co-delay, 0ms) + var(--i, 0) * var(--co-stagger, 70ms));
+  }
+
+  /* SplitText: every word is its own clip window; the word inside rises
+     from below the window's edge. Inline-blocks of natural size, so the
+     lines break exactly as plain text would. */
+  .co-split-w,
+  .co-split-i {
+    display: inline-block;
+  }
+  .co-split-w {
+    /* Generous edges so descenders, accents and tight letter-spacing are
+       never cut, while the word below the line stays hidden. */
+    clip-path: inset(-0.32em -0.18em -0.3em -0.18em);
+  }
+  [data-co-split="load"] .co-split-i,
+  [data-co-reveal="in"][data-co-variant="split"] .co-split-i {
+    animation: co-split 0.95s var(--co-ease) backwards;
+    animation-delay: calc(var(--co-delay, 0ms) + var(--w, 0) * var(--co-stagger, 45ms));
+  }
+  [data-co-reveal="in"][data-co-variant="split"] {
+    animation: none;
+  }
+  [data-co-reveal="wait"][data-co-variant="split"] .co-split-i {
+    opacity: 0;
+    translate: 0 1.2em;
+  }
+
+  /* Above-the-fold entrance with no JavaScript at all: add class co-enter
+     (and style="--co-delay: 200ms" to queue it after the headline). */
+  .co-enter {
+    animation: co-rv-rise 0.8s var(--co-ease) var(--co-delay, 0ms) backwards;
+  }
+}
+@keyframes co-rv-rise {
+  from { opacity: 0; translate: 0 32px; }
+}
+@keyframes co-rv-fade {
+  from { opacity: 0; }
+}
+@keyframes co-rv-scale {
+  from { opacity: 0; scale: 0.92; }
+}
+@keyframes co-rv-left {
+  from { opacity: 0; translate: -56px 0; }
+}
+@keyframes co-rv-right {
+  from { opacity: 0; translate: 56px 0; }
+}
+@keyframes co-rv-clip {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes co-split {
+  0% { opacity: 0; translate: 0 1.2em; rotate: 3deg; }
+  35% { opacity: 1; }
+  100% { translate: 0 0; rotate: 0deg; }
+}
+/* Printing never waits for a scroll. */
+@media print {
+  [data-co-reveal] { opacity: 1 !important; translate: none !important; transform: none !important; clip-path: none !important; }
+  [data-co-reveal] * { opacity: 1 !important; translate: none !important; }
+}
+
+/* ---- Spotlight (and Tilt with `spotlight`) -------------------------------- */
+/* :where() keeps this at zero specificity: a class that positions the
+   surface (absolute, sticky) wins. */
+:where(.co-spot) {
+  position: relative;
+}
+.co-spot {
+  isolation: isolate;
+}
+/* The light sits at z-index -1 inside the isolated surface: above the
+   surface's own background, under its text. */
+.co-spot-light {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+.co-spot-light::before,
+.co-spot-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+/* A soft pool of cobalt light under the pointer. */
+.co-spot-light::before {
+  background: radial-gradient(420px circle at var(--co-mx, 50%) var(--co-my, 50%), rgba(91, 116, 255, 0.17), rgba(91, 116, 255, 0) 62%);
+}
+/* The border, lit only near the pointer: a 1.5px ring cut out with a mask. */
+.co-spot-light::after {
+  padding: 1.5px;
+  background: radial-gradient(240px circle at var(--co-mx, 50%) var(--co-my, 50%), rgba(35, 64, 232, 0.75), rgba(142, 240, 201, 0.35) 45%, rgba(35, 64, 232, 0) 72%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.co-spot[data-co-hover] > .co-spot-light,
+.co-spot[data-co-press] > .co-spot-light {
+  opacity: 1;
+  transition-duration: 0.2s;
+}
+
+/* ---- Tilt ------------------------------------------------------------------ */
+:where(.co-tilt) {
+  display: grid;
+}
+.co-tilt {
+  perspective: 1100px;
+}
+.co-tilt-in {
+  transform: rotateX(var(--co-rx, 0deg)) rotateY(var(--co-ry, 0deg));
+  /* Springs back (slight overshoot) when the pointer leaves. */
+  transition: transform 0.75s var(--co-spring), translate 0.6s var(--co-spring);
+}
+.co-tilt[data-co-hover] > .co-tilt-in {
+  translate: 0 -6px;
+  /* While hovered, follow the pointer closely. */
+  transition: transform 0.14s ease-out, translate 0.4s var(--co-spring);
+  will-change: transform;
+}
+
+/* ---- Magnetic -------------------------------------------------------------- */
+/* The wrapper never moves; its one child leans with `translate`. Buttons
+   (.co-btn) already transition `translate` (motion.css). */
+.co-mag {
+  display: inline-flex;
+  vertical-align: top;
+}
+.co-mag > * {
+  translate: var(--co-mag-x, 0px) var(--co-mag-y, 0px);
+}
+.co-mag > :not(.co-btn) {
+  transition: translate 0.5s var(--co-spring);
+}
+
+/* ---- CountUp --------------------------------------------------------------- */
+/* The number and an invisible copy of its final text share one grid cell,
+   so the box is always as wide as the final value: no shift while counting. */
+.co-count {
+  display: inline-grid;
+  font-variant-numeric: tabular-nums;
+}
+.co-count-n,
+.co-count::after {
+  grid-area: 1 / 1;
+}
+.co-count::after {
+  content: attr(data-co-final);
+  visibility: hidden;
+}
+
+/* ---- Parallax -------------------------------------------------------------- */
+.co-parallax {
+  translate: 0 var(--co-parallax, 0px);
+}
+
+/* ---- Accordion (AccordionItem) --------------------------------------------- */
+.co-acc {
+  border-top: 1px solid var(--co-line);
+}
+.co-acc-h {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.co-acc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 4px 20px 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--co-navy);
+  cursor: pointer;
+}
+.co-acc-label {
+  transition: translate 0.35s var(--co-ease);
+}
+/* A plus that turns into a minus: two bars, the upright one turns flat and
+   fades. The round button turns navy while open. */
+.co-acc-icon {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out, rotate 0.5s var(--co-spring), scale 0.25s var(--co-ease);
+}
+.co-acc-icon::before,
+.co-acc-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 2px;
+  margin: -1px 0 0 -6px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: rotate 0.4s var(--co-ease), opacity 0.25s ease-out;
+}
+.co-acc-icon::after {
+  rotate: 90deg;
+}
+.co-acc[data-open="true"] .co-acc-icon {
+  color: #fff;
+  background: var(--co-navy);
+  rotate: 180deg;
+}
+.co-acc[data-open="true"] .co-acc-icon::after {
+  rotate: 0deg;
+  opacity: 0;
+}
+.co-acc-btn:hover .co-acc-label {
+  translate: 4px 0;
+}
+.co-acc-btn:hover .co-acc-icon {
+  scale: 1.08;
+}
+.co-acc[data-open="false"] .co-acc-btn:hover .co-acc-icon {
+  background: #fff;
+}
+.co-acc-btn:active .co-acc-icon {
+  scale: 0.94;
+}
+.co-acc-btn:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+/* The height animates by moving the grid row between 0fr and 1fr: no
+   measuring, works with any content length. */
+.co-acc-panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.45s var(--co-ease);
+}
+.co-acc[data-open="false"] .co-acc-panel {
+  grid-template-rows: 0fr;
+}
+.co-acc-body {
+  min-height: 0;
+  overflow: hidden;
+}
+.co-acc-inner {
+  padding: 0 52px 22px 0;
+  color: var(--co-ink2);
+  transition: opacity 0.35s ease-out, translate 0.45s var(--co-ease);
+}
+.co-acc[data-open="false"] .co-acc-inner {
+  opacity: 0;
+  translate: 0 -8px;
+}
+
+/* ---- Live background glows (GlowDrift, via <CobaltGlows live />) ------------ */
+/* GlowDrift writes --co-sy (scroll px), --co-px and --co-py (-1..1 mouse).
+   `translate` follows them with a slow, soft transition; `transform` runs
+   the endless drift. The two properties combine. Both are compositor-only,
+   so the 70px blur is drawn once and only moved. */
+@media (prefers-reduced-motion: no-preference) {
+  .co-glows[data-co-live] .co-glow {
+    will-change: transform;
+    transition: translate 1.2s var(--co-ease);
+    animation: co-glow-drift 22s ease-in-out infinite alternate;
+  }
+  .co-glows[data-co-live] .co-glow[data-tone="blue"] {
+    translate: calc(var(--co-px, 0) * -38px) calc(var(--co-sy, 0) * 0.18px + var(--co-py, 0) * -24px);
+  }
+  .co-glows[data-co-live] .co-glow[data-tone="mint"] {
+    translate: calc(var(--co-px, 0) * 52px) calc(var(--co-sy, 0) * 0.3px + var(--co-py, 0) * 32px);
+    animation-duration: 17s;
+    animation-direction: alternate-reverse;
+  }
+  .co-glows[data-co-live] .co-glow[data-co-off] {
+    animation-play-state: paused;
+  }
+}
+@keyframes co-glow-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-6%, 5%, 0) scale(1.1); }
+  100% { transform: translate3d(5%, -4%, 0) scale(0.94); }
+}
+
+/* ---- Less motion: everything lands at once, nothing travels. ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .co-spot-light,
+  .co-tilt-in,
+  .co-mag > *,
+  .co-acc-label,
+  .co-acc-icon,
+  .co-acc-icon::before,
+  .co-acc-icon::after,
+  .co-acc-panel,
+  .co-acc-inner {
+    transition: none;
+  }
+  .co-tilt-in {
+    transform: none;
+  }
+  .co-tilt[data-co-hover] > .co-tilt-in,
+  .co-acc-btn:hover .co-acc-label,
+  .co-acc[data-open="false"] .co-acc-inner {
+    translate: none;
+  }
+  .co-acc-icon,
+  .co-acc[data-open="true"] .co-acc-icon,
+  .co-acc-btn:hover .co-acc-icon,
+  .co-acc-btn:active .co-acc-icon {
+    rotate: none;
+    scale: none;
+  }
+  .co-mag > * {
+    translate: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .co-acc-btn {
+    font-size: 16.5px;
+    padding: 18px 0;
+  }
+  .co-acc-inner {
+    padding-right: 0;
+  }
+}

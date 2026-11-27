@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import { Magnetic } from "../motion/pointer";
+import { Reveal } from "../motion/Reveal";
+import { SplitText } from "../motion/SplitText";
+
 /**
  * The closing call to action at the bottom of a public page: a large
  * heading on the left, one sentence and one button on the right.
@@ -16,6 +20,9 @@ import Link from "next/link";
  *
  * Styles: reuses `.co-final` from styles.css (the home page's closing band)
  * with the `.co-page-final` size step from pages.css.
+ *
+ * Motion: the heading rises word by word as the band scrolls into view, the
+ * sentence and button follow, and the button leans toward the mouse.
  */
 export function CtaBand({
   title,
@@ -28,11 +35,13 @@ export function CtaBand({
 }) {
   return (
     <section className="co-final co-page-final">
-      <h2>{title}</h2>
-      <div>
+      <SplitText as="h2" text={title} stagger={60} />
+      <Reveal delay={260}>
         <p>{body}</p>
-        <Link className="co-btn co-btn-p" href={action.href}>{action.label}</Link>
-      </div>
+        <Magnetic>
+          <Link className="co-btn co-btn-p" href={action.href}>{action.label}</Link>
+        </Magnetic>
+      </Reveal>
     </section>
   );
 }

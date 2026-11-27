@@ -4,6 +4,8 @@
 .co {
   /* One shared curve: starts fast, lands softly. */
   --co-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* A spring: overshoots a little, then settles. For things that snap back. */
+  --co-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Parts of the page the browser draws for us, themed to match. */
@@ -20,10 +22,32 @@ button.co-brow:focus-visible {
   outline-color: #fff;
 }
 
-/* Buttons answer the pointer: brighter on hover, pressed in on click. */
+/* ---- Buttons (every .co-btn on the site) ----
+   Hover: primary buttons brighten and a sheen of light sweeps across;
+   ghost buttons turn white with a cobalt edge. Press: a quick squash.
+   An icon at the end (an svg, or .co-btn-icon) nudges forward on hover.
+   Keyboard focus: the ring snaps in from a wider circle.
+   Movement uses `scale` and `translate` (not `transform`), so it combines
+   with <Magnetic> (motion/pointer.tsx), which also moves buttons. */
 .co-btn {
+  position: relative;
+  isolation: isolate;
   transition: filter 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.2s ease-out,
-    transform 0.15s var(--co-ease);
+    scale 0.2s var(--co-ease), translate 0.55s var(--co-spring);
+}
+.co-btn-p {
+  overflow: hidden;
+}
+/* The sheen: a soft diagonal band of light parked off the left edge. */
+.co-btn-p::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0.5) 48%, rgba(255, 255, 255, 0) 68%);
+  translate: -110% 0;
+  pointer-events: none;
 }
 .co-btn-p:hover {
   filter: brightness(1.12);
@@ -31,9 +55,81 @@ button.co-brow:focus-visible {
 }
 .co-btn-g:hover {
   background: #fff;
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px rgba(35, 64, 232, 0.35), 0 14px 26px -16px rgba(35, 64, 232, 0.6);
 }
 .co-btn:active:not(:disabled) {
-  transform: scale(0.975);
+  scale: 0.96;
+}
+.co-btn > svg,
+.co-btn .co-btn-icon {
+  transition: translate 0.4s var(--co-spring);
+}
+
+/* ---- Text links ----
+   `co-link`: a stand-alone link (no underline at rest) whose underline
+   draws in from the left on hover and leaves to the right. Links inside
+   running text keep their underline (so they never rely on color alone);
+   it turns cobalt and drops a little lower on hover. */
+.co-link {
+  position: relative;
+  text-decoration: none;
+}
+.co-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  scale: 0 1;
+  transform-origin: right;
+  transition: scale 0.4s var(--co-ease);
+  pointer-events: none;
+}
+.co-link:hover::after {
+  scale: 1 1;
+  transform-origin: left;
+}
+.co-prose a,
+.co-page-copy a,
+.co-news-consent a,
+.co-acc-inner a {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.2s ease-out, text-underline-offset 0.2s ease-out, color 0.2s ease-out;
+}
+.co-prose a:hover,
+.co-page-copy a:hover,
+.co-news-consent a:hover,
+.co-acc-inner a:hover {
+  color: var(--co-cobalt);
+  text-decoration-color: var(--co-cobalt);
+  text-underline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .co-btn-p:hover::after {
+    translate: 110% 0;
+    transition: translate 0.9s cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  .co-btn:hover > svg:last-child,
+  .co-btn:hover .co-btn-icon {
+    translate: 3px 0;
+  }
+  .co-btn:focus-visible,
+  .co-link:focus-visible,
+  .co-acc-btn:focus-visible {
+    animation: co-ring 0.35s var(--co-ease);
+  }
+}
+@keyframes co-ring {
+  from {
+    outline-offset: 9px;
+    outline-color: rgba(35, 64, 232, 0);
+  }
 }
 
 /* ---- Matching demo ---- */
@@ -245,33 +341,38 @@ button.co-brow {
     animation: co-grow 0.9s var(--co-ease) calc(0.35s + var(--i, 0) * 70ms) backwards;
   }
 
-  /* The six steps light up in order as you scroll to them. Browsers that
-     cannot tie animation to scrolling simply show all six lit. */
-  @supports (animation-timeline: view()) {
-    .co-six > div {
-      position: relative;
-      border-top-color: var(--co-line);
-    }
-    .co-six > div::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -2px;
-      height: 2px;
-      background: var(--co-navy);
-      transform-origin: left;
-      animation: co-draw linear both;
-    }
-    .co-six .co-num {
-      animation: co-lit linear both;
-    }
-    .co-six > div::before,
-    .co-six .co-num {
-      animation-timeline: view();
-      /* --i is the step number, so each step starts a little later. */
-      animation-range: cover calc(8% + var(--i, 0) * 4%) cover calc(20% + var(--i, 0) * 4%);
-    }
+  /* The six steps light up in order when they scroll into view. Driven by
+     the reveal engine (motion/reveal-observer.ts) in every browser: mark
+     `.co-six` with data-co-reveal="" (any variant) and render <RevealAll />
+     or wrap it in <Reveal>. Unmarked, or before JavaScript, all six are lit.
+     --i is the step number, so each step starts a little later. */
+  .co-six[data-co-reveal="wait"] > div,
+  .co-six[data-co-reveal="in"] > div {
+    position: relative;
+    border-top-color: var(--co-line);
+  }
+  .co-six[data-co-reveal="wait"] > div::before,
+  .co-six[data-co-reveal="in"] > div::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+    height: 2px;
+    background: var(--co-navy);
+    transform-origin: left;
+  }
+  .co-six[data-co-reveal="wait"] > div::before {
+    scale: 0 1;
+  }
+  .co-six[data-co-reveal="wait"] .co-num {
+    opacity: 0.28;
+  }
+  .co-six[data-co-reveal="in"] > div::before {
+    animation: co-draw 0.7s var(--co-ease) calc(0.15s + var(--i, 0) * 120ms) backwards;
+  }
+  .co-six[data-co-reveal="in"] .co-num {
+    animation: co-lit 0.5s ease-out calc(0.3s + var(--i, 0) * 120ms) backwards;
   }
 }
 @keyframes co-rise {
@@ -297,7 +398,7 @@ button.co-brow {
 }
 @keyframes co-draw {
   from {
-    transform: scaleX(0);
+    scale: 0 1;
   }
 }
 @keyframes co-lit {
@@ -311,12 +412,21 @@ button.co-brow {
   .co-btn,
   .co-need,
   .co-track i,
-  .co-stage-gl {
+  .co-stage-gl,
+  .co-link::after,
+  .co-btn > svg,
+  .co-btn .co-btn-icon {
     transition-duration: 0.01s;
   }
-  .co-btn:active:not(:disabled),
+  .co-btn:active:not(:disabled) {
+    scale: none;
+  }
   .co-need:active {
     transform: none;
+  }
+  /* No sweeping sheen; the hover brightening still shows. */
+  .co-btn-p::after {
+    display: none;
   }
   .co-need-box path {
     animation: none;

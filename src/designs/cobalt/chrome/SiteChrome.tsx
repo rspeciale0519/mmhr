@@ -7,6 +7,8 @@ import { NewsletterSignup } from "./NewsletterSignup";
 
 /**
  * Public-site chrome: canvas glows, nav, and footer (a Server Component).
+ * The glows are live (they drift and follow scroll and the mouse); the nav
+ * and footer motion is described in Nav.tsx and pages.css.
  *
  * The footer shows the newsletter signup only when the newsletter can work:
  * `isNewsletterConfigured()` is true only when RESEND_API_KEY and
@@ -19,7 +21,8 @@ import { NewsletterSignup } from "./NewsletterSignup";
 export function CobaltSiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <div className="co-w">
-      <CobaltGlows placement="hero" />
+      {/* live: the glows drift and answer scroll and the mouse (Glow.tsx). */}
+      <CobaltGlows placement="hero" live />
       <CobaltNav />
       <div id="content">{children}</div>
       <CobaltFooter newsletter={isNewsletterConfigured() ? <NewsletterSignup /> : undefined} />

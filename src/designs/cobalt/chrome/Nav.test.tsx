@@ -1,7 +1,8 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { usePathname } from "next/navigation";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import { flushFrames, installMotionDoubles, setMedia } from "../motion/test-helpers";
 import { CobaltNav } from "./Nav";
 
 vi.mock("next/navigation", () => ({ usePathname: vi.fn() }));
@@ -126,5 +127,88 @@ describe("phone menu", () => {
     expect(menuButton()).toHaveAttribute("aria-expanded", "true");
     fireEvent.pointerDown(document.body);
     expect(menuButton()).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+describe("menu motion", () => {
+  /** Runs the shared scroll loop after moving the page to `y`. */
+  function scrollTo(y: number) {
+    vi.stubGlobal("scrollY", y);
+    window.dispatchEvent(new Event("scroll"));
+    flushFrames();
+  }
+
+  beforeEach(installMotionDoubles);
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  test("the gliding pill rests on the current page and follows the hovered link", () => {
+    renderNavAt("/why-its-free");
+    const primary = screen.getByRole("navigation", { name: "Primary navigation" });
+    const list = primary.querySelector("ul")!;
+    expect(list).toHaveAttribute("data-co-ind", "on");
+    // The pill is decoration: hidden from screen readers, not a link.
+    expect(list.querySelector(".co-pills-ind")).toHaveAttribute("aria-hidden", "true");
+
+    const resources = within(primary).getByRole("link", { name: "Resources" });
+    fireEvent.pointerOver(resources);
+    expect(resources).toHaveAttribute("data-co-hot");
+    fireEvent.pointerLeave(list);
+    expect(resources).not.toHaveAttribute("data-co-hot");
+    expect(list).toHaveAttribute("data-co-ind", "on");
+  });
+
+  test("on a page outside the menu the pill only shows while a link is hovered", () => {
+    renderNavAt("/contact");
+    const list = screen.getByRole("navigation", { name: "Primary navigation" }).querySelector("ul")!;
+    expect(list).toHaveAttribute("data-co-ind", "off");
+  });
+
+  test("hides on the way down, comes back on the way up, and never near the top", () => {
+    scrollTo(0);
+    renderNavAt("/");
+    const header = screen.getByRole("banner");
+    flushFrames();
+    scrollTo(60);
+    expect(header).not.toHaveAttribute("data-co-hide");
+    expect(header).toHaveAttribute("data-co-scrolled");
+    scrollTo(400);
+    expect(header).toHaveAttribute("data-co-hide");
+    scrollTo(380);
+    expect(header).not.toHaveAttribute("data-co-hide");
+  });
+
+  test("never hides while the phone menu is open or focus is inside the menu", () => {
+    scrollTo(0);
+    renderNavAt("/");
+    const header = screen.getByRole("banner");
+    fireEvent.click(menuButton());
+    scrollTo(800);
+    expect(header).not.toHaveAttribute("data-co-hide");
+
+    fireEvent.click(menuButton());
+    menuButton().focus();
+    scrollTo(1600);
+    expect(header).not.toHaveAttribute("data-co-hide");
+  });
+
+  test("writes page reading progress on the progress line", () => {
+    vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(1800);
+    vi.stubGlobal("innerHeight", 800);
+    renderNavAt("/");
+    scrollTo(500);
+    const line = screen.getByRole("banner").querySelector<HTMLElement>(".co-nav-progress")!;
+    expect(line.style.getPropertyValue("--co-progress")).toBe("0.5000");
+  });
+
+  test("with reduced motion the menu stays put", () => {
+    setMedia({ reduce: true });
+    scrollTo(0);
+    renderNavAt("/");
+    scrollTo(300);
+    scrollTo(900);
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-co-hide");
   });
 });

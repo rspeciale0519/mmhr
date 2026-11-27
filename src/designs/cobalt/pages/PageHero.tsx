@@ -1,3 +1,5 @@
+import { SplitText } from "../motion/SplitText";
+
 /**
  * The top of a public page: the page's only <h1>, a short lede, and
  * optional buttons.
@@ -15,7 +17,13 @@
  *
  * Styles: `.co-page-hero` in src/designs/cobalt/pages.css. The title reuses
  * `.co-pt` and the lede `.co-lede` from styles.css; `actions` sits in the
- * existing `.co-ctas` row, so pass `co-btn` links straight in.
+ * existing `.co-ctas` row, so pass `co-btn` links straight in (wrap the main
+ * one in `<Magnetic>` from ../motion for the pull toward the mouse).
+ *
+ * Motion, on every page as soon as it paints (pure CSS, no waiting for
+ * JavaScript): the title's words rise one after another from behind their
+ * own edge (SplitText, trigger "load"), then the lede and the actions rise
+ * in after it (`co-enter`). Reduced motion: all of it is simply there.
  */
 export function PageHero({
   title,
@@ -28,9 +36,16 @@ export function PageHero({
 }) {
   return (
     <header className="co-page-hero">
-      <h1 className="co-pt">{title}</h1>
-      <p className="co-lede">{lede}</p>
-      {actions ? <div className="co-ctas">{actions}</div> : null}
+      <SplitText as="h1" className="co-pt" text={title} trigger="load" />
+      {/* Queued after the headline: about when its last words land. */}
+      <p className="co-lede co-enter" style={{ ["--co-delay" as string]: "260ms" }}>
+        {lede}
+      </p>
+      {actions ? (
+        <div className="co-ctas co-enter" style={{ ["--co-delay" as string]: "380ms" }}>
+          {actions}
+        </div>
+      ) : null}
     </header>
   );
 }

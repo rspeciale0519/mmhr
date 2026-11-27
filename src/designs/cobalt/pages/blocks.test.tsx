@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import { VENDORS } from "../../_content";
@@ -39,10 +39,17 @@ describe("QuestionsAndAnswers", () => {
     { question: "Does the referral fee change rank?", answer: "No. It is never an input to rank." },
   ];
 
-  test("shows every question and answer and describes the same text as an FAQPage", () => {
+  test("lists every question as an expandable row, keeps every answer in the page, and describes the same text as an FAQPage", () => {
     const { container } = render(<QuestionsAndAnswers items={items} />);
     expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(items.map((i) => i.question));
-    for (const item of items) expect(screen.getByText(item.answer)).toBeVisible();
+    const buttons = items.map((item) => screen.getByRole("button", { name: item.question }));
+    // The first row starts open; the others open on click.
+    expect(buttons.map((button) => button.getAttribute("aria-expanded"))).toEqual(["true", "false"]);
+    expect(screen.getByText(items[0]!.answer)).toBeVisible();
+    // A closed answer is still in the HTML (search engines, find-in-page).
+    expect(container.textContent).toContain(items[1]!.answer);
+    fireEvent.click(buttons[1]!);
+    expect(screen.getByText(items[1]!.answer)).toBeVisible();
 
     const data = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.textContent ?? "");
     expect(data).toEqual({
@@ -61,6 +68,11 @@ describe("page blocks", () => {
   test("PageHero renders one h1, the lede, and optional actions", () => {
     render(<PageHero title="A title" lede="A lede." actions={<a href="/sign-up">Go</a>} />);
     expect(screen.getAllByRole("heading", { level: 1 }).map((h) => h.textContent)).toEqual(["A title"]);
+    // The h1 rises word by word on first paint; lede and actions follow.
+    const h1 = screen.getByRole("heading", { level: 1, name: "A title" });
+    expect(h1).toHaveAttribute("data-co-split", "load");
+    expect(h1.querySelectorAll(".co-split-w")).toHaveLength(2);
+    expect(screen.getByText("A lede.")).toHaveClass("co-enter");
     expect(screen.getByText("A lede.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Go" })).toBeInTheDocument();
   });
@@ -70,6 +82,9 @@ describe("page blocks", () => {
     const region = screen.getByRole("region", { name: "Names stay masked" });
     expect(region).toHaveAttribute("id", "masking");
     expect(screen.getByRole("heading", { level: 2, name: "Names stay masked" })).toHaveAttribute("id", "masking-title");
+    // The heading and intro play in on scroll (reveal engine, every browser).
+    expect(screen.getByRole("heading", { level: 2, name: "Names stay masked" })).toHaveAttribute("data-co-variant", "split");
+    expect(screen.getByText("Until review.")).toHaveAttribute("data-co-reveal");
   });
 
   test("CtaBand defaults to the buyer sign-up and accepts another action", () => {
@@ -77,6 +92,8 @@ describe("page blocks", () => {
     expect(screen.getByRole("link", { name: "Start your needs list" })).toHaveAttribute("href", "/sign-up");
     rerender(<CtaBand title="Talk." body="Ask us." action={{ href: "/contact", label: "Contact MMHR" }} />);
     expect(screen.getByRole("link", { name: "Contact MMHR" })).toHaveAttribute("href", "/contact");
+    expect(screen.getByRole("link", { name: "Contact MMHR" }).parentElement).toHaveClass("co-mag");
+    expect(screen.getByRole("heading", { level: 2, name: "Talk." })).toHaveAttribute("data-co-variant", "split");
   });
 });
 

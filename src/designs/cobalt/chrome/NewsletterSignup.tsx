@@ -152,7 +152,9 @@ export function NewsletterSignup() {
         role="status"
         aria-live="polite"
       >
-        {message}
+        {/* A new span per outcome, so each message plays its short rise-in
+            (pages.css). The live region itself never changes. */}
+        {message ? <span key={state}>{message}</span> : null}
       </p>
     </form>
   );
