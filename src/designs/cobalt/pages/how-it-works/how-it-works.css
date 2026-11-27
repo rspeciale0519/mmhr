@@ -1,0 +1,1139 @@
+/* /how-it-works: the six-step scroll story with its step rail, the masking
+   demo, and the "after the RFP" cards. Imported by
+   pages/how-it-works/Body.tsx. Builds on styles.css (.co-stage,
+   .co-stage-tag, .co-num, .co-chip), motion.css and the motion toolkit
+   (motion/motion-kit.css: Reveal, Spotlight, Tilt, Parallax). Colors come
+   only from the Cobalt variables and the white/navy tints styles.css
+   already uses. Every entrance is played by the toolkit's JavaScript
+   reveals (IntersectionObserver), so it works in every browser.
+
+   Three layouts, chosen by the same media query as StepStory.tsx:
+   - Story (wider than 760px, motion allowed): step texts on the left, one
+     sticky navy stage on the right that follows the scroll.
+   - Less motion on a wide screen: no sticky stage; each step shows its own
+     still picture beside its text.
+   - Phone (760px and narrower): no sticky stage; each step's still picture
+     sits above its text. */
+
+/* ---- Story layout -------------------------------------------------------- */
+
+.co-hiw-story {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 56px;
+  min-width: 0;
+}
+
+.co-hiw-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* Each step is tall, so scrolling through it gives the stage time to play
+   that step's change and then hold it while the text is read. */
+.co-hiw-step {
+  position: relative;
+  min-height: 72vh;
+  padding: 6px 0 56px 28px;
+  border-left: 2px solid var(--co-line);
+  transition: border-color 0.2s ease-out;
+}
+/* The step's timeline line fills from the top as the story moves through
+   it. StepStory writes --hiw-p (0 to 6) on the story; --n is the step's
+   place (0 to 5). Without the story both are missing and it stays empty. */
+.co-hiw-step::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--co-cobalt), var(--co-cob2) 70%, var(--co-mint));
+  transform-origin: top;
+  scale: 1 clamp(0, calc(var(--hiw-p, 0) - var(--n, 0)), 1);
+  pointer-events: none;
+}
+.co-hiw-step:last-child {
+  padding-bottom: 0;
+}
+.co-hiw-num {
+  font-size: 56px;
+  transition: color 0.2s ease-out, translate 0.6s var(--co-spring);
+}
+.co-hiw-step h3 {
+  margin: 14px 0 8px;
+  font-stretch: 120%;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  transition: color 0.2s ease-out;
+}
+.co-hiw-sum {
+  margin: 0;
+  font-size: 17px;
+  color: var(--co-ink2);
+}
+
+/* "You / MMHR / You get": a small labelled list under each step. */
+/* Each row is a Spotlight surface: under the mouse a soft light follows the
+   pointer and the nearest edge glows; the label slides in and turns cobalt. */
+.co-hiw-parts {
+  display: grid;
+  gap: 4px;
+  margin: 24px 0 0;
+  max-width: 560px;
+}
+.co-hiw-part {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 12px 12px 0;
+  border-top: 1px solid var(--co-line);
+  border-radius: 0 0 12px 12px;
+  transition: background-color 0.25s ease-out;
+}
+.co-hiw-part[data-co-hover] {
+  background: rgba(255, 255, 255, 0.55);
+}
+.co-hiw-parts dt {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--co-navy);
+  transition: translate 0.45s var(--co-spring), color 0.2s ease-out;
+}
+.co-hiw-parts dd {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+  transition: color 0.2s ease-out;
+}
+.co-hiw-part:hover dt {
+  translate: 8px 0;
+  color: var(--co-cobalt);
+}
+.co-hiw-steps .co-hiw-part:hover dd {
+  color: var(--co-navy);
+}
+
+/* While the story runs, the step under the reading line is marked with
+   aria-current. It gets the cobalt edge; the others step back to the muted
+   text color, which still reads at well over 4.5:1 contrast. */
+.co-hiw-step[aria-current="step"] .co-hiw-num {
+  translate: 10px 0;
+}
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) .co-hiw-num {
+  color: var(--co-cob2);
+}
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) h3,
+.co-hiw-steps:has([aria-current]) .co-hiw-step:not([aria-current]) dd {
+  color: var(--co-mute);
+}
+
+/* The column that holds the sticky stage runs the full height of the
+   steps, so the stage can stay in view the whole way down. */
+.co-hiw-rail {
+  min-width: 0;
+}
+/* The stage and its controls stay in view together. */
+.co-hiw-sticky {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 14px;
+}
+.co-hiw-rail .co-hiw-stage {
+  height: min(560px, calc(100vh - 196px));
+  margin: 0;
+  /* Lets the still picture size itself to the stage (cqw/cqh below). */
+  container-type: size;
+}
+/* The 3D canvas layer sits over the still picture once it is live. */
+.co-hiw-gl {
+  z-index: 1;
+}
+.co-hiw-stage .co-hiw-still {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100cqw, 160cqh);
+  transform: translate(-50%, -50%);
+}
+.co-hiw-stage .co-stage-key {
+  z-index: 2;
+}
+
+/* Which step the stage shows, and the "Illustration" label. */
+.co-hiw-caption {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.co-hiw-where {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ---- Step rail: previous, 01 to 06, next ---------------------------------- */
+
+.co-hiw-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.co-hiw-arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 13px;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px var(--co-line), 0 8px 20px -14px rgba(13, 26, 74, 0.4);
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, scale 0.2s var(--co-ease), opacity 0.2s ease-out;
+}
+.co-hiw-prev svg {
+  rotate: 180deg;
+}
+.co-hiw-arrow svg {
+  transition: translate 0.45s var(--co-spring);
+}
+.co-hiw-arrow:hover:not([aria-disabled="true"]) {
+  background: #fff;
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px rgba(35, 64, 232, 0.35), 0 14px 26px -16px rgba(35, 64, 232, 0.6);
+}
+.co-hiw-next:hover:not([aria-disabled="true"]) svg {
+  translate: 3px 0;
+}
+.co-hiw-prev:hover:not([aria-disabled="true"]) svg {
+  translate: -3px 0;
+}
+.co-hiw-arrow:active:not([aria-disabled="true"]) {
+  scale: 0.92;
+}
+.co-hiw-arrow[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.co-hiw-dots {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.co-hiw-dots li {
+  position: relative;
+  min-width: 0;
+}
+.co-hiw-dot {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 8px 9px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  text-align: left;
+  color: var(--co-mute);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.25s ease-out, box-shadow 0.25s ease-out, color 0.2s ease-out;
+}
+.co-hiw-dot-n {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  transition: translate 0.45s var(--co-spring);
+}
+/* This step's slice of the story: fills while the story is in this step. */
+.co-hiw-seg {
+  position: relative;
+  display: block;
+  height: 3px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(13, 26, 74, 0.12);
+}
+.co-hiw-seg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--co-cobalt), var(--co-cob2) 60%, var(--co-mint));
+  transform-origin: left;
+  scale: clamp(0, calc(var(--hiw-p, 0) - var(--n, 0)), 1) 1;
+}
+/* The title bubble: pops up over the button on hover and keyboard focus. */
+.co-hiw-dot-t {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 3;
+  padding: 6px 10px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--co-navy);
+  box-shadow: 0 12px 24px -12px rgba(13, 26, 74, 0.7);
+  translate: -50% 6px;
+  scale: 0.92;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, translate 0.35s var(--co-spring), scale 0.35s var(--co-spring);
+}
+.co-hiw-dots li:first-child .co-hiw-dot-t {
+  left: 0;
+  translate: 0 6px;
+}
+.co-hiw-dots li:nth-last-child(-n + 2) .co-hiw-dot-t {
+  left: auto;
+  right: 0;
+  translate: 0 6px;
+}
+.co-hiw-dot:hover .co-hiw-dot-t,
+.co-hiw-dot:focus-visible .co-hiw-dot-t {
+  opacity: 1;
+  translate: -50% 0;
+  scale: 1;
+}
+.co-hiw-dots li:first-child .co-hiw-dot:is(:hover, :focus-visible) .co-hiw-dot-t,
+.co-hiw-dots li:nth-last-child(-n + 2) .co-hiw-dot:is(:hover, :focus-visible) .co-hiw-dot-t {
+  translate: 0 0;
+}
+.co-hiw-dot:hover {
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.6);
+}
+.co-hiw-dot:hover .co-hiw-dot-n {
+  translate: 0 -2px;
+}
+.co-hiw-dot[aria-current="step"] {
+  color: var(--co-cobalt);
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.25), 0 10px 22px -14px rgba(35, 64, 232, 0.7);
+}
+.co-hiw-dot:active {
+  scale: 0.96;
+}
+.co-hiw-dot:focus-visible,
+.co-hiw-arrow:focus-visible,
+.co-hiw-replay:focus-visible,
+.co-hiw-seg-ctl button:focus-visible,
+.co-hiw-switch:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+
+/* Read by screen readers only (the live regions). */
+.co-hiw-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+/* A chip that reads on the navy stage (the light chips are for the light page). */
+.co-hiw-chip {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+/* ---- Still picture (SceneStill.tsx) -------------------------------------- */
+
+/* Keeps the drawing's 16:10 shape so the HTML tags land on their dots. */
+.co-hiw-still {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+.co-hiw-still svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Tags are placed by percent (inline left/top) and lifted over their dot. */
+.co-hiw-tag {
+  transform: translate(-50%, -150%);
+}
+.co-hiw-tag.co-stage-tag-core {
+  transform: translate(-50%, 70%);
+}
+.co-hiw-need {
+  color: var(--co-mint);
+}
+
+/* A step's own picture: hidden while the sticky stage tells the story. */
+.co-hiw-step-pic {
+  display: none;
+  position: relative;
+  margin: 0 0 20px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 26px 44px -30px rgba(13, 26, 74, 0.8);
+}
+.co-hiw-step-pic .co-hiw-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+/* "Replay" on a step's own picture (phones): plays the step's change again. */
+.co-hiw-replay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, scale 0.2s var(--co-ease);
+}
+.co-hiw-replay svg {
+  transition: rotate 0.6s var(--co-spring);
+}
+.co-hiw-replay:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+.co-hiw-replay:hover svg,
+.co-hiw-replay:active svg {
+  rotate: -200deg;
+}
+.co-hiw-replay:active {
+  scale: 0.94;
+}
+
+/* ---- Less motion, or a phone: a still picture with each step ------------- */
+
+@media (max-width: 760px), (prefers-reduced-motion: reduce) {
+  .co-hiw-story {
+    display: block;
+  }
+  .co-hiw-step::before {
+    display: none;
+  }
+  .co-hiw-rail {
+    display: none;
+  }
+  .co-hiw-step-pic {
+    display: block;
+  }
+  .co-hiw-step {
+    min-height: 0;
+  }
+  .co-hiw-step,
+  .co-hiw-num,
+  .co-hiw-step h3,
+  .co-hiw-parts dd {
+    transition: none;
+  }
+}
+
+/* Less motion on a wide screen: picture beside the text, like the story. */
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  .co-hiw-step {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 56px;
+    padding-bottom: 64px;
+  }
+  .co-hiw-step > * {
+    grid-column: 1;
+  }
+  .co-hiw-step > .co-hiw-step-pic {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: start;
+    margin: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .co-hiw-step {
+    padding: 0 0 44px 16px;
+  }
+  .co-hiw-step-pic {
+    border-radius: 14px;
+  }
+  .co-hiw-num {
+    font-size: 40px;
+  }
+  .co-hiw-step h3 {
+    margin-top: 8px;
+    font-size: 26px;
+  }
+  .co-hiw-sum {
+    font-size: 16px;
+  }
+  .co-hiw-parts > div {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .co-hiw-parts dd {
+    font-size: 15px;
+  }
+}
+
+
+/* ---- Masking: the text beside a hands-on sample comparison --------------- */
+
+.co-hiw-masking {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 56px;
+  align-items: start;
+  min-width: 0;
+}
+/* Decorative shapes (Parallax moves them with `translate`). */
+.co-hiw-deco {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.co-hiw-deco-ring {
+  right: 4%;
+  top: -60px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(35, 64, 232, 0.14) inset, 0 0 0 46px rgba(35, 64, 232, 0.035) inset;
+}
+.co-hiw-deco-blob {
+  left: 28%;
+  bottom: -90px;
+  width: 300px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(142, 240, 201, 0.42), rgba(142, 240, 201, 0));
+}
+.co-hiw-mask-wrap {
+  min-width: 0;
+}
+
+.co-hiw-mask {
+  padding: 22px;
+}
+.co-hiw-mask-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+/* The two-button switch. The white pill slides under the pressed one. */
+.co-hiw-seg-ctl {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: 13px;
+  background: rgba(13, 26, 74, 0.06);
+}
+.co-hiw-seg-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(13, 26, 74, 0.14), 0 8px 18px -12px rgba(35, 64, 232, 0.6);
+  transition: translate 0.55s var(--co-spring);
+}
+.co-hiw-mask[data-view="named"] .co-hiw-seg-pill {
+  translate: 100% 0;
+}
+.co-hiw-seg-ctl button {
+  position: relative;
+  z-index: 1;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--co-mute);
+  background: none;
+  cursor: pointer;
+  transition: color 0.2s ease-out, scale 0.2s var(--co-ease);
+}
+.co-hiw-seg-ctl button:hover,
+.co-hiw-seg-ctl button[aria-pressed="true"] {
+  color: var(--co-navy);
+}
+.co-hiw-seg-ctl button:active {
+  scale: 0.96;
+}
+
+/* The sample rows. */
+.co-hiw-board {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.co-hiw-board li {
+  display: grid;
+  /* rank, name, bar, score, pick ("Pick" / "Out" / empty). */
+  grid-template-columns: 26px minmax(0, 9.5em) minmax(0, 1fr) 30px 34px;
+  /* Row 2 holds the fee chip; it opens from 0fr when fees are shown. */
+  grid-template-rows: auto 0fr;
+  column-gap: 12px;
+  align-items: center;
+  padding: 11px 10px;
+  border-top: 1px solid var(--co-line);
+  border-radius: 12px;
+  transition: background-color 0.2s ease-out, grid-template-rows 0.45s var(--co-ease);
+}
+.co-hiw-board li:first-child {
+  border-top-color: transparent;
+}
+.co-hiw-board li:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+.co-hiw-rank {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--co-cob2);
+  transition: translate 0.4s var(--co-spring), color 0.2s ease-out;
+}
+.co-hiw-board li:hover .co-hiw-rank {
+  translate: 3px 0;
+  color: var(--co-cobalt);
+}
+/* The name cell: "Masked" and the letter share one grid cell and swap by
+   sliding through a clip, one row after another (--i). */
+.co-hiw-name {
+  display: grid;
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.co-hiw-name > * {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: translate 0.55s var(--co-ease), opacity 0.35s ease-out;
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.co-hiw-name-m {
+  color: var(--co-mute);
+}
+.co-hiw-name-r {
+  justify-self: start;
+  margin-left: -5px;
+  padding: 0 5px;
+  border-radius: 6px;
+  font-weight: 650;
+  color: var(--co-navy);
+  translate: 0 110%;
+  opacity: 0;
+}
+/* After the advisor review only the picked rows (data-named) show a name:
+   a match the buyer did not pick stays masked. */
+.co-hiw-board li[data-named] .co-hiw-name-m {
+  translate: 0 -110%;
+  opacity: 0;
+}
+.co-hiw-board li[data-named] .co-hiw-name-r {
+  translate: 0 0;
+  opacity: 1;
+}
+.co-hiw-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 8px;
+  background: rgba(13, 26, 74, 0.08);
+  overflow: hidden;
+}
+.co-hiw-bar i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--co-cobalt), var(--co-cob2));
+  transform-origin: left;
+  scale: var(--fit, 1) 1;
+  overflow: hidden;
+}
+.co-hiw-board li:hover .co-hiw-bar i {
+  filter: brightness(1.15) saturate(1.1);
+}
+.co-hiw-score {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--co-navy);
+}
+.co-hiw-fee {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  justify-self: start;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0b5a3e;
+  opacity: 0;
+  translate: 12px 0;
+  transition: opacity 0.3s ease-out, translate 0.5s var(--co-spring);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+/* The pick cell: a small mint "Pick", or a struck-through "Out" for a pick
+   the buyer swapped after seeing its name. */
+.co-hiw-pick {
+  justify-self: end;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  color: var(--co-mute);
+}
+.co-hiw-board li[data-pick="pick"] .co-hiw-pick {
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(142, 240, 201, 0.45);
+  color: #0b5a3e;
+}
+.co-hiw-board li[data-pick="out"] .co-hiw-pick {
+  text-decoration: line-through;
+}
+.co-hiw-board li[data-pick="out"] .co-hiw-name-r {
+  color: var(--co-mute);
+}
+
+/* The swap offer under the rows, and its button (after the review only). */
+.co-hiw-swap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 12px;
+  padding: 12px 10px 0;
+  border-top: 1px solid var(--co-line);
+}
+.co-hiw-swap p {
+  flex: 1 1 16em;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--co-ink2);
+}
+.co-hiw-swap-btn.co-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+}
+
+.co-hiw-mask[data-fees="on"] .co-hiw-board li {
+  grid-template-rows: auto 1fr;
+}
+.co-hiw-mask[data-fees="on"] .co-hiw-fee {
+  opacity: 1;
+  translate: 0 0;
+  padding-top: 4px;
+}
+
+/* The fee switch and the rule it shows. */
+.co-hiw-mask-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--co-line);
+}
+.co-hiw-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 4px 4px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--co-navy);
+  background: none;
+  cursor: pointer;
+}
+.co-hiw-switch-track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(13, 26, 74, 0.18);
+  transition: background-color 0.25s ease-out;
+}
+.co-hiw-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(13, 26, 74, 0.3);
+  transition: translate 0.45s var(--co-spring), scale 0.2s var(--co-ease);
+}
+.co-hiw-switch:hover .co-hiw-switch-knob {
+  scale: 1.12;
+}
+.co-hiw-switch[aria-pressed="true"] .co-hiw-switch-track {
+  background: var(--co-cobalt);
+}
+.co-hiw-switch[aria-pressed="true"] .co-hiw-switch-knob {
+  translate: 16px 0;
+}
+.co-hiw-fee-note {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--co-mute);
+  transition: color 0.3s ease-out;
+}
+.co-hiw-mask[data-fees="on"] .co-hiw-fee-note {
+  color: var(--co-navy);
+}
+
+/* The advisor review text: a little wider measure. */
+.co-hiw-review {
+  max-width: 760px;
+}
+
+/* ---- After the RFP: four cards in a row ----------------------------------- */
+
+.co-hiw-after-wrap {
+  position: relative;
+  isolation: isolate;
+}
+.co-hiw-deco-line {
+  left: -4%;
+  right: -4%;
+  top: 50%;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(91, 116, 255, 0.16), rgba(91, 116, 255, 0));
+}
+.co-hiw-after {
+  position: relative;
+  isolation: isolate;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+/* A line that joins the cards; it shows in the gaps between them and
+   draws itself from left to right when the row scrolls in. */
+.co-hiw-after::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46px;
+  z-index: -1;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--co-cobalt), var(--co-cob2) 60%, var(--co-mint));
+  transform-origin: left;
+}
+.co-hiw-after > li {
+  display: grid;
+  min-width: 0;
+}
+.co-hiw-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  padding: 22px;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+}
+/* A bright edge that grows along the top of the card under the mouse. */
+.co-hiw-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--co-cobalt), var(--co-mint));
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 0.5s var(--co-ease);
+}
+.co-hiw-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.co-hiw-card-n {
+  font-stretch: 125%;
+  font-weight: 250;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--co-cobalt);
+  transition: translate 0.5s var(--co-spring), color 0.2s ease-out;
+}
+.co-hiw-who {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: scale 0.4s var(--co-spring);
+}
+.co-hiw-who[data-who="You"] {
+  background: rgba(142, 240, 201, 0.45);
+  color: #0b5a3e;
+}
+.co-hiw-who[data-who="Provider"] {
+  background: rgba(13, 26, 74, 0.07);
+  color: var(--co-ink2);
+}
+.co-hiw-card-arrow {
+  margin-top: auto;
+  color: var(--co-cob2);
+  transition: translate 0.5s var(--co-spring), color 0.2s ease-out;
+}
+.co-tilt[data-co-hover] .co-hiw-card::before,
+.co-tilt:focus-within .co-hiw-card::before {
+  scale: 1 1;
+}
+.co-tilt[data-co-hover] .co-hiw-card-n {
+  translate: 4px -3px;
+  color: var(--co-navy);
+}
+.co-tilt[data-co-hover] .co-hiw-who {
+  scale: 1.06;
+}
+.co-tilt[data-co-hover] .co-hiw-card-arrow {
+  translate: 8px 0;
+  color: var(--co-cobalt);
+}
+.co-tilt[data-co-hover] .co-hiw-card-text {
+  color: var(--co-navy);
+}
+.co-hiw-card-text {
+  transition: color 0.2s ease-out;
+}
+
+@media (max-width: 900px) {
+  .co-hiw-masking {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .co-hiw-after {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .co-hiw-after::before {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .co-hiw-after {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .co-hiw-card-n {
+    font-size: 34px;
+  }
+  .co-hiw-mask {
+    padding: 16px;
+  }
+  .co-hiw-board li {
+    grid-template-columns: 22px minmax(0, 7.5em) minmax(0, 1fr) 26px 32px;
+    column-gap: 9px;
+    padding: 10px 6px;
+  }
+  .co-hiw-deco-ring {
+    width: 220px;
+    height: 220px;
+    right: 0;
+  }
+  .co-hiw-deco-blob {
+    left: 10%;
+    width: 220px;
+  }
+}
+
+/* ---- Movement (only when motion is allowed) ------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* In the sticky stage, each step's still fades in when the step changes
+     (seen before the 3D loads, or without WebGL), and the caption's words
+     slide up into place. */
+  .co-hiw-stage .co-hiw-still {
+    animation: co-hiw-fade 0.32s var(--co-ease) both;
+  }
+  .co-hiw-where {
+    animation: co-hiw-cap 0.55s var(--co-ease) both;
+  }
+  /* The joining line draws itself once the row has started to arrive
+     (the toolkit's reveal sets data-co-reveal="in"). */
+  .co-hiw-after[data-co-reveal="wait"]::before {
+    scale: 0 1;
+  }
+  .co-hiw-after[data-co-reveal="in"]::before {
+    animation: co-hiw-draw 1.3s var(--co-ease) 0.8s backwards;
+  }
+  /* The sample bars grow in when the demo arrives... */
+  [data-co-reveal="in"] .co-hiw-bar i {
+    animation: co-hiw-grow 1.1s var(--co-ease) backwards;
+    animation-delay: calc(450ms + var(--i, 0) * 90ms);
+  }
+  /* ...a name flashes mint as it is revealed... */
+  .co-hiw-board li[data-named] .co-hiw-name-r {
+    animation: co-hiw-flash 1.2s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+  /* ...and when fees are shown, a sheen runs along each bar in place:
+     the bars do not move, because fees are never an input. */
+  .co-hiw-bar i::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+    translate: -100% 0;
+  }
+  .co-hiw-mask[data-fees="on"] .co-hiw-bar i::after {
+    animation: co-hiw-sheen 1.1s ease-in-out backwards;
+    animation-delay: calc(200ms + var(--i, 0) * 90ms);
+  }
+}
+@keyframes co-hiw-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes co-hiw-cap {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+@keyframes co-hiw-draw {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes co-hiw-grow {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes co-hiw-flash {
+  0% {
+    background-color: rgba(142, 240, 201, 0.7);
+  }
+  100% {
+    background-color: rgba(142, 240, 201, 0);
+  }
+}
+@keyframes co-hiw-sheen {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 100% 0;
+  }
+}
+
+/* ---- Less motion: every state is still there, nothing travels ------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-hiw-num,
+  .co-hiw-parts dt,
+  .co-hiw-part,
+  .co-hiw-arrow,
+  .co-hiw-arrow svg,
+  .co-hiw-dot,
+  .co-hiw-dot-n,
+  .co-hiw-dot-t,
+  .co-hiw-replay,
+  .co-hiw-replay svg,
+  .co-hiw-seg-pill,
+  .co-hiw-seg-ctl button,
+  .co-hiw-board li,
+  .co-hiw-rank,
+  .co-hiw-name > *,
+  .co-hiw-fee,
+  .co-hiw-switch-track,
+  .co-hiw-switch-knob,
+  .co-hiw-fee-note,
+  .co-hiw-card::before,
+  .co-hiw-card-n,
+  .co-hiw-who,
+  .co-hiw-card-arrow,
+  .co-hiw-card-text {
+    transition: none;
+  }
+  .co-hiw-part:hover dt,
+  .co-hiw-board li:hover .co-hiw-rank,
+  .co-hiw-card-n,
+  .co-tilt[data-co-hover] .co-hiw-card-n,
+  .co-tilt[data-co-hover] .co-hiw-card-arrow {
+    translate: none;
+  }
+  .co-hiw-name-r,
+  .co-hiw-fee {
+    translate: none;
+  }
+  .co-hiw-board li[data-named] .co-hiw-name-m {
+    translate: none;
+  }
+}

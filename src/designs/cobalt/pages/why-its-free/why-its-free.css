@@ -1,0 +1,1742 @@
+/* /why-its-free page styles (Body.tsx and FollowTheMoney.tsx).
+   Loaded by Body.tsx, after the Cobalt styles.css, motion.css and pages.css,
+   so rules here build on theirs. Colors come only from the Cobalt variables
+   and the white/navy/mint tints those files already use. Every animation has
+   a reduced-motion version in the block at the end of this file.
+
+   Class prefixes: `co-wif-` for the page sections, `co-fm-` for the
+   "Follow the money" diagram. */
+
+/* ---- Page sections: cards ------------------------------------------------ */
+
+/* Three cards in a row. Used for "Who pays", the ranking reasons and the
+   honesty checks. Each grid cell is a Reveal element (the entrance) holding
+   a Tilt (the hover); both are grids so the card fills the row's height. */
+.co-wif-cols {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  min-width: 0;
+}
+.co-wif-cols > * {
+  display: grid;
+  min-width: 0;
+}
+/* The card itself: the tilting inner layer of Tilt (with .co-gl glass). */
+.co-wif-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px 24px 26px;
+}
+/* A short cobalt-to-mint bar on the card's top edge that runs the full
+   width on hover. */
+.co-wif-card::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--co-cobalt), var(--co-mint));
+  scale: 0.16 1;
+  transform-origin: left;
+  transition: scale 0.6s var(--co-ease);
+}
+.co-wif-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+/* The icon tile. It turns cobalt and lifts on hover. */
+.co-wif-ico {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  color: var(--co-cobalt);
+  background: rgba(35, 64, 232, 0.08);
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.14) inset;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out, translate 0.55s var(--co-spring), rotate 0.55s var(--co-spring);
+}
+.co-wif-ico svg {
+  transition: scale 0.45s var(--co-spring);
+}
+/* The card's number (ranking reasons, honesty checks). */
+.co-wif-n {
+  font-stretch: 125%;
+  font-weight: 300;
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: rgba(13, 26, 74, 0.22);
+  transition: color 0.3s ease-out, translate 0.5s var(--co-ease);
+}
+.co-wif-card h3 {
+  margin: 0 0 8px;
+  font-weight: 650;
+  font-size: 20px;
+  line-height: 1.25;
+  transition: translate 0.45s var(--co-ease);
+}
+.co-wif-card p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+/* Colour changes work with any mouse, also with reduced motion. */
+@media (hover: hover) {
+  .co-tilt:hover .co-wif-ico {
+    color: #fff;
+    background-color: var(--co-cobalt);
+  }
+  .co-tilt:hover .co-wif-n {
+    color: var(--co-cobalt);
+  }
+}
+
+/* "What MMHR does not do": one readable column of rows. Each row is a
+   Spotlight inside a Reveal (it slides in from the left). */
+.co-wif-nots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-width: 820px;
+}
+.co-wif-nots > li {
+  display: grid;
+  min-width: 0;
+}
+.co-wif-not {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 15px 18px;
+  border-radius: 14px;
+  font-size: 17px;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+  transition: background-color 0.25s ease-out;
+}
+.co-wif-not > span:last-child {
+  transition: translate 0.45s var(--co-ease);
+}
+.co-wif-not-ico {
+  display: grid;
+  flex: none;
+  margin-top: 1px;
+  color: var(--co-cobalt);
+  transition: rotate 0.6s var(--co-spring), scale 0.4s var(--co-spring), color 0.25s ease-out;
+}
+@media (hover: hover) {
+  .co-wif-not:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+  .co-wif-not:hover .co-wif-not-ico {
+    color: var(--co-navy);
+  }
+}
+
+/* Decorative shapes behind a row of cards (Parallax moves them). The scene
+   is isolated, so the shapes sit above the page but under the cards, and
+   the glass cards blur them softly. */
+.co-wif-scene {
+  position: relative;
+  isolation: isolate;
+}
+.co-wif-decor {
+  position: absolute;
+  inset: -80px 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.co-wif-orb {
+  position: absolute;
+  width: min(420px, 70%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.co-wif-orb-1 {
+  left: 0;
+  top: 8%;
+  background: radial-gradient(circle, rgba(91, 116, 255, 0.3), rgba(91, 116, 255, 0) 66%);
+}
+.co-wif-orb-2 {
+  right: 0;
+  bottom: 4%;
+  width: min(340px, 60%);
+  background: radial-gradient(circle, rgba(142, 240, 201, 0.34), rgba(142, 240, 201, 0) 66%);
+}
+.co-wif-ring {
+  position: absolute;
+  right: 12%;
+  top: 14px;
+  width: 180px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(35, 64, 232, 0.14) inset;
+}
+.co-wif-decor[data-tone="b"] .co-wif-orb-1 {
+  left: auto;
+  right: 6%;
+  top: 0;
+}
+.co-wif-decor[data-tone="b"] .co-wif-orb-2 {
+  right: auto;
+  left: 4%;
+}
+/* Beside the "does not do" list: the shapes sit in the empty right side. */
+.co-wif-decor[data-tone="c"] .co-wif-orb-1 {
+  left: auto;
+  right: 4%;
+  top: 20%;
+}
+.co-wif-decor[data-tone="c"] .co-wif-orb-2 {
+  right: 22%;
+  bottom: 0;
+}
+.co-wif-decor[data-tone="c"] .co-wif-ring {
+  right: 10%;
+  top: 30%;
+  width: 260px;
+}
+.co-wif-decor[data-tone="b"] .co-wif-ring {
+  right: auto;
+  left: 38%;
+  top: auto;
+  bottom: 18%;
+  width: 240px;
+}
+
+/* The hero's "Follow the money" arrow points down and bobs on hover. */
+.co-wif-down svg {
+  transition: translate 0.4s var(--co-spring);
+}
+
+/* Particles that run along a line, used by the diagram's lines and by "Try
+   an input". The run box is exactly as long as its line, so moving a
+   particle box by 100% of its own size carries its dot from start to end.
+   --run-x / --run-y pick the direction, --run-time the speed and
+   --run-color the dot. They only run inside a `[data-live]` parent (on
+   screen) and without reduced motion. */
+.co-wif-run {
+  --run-x: 100%;
+  --run-y: 0px;
+  --run-l: 0px;
+  --run-t: 50%;
+  position: absolute;
+  inset: -4px 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease-out;
+}
+.co-wif-run > span {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.co-wif-run > span::before {
+  content: "";
+  position: absolute;
+  left: var(--run-l);
+  top: var(--run-t);
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--run-color, var(--co-mint));
+  box-shadow: 0 0 8px var(--run-color, var(--co-mint));
+}
+/* Lines that run down instead of across. */
+.co-wif-run[data-down],
+.co-fm-wire[data-money] .co-wif-run {
+  --run-x: 0px;
+  --run-y: 100%;
+  --run-l: 50%;
+  --run-t: 0px;
+  inset: 0 -4px;
+}
+
+/* ---- Follow the money: the stage ------------------------------------------ */
+
+/* The diagram reuses the home page's dark .co-stage panel (motion.css) for
+   its navy background and glow, but grows to fit its content. */
+.co-fm.co-stage {
+  /* Space between stage boxes across (and the length of the lines between
+     them), and between the decision row and the money lane below. */
+  --fm-gap: 36px;
+  --fm-row: 56px;
+  height: auto;
+  margin-bottom: 0;
+  padding: 24px 28px 28px;
+  /* clip, not hidden: the light and dot grid reach past the edges, and a
+     hidden-overflow box can still be scrolled (a click on a stage once
+     shifted the whole diagram). clip never scrolls. */
+  overflow: clip;
+  color: #dfe5ff;
+}
+
+/* Depth layers behind the content (the stage is isolated, so z-index -1
+   sits above its navy background and under everything else): a faint dot
+   grid and a soft light that follows the mouse. */
+.co-fm-depth {
+  position: absolute;
+  inset: -40px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1.5px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 35%, #000, transparent);
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 35%, #000, transparent);
+}
+.co-fm-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(91, 116, 255, 0.3), rgba(91, 116, 255, 0) 64%);
+  opacity: 0;
+  translate: var(--fm-mx, 50%) var(--fm-my, 50%);
+  transition: opacity 0.5s ease-out, translate 0.35s ease-out;
+}
+.co-fm[data-pointer] .co-fm-glow {
+  opacity: 1;
+}
+
+/* Top bar: step count, "money moved so far", Play, Previous / Next. */
+.co-fm-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+.co-fm-count,
+.co-fm-money {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.co-fm-count b,
+.co-fm-money b {
+  font-weight: 650;
+  color: #fff;
+}
+/* Once money has moved, the words turn mint, the color of the money lane. */
+.co-fm-money[data-moved] b {
+  color: var(--co-mint);
+}
+.co-fm-steps {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Buttons on the dark stage. */
+.co-fm-btn,
+.co-fm-switch {
+  border: 0;
+  font: inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out, filter 0.15s ease-out, transform 0.15s var(--co-ease);
+}
+.co-fm-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.co-fm-btn svg {
+  flex: none;
+  transition: translate 0.4s var(--co-spring), scale 0.3s var(--co-spring);
+}
+/* "Play the story": mint, so it reads as the way in. A ring pulses a few
+   times when the diagram comes on screen, to invite a click. */
+.co-fm-play {
+  color: var(--co-mint);
+  box-shadow: 0 0 0 1px rgba(142, 240, 201, 0.45) inset;
+}
+.co-fm-play::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--co-mint);
+  opacity: 0;
+  pointer-events: none;
+}
+.co-fm-play[data-on] {
+  color: #0b1541;
+  background: var(--co-mint);
+}
+.co-fm-play[data-on]:hover {
+  background: var(--co-mint);
+  filter: brightness(1.08);
+}
+.co-fm-btn:hover,
+.co-fm-switch:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+.co-fm-btn-p {
+  background: linear-gradient(180deg, var(--co-btn-start), var(--co-btn-end));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+}
+.co-fm-btn-p:hover {
+  filter: brightness(1.15);
+}
+.co-fm-btn:active:not([aria-disabled="true"]),
+.co-fm-switch:active {
+  transform: scale(0.975);
+}
+.co-fm-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* Cobalt blue focus rings vanish on navy, so the stage uses mint. */
+.co-fm-btn:focus-visible,
+.co-fm-node:focus-visible,
+.co-fm-switch:focus-visible {
+  outline: 2px solid var(--co-mint);
+  outline-offset: 3px;
+}
+
+/* The step rail: seven segments under the bar. Passed steps are filled; the
+   current one fills over STEP_MS while the story plays (the `i`). */
+.co-fm-rail {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 16px;
+}
+.co-fm-rail > span {
+  position: relative;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+.co-fm-rail > span::before,
+.co-fm-rail i {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--co-cob2);
+  transform-origin: left;
+}
+.co-fm-rail > span::before {
+  scale: 0 1;
+  transition: scale 0.45s var(--co-ease);
+}
+.co-fm-rail > span[data-fill]::before {
+  scale: 1 1;
+}
+.co-fm-rail > span[data-money]::before {
+  background: var(--co-mint);
+}
+.co-fm-rail i {
+  background: #dfe5ff;
+  scale: 1 1;
+}
+
+/* ---- Follow the money: the diagram ---------------------------------------- */
+
+/* Wide screens: stages 1 to 6 in one row, the money lane in a row below. */
+.co-fm-flow {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: var(--fm-gap);
+  row-gap: var(--fm-row);
+  min-width: 0;
+}
+.co-fm-li {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+/* One stage box. Its color says where the visitor is: dim ahead, outlined
+   once passed, filled blue when selected. Hover only tints it. */
+.co-fm-node {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 136px;
+  padding: 14px 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, color 0.2s ease-out, opacity 0.3s ease-out;
+}
+.co-fm-node:hover,
+.co-fm-node[data-shown] {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+/* The stages next to the one being looked at: their outline brightens. */
+.co-fm-node[data-near]:not([data-state="current"]) {
+  box-shadow: 0 0 0 1px rgba(159, 176, 255, 0.5) inset;
+}
+/* While the mouse previews a stage, the stages it does not touch step back. */
+.co-fm[data-peek] .co-fm-node:not([data-shown]):not([data-near]):not([data-state="current"]) {
+  opacity: 0.5;
+}
+.co-fm[data-peek] .co-fm-node[data-shown] {
+  box-shadow: 0 0 0 1.5px rgba(159, 176, 255, 0.9) inset, 0 18px 34px -18px rgba(91, 116, 255, 0.9);
+}
+/* The arrow in the box's corner slides in on hover and on the shown stage. */
+.co-fm-go {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  color: var(--co-mint);
+  opacity: 0;
+  translate: -8px 0;
+  transition: opacity 0.25s ease-out, translate 0.45s var(--co-spring);
+}
+.co-fm-node:hover .co-fm-go,
+.co-fm-node[data-shown] .co-fm-go {
+  opacity: 1;
+  translate: 0 0;
+}
+.co-fm-num,
+.co-fm-title {
+  transition: translate 0.45s var(--co-spring), color 0.2s ease-out;
+}
+/* A light that runs round the selected box's border (rotating conic
+   gradient, masked to a 1.5px ring). Only while the diagram is on screen. */
+.co-fm-beam {
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: inherit;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  transition: opacity 0.4s ease-out;
+}
+.co-fm-beam::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(from 0deg, rgba(142, 240, 201, 0) 0 62%, rgba(142, 240, 201, 0.95) 82%, rgba(255, 255, 255, 1) 86%, rgba(142, 240, 201, 0) 92%);
+}
+.co-fm-node[data-state="done"] {
+  color: #dfe5ff;
+  box-shadow: 0 0 0 1px rgba(91, 116, 255, 0.6) inset;
+}
+.co-fm-node[data-state="current"] {
+  color: #fff;
+  background-color: rgba(35, 64, 232, 0.5);
+  box-shadow: 0 0 0 1.5px var(--co-cob2) inset, 0 14px 30px -16px rgba(35, 64, 232, 0.9);
+}
+/* The glow FollowTheMoney plays once when a box is reached or checked. */
+.co-fm-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 18px;
+  box-shadow: 0 0 0 2px var(--co-mint);
+  opacity: 0;
+  pointer-events: none;
+}
+.co-fm-num {
+  font-stretch: 125%;
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: #9fb0ff;
+}
+.co-fm-node[data-state="current"] .co-fm-num {
+  color: var(--co-mint);
+}
+.co-fm-title {
+  margin-top: 18px;
+  font-weight: 650;
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.co-fm-tag {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.7);
+}
+.co-fm-node[data-state="current"] .co-fm-tag {
+  color: rgba(255, 255, 255, 0.88);
+}
+/* Scoring's tag names its single input. Mint makes it stand out. */
+.co-fm-li:nth-child(2) .co-fm-tag {
+  color: var(--co-mint);
+}
+
+/* The line from one stage to the next. The grey track is always there; the
+   blue fill (`i`) grows along it once the visitor has passed that line.
+   --d (set by FollowTheMoney) delays each fill a little on a jump ahead. */
+.co-fm-wire {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: var(--fm-gap);
+  height: 2px;
+  margin-top: -1px;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+.co-fm-wire i {
+  position: absolute;
+  inset: 0;
+  background: var(--co-cob2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.36s var(--co-ease) calc(var(--d, 0) * 70ms);
+}
+.co-fm-wire[data-lit] i {
+  transform: none;
+}
+/* An arrow head at the end of each line. */
+.co-fm-wire::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  border: 4px solid transparent;
+  border-left: 6px solid rgba(255, 255, 255, 0.3);
+  border-right-width: 0;
+  transform: translateY(-50%);
+}
+.co-fm-wire[data-lit]::after {
+  border-left-color: var(--co-cob2);
+}
+/* The small dot FollowTheMoney sends along a line. Hidden at rest. */
+.co-fm-dot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--co-mint);
+  box-shadow: 0 0 10px var(--co-mint);
+  opacity: 0;
+}
+
+/* Particles on the lines: faint ahead, bright on lines already passed, and
+   brighter and faster on the lines into and out of the stage being looked
+   at (`data-hot`). */
+.co-fm-wire {
+  transition: background-color 0.25s ease-out;
+}
+.co-fm-wire .co-wif-run {
+  --run-color: #9fb0ff;
+  --run-time: 1.9s;
+  opacity: 0.35;
+}
+.co-fm-wire[data-lit] .co-wif-run {
+  --run-color: #dfe5ff;
+  --run-time: 1.3s;
+  opacity: 1;
+}
+.co-fm-wire[data-hot] {
+  background-color: rgba(255, 255, 255, 0.34);
+}
+.co-fm-wire[data-hot] .co-wif-run {
+  --run-time: 0.85s;
+  opacity: 1;
+}
+.co-fm-wire[data-money] .co-wif-run {
+  --run-color: var(--co-mint);
+}
+/* No money moves before the fee stage, so the money line carries nothing. */
+.co-fm-wire[data-money]:not([data-lit]) .co-wif-run {
+  opacity: 0;
+}
+
+/* The money line runs down from "You sign direct" into the money lane, in
+   mint. It is the only line that touches the referral fee. */
+.co-fm-wire[data-money] {
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: var(--fm-row);
+  margin: 0 0 0 -1px;
+}
+.co-fm-wire[data-money] i {
+  background: var(--co-mint);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.co-fm-wire[data-money][data-lit] i {
+  transform: none;
+}
+.co-fm-wire[data-money]::after {
+  right: auto;
+  left: 50%;
+  top: auto;
+  bottom: -2px;
+  border: 4px solid transparent;
+  border-top: 6px solid rgba(255, 255, 255, 0.3);
+  border-bottom-width: 0;
+  transform: translateX(-50%);
+}
+.co-fm-wire[data-money][data-lit]::after {
+  border-top-color: var(--co-mint);
+}
+.co-fm-wire[data-money] .co-fm-dot {
+  left: 50%;
+  top: 0;
+  margin: -4px 0 0 -4px;
+}
+
+/* The money lane: a dashed mint band along the bottom. It holds the
+   referral fee (under "You sign direct") and a note under the scoring
+   column. It uses the same six columns as the row above, so its contents
+   line up with the stages. */
+.co-fm-lane {
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  column-gap: var(--fm-gap);
+  align-items: start;
+  min-width: 0;
+}
+.co-fm-lane::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 18px;
+  border: 1px dashed rgba(142, 240, 201, 0.4);
+  background: rgba(142, 240, 201, 0.04);
+  pointer-events: none;
+}
+.co-fm-lane > .co-fm-node {
+  grid-column: 6;
+  grid-row: 1;
+  min-height: 116px;
+}
+.co-fm-lane .co-fm-num {
+  color: var(--co-mint);
+}
+.co-fm-lane .co-fm-node[data-state="current"] {
+  background-color: rgba(142, 240, 201, 0.14);
+  box-shadow: 0 0 0 1.5px var(--co-mint) inset, 0 14px 30px -16px rgba(142, 240, 201, 0.5);
+}
+/* While "what if a provider paid more?" is on, the fee box keeps a mint
+   outline: this is where the bigger fee goes, and the only place. */
+.co-fm[data-paid-more] .co-fm-lane .co-fm-node {
+  box-shadow: 0 0 0 1.5px var(--co-mint) inset;
+}
+.co-fm-lane-label,
+.co-fm-lane-gap {
+  grid-row: 1;
+  margin: 0;
+  padding-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78);
+  min-width: 0;
+}
+.co-fm-lane-label {
+  grid-column: 1;
+  display: grid;
+  gap: 2px;
+}
+.co-fm-lane-label b {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--co-mint);
+}
+/* Under the scoring column: "no line from fees into scoring". */
+.co-fm-lane-gap {
+  grid-column: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.co-fm-lane-gap svg {
+  flex: none;
+  color: var(--co-mint);
+}
+.co-fm-lane-label,
+.co-fm-lane-gap {
+  transition: color 0.25s ease-out;
+}
+/* Looking at scoring or the fee lights the "no line" note. */
+.co-fm-lane-gap[data-hot] {
+  color: #fff;
+}
+.co-fm-lane::before {
+  transition: background-color 0.4s ease-out, border-color 0.4s ease-out;
+}
+.co-fm-lane[data-moved]::before {
+  border-color: rgba(142, 240, 201, 0.75);
+  background-color: rgba(142, 240, 201, 0.08);
+}
+
+/* ---- Follow the money: explanation and "what if" -------------------------- */
+
+.co-fm-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.co-fm-detail {
+  padding-right: 40px;
+  min-width: 0;
+}
+.co-fm-detail h3 {
+  margin: 0 0 10px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.co-fm-detail p {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 16.5px;
+  line-height: 1.6;
+}
+/* Room for the longest explanation, so previews never make the panel jump. */
+.co-fm-current {
+  min-height: 196px;
+}
+.co-fm-current[data-money] h3 {
+  color: var(--co-mint);
+}
+.co-fm-detail .co-fm-where {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+.co-fm-where-n {
+  font-stretch: 125%;
+  font-weight: 300;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: #9fb0ff;
+}
+/* The selected stage's explanation repeated under its box: phones only. */
+.co-fm-inline {
+  display: none;
+}
+/* "Scoring reads / never reads": two short rows under the explanation. */
+.co-fm-ledger {
+  display: grid;
+  gap: 10px;
+  margin: 28px 0 0;
+  max-width: 56ch;
+}
+.co-fm-ledger > div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 14.5px;
+}
+.co-fm-ledger dt {
+  font-weight: 650;
+  color: var(--co-mint);
+}
+.co-fm-ledger div + div dt {
+  color: #fff;
+}
+.co-fm-ledger dd {
+  margin: 0;
+}
+.co-fm-what {
+  padding-left: 40px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  min-width: 0;
+}
+.co-fm-what-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.co-fm-what-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  color: #fff;
+}
+.co-fm-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+}
+
+/* The sample ranking. Numbers line up in columns. */
+.co-fm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.co-fm-table th {
+  padding: 0 10px 8px 0;
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+.co-fm-table th:last-child {
+  width: 34%;
+}
+.co-fm-table td {
+  padding: 9px 10px 9px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  vertical-align: middle;
+}
+.co-fm-table td:last-child,
+.co-fm-table th:last-child {
+  padding-right: 0;
+}
+.co-fm-table td small {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.co-fm-rank {
+  width: 40px;
+  font-weight: 650;
+  color: #fff;
+}
+.co-fm-fit {
+  width: 48px;
+  font-stretch: 125%;
+  font-weight: 750;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+/* A relative fee bar: longer means a bigger fee in this sample. */
+.co-fm-fee {
+  position: relative;
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+/* --v is the fee level as a share of the highest (0 to 1). */
+.co-fm-fee i {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background: rgba(142, 240, 201, 0.5);
+  scale: var(--v, 0) 1;
+  transform-origin: left;
+  transition: scale 0.6s var(--co-spring), background-color 0.3s ease-out;
+}
+.co-fm-table tbody tr {
+  transition: background-color 0.2s ease-out;
+}
+.co-fm-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.co-fm-table tr[data-raised] .co-fm-fee i {
+  background: var(--co-mint);
+}
+
+/* The "what if" switch: a whole-width button with a small track and knob. */
+.co-fm-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.co-fm-switch-track {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background-color 0.2s ease-out;
+}
+.co-fm-switch-track i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s var(--co-ease), background-color 0.2s ease-out;
+}
+.co-fm-switch[aria-pressed="true"] .co-fm-switch-track {
+  background: var(--co-mint);
+}
+.co-fm-switch[aria-pressed="true"] .co-fm-switch-track i {
+  transform: translateX(16px);
+  background: #0b1541;
+}
+.co-fm-verdict {
+  margin: 12px 0 0;
+  min-height: 4.65em;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #fff;
+}
+.co-fm-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---- Narrower screens ------------------------------------------------------ */
+
+/* Small laptops and tablets in landscape: tighter boxes so six still fit. */
+@media (max-width: 1100px) {
+  .co-fm.co-stage {
+    --fm-gap: 20px;
+  }
+  .co-fm-node {
+    padding: 12px 11px 14px;
+  }
+  .co-fm-title {
+    font-size: 14px;
+  }
+}
+
+/* Phones and portrait tablets: the diagram turns into one column that reads
+   top to bottom. Lines run down the left, and the money lane comes last. */
+@media (max-width: 900px) {
+  .co-fm.co-stage {
+    --fm-gap: 18px;
+    padding: 18px 16px 20px;
+  }
+  .co-fm-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin-left: 0;
+  }
+  .co-fm-play {
+    grid-column: 1 / -1;
+  }
+  .co-fm-current {
+    min-height: 0;
+  }
+  .co-fm-flow {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--fm-gap);
+    margin-top: 18px;
+  }
+  /* Number on the left, title and tag on the right. */
+  .co-fm-node {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 10px;
+    align-items: center;
+    min-height: 0;
+    padding: 12px 14px;
+  }
+  .co-fm-num {
+    grid-row: 1 / span 2;
+    font-size: 26px;
+  }
+  .co-fm-title {
+    margin-top: 0;
+    font-size: 15px;
+  }
+  .co-fm-tag {
+    margin-top: 2px;
+  }
+  /* Every line now runs down, from the middle of the number column. */
+  .co-fm-wire,
+  .co-fm-wire[data-money] {
+    left: 34px;
+    top: 100%;
+    width: 2px;
+    height: var(--fm-gap);
+    margin: 0 0 0 -1px;
+  }
+  .co-fm-wire i {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  .co-fm-wire::after,
+  .co-fm-wire[data-money]::after {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -2px;
+    border: 4px solid transparent;
+    border-top: 6px solid rgba(255, 255, 255, 0.3);
+    border-bottom-width: 0;
+    transform: translateX(-50%);
+  }
+  .co-fm-wire[data-lit]::after {
+    border-top-color: var(--co-cob2);
+  }
+  .co-fm-wire[data-money][data-lit]::after {
+    border-top-color: var(--co-mint);
+  }
+  .co-fm-wire .co-fm-dot {
+    left: 50%;
+    top: 0;
+  }
+  .co-fm-wire .co-wif-run {
+    --run-x: 0px;
+    --run-y: 100%;
+    --run-l: 50%;
+    --run-t: 0px;
+    inset: 0 -4px;
+  }
+  .co-fm-go {
+    display: none;
+  }
+  /* The lane stacks: the fee box first (the line from "You sign direct"
+     lands on it), then the two notes. */
+  .co-fm-lane {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+  .co-fm-lane::before {
+    inset: -8px;
+  }
+  .co-fm-lane > .co-fm-node,
+  .co-fm-lane-label,
+  .co-fm-lane-gap {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .co-fm-lane > .co-fm-node {
+    min-height: 0;
+  }
+  .co-fm-lane-label {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 2px 4px 0;
+  }
+  .co-fm-lane-gap {
+    padding: 0 4px 2px;
+  }
+  .co-fm-lower {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 28px;
+    padding-top: 20px;
+  }
+  .co-fm-detail {
+    padding-right: 0;
+  }
+  /* The explanation moves up under the selected box (.co-fm-inline). */
+  .co-fm-current {
+    display: none;
+  }
+  .co-fm-inline {
+    display: block;
+    margin: 0;
+    padding: 10px 4px 2px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #fff;
+  }
+  .co-fm-li {
+    flex-direction: column;
+  }
+  .co-fm-lane .co-fm-inline {
+    grid-column: 1;
+    padding-top: 0;
+  }
+  .co-fm-ledger {
+    margin-top: 0;
+  }
+  .co-fm-ledger > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .co-fm-what {
+    margin-top: 24px;
+    padding: 20px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ---- Try an input (ScoreInputs.tsx) ----------------------------------------- */
+
+/* The Reveal wrapper under the ranking reasons. */
+.co-wif-try {
+  display: grid;
+  margin-top: 24px;
+}
+.co-si {
+  --si-gap: 72px;
+  padding: 24px 28px 22px;
+}
+.co-si-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.co-si-hint {
+  margin: 0;
+  font-weight: 650;
+  font-size: 18px;
+  color: var(--co-navy);
+}
+.co-si-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--co-ink2);
+  background: rgba(13, 26, 74, 0.05);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+}
+/* Inputs | scoring | sample ranking, with lines across the gaps. */
+.co-si-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.75fr) minmax(0, 1fr);
+  column-gap: var(--si-gap);
+  align-items: stretch;
+}
+.co-si-inputs,
+.co-si-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  align-content: center;
+}
+.co-si-inputs > li {
+  position: relative;
+  display: grid;
+}
+.co-si-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px 10px 10px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  text-align: left;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, scale 0.15s var(--co-ease);
+}
+.co-si-in:hover {
+  background-color: #fff;
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.4) inset, 0 10px 24px -16px rgba(23, 45, 160, 0.6);
+}
+.co-si-in:active {
+  scale: 0.98;
+}
+.co-si-in:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+.co-si-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 15px;
+}
+.co-si-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--co-cobalt);
+  background: rgba(35, 64, 232, 0.08);
+  transition: translate 0.45s var(--co-spring), rotate 0.45s var(--co-spring);
+}
+.co-si-inputs > li[data-accepted] .co-si-ico {
+  color: var(--co-mint);
+  background: var(--co-navy);
+}
+.co-si-in small {
+  flex: none;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--co-mute);
+}
+.co-si-inputs > li[data-accepted] .co-si-in small {
+  font-weight: 600;
+  color: var(--co-cobalt);
+}
+.co-si-inputs > li[data-tried] .co-si-in {
+  box-shadow: 0 0 0 1.5px var(--co-cobalt) inset;
+}
+/* A line from each input toward scoring. The needs list's line reaches it;
+   the other two are dashed and stop at a bar (blocked). */
+.co-si-wire,
+.co-si-out {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: var(--si-gap);
+  height: 2px;
+  margin-top: -1px;
+  pointer-events: none;
+}
+.co-si-wire {
+  background: rgba(35, 64, 232, 0.4);
+}
+.co-si-inputs > li:not([data-accepted]) .co-si-wire {
+  width: calc(var(--si-gap) * 0.62);
+  background: repeating-linear-gradient(90deg, rgba(13, 26, 74, 0.22) 0 4px, transparent 4px 8px);
+}
+.co-si-inputs > li:not([data-accepted]) .co-si-wire::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -7px;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--co-navy);
+}
+.co-si-wire .co-wif-run {
+  --run-color: var(--co-cobalt);
+  --run-time: 1.2s;
+}
+.co-si-inputs > li:not([data-accepted]) .co-wif-run {
+  --run-color: rgba(13, 26, 74, 0.45);
+  --run-time: 1.6s;
+}
+/* Scoring: a small navy block with a lock. */
+.co-si-core {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  align-self: center;
+  min-height: 176px;
+  padding: 20px 14px;
+  border-radius: 18px;
+  text-align: center;
+  color: #fff;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(35, 64, 232, 0.55), rgba(35, 64, 232, 0) 75%),
+    #0b1541;
+}
+.co-si-core b {
+  font-size: 18px;
+  font-weight: 700;
+}
+.co-si-core small {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.co-si-lock {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 4px;
+  color: var(--co-mint);
+}
+.co-si-out {
+  background: rgba(35, 64, 232, 0.4);
+}
+.co-si-out .co-wif-run {
+  --run-color: var(--co-cobalt);
+  --run-time: 1.2s;
+}
+/* The sample ranking: four masked rows, each with a lock. */
+.co-si-rank {
+  gap: 8px;
+}
+.co-si-rank > li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+}
+.co-si-rank b {
+  font-stretch: 125%;
+  font-weight: 700;
+  font-size: 18px;
+}
+.co-si-rank small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--co-mute);
+}
+.co-si-rank svg {
+  color: var(--co-cobalt);
+}
+.co-si-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px 24px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--co-line);
+}
+.co-si-msg {
+  flex: 1 1 380px;
+  min-height: 3.2em;
+  margin: 0;
+  max-width: 62ch;
+  font-size: 15.5px;
+  font-weight: 550;
+  line-height: 1.55;
+  color: var(--co-navy);
+}
+.co-si-msg span {
+  display: block;
+}
+.co-si-count {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--co-mute);
+  font-variant-numeric: tabular-nums;
+}
+.co-si-count b {
+  color: var(--co-navy);
+}
+
+/* ---- Narrow screens: page sections and "Try an input" -------------------- */
+
+@media (max-width: 900px) {
+  .co-si {
+    padding: 20px 16px 18px;
+  }
+  /* One column: inputs, scoring, ranking. Lines are dropped. */
+  .co-si-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 14px;
+  }
+  .co-si-wire,
+  .co-si-out {
+    display: none;
+  }
+  .co-si-core {
+    min-height: 0;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .co-wif-cols {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .co-wif-not {
+    font-size: 16px;
+    padding: 14px;
+  }
+  /* Phones get one particle per line instead of three. */
+  .co-wif-run > span:nth-child(n + 2) {
+    display: none;
+  }
+}
+
+/* ---- Movement ---------------------------------------------------------------- */
+/* Entrances are the toolkit's Reveal (JavaScript, every browser). This
+   block holds the page's own loops and hover moves. */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Particles: run only while their parent is on screen (`data-live`). */
+  [data-live] .co-wif-run > span {
+    animation: co-wif-run var(--run-time, 1.4s) linear infinite;
+  }
+  [data-live] .co-wif-run > span:nth-child(2) {
+    animation-delay: calc(var(--run-time, 1.4s) * -0.34);
+  }
+  [data-live] .co-wif-run > span:nth-child(3) {
+    animation-delay: calc(var(--run-time, 1.4s) * -0.67);
+  }
+  /* Blocked lines in "Try an input": the particle fades out at the bar. */
+  [data-live] .co-si-inputs > li:not([data-accepted]) .co-wif-run > span {
+    animation-name: co-wif-blocked;
+  }
+
+  /* Cards: the icon lifts and turns, the number slides, the title steps
+     aside, the top bar runs across. Hover needs a mouse (Tilt sets
+     data-co-hover); a touch press does the same (data-co-press). */
+  .co-tilt[data-co-hover] .co-wif-card::before,
+  .co-tilt[data-co-press] .co-wif-card::before {
+    scale: 1 1;
+  }
+  .co-tilt[data-co-hover] .co-wif-ico,
+  .co-tilt[data-co-press] .co-wif-ico {
+    translate: 0 -4px;
+    rotate: -8deg;
+  }
+  .co-tilt[data-co-hover] .co-wif-ico svg {
+    scale: 1.1;
+  }
+  .co-tilt[data-co-hover] .co-wif-n {
+    translate: -6px 0;
+  }
+  .co-tilt[data-co-hover] .co-wif-card h3 {
+    translate: 3px 0;
+  }
+
+  /* "Does not do" rows: the minus turns over, the text steps aside. */
+  .co-wif-not[data-co-hover] .co-wif-not-ico,
+  .co-wif-not[data-co-press] .co-wif-not-ico {
+    rotate: 180deg;
+    scale: 1.15;
+  }
+  .co-wif-not[data-co-hover] > span:last-child {
+    translate: 6px 0;
+  }
+
+  /* Hero: the down arrow drops a little on hover. */
+  .co-wif-down:hover svg {
+    translate: 0 3px;
+  }
+
+  /* Diagram: inner layers move on hover, never the box itself. */
+  .co-fm-node:hover .co-fm-num {
+    translate: 4px 0;
+  }
+  .co-fm-node:hover .co-fm-title {
+    translate: 0 -2px;
+  }
+  .co-fm-btn-p:hover svg {
+    translate: 3px 0;
+  }
+  .co-fm-play:hover svg {
+    scale: 1.2;
+  }
+  .co-fm[data-live] .co-fm-play:not([data-on])::after {
+    animation: co-fm-invite 1.8s var(--co-ease) 0.6s 3;
+  }
+  .co-fm[data-live] .co-fm-node[data-state="current"] .co-fm-beam {
+    opacity: 1;
+  }
+  .co-fm[data-live] .co-fm-node[data-state="current"] .co-fm-beam::before {
+    animation: co-fm-spin 3.4s linear infinite;
+  }
+  .co-fm-rail i {
+    animation: co-fm-timer linear both;
+  }
+  .co-fm:not([data-live]) .co-fm-rail i {
+    animation-play-state: paused;
+  }
+  .co-fm[data-live] .co-fm-lane[data-moved]::before {
+    animation: co-fm-breathe 2.4s ease-in-out infinite;
+  }
+  .co-fm-lane-gap[data-hot] svg {
+    animation: co-fm-nope 0.6s var(--co-ease);
+  }
+  /* The explanation slides in each time the stage changes (key remount). */
+  .co-fm-current {
+    animation: co-fm-swap 0.55s var(--co-ease) both;
+  }
+  /* "Try an input": the result sentence rises in on each try. */
+  .co-si-msg span {
+    animation: co-fm-swap 0.5s var(--co-ease) both;
+  }
+  .co-si-in:hover .co-si-ico {
+    translate: 3px 0;
+    rotate: -6deg;
+  }
+
+  /* Depth: with a mouse over the diagram, layers shift by different
+     amounts (FollowTheMoney writes --fm-px / --fm-py, -1 to 1). The dot
+     grid moves against the content, so the stage reads as deep. */
+  .co-fm-bar,
+  .co-fm-rail,
+  .co-fm-flow,
+  .co-fm-lane,
+  .co-fm-depth {
+    transition: translate 0.9s var(--co-ease);
+  }
+  .co-fm-bar,
+  .co-fm-rail {
+    translate: calc(var(--fm-px, 0) * 3px) calc(var(--fm-py, 0) * 2px);
+  }
+  .co-fm-flow {
+    translate: calc(var(--fm-px, 0) * 7px) calc(var(--fm-py, 0) * 5px);
+  }
+  .co-fm-lane {
+    translate: calc(var(--fm-px, 0) * 4px) calc(var(--fm-py, 0) * 3px);
+  }
+  .co-fm-depth {
+    translate: calc(var(--fm-px, 0) * -20px) calc(var(--fm-py, 0) * -16px);
+  }
+}
+@keyframes co-wif-run {
+  0% { translate: 0 0; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { translate: var(--run-x) var(--run-y); opacity: 0; }
+}
+@keyframes co-wif-blocked {
+  0% { translate: 0 0; opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { translate: calc(var(--run-x) * 0.92) var(--run-y); opacity: 0; }
+}
+@keyframes co-fm-spin {
+  to { rotate: 1turn; }
+}
+@keyframes co-fm-timer {
+  from { scale: 0 1; }
+  to { scale: 1 1; }
+}
+@keyframes co-fm-invite {
+  0% { opacity: 0.9; scale: 1; }
+  100% { opacity: 0; scale: 1.06 1.35; }
+}
+@keyframes co-fm-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+@keyframes co-fm-nope {
+  0%, 100% { rotate: 0deg; }
+  30% { rotate: -16deg; }
+  65% { rotate: 12deg; }
+}
+@keyframes co-fm-swap {
+  from { opacity: 0; translate: 0 14px; filter: blur(4px); }
+  to { opacity: 1; translate: 0 0; filter: blur(0); }
+}
+
+/* ---- Less motion: keep the feedback, drop the travel ---------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-fm-btn,
+  .co-fm-btn svg,
+  .co-fm-switch,
+  .co-fm-node,
+  .co-fm-num,
+  .co-fm-title,
+  .co-fm-go,
+  .co-fm-wire i,
+  .co-fm-fee i,
+  .co-fm-switch-track,
+  .co-fm-switch-track i,
+  .co-fm-rail > span::before,
+  .co-fm-glow,
+  .co-wif-card::before,
+  .co-wif-ico,
+  .co-wif-ico svg,
+  .co-wif-n,
+  .co-wif-card h3,
+  .co-wif-not-ico,
+  .co-wif-not > span:last-child,
+  .co-si-in,
+  .co-si-ico {
+    transition: none;
+  }
+  .co-fm-btn:active:not([aria-disabled="true"]),
+  .co-fm-switch:active {
+    transform: none;
+  }
+  .co-si-in:active {
+    scale: none;
+  }
+  /* Particles, the beam, the light and the step timer are decoration that
+     only exists as movement: hide them. */
+  .co-wif-run,
+  .co-fm-beam,
+  .co-fm-glow,
+  .co-fm-rail i {
+    display: none;
+  }
+  .co-fm-go {
+    translate: none;
+  }
+}

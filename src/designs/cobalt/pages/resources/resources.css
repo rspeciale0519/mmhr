@@ -1,0 +1,740 @@
+/* /resources (src/designs/cobalt/pages/resources/).
+   Loaded by Body.tsx. Builds on styles.css, motion.css, pages.css, and the
+   motion toolkit's motion-kit.css (entrances, Tilt, Spotlight, Parallax).
+   Colors come only from the Cobalt variables. Hover moves happen on inner
+   layers (the hit box stays still); every animation is inside
+   `prefers-reduced-motion: no-preference` or switched off in the
+   reduced-motion block near the end. */
+
+/* Text for screen readers only (the checklist's live region). */
+.co-res-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Soft glows behind the checklist and the glossary, moved by Parallax.
+   Their parents isolate, so the glows sit above the page, under the cards. */
+.co-res-check,
+.co-res-gl {
+  position: relative;
+  isolation: isolate;
+}
+.co-res-deco {
+  position: absolute;
+  z-index: -1;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.co-res-deco-a {
+  left: -160px;
+  top: 120px;
+  background: radial-gradient(closest-side, rgba(91, 116, 255, 0.24), rgba(91, 116, 255, 0));
+}
+.co-res-deco-b {
+  right: -40px;
+  top: 40px;
+  background: radial-gradient(closest-side, rgba(142, 240, 201, 0.34), rgba(142, 240, 201, 0));
+}
+
+/* ---- The buyer's checklist (Checklist.tsx) ----------------------------- */
+
+/* The progress bar: ring, count, reset. It stays in view (under the menu)
+   while the visitor works down the list. */
+.co-res-prog {
+  position: sticky;
+  top: 84px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 10px 12px 10px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px var(--co-line), 0 16px 34px -24px rgba(23, 45, 160, 0.5);
+}
+.co-res-ring {
+  flex: none;
+  rotate: -90deg;
+}
+.co-res-ring circle {
+  fill: none;
+  stroke-width: 6;
+}
+.co-res-ring-bg {
+  stroke: rgba(13, 26, 74, 0.08);
+}
+.co-res-ring-fg {
+  stroke: var(--co-cobalt);
+  stroke-linecap: round;
+  stroke-dashoffset: var(--off, 0);
+  transition: stroke-dashoffset 0.6s var(--co-ease), stroke 0.4s ease-out, opacity 0.2s ease-out;
+}
+/* Nothing ticked: hide the arc (its round cap would still show a dot). */
+.co-res-check:not([data-some]) .co-res-ring-fg {
+  opacity: 0;
+}
+.co-res-check[data-all] .co-res-ring-fg {
+  stroke: #2bb985;
+}
+.co-res-count {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 650;
+  font-size: 17px;
+  color: var(--co-navy);
+}
+/* One pip per step. */
+.co-res-pips {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.co-res-pips i {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(13, 26, 74, 0.09);
+  transition: background-color 0.3s ease-out;
+}
+.co-res-pips i[data-on] {
+  background: var(--co-cobalt);
+}
+.co-res-check[data-all] .co-res-pips i {
+  background: #2bb985;
+}
+/* The number keeps the width of two digits, so the text never shifts. */
+.co-res-roll {
+  display: inline-block;
+  min-width: 2ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-stretch: 115%;
+  font-size: 24px;
+  font-weight: 750;
+  color: var(--co-cobalt);
+}
+.co-res-check[data-all] .co-res-roll {
+  color: #138a5e;
+}
+
+.co-res-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+/* One step: a surface with a light under the mouse (Spotlight). */
+.co-res-step {
+  display: grid;
+  grid-template-columns: 30px 52px minmax(0, 1fr);
+  gap: 14px;
+  height: 100%;
+  padding: 20px 20px 20px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9) inset, 0 0 0 1px var(--co-line);
+  transition: background-color 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+.co-res-step[data-co-hover] {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px rgba(35, 64, 232, 0.2), 0 22px 40px -28px rgba(23, 45, 160, 0.55);
+}
+.co-res-step[data-done] {
+  background: rgba(142, 240, 201, 0.16);
+}
+/* The checkbox: the real input sits on top of the drawn box (invisible),
+   so it gets every click and keyboard press; the box shows its state. */
+.co-res-tickbox {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+.co-res-cb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.co-res-box {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  color: #fff;
+  background: #fff;
+  box-shadow: 0 0 0 1.5px rgba(13, 26, 74, 0.25) inset;
+  pointer-events: none;
+  transition: background-color 0.25s ease-out, box-shadow 0.25s ease-out, scale 0.45s var(--co-spring);
+}
+.co-res-box path {
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* pathLength is 1: the tick is hidden at offset 1 and drawn at 0. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.35s var(--co-ease) 0.05s;
+}
+.co-res-cb:checked + .co-res-box {
+  background: var(--co-cobalt);
+  box-shadow: 0 0 0 1.5px var(--co-cobalt) inset, 0 6px 14px -6px rgba(35, 64, 232, 0.8);
+}
+.co-res-cb:checked + .co-res-box path {
+  stroke-dashoffset: 0;
+}
+.co-res-cb:hover + .co-res-box {
+  box-shadow: 0 0 0 1.5px var(--co-cobalt) inset;
+}
+.co-res-cb:focus-visible + .co-res-box {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 3px;
+}
+/* The step number, in the thin cobalt figures the home page uses. */
+.co-res-n {
+  font-stretch: 125%;
+  font-weight: 250;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--co-cobalt);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease-out, translate 0.45s var(--co-spring);
+}
+.co-res-step[data-done] .co-res-n {
+  color: #2bb985;
+}
+.co-res-step-text {
+  min-width: 0;
+}
+.co-res-steps h3 {
+  margin: 2px 0 6px;
+  font-weight: 650;
+  font-size: 18px;
+  line-height: 1.3;
+}
+.co-res-steps h3 label {
+  cursor: pointer;
+}
+/* The title is struck through when ticked: a line that draws across,
+   following the text over several lines. */
+.co-res-strike {
+  background: linear-gradient(currentColor, currentColor) 0 58% / 0 1.5px no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-size 0.45s var(--co-ease), color 0.3s ease-out;
+}
+.co-res-step[data-done] .co-res-strike {
+  background-size: 100% 1.5px;
+  color: var(--co-mute);
+}
+.co-res-steps p {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+
+/* ---- The glossary (Glossary.tsx) ---------------------------------------- */
+
+/* Search box, letter chips, and the match count, in one row. */
+.co-res-tools {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  margin-bottom: 22px;
+}
+.co-res-search {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 280px;
+  max-width: 380px;
+}
+.co-res-search-l {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--co-ink2);
+}
+.co-res-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.co-res-search-box svg {
+  position: absolute;
+  left: 14px;
+  color: var(--co-mute);
+  pointer-events: none;
+  transition: color 0.25s ease-out, scale 0.4s var(--co-spring), rotate 0.4s var(--co-spring);
+}
+.co-res-search-in {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px 0 42px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px var(--co-line), 0 10px 24px -18px rgba(23, 45, 160, 0.45);
+  transition: box-shadow 0.25s ease-out, background-color 0.25s ease-out;
+}
+.co-res-search-in:hover {
+  background: #fff;
+}
+.co-res-search-in:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--co-cobalt), 0 14px 30px -16px rgba(35, 64, 232, 0.55);
+}
+.co-res-search-box:focus-within svg {
+  color: var(--co-cobalt);
+  scale: 1.12;
+  rotate: -8deg;
+}
+.co-res-az {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.co-res-chip {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--co-ink2);
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 0 0 1px var(--co-line);
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out, box-shadow 0.2s ease-out, translate 0.4s var(--co-spring), scale 0.2s var(--co-ease);
+}
+.co-res-chip:hover {
+  color: var(--co-cobalt);
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.35), 0 8px 16px -10px rgba(35, 64, 232, 0.6);
+}
+.co-res-chip:active {
+  scale: 0.94;
+}
+.co-res-chip[aria-pressed="true"] {
+  color: #fff;
+  background: var(--co-navy);
+  box-shadow: 0 8px 18px -10px rgba(13, 26, 74, 0.7);
+}
+.co-res-chip:focus-visible,
+.co-res-more:focus-visible,
+.co-res-rel-b:focus-visible,
+.co-res-copy:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+.co-res-matches {
+  margin: 0 0 10px auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--co-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.co-res-terms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+.co-res-terms > li {
+  min-width: 0;
+}
+.co-res-terms > li[hidden] {
+  display: none;
+}
+/* An open card takes the whole row. */
+.co-res-terms > li[data-open] {
+  grid-column: 1 / -1;
+}
+.co-res-term {
+  position: relative;
+  height: 100%;
+  padding: 22px 24px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.95) inset, 0 0 0 1px var(--co-line), 0 18px 40px -32px rgba(23, 45, 160, 0.45);
+  transition: transform 0.75s var(--co-spring), translate 0.6s var(--co-spring), background-color 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+.co-tilt[data-co-hover] > .co-res-term {
+  transition: transform 0.14s ease-out, translate 0.4s var(--co-spring), background-color 0.3s ease-out, box-shadow 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px rgba(35, 64, 232, 0.22), 0 30px 54px -30px rgba(23, 45, 160, 0.55);
+}
+/* A related-term jump flashes the card it lands on. */
+.co-res-terms > li[data-flash] .co-res-term {
+  box-shadow: 0 0 0 2px var(--co-cobalt), 0 30px 54px -30px rgba(23, 45, 160, 0.55);
+}
+.co-res-term-h {
+  margin: 0;
+}
+.co-res-term-h:focus {
+  outline: none;
+}
+.co-res-term-h:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.co-res-term dfn {
+  display: inline-block;
+  font-style: normal;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  transition: color 0.3s ease-out, translate 0.45s var(--co-spring);
+}
+.co-tilt[data-co-hover] .co-res-term dfn {
+  color: var(--co-cobalt);
+  translate: 4px 0;
+}
+/* What an abbreviation stands for, under the term. */
+.co-res-exp {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--co-mute);
+}
+.co-res-def {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+/* A search match: a soft cobalt marker that sweeps in. */
+.co-res-hit {
+  border-radius: 4px;
+  padding: 0 1px;
+  color: var(--co-navy);
+  background: linear-gradient(rgba(91, 116, 255, 0.28), rgba(91, 116, 255, 0.28)) 0 0 / 100% 100% no-repeat;
+}
+/* "More": a small text button with a plus that turns into a minus. */
+.co-res-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--co-cobalt);
+  cursor: pointer;
+}
+.co-res-more-i {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: rgba(35, 64, 232, 0.1);
+  transition: background-color 0.25s ease-out, rotate 0.45s var(--co-spring), scale 0.3s var(--co-ease);
+}
+.co-res-more-i::before,
+.co-res-more-i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 1.6px;
+  margin: -0.8px 0 0 -4px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: rotate 0.35s var(--co-ease), opacity 0.25s ease-out;
+}
+.co-res-more-i::after {
+  rotate: 90deg;
+}
+.co-res-more:hover .co-res-more-i {
+  scale: 1.15;
+  background: rgba(35, 64, 232, 0.18);
+}
+.co-res-more[aria-expanded="true"] .co-res-more-i {
+  rotate: 180deg;
+  color: #fff;
+  background: var(--co-cobalt);
+}
+.co-res-more[aria-expanded="true"] .co-res-more-i::after {
+  rotate: 0deg;
+  opacity: 0;
+}
+.co-res-panel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--co-line);
+}
+.co-res-panel[hidden] {
+  display: none;
+}
+.co-res-rel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.co-res-rel-k {
+  font-size: 13px;
+  color: var(--co-mute);
+}
+.co-res-rel-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1c33c2;
+  background: rgba(35, 64, 232, 0.08);
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+.co-res-rel-b svg {
+  transition: translate 0.4s var(--co-spring);
+}
+.co-res-rel-b:hover {
+  color: #fff;
+  background: var(--co-cobalt);
+}
+.co-res-rel-b:hover svg {
+  translate: 3px 0;
+}
+.co-res-copy {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--co-navy);
+  cursor: pointer;
+}
+
+/* Nothing matches. */
+.co-res-empty {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  padding: 26px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 1px var(--co-line);
+}
+.co-res-empty p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--co-ink2);
+}
+
+/* The one-line "coming next" note under the glossary. */
+.co-res-next {
+  margin: 36px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--co-line);
+  max-width: 680px;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+
+/* ---- Movement ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Ticking: the box pops, the tick draws itself (above), the number
+     nudges. */
+  .co-res-cb:checked + .co-res-box {
+    animation: co-res-pop 0.45s var(--co-spring);
+  }
+  .co-res-step[data-co-hover] .co-res-n {
+    translate: 4px 0;
+  }
+  .co-res-step[data-co-hover] .co-res-box {
+    scale: 1.08;
+  }
+  /* Every step ticked: the ring gives one soft pulse. */
+  .co-res-pips i[data-on] {
+    animation: co-res-pip 0.45s var(--co-spring);
+  }
+  .co-res-check[data-all] .co-res-ring {
+    animation: co-res-done 0.9s var(--co-spring);
+  }
+  /* Matches sweep in from the left. */
+  .co-res-hit {
+    animation: co-res-hit 0.45s var(--co-ease) backwards;
+  }
+  /* An opened card's extra row fades down into place. */
+  .co-res-panel:not([hidden]) {
+    animation: co-res-panel 0.45s var(--co-ease) backwards;
+  }
+  .co-res-empty {
+    animation: co-res-panel 0.45s var(--co-ease) backwards;
+  }
+}
+@keyframes co-res-pop {
+  0% { scale: 0.8; }
+  60% { scale: 1.15; }
+  100% { scale: 1; }
+}
+@keyframes co-res-pip {
+  0% { scale: 1 0.4; }
+  60% { scale: 1 1.6; }
+  100% { scale: 1 1; }
+}
+@keyframes co-res-done {
+  0% { scale: 1; }
+  40% { scale: 1.18; }
+  100% { scale: 1; }
+}
+@keyframes co-res-hit {
+  from { background-size: 0 100%; }
+}
+@keyframes co-res-panel {
+  from { opacity: 0; translate: 0 -6px; }
+}
+
+/* ---- Less motion: changes land at once ---------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-res-ring-fg,
+  .co-res-box,
+  .co-res-box path,
+  .co-res-strike,
+  .co-res-n,
+  .co-res-step,
+  .co-res-term,
+  .co-res-term dfn,
+  .co-res-chip,
+  .co-res-more-i,
+  .co-res-more-i::before,
+  .co-res-more-i::after,
+  .co-res-search-box svg {
+    transition: none;
+  }
+  .co-tilt[data-co-hover] .co-res-term dfn,
+  .co-res-rel-b:hover svg {
+    translate: none;
+  }
+  .co-res-search-box:focus-within svg,
+  .co-res-more:hover .co-res-more-i,
+  .co-res-more[aria-expanded="true"] .co-res-more-i,
+  .co-res-chip:active {
+    scale: none;
+    rotate: none;
+  }
+}
+
+/* ---- Touch screens: press states instead of hover ------------------------ */
+
+@media (hover: none) {
+  .co-res-step:active,
+  .co-res-term:active {
+    background: rgba(255, 255, 255, 0.86);
+  }
+}
+
+/* ---- Phones -------------------------------------------------------------- */
+
+@media (max-width: 880px) {
+  /* The phone menu is shorter. */
+  .co-res-prog {
+    top: 72px;
+  }
+}
+@media (max-width: 760px) {
+  .co-res-steps,
+  .co-res-terms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-res-matches {
+    margin-left: 0;
+  }
+}
+@media (max-width: 600px) {
+  .co-res-step {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+  /* On a phone the number sits above the title. */
+  .co-res-n {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 26px;
+  }
+  .co-res-step-text {
+    grid-column: 2;
+  }
+  .co-res-tickbox {
+    grid-row: 1 / span 2;
+  }
+  .co-res-term dfn {
+    font-size: 20px;
+  }
+  .co-res-term {
+    padding: 18px 18px 14px;
+  }
+  .co-res-search {
+    max-width: none;
+  }
+  .co-res-deco {
+    width: 300px;
+    height: 300px;
+  }
+  .co-res-deco-b {
+    right: 0;
+  }
+  .co-res-prog {
+    gap: 12px;
+  }
+  .co-res-count {
+    font-size: 15px;
+  }
+  /* No room for the pips on a phone; the ring and count say it. */
+  .co-res-pips {
+    display: none;
+  }
+  .co-res-reset {
+    margin-left: auto;
+  }
+}

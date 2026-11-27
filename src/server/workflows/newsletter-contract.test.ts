@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
   newsletterRegistrationInputSchema,
@@ -13,6 +13,11 @@ const input = {
 };
 
 describe("newsletter registration contract", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
   test("normalizes the email and idempotency key", () => {
     expect(newsletterRegistrationInputSchema.parse(input)).toEqual({
       email: "alex@example.com",
@@ -45,7 +50,13 @@ describe("newsletter registration contract", () => {
   });
 
   test("fails closed without invoking an external provider by default", async () => {
+    // The default service is Resend. With no settings it must stop before any request.
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("RESEND_NEWSLETTER_SEGMENT_ID", "");
     await expect(registerNewsletterSubscriber(input))
       .rejects.toMatchObject({ name: NewsletterServiceError.name, code: "UNAVAILABLE" });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

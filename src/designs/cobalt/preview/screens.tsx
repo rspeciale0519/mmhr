@@ -54,8 +54,9 @@ const history: EvaluationSelectionRead = {
 const stages = [
   { n: "01", title: "Needs list", hint: "Open intakes", current: true },
   { n: "02", title: "Masked compare", hint: "After a published comparison", current: false },
-  { n: "03", title: "Advisor review", hint: "Staff record disclosure", current: false },
-  { n: "04", title: "Contenders", hint: "Up to five", current: false },
+  // Pick first: contenders are chosen masked, then the advisor review discloses them.
+  { n: "03", title: "Contenders", hint: "Up to five", current: false },
+  { n: "04", title: "Advisor review", hint: "Staff record disclosure", current: false },
   { n: "05", title: "Approved RFP", hint: "Sent by MMHR", current: false },
   { n: "06", title: "Sign direct", hint: "With the provider", current: false },
 ] as const;

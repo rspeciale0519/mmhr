@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const { registerNewsletterSubscriber } = vi.hoisted(() => ({ registerNewsletterSubscriber: vi.fn() }));
 vi.mock("@/server/workflows/newsletter-contract", async () => {
@@ -36,6 +36,10 @@ describe("public newsletter route boundary", () => {
       correlationId: "22222222-2222-4222-8222-222222222222",
     });
   });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
 
   test.each([undefined, "https://evil.example", "http://localhost:3000/path"])(
     "rejects a non-exact origin: %s",
@@ -66,5 +70,23 @@ describe("public newsletter route boundary", () => {
     const response = await POST(request(payload, "http://localhost:3000"));
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "unavailable" });
+  });
+
+  test("keeps answering 503 without calling Resend while the newsletter is not configured", async () => {
+    // Run the real contract and Resend service, with the settings left empty.
+    const actual = await vi.importActual<typeof import("@/server/workflows/newsletter-contract")>(
+      "@/server/workflows/newsletter-contract",
+    );
+    registerNewsletterSubscriber.mockImplementationOnce(actual.registerNewsletterSubscriber);
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("RESEND_NEWSLETTER_SEGMENT_ID", "");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(request(payload, "http://localhost:3000"));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "unavailable" });
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

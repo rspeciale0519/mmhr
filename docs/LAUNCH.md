@@ -13,12 +13,18 @@ No vendor user signs in for this. See [vendor-entry.md](./vendor-entry.md).
 1. A customer creates a free account and gets a private workspace.
 2. The customer enters software needs and submits them.
 3. The customer sees all published vendor options in the comparison matrix. Vendor names are hidden.
-4. The customer selects a maximum of five options.
-5. Staff talk with the customer and record the disclosure of vendor names.
+4. The customer selects a maximum of five options while vendor names are still hidden ("pick first", owner decision, 2026-11-27).
+5. Staff talk with the customer (the advisor review) and record the disclosure of vendor names, for the selected options only.
+   If the customer recognizes a selected vendor that they already know and do not want, the customer can replace it with another option
+   (owner decision, 2026-11-27). The app does not support this yet: a selection can only be added to, up to five, and no replace command exists.
 6. Staff approve the RFP and send it out to each selected vendor's contact by email (owner decision, 2026-11-17).
    The vendor does not need to sign in. The vendor workspace records the send, the due date, and each follow-up.
 7. The vendor replies outside the app, usually by email. Staff record the reply and its status in the vendor workspace.
    A vendor may still join and answer in the portal, but that is the rare case, not the launch path.
+
+The public site shows this path as six steps: 1 Share your needs, 2 Compare masked, 3 Pick up to five (names still masked),
+4 Advisor review (names of the picks only; a pick the buyer knows and does not want can be swapped for another match),
+5 One approved RFP, 6 Sign direct. Source: `src/designs/cobalt/landing/sample-ranking.ts`.
 
 Launch is ready when one customer and staff complete this path on hosted staging, with one vendor reply recorded.
 Demos, proposals, contract handoff, and account recovery are manual work at launch. Use [the pilot operating procedure](./mvp-pilot-operating-procedure.md).
@@ -27,7 +33,7 @@ Demos, proposals, contract handoff, and account recovery are manual work at laun
 
 1. One customer cannot see the data of a different customer.
 2. One vendor cannot see the replies of a competitor.
-3. Vendor names stay hidden until staff record the disclosure.
+3. Vendor names stay hidden until staff record the disclosure. Only the options the customer selected are disclosed.
 4. Commission amounts stay hidden and do not change a score.
 5. Staff logins have strong protection.
 
@@ -38,7 +44,7 @@ Add more control only when the work touches one of the five protections.
 
 | Area | Pages that stay |
 |---|---|
-| Public | `/`, `/contact`, `/privacy`, `/terms`, `/rfp/[token]` (the RFP web form a vendor opens from an emailed private link) |
+| Public | `/`, `/how-it-works`, `/why-its-free`, `/for-providers`, `/resources` (the four menu pages, owner decision, 2026-11-25), `/contact`, `/privacy`, `/terms`, `/rfp/[token]` (the RFP web form a vendor opens from an emailed private link) |
 | Sign-in | `/sign-up`, `/sign-in`, `/mfa`, `/pending-access`, `/invitations/accept` |
 | Shared | `/home`, `/workspaces`, `/members`, `/invitations` |
 | Customer | `/customer` (needs), `/customer/evaluation` (matrix), `/customer/rfp` |
@@ -48,7 +54,11 @@ Add more control only when the work touches one of the five protections.
 Blocked now by [`src/lib/launch-surface.ts`](../src/lib/launch-surface.ts) and `src/proxy.ts`:
 finance, documents, demos, proposals, and contracts, with their API routes.
 
-To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gallery`.
+Also blocked by `src/lib/launch-surface.ts`: the older public pages with unapproved claims (trim task 6).
+`/resources` is public, but every page below it, such as `/resources/partner-finder`, stays blocked (owner decision, 2026-11-25).
+`/blog` stays blocked until the blog is built in a later change.
+
+To block in trim task 7: `/designs` and `/gallery`.
 `/agentid/complete-registration` needs a review in task 4.
 
 ## What does not change
@@ -76,7 +86,7 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 | 3 | Run the launch path in a browser on the local stack; record each failure | Open |
 | 4 | Confirm the pages that stay | Open |
 | 5 | Block finance, documents, demos, proposals, and contracts | Done before the trim (allowlist) |
-| 6 | Reduce the public site to four pages | Open |
+| 6 | Reduce the public site to the public pages in the table above (eight, owner decision, 2026-11-25) | Open |
 | 7 | Block the two design galleries | Open |
 | 8 | Archive the 20 candidate designs and the older gallery; keep Pulse | Open |
 | 9 | Archive the file reader; remove `pdfjs-dist`, `mammoth`, `sharp`, and `braces` | Open |
@@ -99,6 +109,7 @@ To block in trim tasks 6 and 7: the other 17 public pages, `/designs`, and `/gal
 
 ## Owner decisions that stay open
 
+- Whether the in-app replace step (path step 5, decided 2026-11-27) must be built before launch, or handled by staff at first.
 - Approval of the Gusto and Rippling draft records. Until then, launch uses the eight approved products.
 - Removal of one expired local worker login, which task 3 needs before the local server starts.
 - Each external staging action and each production action.

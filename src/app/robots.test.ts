@@ -39,7 +39,7 @@ describe("robots route", () => {
       "/faq",
       "/partners",
       "/platform",
-      "/resources",
+      "/resources/",
       "/services",
       "/transparency",
     ]) {

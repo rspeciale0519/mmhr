@@ -1,0 +1,1049 @@
+/* Home page (src/designs/cobalt/landing/). Builds on styles.css (.co-sec,
+   .co-sech, .co-six, .co-blue, .co-final), motion.css (--co-ease, buttons,
+   the six steps lighting up), motion-kit.css (Reveal, SplitText, Tilt,
+   Spotlight, Magnetic, Parallax) and pages.css (PageSection, Q&A). Colors
+   come only from the Cobalt variables and the white/navy tints styles.css
+   already uses. Scroll entrances come from the toolkit (JavaScript driven,
+   every browser); nothing here waits on scroll-driven CSS. Everything that
+   moves has a still version: see "Less motion" at the end. */
+
+/* Text for screen readers only (the real value behind a rolling digit). */
+.co-home-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+/* isolation: the decorative orbit rings (z-index -1) stay behind the hero's
+   text but in front of the page background. */
+.co-hero {
+  isolation: isolate;
+}
+/* The stage takes a drag sideways (to spin the field) but leaves vertical
+   swipes to the page, so phones still scroll over it. */
+.co-home-stage .co-stage-gl {
+  touch-action: pan-y;
+  cursor: grab;
+}
+.co-home-stage .co-stage-gl[data-drag] {
+  cursor: grabbing;
+}
+.co-home-stage-hint {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease-out 0.8s;
+}
+/* Only once the 3D view is live (no hint over the still fallback). */
+.co-stage-gl[data-live] ~ .co-home-stage-hint {
+  opacity: 1;
+}
+/* After the first switch, re-ordered rows must not replay motion.css's
+   first-load bar growth (a moved row is re-inserted, which restarts CSS
+   animations); MatchDemo glides each bar from its old length instead. */
+.co-demo[data-touched] .co-track i {
+  animation: none;
+}
+/* A board row leans right a touch under the pointer; its 3D dot swells. */
+.co-demo .co-brow .co-n {
+  transition: translate 0.35s var(--co-ease);
+}
+.co-demo .co-brow:hover .co-n,
+.co-demo .co-brow:focus-visible .co-n {
+  translate: 4px 0;
+}
+
+/* ---- Decorative orbit rings (Orbits in Body.tsx, inside Parallax) ---------- */
+.co-home-orbits {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.co-home-orbits svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  stroke: rgba(35, 64, 232, 0.16);
+  stroke-width: 1.2;
+}
+.co-home-orbit-dot {
+  fill: var(--co-cobalt);
+  stroke: none;
+  opacity: 0.4;
+}
+.co-home-bleed {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  overflow: hidden;
+  pointer-events: none;
+}
+.co-home-orbits-hero {
+  right: -60px;
+  top: 120px;
+  width: 720px;
+  height: 720px;
+}
+.co-home-who {
+  position: relative;
+  isolation: isolate;
+}
+.co-home-orbits-who {
+  left: -300px;
+  top: 60px;
+  width: 560px;
+  height: 560px;
+}
+.co-home-free {
+  isolation: isolate;
+}
+.co-home-orbits-free {
+  right: -180px;
+  top: -160px;
+  width: 640px;
+  height: 640px;
+}
+.co-home-orbits-free svg {
+  stroke: rgba(255, 255, 255, 0.16);
+}
+.co-home-orbits-free .co-home-orbit-dot {
+  fill: var(--co-mint);
+  opacity: 0.7;
+}
+
+/* ---- Four numbers under the hero ---------------------------------------- */
+.co-home-facts {
+  margin-top: 120px;
+}
+.co-home-facts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+.co-home-fact {
+  padding: 24px 24px 26px;
+  border-radius: 22px;
+  min-width: 0;
+}
+.co-home-facts p {
+  margin: 14px 0 0;
+  max-width: 30ch;
+  font-size: 15.5px;
+  color: var(--co-ink2);
+}
+
+/* The rolling digit: a window one digit tall over a column of digits.
+   --co-odo-steps (set in HomeFacts.tsx) is how many digits the column moves
+   to reach the value; at rest it already shows the value. */
+.co-odo {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+  font-stretch: 125%;
+  font-weight: 250;
+  font-size: 112px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--co-cobalt);
+  transform-origin: left bottom;
+  transition: translate 0.5s var(--co-spring), scale 0.5s var(--co-spring), font-weight 0.4s var(--co-ease);
+}
+.co-odo-col {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--co-odo-steps, 0) * -1em));
+}
+.co-odo-col > span {
+  display: block;
+  height: 1em;
+}
+/* Hover: the digit lifts, grows a little and turns bolder. */
+.co-tilt[data-co-hover] .co-odo {
+  translate: 0 -4px;
+  scale: 1.06;
+  font-weight: 420;
+}
+
+/* ---- Who it's for --------------------------------------------------------- */
+.co-home-who {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 24px 56px;
+  align-items: start;
+}
+.co-home-who-head h2 {
+  font-stretch: 125%;
+  font-weight: 780;
+  font-size: 68px;
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.co-home-who-head p {
+  margin: 24px 0 0;
+  max-width: 36ch;
+  font-size: 17px;
+  color: var(--co-ink2);
+}
+.co-home-who-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.co-home-who-card {
+  padding: 26px 26px 28px;
+  border-radius: 22px;
+  min-width: 0;
+}
+.co-home-who-ic {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 26px;
+  border-radius: 14px;
+  color: var(--co-cobalt);
+  background: rgba(35, 64, 232, 0.09);
+  box-shadow: 0 0 0 1px rgba(35, 64, 232, 0.16) inset;
+  transition: translate 0.5s var(--co-spring), rotate 0.6s var(--co-spring), background-color 0.25s ease-out,
+    color 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+.co-home-who-card h3 {
+  margin: 0 0 10px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  transition: color 0.25s ease-out;
+}
+.co-home-who-card p {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+}
+/* Hover: the icon tile turns solid cobalt, hops and tilts; the title
+   turns cobalt. The card itself tilts toward the mouse (Tilt). */
+.co-tilt[data-co-hover] .co-home-who-ic {
+  color: #fff;
+  background: var(--co-cobalt);
+  box-shadow: 0 12px 22px -10px rgba(35, 64, 232, 0.9);
+  translate: 0 -4px;
+  rotate: -8deg;
+}
+.co-tilt[data-co-hover] .co-home-who-card h3 {
+  color: var(--co-cobalt);
+}
+
+/* A row with one "read more" link under a section. */
+.co-home-more {
+  margin-top: 44px;
+  position: relative;
+}
+
+/* ---- Six steps (SixSteps.tsx) --------------------------------------------- */
+.co-steps .co-six > div {
+  position: relative;
+  isolation: isolate;
+}
+/* The soft white card behind the selected step (and a hovered one). */
+.co-step-glow {
+  position: absolute;
+  inset: -14px -12px -18px;
+  z-index: -1;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.95) inset, 0 26px 44px -28px rgba(23, 45, 160, 0.55);
+  opacity: 0;
+  scale: 0.94;
+  transition: opacity 0.35s ease-out, scale 0.55s var(--co-spring);
+}
+.co-step[data-active] .co-step-glow {
+  opacity: 1;
+  scale: 1;
+}
+.co-step:not([data-active]):hover .co-step-glow {
+  opacity: 0.55;
+  scale: 0.98;
+}
+.co-steps .co-num {
+  transition: translate 0.5s var(--co-spring), opacity 0.3s ease-out, font-weight 0.35s var(--co-ease);
+}
+.co-step:not([data-active]) .co-num {
+  opacity: 0.42;
+}
+.co-step:hover .co-num {
+  opacity: 1;
+  translate: 0 -5px;
+}
+.co-step[data-active] .co-num {
+  font-weight: 420;
+}
+.co-steps h3 {
+  transition: color 0.25s ease-out;
+}
+.co-step[data-active] h3 {
+  color: var(--co-cobalt);
+}
+/* The step button fills the whole tile (its ::after is the click area). */
+.co-step-btn {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.co-step-btn::after {
+  content: "";
+  position: absolute;
+  inset: -14px -12px -18px;
+  border-radius: 18px;
+}
+.co-step-btn:focus-visible {
+  outline: none;
+}
+.co-step-btn:focus-visible::after {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+/* The timer bar on the tile's top line: full on the selected step; while
+   the stepper plays it fills over --co-step-ms, then the next step comes. */
+.co-step-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -3px;
+  z-index: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.co-step-bar i {
+  display: block;
+  height: 100%;
+  background: var(--co-cobalt);
+  box-shadow: 0 0 12px rgba(35, 64, 232, 0.7);
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 0.45s var(--co-ease);
+}
+.co-step[data-active] .co-step-bar i {
+  scale: 1 1;
+}
+.co-step-bar i.co-step-run {
+  animation: co-home-timer var(--co-step-ms, 5000ms) linear both;
+}
+.co-steps[data-paused] .co-step-run {
+  animation-play-state: paused;
+}
+@keyframes co-home-timer {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* The detail panel under the row. */
+.co-steps-detail {
+  margin-top: 44px;
+  padding: 24px 28px 24px 24px;
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: center;
+}
+.co-steps-art {
+  display: grid;
+  place-items: center;
+  width: 148px;
+  height: 148px;
+  border-radius: 20px;
+  color: var(--co-mint);
+  background: radial-gradient(ellipse 70% 62% at 50% 50%, rgba(35, 64, 232, 0.6), rgba(35, 64, 232, 0) 72%), #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 22px 40px -26px rgba(13, 26, 74, 0.8);
+}
+.co-glyph {
+  width: 100px;
+  height: 100px;
+  overflow: visible;
+}
+.co-g-lift {
+  translate: 0 -7px;
+}
+.co-steps-text {
+  min-width: 0;
+}
+.co-steps-of {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--co-cobalt);
+  font-variant-numeric: tabular-nums;
+}
+.co-steps-title {
+  margin: 6px 0 8px;
+  font-stretch: 120%;
+  font-weight: 740;
+  font-size: 36px;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--co-navy);
+}
+.co-steps-body {
+  margin: 0;
+  font-size: 17px;
+  color: var(--co-ink2);
+}
+.co-steps-then {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--co-mute);
+}
+.co-steps-nav {
+  display: flex;
+  gap: 10px;
+}
+.co-steps-arrow {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px var(--co-line), 0 10px 20px -14px rgba(13, 26, 74, 0.5);
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out, translate 0.45s var(--co-spring), scale 0.2s var(--co-ease),
+    opacity 0.2s ease-out;
+}
+.co-steps-arrow svg {
+  transition: translate 0.4s var(--co-spring);
+}
+.co-steps-arrow:hover:not(:disabled) {
+  color: #fff;
+  background: var(--co-cobalt);
+  translate: 0 -2px;
+}
+.co-steps-arrow:last-child:hover:not(:disabled) svg {
+  translate: 3px 0;
+}
+.co-steps-arrow:first-child:hover:not(:disabled) svg {
+  translate: -3px 0;
+}
+.co-steps-arrow:active:not(:disabled) {
+  scale: 0.94;
+}
+.co-steps-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.co-steps-arrow:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 3px;
+}
+
+/* ---- Why it's free (inside the blue .co-blue band) ------------------------ */
+.co-home-free-lede {
+  position: relative;
+  max-width: 640px;
+  margin: 28px 0 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.86);
+}
+/* Tilt wrappers fill their grid cells, so the three cards stay equal. */
+.co-rules3 > * {
+  display: grid;
+}
+.co-home-free .co-ic {
+  transition: translate 0.5s var(--co-spring), rotate 0.6s var(--co-spring), background-color 0.25s ease-out,
+    box-shadow 0.25s ease-out;
+}
+.co-home-free .co-ic svg {
+  transition: scale 0.45s var(--co-spring);
+}
+.co-home-free .co-tilt[data-co-hover] .co-ic {
+  translate: 0 -5px;
+  rotate: -10deg;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset, 0 14px 24px -12px rgba(13, 26, 74, 0.8);
+}
+.co-home-free .co-tilt[data-co-hover] .co-ic svg {
+  scale: 1.15;
+}
+/* On blue, the cursor light is white and the lit border mint. */
+.co-home-free .co-spot-light::before {
+  background: radial-gradient(400px circle at var(--co-mx, 50%) var(--co-my, 50%), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 62%);
+}
+.co-home-free .co-spot-light::after {
+  background: radial-gradient(240px circle at var(--co-mx, 50%) var(--co-my, 50%), rgba(142, 240, 201, 0.9), rgba(255, 255, 255, 0.35) 45%, rgba(255, 255, 255, 0) 72%);
+}
+
+/* The "read more" button sits on blue here, so it is solid white instead of
+   see-through glass; hover tints it sky blue. */
+.co-home-free .co-btn-g {
+  background: #fff;
+}
+.co-home-free .co-btn-g:hover {
+  background: var(--co-sky);
+}
+
+/* The fee slider demo (FeeDemo.tsx). */
+.co-home-fee {
+  position: relative;
+  margin-top: 20px;
+}
+.co-fee {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 24px 48px;
+  align-items: center;
+  padding: 30px;
+  border-radius: 24px;
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22) inset;
+  backdrop-filter: blur(10px);
+}
+.co-fee-ctl {
+  min-width: 0;
+}
+.co-fee-chip {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.co-fee-label {
+  display: block;
+  margin: 18px 0 16px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+/* The slider: a mint fill up to the thumb, a big white thumb that grows
+   under the pointer and squeezes while dragged. */
+.co-fee-range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+}
+.co-fee-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--co-mint) var(--co-fee, 0%), rgba(255, 255, 255, 0.2) var(--co-fee, 0%));
+}
+.co-fee-range::-moz-range-track {
+  height: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.co-fee-range::-moz-range-progress {
+  height: 8px;
+  border-radius: 8px;
+  background: var(--co-mint);
+}
+.co-fee-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -10px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 6px rgba(142, 240, 201, 0.28), 0 8px 18px -6px rgba(13, 26, 74, 0.8);
+  transition: scale 0.3s var(--co-spring), box-shadow 0.2s ease-out;
+}
+.co-fee-range::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 6px rgba(142, 240, 201, 0.28), 0 8px 18px -6px rgba(13, 26, 74, 0.8);
+  transition: scale 0.3s var(--co-spring), box-shadow 0.2s ease-out;
+}
+.co-fee-range:hover::-webkit-slider-thumb {
+  scale: 1.12;
+  box-shadow: 0 0 0 9px rgba(142, 240, 201, 0.32), 0 10px 20px -6px rgba(13, 26, 74, 0.8);
+}
+.co-fee-range:hover::-moz-range-thumb {
+  scale: 1.12;
+}
+.co-fee-range:active::-webkit-slider-thumb {
+  scale: 0.92 1.08;
+}
+.co-fee-range:focus-visible {
+  outline: none;
+}
+.co-fee-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px #0d1a4a, 0 0 0 6px #fff;
+}
+.co-fee-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px #0d1a4a, 0 0 0 6px #fff;
+}
+.co-fee-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.66);
+}
+.co-fee-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 0;
+  font-weight: 600;
+  font-size: 15.5px;
+  color: #fff;
+}
+.co-fee-lock {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  color: var(--co-navy);
+  background: var(--co-mint);
+}
+.co-fee-list {
+  min-width: 0;
+}
+.co-fee-head,
+.co-fee-row {
+  display: grid;
+  grid-template-columns: 30px 104px minmax(0, 1fr) minmax(70px, 120px);
+  align-items: center;
+  gap: 14px;
+}
+.co-fee-head {
+  padding: 0 14px 8px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.66);
+}
+.co-fee-head span:first-child {
+  grid-column: 3;
+}
+.co-fee-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.co-fee-row {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  font-size: 14.5px;
+}
+.co-fee-row-on {
+  box-shadow: 0 0 0 1px rgba(142, 240, 201, 0.55) inset;
+}
+.co-fee-rank {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--co-navy);
+  background: #fff;
+}
+.co-fee-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.co-fee-fit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.co-fee-fit b {
+  flex: none;
+  width: 2ch;
+  font-variant-numeric: tabular-nums;
+}
+.co-fee-bar,
+.co-fee-meter {
+  position: relative;
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.co-fee-bar i,
+.co-fee-meter i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 8px;
+}
+.co-fee-bar i {
+  width: var(--v);
+  background: #fff;
+}
+.co-fee-meter {
+  display: block;
+}
+.co-fee-meter i {
+  width: 100%;
+  background: var(--co-mint);
+  transform-origin: left;
+  transition: scale 0.4s var(--co-spring);
+}
+
+/* ---- For providers: one glass band ---------------------------------------- */
+.co-home-prov-wrap {
+  margin-top: 120px;
+}
+.co-home-prov {
+  padding: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  gap: 24px 56px;
+  align-items: end;
+}
+.co-home-prov h2 {
+  margin: 0;
+  font-stretch: 125%;
+  font-weight: 780;
+  font-size: 48px;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  overflow-wrap: break-word;
+}
+.co-home-prov p {
+  margin: 0 0 22px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+}
+
+/* ---- Tablet --------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .co-home-facts ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .co-home-who {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-home-who-head {
+    max-width: 760px;
+  }
+  .co-home-who-list {
+    margin-top: 16px;
+  }
+  .co-fee {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-steps-detail {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+  .co-steps-art {
+    width: 120px;
+    height: 120px;
+  }
+  .co-steps-nav {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+/* ---- Phone ---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .co-home-facts {
+    margin-top: 72px;
+  }
+  .co-home-facts ul {
+    gap: 12px;
+  }
+  .co-home-fact {
+    padding: 16px 16px 18px;
+    border-radius: 18px;
+  }
+  .co-home-facts p {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .co-odo {
+    font-size: 64px;
+  }
+  .co-home-who-head h2 {
+    font-size: 44px;
+  }
+  .co-home-who-head p {
+    margin-top: 16px;
+  }
+  .co-home-who-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .co-home-who-card {
+    padding: 22px;
+  }
+  .co-home-who-ic {
+    margin-bottom: 18px;
+  }
+  .co-home-who-card h3 {
+    font-size: 20px;
+  }
+  .co-home-more {
+    margin-top: 32px;
+  }
+  .co-home-orbits-hero {
+    right: -240px;
+    top: 260px;
+    width: 520px;
+    height: 520px;
+  }
+  .co-home-orbits-who {
+    left: -260px;
+    width: 420px;
+    height: 420px;
+  }
+  .co-steps-detail {
+    margin-top: 36px;
+    padding: 18px;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 16px 18px;
+    align-items: start;
+  }
+  .co-steps-art {
+    width: 84px;
+    height: 84px;
+    border-radius: 16px;
+  }
+  .co-glyph {
+    width: 60px;
+    height: 60px;
+  }
+  .co-steps-title {
+    font-size: 26px;
+  }
+  .co-steps-body {
+    font-size: 15.5px;
+  }
+  .co-steps-arrow {
+    width: 46px;
+    height: 46px;
+  }
+  .co-home-free-lede {
+    font-size: 16px;
+    margin-top: 18px;
+  }
+  .co-fee {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+  .co-fee-label {
+    font-size: 20px;
+  }
+  .co-fee-head,
+  .co-fee-row {
+    grid-template-columns: 26px 80px minmax(0, 1fr) 44px;
+    gap: 10px;
+  }
+  .co-fee-head {
+    padding: 0 10px 6px;
+  }
+  .co-fee-row {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+  .co-fee-rank {
+    width: 26px;
+    height: 26px;
+  }
+  .co-home-prov-wrap {
+    margin-top: 72px;
+  }
+  .co-home-prov {
+    padding: 26px 22px;
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: 22px;
+  }
+  .co-home-prov h2 {
+    font-size: 32px;
+  }
+  .co-home-prov p {
+    font-size: 15.5px;
+  }
+}
+
+/* ---- Movement ------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* The hero headline uses the toolkit's word-by-word rise (HeroTitle in
+     Body.tsx); switch off motion.css's older whole-line rise so the two
+     never play at once. */
+  .co-hero .co-h1.co-split,
+  .co-hero .co-h1.co-split em {
+    animation: none;
+  }
+  /* The demo card rises and grows into place while the headline lands. */
+  .co-hero .co-demo {
+    animation: co-home-demo-in 1.1s var(--co-ease) 0.4s backwards;
+  }
+
+  /* The orbit rings turn slowly on their own; Parallax moves them on scroll. */
+  .co-home-orbits svg {
+    animation: co-home-spin 90s linear infinite;
+  }
+  .co-home-orbits-who svg {
+    animation-direction: reverse;
+  }
+
+  /* The digits wait on their first number, then roll to the value. */
+  [data-co-reveal="wait"] .co-odo-col {
+    transform: none;
+  }
+  [data-co-reveal="in"] .co-odo-col {
+    transition: transform calc(0.5s + var(--co-odo-steps, 0) * 60ms) var(--co-ease);
+    transition-delay: calc(0.2s + var(--i, 0) * 110ms);
+  }
+
+  /* A new step: its drawing draws itself, its words rise in one by one. */
+  .co-g-d {
+    stroke-dasharray: 1;
+    animation: co-home-draw 0.8s var(--co-ease) calc(var(--d, 0) * 110ms) backwards;
+  }
+  .co-g-f {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: co-home-pop 0.5s var(--co-spring) calc(var(--d, 0) * 110ms + 80ms) backwards;
+  }
+  .co-g-lift {
+    animation: co-home-lift 0.6s var(--co-spring) 0.75s backwards;
+  }
+  .co-steps-text > * {
+    animation: co-rv-rise 0.6s var(--co-ease) backwards;
+  }
+  .co-steps-text > :nth-child(2) {
+    animation-delay: 50ms;
+  }
+  .co-steps-text > :nth-child(3) {
+    animation-delay: 100ms;
+  }
+  .co-steps-text > :nth-child(4) {
+    animation-delay: 150ms;
+  }
+
+  /* The fee demo's lock answers every change with a quick pop. */
+  .co-fee-lock {
+    animation: co-home-pop 0.45s var(--co-spring);
+  }
+}
+@keyframes co-home-demo-in {
+  from {
+    opacity: 0;
+    translate: 0 44px;
+    scale: 0.96;
+  }
+}
+@keyframes co-home-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes co-home-draw {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes co-home-pop {
+  from {
+    opacity: 0;
+    scale: 0.3;
+  }
+}
+@keyframes co-home-lift {
+  from {
+    translate: 0 0;
+  }
+}
+
+/* ---- Less motion: everything is in place, nothing travels. ----------------- */
+@media (prefers-reduced-motion: reduce) {
+  .co-home-stage-hint {
+    display: none;
+  }
+  .co-home-stage .co-stage-gl {
+    cursor: default;
+  }
+  .co-odo,
+  .co-home-who-ic,
+  .co-step-glow,
+  .co-steps .co-num,
+  .co-step-bar i,
+  .co-steps-arrow,
+  .co-steps-arrow svg,
+  .co-home-free .co-ic,
+  .co-home-free .co-ic svg,
+  .co-fee-meter i,
+  .co-fee-range::-webkit-slider-thumb,
+  .co-demo .co-brow .co-n {
+    transition-duration: 0.01s;
+  }
+  .co-tilt[data-co-hover] .co-odo,
+  .co-tilt[data-co-hover] .co-home-who-ic,
+  .co-home-free .co-tilt[data-co-hover] .co-ic,
+  .co-home-free .co-tilt[data-co-hover] .co-ic svg,
+  .co-step:hover .co-num,
+  .co-steps-arrow:hover:not(:disabled),
+  .co-steps-arrow:hover:not(:disabled) svg,
+  .co-demo .co-brow:hover .co-n {
+    translate: none;
+    rotate: none;
+    scale: none;
+  }
+}

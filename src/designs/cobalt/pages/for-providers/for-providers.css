@@ -1,0 +1,1051 @@
+/* /for-providers (src/designs/cobalt/pages/for-providers/).
+   Loaded by Body.tsx. Builds on styles.css, motion.css, pages.css, and the
+   motion toolkit's motion-kit.css (entrances, Tilt, Spotlight, Parallax).
+   Colors come only from the Cobalt variables and the navy/white tints the
+   home page's 3D stage already uses (motion.css, ".co-stage").
+   Hover moves happen on inner layers (the hit box stays still); every
+   animation is inside `prefers-reduced-motion: no-preference` or switched
+   off in the reduced-motion block near the end. */
+
+/* ---- "One RFP out. Answers back." (RfpFlow.tsx) ------------------------- */
+
+/* The heading row above the panel: title on the left, the "Illustration"
+   label and the Pause/Play and Replay buttons on the right. */
+.co-fp-flow-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+.co-fp-flow-head h3 {
+  margin: 0;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.co-fp-flow-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* Pause/Play keeps one width, so Replay does not jump when it changes. */
+.co-fp-tool:not(.co-fp-replay) {
+  min-width: 96px;
+}
+
+/* One dark panel: the stepper across the top, then the 3D stage on the
+   left and the status list on the right. Without WebGL only the stepper
+   and the list remain (.co-fp-panel-text). The panel is also a Spotlight:
+   a soft cobalt light and a glowing edge follow the mouse. */
+.co-fp-panel {
+  border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b1541;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 26px 44px -30px rgba(13, 26, 74, 0.8);
+  color: #dfe5ff;
+}
+.co-fp-panel-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+}
+.co-fp-panel-text .co-fp-panel-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+.co-fp-panel-text .co-fp-stage {
+  display: none;
+}
+.co-fp-panel-text .co-fp-status {
+  border-left: 0;
+  max-width: 720px;
+}
+
+/* The stepper: four stage buttons. Each has a bar that fills as the replay
+   reaches that stage (RfpFlow writes --fill, 0 to 1; full without script). */
+.co-fp-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.co-fp-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 10px;
+  min-width: 0;
+  padding: 12px 14px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out;
+}
+.co-fp-step-n {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  transition: background-color 0.3s ease-out, color 0.3s ease-out, scale 0.45s var(--co-spring), rotate 0.45s var(--co-spring);
+}
+.co-fp-step-l {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: translate 0.35s var(--co-ease);
+}
+.co-fp-step-bar {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+.co-fp-step-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #8fa2ff;
+  transform-origin: left;
+  scale: var(--fill, 1) 1;
+}
+.co-fp-step[data-done] .co-fp-step-n {
+  background: #8fa2ff;
+  color: #0b1541;
+}
+.co-fp-step[aria-current="step"] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+}
+.co-fp-step[aria-current="step"] .co-fp-step-n,
+.co-fp-step:last-child[data-done] .co-fp-step-n {
+  background: var(--co-mint);
+  color: #0b1541;
+}
+.co-fp-step:last-child .co-fp-step-bar::after {
+  background: var(--co-mint);
+}
+.co-fp-step:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+.co-fp-step:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+.co-fp-step:focus-visible {
+  outline: 2px solid var(--co-mint);
+  outline-offset: -2px;
+}
+
+/* The stage. The glow is what shows before the 3D loads. */
+.co-fp-stage {
+  position: relative;
+  min-height: 460px;
+  background:
+    radial-gradient(ellipse 22% 26% at 50% 50%, rgba(142, 240, 201, 0.16), rgba(142, 240, 201, 0) 70%),
+    radial-gradient(ellipse 60% 62% at 50% 50%, rgba(35, 64, 232, 0.55), rgba(35, 64, 232, 0) 72%),
+    #0b1541;
+}
+.co-fp-gl {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+/* RfpStage sets data-live once the first 3D frame is drawn. */
+.co-fp-gl[data-live] {
+  opacity: 1;
+}
+.co-fp-gl canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Small tags that follow the dots. RfpStage moves them (transform). */
+.co-fp-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(13, 26, 74, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: filter 0.25s ease-out, background-color 0.25s ease-out, box-shadow 0.25s ease-out, scale 0.35s var(--co-spring);
+}
+.co-fp-tag b {
+  margin-left: 6px;
+  font-weight: 500;
+  color: #dfe5ff;
+}
+.co-fp-tag-on,
+.co-fp-tag-on b {
+  color: var(--co-mint);
+}
+.co-fp-tag-core {
+  color: var(--co-mint);
+  font-weight: 600;
+}
+/* Pointing at a stage or a list row lights the matching tags. */
+.co-fp-tag[data-lit="on"] {
+  scale: 1.08;
+  background: rgba(35, 64, 232, 0.85);
+  box-shadow: 0 0 0 1px rgba(142, 240, 201, 0.7) inset, 0 6px 18px -6px rgba(142, 240, 201, 0.6);
+}
+.co-fp-tag[data-lit="off"] {
+  filter: opacity(0.4);
+}
+
+/* The status list: the same states as text. */
+.co-fp-status {
+  padding: 26px 28px 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
+}
+.co-fp-status-sum {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.co-fp-status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.co-fp-status-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin: 0 -10px;
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: opacity 0.25s ease-out, background-color 0.25s ease-out;
+}
+.co-fp-status-list li[data-lit="on"] {
+  background: rgba(255, 255, 255, 0.06);
+}
+.co-fp-status-list li[data-lit="off"] {
+  opacity: 0.45;
+}
+.co-fp-status-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  transition: color 0.25s ease-out, translate 0.35s var(--co-ease);
+}
+.co-fp-status-list li[data-lit="on"] .co-fp-status-name {
+  color: var(--co-mint);
+}
+.co-fp-status-word {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #dfe5ff;
+}
+.co-fp-status-list li[data-step="0"] .co-fp-status-word {
+  color: rgba(255, 255, 255, 0.66);
+}
+.co-fp-status-list li[data-step="4"] .co-fp-status-word {
+  color: var(--co-mint);
+  font-weight: 650;
+}
+/* Four marks under each provider: Sent, Opened, Answering, Answered. */
+.co-fp-marks {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+.co-fp-marks i {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.25s var(--co-ease);
+}
+.co-fp-marks i[data-on] {
+  background: #8fa2ff;
+}
+.co-fp-status-list li[data-step="4"] .co-fp-marks i {
+  background: var(--co-mint);
+}
+/* What each status means. */
+.co-fp-key {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12.5px;
+}
+.co-fp-key div {
+  display: flex;
+  gap: 10px;
+}
+.co-fp-key dt {
+  flex: none;
+  width: 76px;
+  font-weight: 600;
+  color: #fff;
+}
+.co-fp-key dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+/* ---- Cards shared by the path and the rules (Tilt inner layer) --------- */
+
+.co-fp-card {
+  height: 100%;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.95) inset, 0 0 0 1px var(--co-line), 0 18px 40px -30px rgba(23, 45, 160, 0.45);
+  transition: transform 0.75s var(--co-spring), translate 0.6s var(--co-spring), box-shadow 0.35s ease-out, background-color 0.35s ease-out;
+}
+.co-tilt[data-co-hover] > .co-fp-card {
+  transition: transform 0.14s ease-out, translate 0.4s var(--co-spring), box-shadow 0.35s ease-out, background-color 0.35s ease-out;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px rgba(35, 64, 232, 0.25), 0 34px 60px -30px rgba(23, 45, 160, 0.6);
+}
+
+/* ---- "From listing to signed contract": six numbered steps ------------- */
+
+.co-fp-path {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.co-fp-path-step {
+  min-width: 0;
+}
+.co-fp-path .co-fp-card {
+  position: relative;
+  padding: 26px 24px 26px;
+}
+/* The line across the top of each step. PathTrack writes --co-progress
+   (0 to 1) on the list; each step's line (--s = its place) draws in once
+   the page has scrolled far enough, one after another. Unset = all drawn. */
+.co-fp-path .co-fp-card::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--co-navy);
+  transform-origin: left;
+  scale: clamp(0, calc((var(--co-progress, 1) - 0.14) * 14 - var(--s, 0)), 1) 1;
+  transition: background-color 0.3s ease-out;
+}
+.co-fp-path .co-num {
+  display: inline-block;
+  transition: translate 0.45s var(--co-spring), color 0.3s ease-out;
+}
+.co-fp-path h3 {
+  margin: 16px 0 6px;
+  font-weight: 650;
+  font-size: 18px;
+  line-height: 1.25;
+  transition: color 0.3s ease-out;
+}
+.co-fp-path p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 15px;
+  color: var(--co-ink2);
+}
+.co-tilt[data-co-hover] .co-num {
+  translate: 6px 0;
+}
+.co-tilt[data-co-hover] > .co-fp-card::before {
+  background: var(--co-cobalt);
+}
+.co-fp-path .co-tilt[data-co-hover] h3,
+.co-fp-rule[data-co-hover] h3 {
+  color: var(--co-cobalt);
+}
+
+/* ---- "Rank is earned on fit": three rules ------------------------------- */
+
+.co-fp-rules {
+  position: relative;
+  /* Keeps the glows (z-index -1) above the page, under the cards. */
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+/* Two soft glows behind the cards, moved by Parallax as the page scrolls. */
+.co-fp-deco {
+  position: absolute;
+  z-index: -1;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.co-fp-deco-a {
+  left: -140px;
+  top: -170px;
+  background: radial-gradient(closest-side, rgba(91, 116, 255, 0.26), rgba(91, 116, 255, 0));
+}
+.co-fp-deco-b {
+  /* Stays inside the page margin, so it never widens the page. */
+  right: -60px;
+  bottom: -190px;
+  background: radial-gradient(closest-side, rgba(142, 240, 201, 0.38), rgba(142, 240, 201, 0));
+}
+.co-fp-rule {
+  height: 100%;
+}
+.co-fp-rule-in {
+  padding: 26px 26px 28px;
+}
+/* A round badge with a line icon. On hover it lifts, turns cobalt, and its
+   moving part shifts (the dot lands, the strike draws, the eye looks). */
+.co-fp-ico {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 18px;
+  border-radius: 15px;
+  color: var(--co-cobalt);
+  background: rgba(35, 64, 232, 0.08);
+  transition: background-color 0.3s ease-out, color 0.3s ease-out, translate 0.5s var(--co-spring), rotate 0.5s var(--co-spring);
+}
+.co-fp-ico-move {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: translate 0.5s var(--co-spring), scale 0.5s var(--co-spring);
+}
+.co-fp-rule[data-co-hover] .co-fp-ico {
+  color: #fff;
+  background: var(--co-cobalt);
+  translate: 0 -4px;
+  rotate: -6deg;
+}
+.co-fp-rule[data-co-hover] circle.co-fp-ico-move {
+  scale: 1.5;
+}
+.co-fp-rule[data-co-hover] path.co-fp-ico-move {
+  scale: 1.12;
+}
+.co-fp-rules h3 {
+  margin: 0 0 8px;
+  font-stretch: 115%;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: color 0.3s ease-out;
+}
+.co-fp-rules p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 16px;
+  color: var(--co-ink2);
+}
+
+/* ---- "Answering the RFP": the facts, and the reply switch ---------------- */
+
+.co-fp-answer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+.co-fp-facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.co-fp-facts li {
+  border-top: 1px solid var(--co-line);
+}
+/* Each fact is one row; on hover the row slides right, its marker turns
+   and grows, and a faint band of light appears behind it. */
+.co-fp-fact {
+  position: relative;
+  display: block;
+  margin: 0 -12px;
+  padding: 16px 12px 16px 42px;
+  border-radius: 12px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--co-ink2);
+  transition: translate 0.45s var(--co-spring), background-color 0.3s ease-out, color 0.3s ease-out;
+}
+.co-fp-fact::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 26px;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--co-cobalt);
+  transition: rotate 0.5s var(--co-spring), scale 0.5s var(--co-spring), background-color 0.3s ease-out;
+}
+.co-fp-fact:hover {
+  translate: 6px 0;
+  color: var(--co-navy);
+  background: rgba(255, 255, 255, 0.6);
+}
+.co-fp-fact:hover::before {
+  rotate: 45deg;
+  scale: 1.35;
+  background: var(--co-cob2);
+}
+
+/* The switch: two buttons on a track, with a white thumb that slides to
+   the chosen one. */
+.co-fp-reply-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.co-fp-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: 15px;
+  background: rgba(13, 26, 74, 0.07);
+  box-shadow: 0 0 0 1px var(--co-line) inset;
+}
+.co-fp-switch::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 4px);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(13, 26, 74, 0.12), 0 8px 18px -10px rgba(35, 64, 232, 0.5);
+  transition: translate 0.5s var(--co-spring);
+}
+.co-fp-switch[data-path="email"]::before {
+  translate: 100% 0;
+}
+.co-fp-switch-b {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 11px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--co-mute);
+  cursor: pointer;
+  transition: color 0.25s ease-out;
+}
+.co-fp-switch-b svg {
+  transition: translate 0.4s var(--co-spring), rotate 0.4s var(--co-spring);
+}
+.co-fp-switch-b:hover {
+  color: var(--co-navy);
+}
+.co-fp-switch-b:hover svg {
+  translate: 0 -2px;
+  rotate: -8deg;
+}
+.co-fp-switch-b[aria-pressed="true"] {
+  color: var(--co-cobalt);
+}
+.co-fp-switch-b:focus-visible {
+  outline: 2px solid var(--co-cobalt);
+  outline-offset: 2px;
+}
+
+/* The drawn window (Tilt with a spotlight). Its parts are plain shapes:
+   grey bars stand for text that is not part of the illustration. */
+.co-fp-win {
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 1px var(--co-line), 0 30px 60px -36px rgba(23, 45, 160, 0.55);
+}
+/* Both previews share one height, so switching never moves the page. */
+.co-fp-win-in {
+  min-height: 372px;
+}
+.co-fp-win-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--co-line);
+  background: rgba(237, 242, 255, 0.7);
+}
+.co-fp-win-bar > i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(13, 26, 74, 0.14);
+}
+.co-fp-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  height: 26px;
+  margin-left: 10px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--co-cobalt);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--co-line);
+}
+.co-fp-win-body {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px 20px;
+}
+.co-fp-sk {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(13, 26, 74, 0.1);
+}
+.co-fp-sk-h {
+  width: 46%;
+  height: 12px;
+  background: rgba(13, 26, 74, 0.2);
+}
+.co-fp-sk-l {
+  width: 38%;
+  grid-column: 1 / -1;
+}
+.co-fp-q {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 10px;
+}
+.co-fp-field {
+  position: relative;
+  display: block;
+  height: 28px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--co-line);
+}
+.co-fp-fill {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 64%;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(35, 64, 232, 0.35);
+  transform-origin: left;
+}
+.co-fp-saved,
+.co-fp-recorded {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0b5a3e;
+  background: rgba(142, 240, 201, 0.55);
+}
+.co-fp-recorded {
+  justify-self: start;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.co-fp-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 9px;
+  color: var(--co-cobalt);
+  background: rgba(35, 64, 232, 0.08);
+}
+.co-fp-up .co-fp-sk {
+  background: rgba(35, 64, 232, 0.25);
+}
+/* Submit, then Locked: two labels in one cell; the finished state shows
+   Locked (the animation plays Submit first). */
+.co-fp-submit {
+  display: grid;
+  justify-self: end;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--co-navy);
+}
+.co-fp-submit-a,
+.co-fp-submit-b {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.co-fp-submit-a {
+  opacity: 0;
+}
+/* The email. */
+.co-fp-to {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--co-line);
+}
+.co-fp-to-k {
+  font-size: 13px;
+  color: var(--co-mute);
+}
+.co-fp-to-v {
+  height: 26px;
+}
+.co-fp-line {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(13, 26, 74, 0.12);
+  transform-origin: left;
+}
+.co-fp-send-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.co-fp-send {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--co-cobalt);
+}
+/* The envelope only shows while it flies off (see the animations). */
+.co-fp-env {
+  display: inline-flex;
+  scale: 1.5;
+  color: var(--co-cobalt);
+  opacity: 0;
+}
+
+/* The steps under the window, each with a dot. */
+.co-fp-reply-steps {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.co-fp-reply-steps li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 15px;
+  color: var(--co-ink2);
+}
+.co-fp-reply-steps li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--co-cobalt);
+  box-shadow: 0 0 0 3px rgba(35, 64, 232, 0.14);
+}
+
+/* ---- Movement ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hover moves inside the stepper. */
+  .co-fp-step:hover .co-fp-step-n {
+    scale: 1.12;
+    rotate: -8deg;
+  }
+  .co-fp-step:hover .co-fp-step-l {
+    translate: 3px 0;
+  }
+  .co-fp-status-list li[data-lit="on"] .co-fp-status-name {
+    translate: 4px 0;
+  }
+  /* A status word slides in each time it changes (RfpFlow keys it). */
+  .co-fp-status-word {
+    display: inline-block;
+    animation: co-fp-word 0.45s var(--co-ease) backwards;
+  }
+  .co-fp-marks i[data-on] {
+    animation: co-fp-mark 0.5s var(--co-ease) backwards;
+  }
+  /* The path lines draw smoothly between scroll frames. */
+  .co-fp-path .co-fp-card::before {
+    transition: scale 0.25s linear, background-color 0.3s ease-out;
+  }
+
+  /* The reply preview. ReplyPaths sets data-anim: "wait" holds every part
+     at its first frame until the preview is on screen, "run" plays. Each
+     part starts at its --at (seconds). */
+  [data-anim="wait"] *,
+  [data-anim="wait"] *::before {
+    animation-play-state: paused !important;
+  }
+  [data-anim] .co-fp-url {
+    animation: co-fp-pop 0.5s var(--co-ease) var(--at) backwards;
+  }
+  [data-anim] .co-fp-fill,
+  [data-anim] .co-fp-line {
+    animation: co-fp-grow 0.55s var(--co-ease) var(--at) backwards;
+  }
+  [data-anim] .co-fp-q {
+    animation: co-fp-fade 0.4s ease-out calc(var(--at) - 0.3s) backwards;
+  }
+  [data-anim] .co-fp-saved {
+    animation: co-fp-pop 0.45s var(--co-spring) calc(var(--at) + 0.55s) backwards;
+  }
+  [data-anim] .co-fp-up {
+    animation: co-fp-slide 0.55s var(--co-spring) var(--at) backwards;
+  }
+  [data-anim] .co-fp-submit,
+  [data-anim] .co-fp-send {
+    animation: co-fp-press 0.4s ease-out var(--at) backwards;
+  }
+  [data-anim] .co-fp-submit-a {
+    animation: co-fp-gone calc(var(--at) + 0.4s) linear backwards;
+  }
+  [data-anim] .co-fp-submit-b {
+    animation: co-fp-pop 0.45s var(--co-spring) calc(var(--at) + 0.35s) backwards;
+  }
+  [data-anim] .co-fp-env {
+    animation: co-fp-fly 0.9s var(--co-ease) var(--at) backwards;
+  }
+  [data-anim] .co-fp-recorded {
+    animation: co-fp-pop 0.55s var(--co-spring) var(--at) backwards;
+  }
+  .co-fp-reply-steps[data-anim] li {
+    animation: co-fp-step 0.5s var(--co-ease) var(--at) backwards;
+  }
+  .co-fp-reply-steps[data-anim] li::before {
+    animation: co-fp-dot 0.6s var(--co-spring) var(--at) backwards;
+  }
+}
+@keyframes co-fp-word {
+  from { opacity: 0; translate: 0 6px; }
+}
+@keyframes co-fp-mark {
+  from { scale: 0 1; }
+}
+@keyframes co-fp-pop {
+  from { opacity: 0; scale: 0.7; }
+}
+@keyframes co-fp-grow {
+  from { scale: 0 1; }
+}
+@keyframes co-fp-fade {
+  from { opacity: 0.25; }
+}
+@keyframes co-fp-slide {
+  from { opacity: 0; translate: -18px 0; }
+}
+@keyframes co-fp-press {
+  0% { scale: 1; filter: brightness(1); }
+  45% { scale: 0.92; filter: brightness(1.3); }
+  100% { scale: 1; filter: brightness(1); }
+}
+@keyframes co-fp-gone {
+  0%, 88% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes co-fp-fly {
+  0% { opacity: 1; translate: 0 0; rotate: 0deg; }
+  20% { opacity: 1; translate: 10px -4px; rotate: -4deg; }
+  100% { opacity: 0; translate: 220px -90px; rotate: -18deg; }
+}
+@keyframes co-fp-step {
+  from { opacity: 0.3; translate: -8px 0; }
+}
+@keyframes co-fp-dot {
+  from { scale: 0.3; background: rgba(13, 26, 74, 0.2); box-shadow: 0 0 0 0 rgba(35, 64, 232, 0.3); }
+  60% { box-shadow: 0 0 0 8px rgba(35, 64, 232, 0); }
+}
+
+/* ---- Less motion: no fades, no glides ----------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .co-fp-gl,
+  .co-fp-marks i,
+  .co-fp-tag,
+  .co-fp-card,
+  .co-fp-fact,
+  .co-fp-fact::before,
+  .co-fp-ico,
+  .co-fp-ico-move,
+  .co-fp-switch::before,
+  .co-fp-step-n,
+  .co-fp-step-l {
+    transition-duration: 0.01s;
+  }
+  .co-fp-tag[data-lit="on"],
+  .co-fp-fact:hover::before,
+  .co-fp-rule[data-co-hover] .co-fp-ico-move {
+    scale: none;
+  }
+  .co-fp-fact:hover,
+  .co-tilt[data-co-hover] .co-num,
+  .co-fp-rule[data-co-hover] .co-fp-ico {
+    translate: none;
+    rotate: none;
+  }
+  .co-fp-path .co-fp-card::before {
+    scale: 1 1;
+  }
+}
+
+/* ---- Touch screens: press states instead of hover ------------------------ */
+
+@media (hover: none) {
+  .co-fp-fact:active {
+    background: rgba(255, 255, 255, 0.6);
+  }
+  .co-fp-card:active {
+    background: rgba(255, 255, 255, 0.85);
+  }
+}
+
+/* ---- Phones -------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .co-fp-path {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .co-fp-rules,
+  .co-fp-answer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-fp-answer {
+    gap: 36px;
+  }
+}
+@media (max-width: 760px) {
+  /* The list moves under the stage. */
+  .co-fp-panel-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .co-fp-stage {
+    min-height: 300px;
+  }
+  .co-fp-status {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+@media (max-width: 600px) {
+  .co-fp-flow-head h3 {
+    font-size: 19px;
+  }
+  .co-fp-panel {
+    border-radius: 18px;
+  }
+  .co-fp-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 8px;
+  }
+  .co-fp-step {
+    padding: 10px 10px 8px;
+    font-size: 13.5px;
+  }
+  .co-fp-stage {
+    min-height: 270px;
+  }
+  .co-fp-status {
+    padding: 18px 18px 20px;
+  }
+  /* On a phone the tags show only the letter; the list says the status. */
+  .co-fp-tag {
+    font-size: 11.5px;
+    padding: 1px 7px;
+  }
+  .co-fp-tag b {
+    display: none;
+  }
+  .co-fp-path {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .co-fp-path .co-num {
+    font-size: 48px;
+  }
+  .co-fp-fact {
+    font-size: 16px;
+  }
+  .co-fp-deco {
+    width: 300px;
+    height: 300px;
+  }
+  .co-fp-deco-b {
+    right: 0;
+  }
+  .co-fp-switch {
+    width: 100%;
+  }
+  .co-fp-switch-b {
+    padding: 0 10px;
+  }
+}

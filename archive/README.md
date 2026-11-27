@@ -41,3 +41,7 @@ Trim task 8 (the two design galleries):
 - `src/app/(marketing)/designs/`: the `/designs` pages.
 
 The archived designs load fonts from `src/assets/fonts/`. Those fonts stay in `src/`, so a restored design finds them.
+
+Newsletter provider change (owner decision, 2026-11-25: Resend replaces Beehiiv):
+
+- `src/server/workflows/beehiiv-newsletter-service.ts` and its test: the older Beehiiv newsletter adapter.

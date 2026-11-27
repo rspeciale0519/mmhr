@@ -93,13 +93,16 @@ Contracts, metadata commands, and injected test adapters do not establish produc
 | Managed content | Embedded Payload | ContentService |
 | External content acquisition | Firecrawl | ContentAcquisitionService |
 | Scheduling | Cal.com | CalendarService |
-| Newsletter | Beehiiv | NewsletterService |
+| Newsletter | Resend (contacts in one newsletter segment; owner choice 2026-11-25) | NewsletterService |
 | PDF generation | @react-pdf/renderer | PdfRenderer |
 | AI processing | No fixed provider or model | AIService |
 | Malware scanning | ClamAV; verified local engine 1.4.6 | DocumentScanner |
 | Finance export or handoff | Select during commission implementation | FinanceExportService |
 
-The newsletter route uses an actual Beehiiv adapter in `src/server/workflows/beehiiv-newsletter-service.ts`.
+The newsletter route uses an actual Resend adapter in `src/server/workflows/resend-newsletter-service.ts`.
+It adds each subscriber as a Resend contact in the segment named by `RESEND_NEWSLETTER_SEGMENT_ID`, with `consent_at` and `consent_source` contact properties.
+The site footer shows the signup only when `RESEND_API_KEY` and `RESEND_NEWSLETTER_SEGMENT_ID` are set; that check runs at build time.
+Resend has no built-in double opt-in. The earlier Beehiiv adapter is in `archive/src/server/workflows/`.
 Configured live delivery, consent withdrawal, and provider failure acceptance remain unverified.
 The adapter location differs from the required `src/server/integrations/` boundary below. Reconcile it during the integration work.
 The AI service supports injected adapters, but routing, persistent run evidence, cost, and human review are not fully composed.

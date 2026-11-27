@@ -12,7 +12,9 @@ async function openLanding(page: Page) {
 
 function landingCtas(page: Page) {
   return {
-    startFree: page.locator("a.co-btn-p", { hasText: "Start free" }),
+    // The phone menu panel holds a second "Start free" link, so take the one
+    // that is on screen (the header button, or the panel one when it is open).
+    startFree: page.locator("a.co-btn-p:visible", { hasText: "Start free" }).first(),
     needs: page.locator("a.co-btn-p", { hasText: "Start your needs list" }).first(),
     ghost: page.locator("a.co-btn-g", { hasText: "How ranking works" }),
     accept: page.getByRole("button", { name: "Accept" }),

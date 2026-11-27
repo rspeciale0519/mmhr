@@ -28,6 +28,8 @@ export type StageNode = {
   top: boolean;
   /** True when the visitor picked this provider as a contender. */
   picked: boolean;
+  /** True while the visitor points at (or focuses) this provider's board row. */
+  hot?: boolean;
 };
 
 type Props = {
@@ -82,6 +84,14 @@ function makeGlowTexture() {
  * middle and each masked provider is a dot. The closer a dot is to the
  * middle, the better it fits. Dots glide to new places when needs change.
  *
+ * Alive before anyone touches it: the field turns slowly, the dots bob, the
+ * center breathes and a ring pings out every few seconds (and at once when
+ * a need is switched). With a mouse over the demo card, the camera and field
+ * lean toward the pointer with a soft, weighty ease. Any pointer can drag
+ * across the stage to spin it. Pointing at a board row makes its dot swell.
+ * The loop pauses off screen and in hidden tabs; reduced motion draws one
+ * still frame; without WebGL the CSS glow behind the canvas stays.
+ *
  * This file is loaded only when the demo scrolls into view, so the 3D
  * library does not slow down the first page load.
  */
@@ -93,6 +103,8 @@ export function MatchStage({ nodes, reduced }: Props) {
   const latest = useRef({ nodes, reduced });
   // Set by the setup effect so the data effect can ask for a redraw.
   const redraw = useRef<(() => void) | null>(null);
+  // Set by the setup effect: starts a ping ring from the center.
+  const ping = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -137,7 +149,8 @@ export function MatchStage({ nodes, reduced }: Props) {
 
     // A wide soft light under the field, then "your needs" in the middle.
     field.add(makeDot(0x2340e8, 9, 0.5));
-    field.add(makeDot(MINT, 0.9, 0.9));
+    const coreDot = makeDot(MINT, 0.9, 0.9);
+    field.add(coreDot);
     field.add(makeDot(0xffffff, 0.3, 1));
 
     // Guide rings, so the eye can read distance as a score band.
@@ -155,6 +168,21 @@ export function MatchStage({ nodes, reduced }: Props) {
       field.add(new LineLoop(geometry, material));
     });
 
+    // A ring that grows out of "your needs" and fades, like a sonar ping.
+    // It pings every few seconds while idle, and at once when the needs
+    // change, so the field always looks alive and answers every toggle.
+    const pulsePoints: number[] = [];
+    for (let step = 0; step < 96; step += 1) {
+      const angle = (step / 96) * Math.PI * 2;
+      pulsePoints.push(Math.cos(angle), 0, Math.sin(angle));
+    }
+    const pulseGeometry = new BufferGeometry();
+    pulseGeometry.setAttribute("position", new BufferAttribute(new Float32Array(pulsePoints), 3));
+    const pulseMaterial = new LineBasicMaterial({ color: MINT, transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false });
+    disposables.push(pulseGeometry, pulseMaterial);
+    const pulse = new LineLoop(pulseGeometry, pulseMaterial);
+    field.add(pulse);
+
     // One dot per provider. Each keeps a fixed direction from the center
     // and a small height offset, so only its distance changes when the
     // score changes. Stepping by 5 places around the circle keeps
@@ -171,6 +199,9 @@ export function MatchStage({ nodes, reduced }: Props) {
         radius: latest.current.reduced ? radiusFor(latest.current.nodes[index].score) : 5.2,
         top: 0,
         picked: 0,
+        hot: 0,
+        // Each dot bobs up and down on its own beat.
+        phase: index * 1.7,
       };
     });
 
@@ -187,6 +218,8 @@ export function MatchStage({ nodes, reduced }: Props) {
 
     let width = 1;
     let height = 1;
+    // Where the camera sits before the pointer leans it (set in resize).
+    const base = { y: 0, z: 0, distance: 1 };
     /** Matches the drawing size to the box and backs the camera up to fit. */
     function resize() {
       width = Math.max(1, host!.clientWidth);
@@ -199,16 +232,30 @@ export function MatchStage({ nodes, reduced }: Props) {
       const forWidth = 3.7 / (halfView * camera.aspect);
       const forHeight = (3.4 * Math.sin(elevation) + 0.45) / halfView;
       const distance = Math.max(forWidth, forHeight);
-      camera.position.set(0, Math.sin(elevation) * distance, Math.cos(elevation) * distance);
-      camera.lookAt(0, -0.15, 0);
+      base.y = Math.sin(elevation) * distance;
+      base.z = Math.cos(elevation) * distance;
+      base.distance = distance;
       camera.updateProjectionMatrix();
+      aim();
     }
 
-    // Pointer position inside the stage, from -0.5 to 0.5. Mouse only.
+    /** Places the camera: its resting spot, leaned toward the pointer. */
+    function aim() {
+      camera.position.set(lean.x * base.distance * 0.16, base.y - lean.y * base.distance * 0.08, base.z);
+      camera.lookAt(0, -0.15, 0);
+    }
+
+    // Pointer position over the demo, from -1 to 1 on each axis (mouse
+    // only). `lean` follows it smoothly; the camera and field use `lean`.
     const pointer = { x: 0, y: 0 };
+    const lean = { x: 0, y: 0 };
+    // Turning: a slow steady spin, plus `fling`, the extra speed a drag
+    // gives, which fades out on its own.
     let spin = 0.6;
-    let lean = 0;
-    let sway = 0;
+    let fling = 0;
+    let clock = 0;
+    // Seconds since the last ping; starts so the first one comes soon.
+    let sincePulse = 2.2;
     const scratch = new Vector3();
     const tint = new Color();
 
@@ -218,30 +265,48 @@ export function MatchStage({ nodes, reduced }: Props) {
       // How far to move this frame. 1 means "jump straight to the target".
       const ease = still ? 1 : 1 - Math.exp(-seconds * 5);
       if (!still) {
-        spin += seconds * 0.07;
-        lean += (pointer.y * 0.18 - lean) * ease;
-        sway += (pointer.x * 0.5 - sway) * ease;
+        clock += seconds;
+        spin += seconds * (0.12 + fling);
+        fling *= Math.exp(-seconds * 1.6);
+        // Lean toward the pointer with a softer ease, so it feels weighty.
+        const follow = 1 - Math.exp(-seconds * 3);
+        lean.x += (pointer.x - lean.x) * follow;
+        lean.y += (pointer.y - lean.y) * follow;
+        aim();
       }
-      field.rotation.set(lean, spin + sway, 0);
+      field.rotation.set(lean.y * 0.12, spin + lean.x * 0.35, 0);
+
+      // "Your needs" breathes, and the ping ring travels outward.
+      coreDot.scale.setScalar(still ? 0.9 : 0.9 + Math.sin(clock * 2.2) * 0.12);
+      sincePulse += seconds;
+      if (!still && sincePulse > 3.6) sincePulse = 0;
+      const travel = Math.min(1, sincePulse / 1.8);
+      pulse.scale.setScalar(0.4 + travel * 3.4);
+      pulseMaterial.opacity = still ? 0 : (1 - travel) * 0.55;
 
       dots.forEach((item, index) => {
         const node = current[index];
         item.radius += (radiusFor(node.score) - item.radius) * ease;
         item.top += ((node.top ? 1 : 0) - item.top) * ease;
         item.picked += ((node.picked ? 1 : 0) - item.picked) * ease;
+        item.hot += ((node.hot ? 1 : 0) - item.hot) * (still ? 1 : 1 - Math.exp(-seconds * 10));
 
         const x = Math.cos(item.angle) * item.radius;
         const z = Math.sin(item.angle) * item.radius;
-        item.dot.position.set(x, item.height, z);
-        item.dot.scale.setScalar(0.26 + item.top * 0.24 + item.picked * 0.1);
-        // Blend dim to bright as it joins the board, then to mint if picked.
-        tint.copy(DIM).lerp(BRIGHT, item.top).lerp(MINT, item.picked);
+        const y = item.height + (still ? 0 : Math.sin(clock * 1.3 + item.phase) * 0.07);
+        item.dot.position.set(x, y, z);
+        // A hot dot (its row is pointed at) swells and pulses.
+        const throb = still ? 0 : Math.sin(clock * 7) * 0.05;
+        item.dot.scale.setScalar(0.26 + item.top * 0.24 + item.picked * 0.1 + item.hot * (0.32 + throb));
+        // Blend dim to bright as it joins the board, then to mint if picked
+        // (and partly mint while its row is pointed at).
+        tint.copy(DIM).lerp(BRIGHT, item.top).lerp(MINT, item.picked).lerp(MINT, item.hot * 0.6);
         item.dot.material.color.copy(tint);
-        item.dot.material.opacity = node.score === null ? 0.35 : 0.5 + item.top * 0.5;
+        item.dot.material.opacity = node.score === null ? 0.35 : Math.min(1, 0.5 + item.top * 0.5 + item.hot * 0.5);
 
         // The link runs from the center (left at 0,0,0) to the dot.
-        linkPositions.set([x, item.height, z], index * 6 + 3);
-        const strength = item.top * 0.55;
+        linkPositions.set([x, y, z], index * 6 + 3);
+        const strength = Math.min(1, item.top * 0.55 + item.hot * 0.6);
         linkColors.set([0, 0, 0, tint.r * strength, tint.g * strength, tint.b * strength], index * 6);
       });
       linkGeometry.attributes.position.needsUpdate = true;
@@ -258,7 +323,7 @@ export function MatchStage({ nodes, reduced }: Props) {
         const left = (scratch.x * 0.5 + 0.5) * width;
         const top = (-scratch.y * 0.5 + 0.5) * height;
         tag.style.transform = `translate(${left.toFixed(1)}px, ${top.toFixed(1)}px) translate(-50%, -155%)`;
-        tag.style.opacity = item.top.toFixed(2);
+        tag.style.opacity = Math.max(item.top, item.hot).toFixed(2);
       });
       // The "Your needs" tag sits just under the glow in the middle.
       const core = coreRef.current;
@@ -293,6 +358,9 @@ export function MatchStage({ nodes, reduced }: Props) {
       }
     }
     redraw.current = sync;
+    ping.current = () => {
+      sincePulse = 0;
+    };
 
     const sizeWatcher = new ResizeObserver(() => {
       resize();
@@ -304,18 +372,45 @@ export function MatchStage({ nodes, reduced }: Props) {
       sync();
     });
     viewWatcher.observe(host);
+    // Mouse: the whole demo card is the hover area, so the scene starts to
+    // lean as soon as the pointer comes near it. Any pointer (mouse, finger,
+    // pen) can also drag across the stage to spin the field; a quick flick
+    // keeps it turning for a moment. CSS sets `touch-action: pan-y` on the
+    // stage, so a vertical swipe still scrolls the page as usual.
+    const area = host.closest<HTMLElement>(".co-demo") ?? host;
+    let dragX: number | null = null;
     function onPointer(event: PointerEvent) {
+      if (dragX !== null && event.pointerId === dragId) {
+        const step = event.clientX - dragX;
+        dragX = event.clientX;
+        spin += step * 0.006;
+        fling = Math.max(-2.4, Math.min(2.4, fling * 0.5 + step * 0.03));
+      }
       if (event.pointerType !== "mouse") return;
       const box = host!.getBoundingClientRect();
-      pointer.x = (event.clientX - box.left) / box.width - 0.5;
-      pointer.y = (event.clientY - box.top) / box.height - 0.5;
+      pointer.x = Math.max(-1, Math.min(1, ((event.clientX - box.left) / box.width - 0.5) * 2));
+      pointer.y = Math.max(-1, Math.min(1, ((event.clientY - box.top) / box.height - 0.5) * 2));
+    }
+    let dragId = -1;
+    function onDown(event: PointerEvent) {
+      if (latest.current.reduced) return;
+      dragX = event.clientX;
+      dragId = event.pointerId;
+      host!.dataset.drag = "true";
+    }
+    function onUp() {
+      dragX = null;
+      delete host!.dataset.drag;
     }
     function onLeave() {
       pointer.x = 0;
       pointer.y = 0;
     }
-    host.addEventListener("pointermove", onPointer);
-    host.addEventListener("pointerleave", onLeave);
+    area.addEventListener("pointermove", onPointer, { passive: true });
+    area.addEventListener("pointerleave", onLeave);
+    host.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
     document.addEventListener("visibilitychange", sync);
 
     resize();
@@ -327,10 +422,14 @@ export function MatchStage({ nodes, reduced }: Props) {
     return () => {
       cancelAnimationFrame(frame);
       redraw.current = null;
+      ping.current = null;
       sizeWatcher.disconnect();
       viewWatcher.disconnect();
-      host.removeEventListener("pointermove", onPointer);
-      host.removeEventListener("pointerleave", onLeave);
+      area.removeEventListener("pointermove", onPointer);
+      area.removeEventListener("pointerleave", onLeave);
+      host.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       document.removeEventListener("visibilitychange", sync);
       disposables.forEach((item) => item.dispose());
       renderer.dispose();
@@ -345,6 +444,13 @@ export function MatchStage({ nodes, reduced }: Props) {
     latest.current = { nodes, reduced };
     redraw.current?.();
   }, [nodes, reduced]);
+
+  // When the scores change (a need was switched), ping at once.
+  const scores = nodes.map((node) => node.score).join(",");
+  const firstScores = useRef(scores);
+  useEffect(() => {
+    if (scores !== firstScores.current) ping.current?.();
+  }, [scores]);
 
   return (
     <div className="co-stage-gl" ref={hostRef}>

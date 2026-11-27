@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
-import { getConfiguredNewsletterService } from "./beehiiv-newsletter-service";
+import { getConfiguredNewsletterService } from "./resend-newsletter-service";
 
 const normalizedEmailSchema = z.string().trim().toLowerCase().pipe(z.email().max(254));
 const consentTimestampSchema = z.iso.datetime({ offset: true })

@@ -1,3 +1,4 @@
+import { CobaltPageTransition } from "@/designs/cobalt/chrome/PageTransition";
 import { getMarketingPageMetadata } from "@/lib/site-metadata";
 import { PageHero } from "../../_site/PageParts";
 
@@ -9,7 +10,7 @@ export const metadata = getMarketingPageMetadata(
 
 export default function TermsPage() {
   return (
-    <>
+    <CobaltPageTransition>
       <PageHero
         eyebrow="Legal"
         title="Terms of service"
@@ -108,6 +109,6 @@ export default function TermsPage() {
             </p>
         </div>
       </section>
-    </>
+    </CobaltPageTransition>
   );
 }
